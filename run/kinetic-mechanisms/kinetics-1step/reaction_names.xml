@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<opensmoke version="0.1a">
+<reaction-number>
+1
+</reaction-number>
+<reaction-names>
+H2+0.5O2=>H2O
+</reaction-names>
+</opensmoke>

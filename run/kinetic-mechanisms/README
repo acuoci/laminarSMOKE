@@ -1,0 +1,22 @@
+========================================================================
+Detailed kinetic mechanisms
+========================================================================
+The kinetic mechanisms contained in this folder can be freely downloaded
+in CHEMKIN format (together with thermodynamic and transport properties) 
+from the CRECK Modeling Group (Politecnico di Milano) at the following 
+web address:
+
+http://creckmodeling.chem.polimi.it/
+
+========================================================================
+CHEMKIN Pre-processor
+========================================================================
+In order to use a detailed kinetic mechanism (available in CHEMKIN
+format) in laminarSMOKE you need to pre-process it using the 
+OpenSMOKE++ kinetic preprocessor, available at the following
+web-address:
+
+
+
+Please consider that the kinetic mechanisms available in this folder
+have been already pre-processed.
