@@ -1,0 +1,31 @@
+#OpenFOAM VERSION (22, 23, 24, 30)
+export OPENFOAM_VERSION='-DOPENFOAM_VERSION=24'
+
+#Compulsory path
+export EIGEN_LIBRARY_PATH=/software/chimica2/libraries/eigen/eigen-3.3-dev
+export BOOST_LIBRARY_PATH=/software/chimica2/libraries/boost/boost-1.60.0-gcc-4.8.2
+export RAPIDXML_LIBRARY_PATH=/software/chimica2/libraries/rapidxml/rapidxml-1.13
+export OPENSMOKE_LIBRARY_PATH=$HOME/Development/MyCodes/OpenSMOKEpp/source
+ 
+#Options: ISAT support
+export ISAT_SUPPORT='-DOPENSMOKE_USE_ISAT=0'
+export ISAT_INCLUDE=
+export ISAT_LIBS=
+
+#Options
+export MKL_SUPPORT='-DOPENSMOKE_USE_MKL=0'
+export EXTERNAL_ODE_SOLVERS=
+
+#Only if the OPENSMOKE_USE_MKL is turned on
+export MKL_PATH=
+export MKL_INCLUDE=
+export MKL_LIBS=
+
+#Optional external ODE solvers
+export MEBDF_LIBS=
+export RADAU_LIBS=
+export DASPK_LIBS=
+export ODEPACK_LIBS=
+export LINPACK_LIBS=
+export SUNDIALS_PATH=
+export SUNDIALS_LIBS=

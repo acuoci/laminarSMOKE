@@ -1,0 +1,6 @@
+mixedUserDefined/mixedUserDefinedFvPatchFields.C
+backwardDiffusion/backwardDiffusionFvPatchScalarField.C
+speciesWall/speciesWallFvPatchScalarField.C
+depositionWall/depositionWallFvPatchScalarField.C
+
+LIB = $(FOAM_USER_LIBBIN)/libUserDefinedBoundaryConditions
