@@ -1,0 +1,3 @@
+laminarBuoyantSimpleSMOKE.C
+
+EXE = $(FOAM_USER_APPBIN)/laminarBuoyantSimpleSMOKE.old.dev24

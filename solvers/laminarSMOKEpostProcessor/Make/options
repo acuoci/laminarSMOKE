@@ -1,0 +1,44 @@
+EXE_INC = \
+    $(OPENFOAM_VERSION) \
+    -w \
+    $(MKL_SUPPORT) \
+    $(ISAT_SUPPORT) \
+    $(EXTERNAL_ODE_SOLVERS) \
+    -I../laminarSMOKE \
+    -I$(OPENSMOKE_LIBRARY_PATH) \
+    -I$(BOOST_LIBRARY_PATH)/include \
+    -I$(EIGEN_LIBRARY_PATH) \
+    -I$(RAPIDXML_LIBRARY_PATH) \
+    -I$(SUNDIALS_PATH)/include \
+    -I$(MKL_PATH)/include \
+    -I/$(ISAT_INCLUDE) \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/fvOptions/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/sampling/lnInclude \
+    -I$(LIB_SRC)/fileFormats/lnInclude \
+    -I$(LIB_SRC)/lagrangian/basic/lnInclude
+
+EXE_LIBS = \
+    -L$(FOAM_USER_LIBBIN) \
+    -L$(BOOST_LIBRARY_PATH)/lib \
+    $(MKL_LIBS) \
+    -lfiniteVolume \
+    -lfvOptions \
+    -lmeshTools \
+    -lsampling \
+    $(SUNDIALS_LIBS) \
+    $(MEBDF_LIBS) \
+    $(RADAU_LIBS) \
+    $(DASPK_LIBS) \
+    $(ODEPACK_LIBS) \
+    $(DVODE_LIBS)     \
+    $(LINPACK_LIBS) \
+    $(ISAT_LIBS) \
+    -lgfortran \
+    $(MKL_LIBS) \
+    -lboost_date_time \
+    -lboost_filesystem \
+    -lboost_system \
+    -lboost_regex
+    

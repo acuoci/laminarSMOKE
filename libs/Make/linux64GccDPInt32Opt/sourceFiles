@@ -1,5 +1,0 @@
-SOURCE = \
-mixedUserDefined/mixedUserDefinedFvPatchFields.C \
-backwardDiffusion/backwardDiffusionFvPatchScalarField.C \
-speciesWall/speciesWallFvPatchScalarField.C \
-depositionWall/depositionWallFvPatchScalarField.C 
