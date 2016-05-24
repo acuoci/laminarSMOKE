@@ -1,0 +1,119 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.2                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    p_rgh
+    {
+	solver           	GAMG;
+        tolerance        	1e-7;
+        relTol           	0.01;
+        smoother         	DICGaussSeidel;
+        cacheAgglomeration 	true;
+        nCellsInCoarsestLevel 	10;
+        agglomerator     	faceAreaPair;
+        mergeLevels      	1;
+    }
+
+    U
+    {
+        solver          smoothSolver;
+        smoother        GaussSeidel;
+        nSweeps         2;
+        tolerance       1e-06;
+        relTol          1e-04;
+    }
+
+    T
+    {
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-09;
+        relTol          1e-06;
+	minIter		1;
+    }
+
+    Yi
+    {
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-09;
+        relTol          1e-06;
+	minIter		1;
+    }
+
+    zMix
+    {
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-09;
+        relTol          1e-06;
+	minIter		1;
+    }
+
+    tau
+    {
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-09;
+        relTol          1e-06;
+	minIter		1;
+    }
+}
+
+SIMPLE
+{
+    nNonOrthogonalCorrectors 0;
+    pRefCell                 0;
+    pRefValue                0;
+
+    rhoMin          rhoMin [ 1 -3  0 0 0 ] 0.02;
+    rhoMax          rhoMax [ 1 -3  0 0 0 ] 3.00;
+    pMin	    pMin   [ 1 -1 -2 0 0 ] 1e4;
+
+    residualControl
+    {
+	default         1e-16;
+
+        p               1e-16;
+        U               1e-16;
+        T               1e-16;
+	zMix		1e-16;
+	tau		1e-16;
+    }
+}
+
+relaxationFactors
+{
+    fields
+    {
+        p_rgh           0.2;
+        rho             0.1;
+    }
+    equations
+    {
+	default         0.3;
+
+        U               0.3;
+        T               0.3;
+	zMix		0.5;
+	tau		0.5;
+    }
+}
+
+
+// ************************************************************************* //

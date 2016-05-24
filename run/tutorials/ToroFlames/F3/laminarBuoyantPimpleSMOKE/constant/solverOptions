@@ -1,0 +1,100 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.2;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      solverOptions;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+Kinetics
+{
+	folder	   		"../../../../kinetic-mechanisms/kinetics-1step";
+	inertSpecies 		N2;
+}
+
+PhysicalModel
+{
+	strangAlgorithm 		"MomentumTransportReaction";
+	homogeneousReactions 		on;
+	momentumEquations		on;
+	speciesEquations		on;
+	energyEquation			on;
+	constPressureBatchReactor 	true;
+	sparseJacobian			false;
+	
+	massDiffusionInEnergyEquation	on;
+	diffusivityModel		"multi-component";
+	
+	thermophoreticEffect		off;
+	soretEffect			on;
+
+	includeDpDt			on;
+	thermodynamicPressure		101325.;
+
+	zMixEquation			on;
+	tauEquation			on;
+	zMixDmixSpecies			N2;
+}
+
+Radiation
+{
+	radiationModel "optically-thin";
+	environmentTemperature 300.;
+}
+
+Output
+{
+	gasProperties		off;
+	gasRadiation		off;
+	formationRates		off;
+	diffusivities		off;
+}
+
+PolimiSoot
+{
+	thermophoreticEffectTag "BIN";
+	physicalSootDiffusivity	off;
+}
+
+OdeHomogeneous
+{
+	odeSolver 	"OpenSMOKE";
+	relTolerance 	1e-7;
+	absTolerance 	1e-12;
+	maximumOrder 	5;
+	fullPivoting 	false;
+}
+
+PostProcessing
+{
+	soot	off;
+}
+
+Spark
+{
+	spark 		on;
+	position    	(5.95e-3  0.0 1.5e-3);
+	time		0.;
+	temperature 	2205;
+	duration 	0.025;
+	diameter 	1.5e-3;
+}
+
+DRG
+{
+	drg	off;
+}
+
+#include "isatOptions"
+#include "lewisNumbers"
+
+// ************************************************************************* //
