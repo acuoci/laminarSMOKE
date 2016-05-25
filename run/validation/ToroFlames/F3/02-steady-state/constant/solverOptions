@@ -1,0 +1,110 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.3;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      solverOptions;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+Kinetics
+{
+	folder	   		"../../../../kinetic-mechanisms/kinetics-POLIMI_H2CO_1412";
+	inertSpecies 		N2;
+}
+
+SteadyState
+{
+	sparseJacobian		true;
+	jacobianUpdate		5;
+	propertiesUpdate	5;
+	implicitSourceTerm 	true;
+	orderSpecies		"sweep";
+	exceptionalSpecies	(none );
+}
+
+PhysicalModel
+{
+	strangAlgorithm 		"MomentumTransportReaction";
+	homogeneousReactions 		on;
+	momentumEquations		on;
+	speciesEquations		on;
+	energyEquation			on;
+	constPressureBatchReactor 	true;
+
+	sparseJacobian                  false;
+	massDiffusionInEnergyEquation	on;
+	diffusivityModel		"multi-component";
+
+	soretEffect			on;
+	thermophoreticEffect		off;
+
+	includeDpDt			on;
+	thermodynamicPressure		101325.;
+
+	zMixEquation			on;
+	tauEquation			on;
+	zMixDmixSpecies			N2;
+}
+
+Radiation
+{
+	radiationModel "optically-thin";
+	environmentTemperature 298.;
+}
+
+Output
+{
+	gasProperties		off;
+	gasRadiation		off;
+	formationRates		off;
+	diffusivities		off;
+}
+
+PolimiSoot
+{
+	physicalSootDiffusivity off;
+	thermophoreticEffectTag "BIN";
+}
+
+OdeHomogeneous
+{
+	odeSolver 	"OpenSMOKE";
+	relTolerance 	1e-7;
+	absTolerance 	1e-12;
+	maximumOrder 	5;
+	fullPivoting 	false;
+}
+
+Spark
+{
+	spark 		off;
+	position    	(5.95e-3  0.0 1.5e-3);
+	time		0.;
+	temperature 	2205;
+	duration 	0.025;
+	diameter 	1.5e-3;
+}
+
+PostProcessing
+{
+	soot	off;
+}
+
+DRG
+{
+	drg	off;
+}
+
+#include "lewisNumbers"
+#include "isatOptions"
+
+// ************************************************************************* //

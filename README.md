@@ -55,7 +55,7 @@ Three different options are available to compile the code, according to the leve
 
 Run your first case
 -------------------
-The folder `run/examples/Toro-Flames/F3` contains a simple test case (laminar coflow diffusion flame fed with hydrogen).
+The folder `run/tutorials/ToroFlames/F3/` contains a simple test case (laminar coflow diffusion flame fed with hydrogen).
 
 1. Unsteady simulation: Open the `laminarBuoyantPimpleSMOKE-Global` folder, build the mesh using the `blockMesh` utility, and run the case using the `laminarBuoyantPimpleSMOKE` solver. Even if you are interested in steady state conditions, we strongly suggest to always start with unsteady calculations to create a reasonable first-guess solution for the application of the steady state solver. In this case, you can stop the unsteady simulation after 50 ms of physical time.
 
