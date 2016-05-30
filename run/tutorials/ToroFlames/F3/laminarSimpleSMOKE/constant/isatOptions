@@ -1,0 +1,65 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+ISAT 
+{
+	// Basic parameters
+ 	ISAT		 			off;		// ISAT on/off
+	tolerance 				1e-4;		// ISAT tolerance [default: 1e-4]
+	numberSubSteps				1;		// ISAT number of substeps for calculating gradient mapping [default: 1]
+
+	// Lists of useful leaves
+	searchMRU				on;		// search for MRU (Most Recently Used) leaves [default: on]
+	searchMFU				on;		// search for MFU (Most Frequently Used) leaves [default: on]
+	maxSizeMRU 				100;		// max size of MRU (Most Recently Used) [default: 100]
+	maxSizeMFU 				100; 		// max size of MFU (Most Frequently Used) [default: 100]
+	maxSearchMRU 				10;		// max numbers of leaves to be tested (MRU) [default: 10]
+	maxSearchMFU 				30;		// max numbers of leaves to be tested (MFU) [default: 30]
+
+	// What to do when the tre is full?
+	maxSizeBT 				100000;		// max size of binary tree [default: 100000]
+	clearingIfFull 				off;            // if on the tree is cleared when full [default: off]
+	
+	// Balancing coefficients
+	cleanAndBalance				on;		// clean and balance [default: on]
+	balanceFactorRetrieve			2.0;		// ? [default: 2.]
+	balanceFactorAddition			0.1;		// ? [default: 0.1]
+	maxTimeOldCoeff 			0.7;		// ? [default: 0.7]
+	maxGrowCoeff 				0.5;		// ? [default: 0.5]
+	minUsedCoeff 				0.01;		// ? [default: 0.01]
+	maxHeightCoeff 				5.;		// ? [default: 5.]
+
+	// Factorizations
+	luFactorization				"Partial";	// LU factorization of dense matrices (Partial || Full) [default: Partial]
+	qrFactorization				"Full";		// QR factorization of dense matrices (NoPivoting || Partial || Full) [default: Full]
+
+	// Scaling factors
+	scalingFactors
+	{
+		T 	1.e3;
+		H	1.e-3;
+		H2	1.e-2;
+		H2O	1.e0;
+		H2O2	1.e-4;
+		HO2	1.e-4;
+		N2	1.e0;
+		O	1.e-3;
+		O2	1.e0;
+		OH	1.e-2;
+		others 	1.;		
+	}
+
+	// Absoute weights to scale the errors
+	scalingErrors
+	{
+		T 	1.;
+		others	1.;		
+	}
+}
+
+// ************************************************************************* //
