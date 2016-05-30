@@ -175,6 +175,105 @@
 			Info << "   Homogeneous chemistry solved in " << tEnd - tStart << " s  (" << (tEnd-tStart)/double(mesh.nCells())*1000. << " ms per reactor)" << endl;
 		}
 	}
+	else if (homogeneousReactions == true && odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_CHEMEQ2)
+	{
+		const unsigned int NC  = thermodynamicsMapXML->NumberOfSpecies();
+		const unsigned int NEQ = thermodynamicsMapXML->NumberOfSpecies();
+		Eigen::VectorXd y0(NEQ);
+		Eigen::VectorXd yf(NEQ);
+
+		OpenSMOKE::OpenSMOKE_CHEMEQ2<OpenSMOKE::BatchReactorHomogeneousConstantPressure_ODE_CHEMEQ2>   odeSolverConstantPressure(chemeq2SolverConstantPressure);
+		odeSolverConstantPressure.SetDimensions(NEQ);
+		OpenSMOKE::OpenSMOKE_CHEMEQ2<OpenSMOKE::BatchReactorHomogeneousConstantVolume_ODE_CHEMEQ2>   odeSolverConstantVolume(chemeq2SolverConstantVolume);
+		odeSolverConstantVolume.SetDimensions(NEQ);
+
+		Info << " * Solving homogeneous chemistry (CHEMEQ2 solver)... " << endl;
+		{			
+			unsigned int counter = 0;
+			
+			double tStart = OpenSMOKE::OpenSMOKEGetCpuTime();
+			forAll(TCells, celli)
+			{
+				//- Solving for celli:	
+				{
+					for(unsigned int i=0;i<NC;i++)
+						y0(i) = Y[i].internalField()[celli];
+					
+					if (constPressureBatchReactor == true)
+					{
+						// Set reactor
+						batchReactorHomogeneousConstantPressure.SetReactor(thermodynamicPressure);
+						batchReactorHomogeneousConstantPressure.SetTemperature(TCells[celli], y0.data());
+						batchReactorHomogeneousConstantPressure.SetEnergyEquation(energyEquation);
+						
+						// Set initial conditions
+						odeSolverConstantPressure.SetInitialValues(t0, y0.data());
+
+						// Additional ODE solver options
+						if (celli == 0)
+						{
+							odeSolverConstantPressure.SetEpsilonMinimum(chemeq2_epsilonMinimum);
+							odeSolverConstantPressure.SetEpsilonMaximum(chemeq2_epsilonMaximum );
+							odeSolverConstantPressure.SetMaximumNumberSubIterations( chemeq2_subIterations);
+							odeSolverConstantPressure.SetMinimumStep(chemeq2_dtMinimum);
+							odeSolverConstantPressure.SetMinimumValue(chemeq2_yMinimum);
+						}
+						
+						// Solve
+						odeSolverConstantPressure.Solve(tf);
+
+						// Recover solution
+						odeSolverConstantPressure.Solution(yf.data());
+						if (energyEquation == true)
+							TCells[celli] = batchReactorHomogeneousConstantPressure.GetTemperature();
+					}
+					else
+					{
+						// Set reactor pressure
+						batchReactorHomogeneousConstantVolume.SetReactor(vCells[celli], thermodynamicPressure, rhoCells[celli]);
+						batchReactorHomogeneousConstantVolume.SetTemperature(TCells[celli], y0.data());
+						batchReactorHomogeneousConstantVolume.SetEnergyEquation(energyEquation);
+
+						// Set initial conditions
+						odeSolverConstantVolume.SetInitialValues(t0, y0.data());
+
+						// Additional ODE solver options
+						if (celli == 0)
+						{
+							odeSolverConstantVolume.SetEpsilonMinimum(chemeq2_epsilonMinimum);
+							odeSolverConstantVolume.SetEpsilonMaximum(chemeq2_epsilonMaximum );
+							odeSolverConstantVolume.SetMaximumNumberSubIterations( chemeq2_subIterations);
+							odeSolverConstantVolume.SetMinimumStep(chemeq2_dtMinimum);
+							odeSolverConstantVolume.SetMinimumValue(chemeq2_yMinimum);
+						}
+						
+						// Solve
+						odeSolverConstantVolume.Solve(tf);
+
+						// Recover solution
+						odeSolverConstantVolume.Solution(yf.data());
+						if (energyEquation == true)
+							TCells[celli] = batchReactorHomogeneousConstantVolume.GetTemperature();
+					}
+				}
+			
+				// Check mass fractions
+				normalizeMassFractions(yf.data(), celli, massFractionsTol, NC);
+
+				// Assign mass fractions
+				for(int i=0;i<NC;i++)
+					Y[i].internalField()[celli] = yf(i);
+
+				if (counter%(int(0.20*mesh.nCells())+1) == 0)
+					Info <<"   Accomplished: " << counter << "/" << mesh.nCells() << endl;
+
+				counter++;
+			}
+			double tEnd = OpenSMOKE::OpenSMOKEGetCpuTime();
+			
+			Info << "   Homogeneous chemistry solved in " << tEnd - tStart << " s  (" << (tEnd-tStart)/double(mesh.nCells())*1000. << " ms per reactor)" << endl;
+		}
+	}
 	else if (homogeneousReactions == true && odeParameterBatchReactorHomogeneous.type() != OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_OPENSMOKE)
 	{
 		const unsigned int NC  = thermodynamicsMapXML->NumberOfSpecies();

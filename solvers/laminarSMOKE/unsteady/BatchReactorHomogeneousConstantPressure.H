@@ -49,6 +49,7 @@ public:
 												OpenSMOKE::KineticsMap_CHEMKIN<double>& kineticsMap);
 
 	void SetReactor( const double P0 );
+	void SetTemperature( const double T, double* y );
 	
 	void SetEnergyEquation(const bool flag) { energyEquation_ = flag; }
 	
@@ -60,8 +61,11 @@ public:
 	unsigned int NumberOfEquations() const { return NE_; }
 
 	virtual int Equations(const double t, const OpenSMOKE::OpenSMOKEVectorDouble& y, OpenSMOKE::OpenSMOKEVectorDouble& dy);
+	void Equations(double* y, std::vector<double>& q, std::vector<double>& d, const double t);
 
 	virtual int Print(const double t, const OpenSMOKE::OpenSMOKEVectorDouble& y);
+
+	double GetTemperature() const;
 
 private:
 
@@ -84,9 +88,14 @@ private:
 	OpenSMOKE::OpenSMOKEVectorDouble x_;
 	OpenSMOKE::OpenSMOKEVectorDouble c_;
 	OpenSMOKE::OpenSMOKEVectorDouble R_;
+	OpenSMOKE::OpenSMOKEVectorDouble Rf_;
+	OpenSMOKE::OpenSMOKEVectorDouble Rb_;
+
 	
 	bool checkMassFractions_;
 	bool energyEquation_;
+
+	double enthalpy_;
 };
 
 BatchReactorHomogeneousConstantPressure::BatchReactorHomogeneousConstantPressure
@@ -102,6 +111,8 @@ BatchReactorHomogeneousConstantPressure::BatchReactorHomogeneousConstantPressure
 		ChangeDimensions(NC_, &x_, true);
 		ChangeDimensions(NC_, &c_, true);
 		ChangeDimensions(NC_, &R_, true);
+		ChangeDimensions(NC_, &Rf_, true);
+		ChangeDimensions(NC_, &Rb_, true);
 		
 		checkMassFractions_ = false;
 		energyEquation_ = true;
@@ -110,6 +121,30 @@ BatchReactorHomogeneousConstantPressure::BatchReactorHomogeneousConstantPressure
 void BatchReactorHomogeneousConstantPressure::SetReactor( const double P0 )
 {
 	P0_    = P0;
+}
+
+void BatchReactorHomogeneousConstantPressure::SetTemperature( const double T, double* y)
+{
+	// Temperature
+	T_    = T;
+
+	// Recover mass fractions
+	for(unsigned int i=1;i<=NC_;++i)
+		omega_[i] = y[i-1];
+
+	// Mole fractions
+	thermodynamicsMap_.MoleFractions_From_MassFractions(x_, MW_, omega_);
+
+	// Enthalpy
+	thermodynamicsMap_.SetTemperature(T_);
+	thermodynamicsMap_.SetPressure(P0_);
+	thermodynamicsMap_.hMolar_Mixture_From_MoleFractions(enthalpy_, x_);
+	enthalpy_ /= MW_;
+}
+
+double BatchReactorHomogeneousConstantPressure::GetTemperature() const
+{
+	return T_;
 }
 
 int BatchReactorHomogeneousConstantPressure::Equations(const double t, const OpenSMOKE::OpenSMOKEVectorDouble& y, OpenSMOKE::OpenSMOKEVectorDouble& dy)
@@ -162,6 +197,44 @@ int BatchReactorHomogeneousConstantPressure::Equations(const double t, const Ope
 	}
 	
 	return 0;
+}
+
+void BatchReactorHomogeneousConstantPressure::Equations(double* y, std::vector<double>& q, std::vector<double>& d, const double t)
+{
+	// Recover mass fractions
+	for(unsigned int i=1;i<=NC_;++i)
+		omega_[i] = y[i-1];
+	
+	// Calculates the mole fractions
+	thermodynamicsMap_.MoleFractions_From_MassFractions(x_, MW_, omega_);
+
+	// Temperature from enthalpy
+	if (energyEquation_ == true)
+		T_ = thermodynamicsMap_.GetTemperatureFromEnthalpyAndMoleFractions(enthalpy_*MW_, P0_, x_, T_);
+
+	// Calculates concentrations of species
+	cTot_ = P0_/PhysicalConstants::R_J_kmol/T_;
+    	rho_ = cTot_*MW_;
+	Product(cTot_, x_, &c_);
+
+	// Calculates thermodynamic properties
+	thermodynamicsMap_.SetTemperature(T_);
+	thermodynamicsMap_.SetPressure(P0_);
+
+	// Calculates kinetics
+	kineticsMap_.SetTemperature(T_);
+	kineticsMap_.SetPressure(P0_);
+	kineticsMap_.KineticConstants();
+	kineticsMap_.ReactionRates(c_);
+	kineticsMap_.FormationRates(&R_);
+	kineticsMap_.ProductionAndDestructionRates(&Rf_, &Rb_);
+	
+	// Species equations
+	for (unsigned int i=1;i<=NC_;++i)	
+		q[i-1] = thermodynamicsMap_.MW()[i]*Rf_[i]/rho_;
+
+	for (unsigned int i=1;i<=NC_;++i)	
+		d[i-1] = thermodynamicsMap_.MW()[i]*Rb_[i]/rho_;
 }
 
 int BatchReactorHomogeneousConstantPressure::Print(const double t, const OpenSMOKE::OpenSMOKEVectorDouble& y)

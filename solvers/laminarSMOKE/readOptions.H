@@ -438,6 +438,12 @@ autoPtr<std::ofstream> fSootIntegrals;
 
 #if STEADYSTATE != 1
 
+scalar chemeq2_epsilonMinimum 	= 0.01;
+scalar chemeq2_epsilonMaximum 	= 100.;
+scalar chemeq2_yMinimum 	= 1.e-32;
+scalar chemeq2_dtMinimum 	= 1.e-20;
+label  chemeq2_subIterations 	= 1;
+
 // Batch reactor homogeneous: ode parameters
 const dictionary& odeHomogeneousDictionary = solverOptions.subDict("OdeHomogeneous");
 OpenSMOKE::ODE_Parameters odeParameterBatchReactorHomogeneous;
@@ -461,9 +467,10 @@ OpenSMOKE::ODE_Parameters odeParameterBatchReactorHomogeneous;
 	// Type
 	word homogeneousODESolverString(odeHomogeneousDictionary.lookup("odeSolver"));
 	if (	homogeneousODESolverString != "OpenSMOKE" 	&& homogeneousODESolverString != "DVODE"  && 
-			homogeneousODESolverString != "DLSODE" 		&& homogeneousODESolverString != "DLSODA" && 
-			homogeneousODESolverString != "CVODE" 		&& homogeneousODESolverString != "DASPK"  &&
-			homogeneousODESolverString != "MEBDF" 		&& homogeneousODESolverString != "RADAU5"  
+		homogeneousODESolverString != "DLSODE" 		&& homogeneousODESolverString != "DLSODA" && 
+		homogeneousODESolverString != "CVODE" 		&& homogeneousODESolverString != "DASPK"  &&
+		homogeneousODESolverString != "MEBDF" 		&& homogeneousODESolverString != "RADAU5"  &&
+		homogeneousODESolverString != "CHEMEQ2"
 	   )
 	{
 		Info << "Wrong homogeneous ODE Solver: OpenSMOKE || DVODE || DLSODE || DLSODA || CVODE || DASPK || MEBDF || RADAU5" << endl;
@@ -471,14 +478,25 @@ OpenSMOKE::ODE_Parameters odeParameterBatchReactorHomogeneous;
 	}
 
 	if (homogeneousODESolverString == "OpenSMOKE")	odeParameterBatchReactorHomogeneous.SetType(OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_OPENSMOKE);
-	if (homogeneousODESolverString == "DVODE") 		odeParameterBatchReactorHomogeneous.SetType(OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_DVODE);
+	if (homogeneousODESolverString == "DVODE") 	odeParameterBatchReactorHomogeneous.SetType(OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_DVODE);
 	if (homogeneousODESolverString == "DLSODE") 	odeParameterBatchReactorHomogeneous.SetType(OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_DLSODE);
 	if (homogeneousODESolverString == "DLSODA") 	odeParameterBatchReactorHomogeneous.SetType(OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_DLSODA);
-	if (homogeneousODESolverString == "CVODE") 		odeParameterBatchReactorHomogeneous.SetType(OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_CVODE);
-	if (homogeneousODESolverString == "DASPK") 		odeParameterBatchReactorHomogeneous.SetType(OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_DASPK);
-	if (homogeneousODESolverString == "MEBDF") 		odeParameterBatchReactorHomogeneous.SetType(OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_MEBDF);
+	if (homogeneousODESolverString == "CVODE") 	odeParameterBatchReactorHomogeneous.SetType(OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_CVODE);
+	if (homogeneousODESolverString == "DASPK") 	odeParameterBatchReactorHomogeneous.SetType(OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_DASPK);
+	if (homogeneousODESolverString == "MEBDF") 	odeParameterBatchReactorHomogeneous.SetType(OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_MEBDF);
 	if (homogeneousODESolverString == "RADAU5") 	odeParameterBatchReactorHomogeneous.SetType(OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_RADAU5);	
-	
+	if (homogeneousODESolverString == "CHEMEQ2") 	odeParameterBatchReactorHomogeneous.SetType(OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_CHEMEQ2);	
+
+	if (homogeneousODESolverString == "CHEMEQ2")
+	{
+		const dictionary& chemeq2Dictionary = odeHomogeneousDictionary.subDict("CHEMEQ2");
+
+		chemeq2_epsilonMinimum 	= readScalar(chemeq2Dictionary.lookup("epsilonMinimum"));
+		chemeq2_epsilonMaximum 	= readScalar(chemeq2Dictionary.lookup("epsilonMaximum"));
+		chemeq2_yMinimum 	= readScalar(chemeq2Dictionary.lookup("yMinimum"));
+		chemeq2_dtMinimum 	= readScalar(chemeq2Dictionary.lookup("dtMinimum"));
+		chemeq2_subIterations 	= readLabel(chemeq2Dictionary.lookup("subIterations"));
+	}	
 }
 
 

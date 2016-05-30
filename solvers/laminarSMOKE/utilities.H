@@ -53,6 +53,31 @@ tmp<volScalarField> Rho(volScalarField& p, volScalarField& psi)
 	return p*psi;
 }
 
+void normalizeMassFractions(double* omega, const label celli, const double massFractionsTol, const unsigned int n)
+{
+	const double eps = 1.e-3;
+
+	double sumFractions = 0.;
+    	for(int i=0; i < n; i++)
+		sumFractions += omega[i];
+
+	if (sumFractions > 1.+eps || sumFractions < 1.-eps)
+	{
+		Info << "WARNING: sum of mass-fractions = " << sumFractions << " in cell " << celli <<endl;
+
+		if (time == 0)
+		{
+		    Info << "\nFATAL ERROR: sum of Yi is not 1" <<endl;
+		    Info << "Check internal field on cell: " << celli <<endl;
+		    abort();
+		}    
+	}
+	
+	for(int i=0; i < n; i++)
+		omega[i] /= sumFractions;
+}
+
+
 void normalizeMassFractions(Eigen::VectorXd& omega_plus_temperature, const label celli, const double massFractionsTol)
 {
 	double sumFractions = 0.;
