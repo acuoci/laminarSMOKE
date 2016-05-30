@@ -82,6 +82,15 @@ OdeHomogeneous
 	absTolerance 	1e-12;
 	maximumOrder 	5;
 	fullPivoting 	false;
+
+	CHEMEQ2
+	{
+		epsilonMinimum	1e-2;
+		epsilonMaximum	1e2;
+		yMinimum	1e-32;
+		dtMinimum	1e-20;
+		subIterations	1;
+	}
 }
 
 Spark
