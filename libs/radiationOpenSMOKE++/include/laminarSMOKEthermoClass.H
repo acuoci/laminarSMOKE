@@ -21,14 +21,12 @@ namespace Foam
 
 		//- Create IO object if dictionary is present
 		IOobject createIOobject(const fvMesh& mesh) const;
-
-		// Constructors
-		laminarSMOKEthermoClass(const volScalarField& T, const volScalarField& p, const PtrList<volScalarField>& Y, const std::vector<double>& W, const std::vector<std::string>& species_names);
-
+		
 		//- Return a reference to the selected radiation model
 		static autoPtr<laminarSMOKEthermoClass> New(const volScalarField& T, const volScalarField& p, const PtrList<volScalarField>& Y, const std::vector<double>& W, const std::vector<std::string>& species_names);
 
-		virtual ~laminarSMOKEthermoClass();
+		// Constructors
+		laminarSMOKEthermoClass(const volScalarField& T, const volScalarField& p, const PtrList<volScalarField>& Y, const std::vector<double>& W, const std::vector<std::string>& species_names);
 
 	public:
 
@@ -47,7 +45,6 @@ namespace Foam
 		std::vector<double> W_;
 		std::vector<std::string> species_names_;
 	};
-
 }
 
 #endif

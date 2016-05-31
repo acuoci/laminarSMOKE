@@ -2,6 +2,7 @@
 
 namespace Foam
 {
+
 	Foam::autoPtr<laminarSMOKEthermoClass> laminarSMOKEthermoClass::New ( const volScalarField& T, const volScalarField& p, const PtrList<volScalarField>& Y, const std::vector<double>& W, const std::vector<std::string>& species_names )
 	{
 	    IOobject radIO
@@ -75,7 +76,4 @@ namespace Foam
 
 		return 0; 
 	}
-
-	laminarSMOKEthermoClass::~laminarSMOKEthermoClass()
-	{}
 }
