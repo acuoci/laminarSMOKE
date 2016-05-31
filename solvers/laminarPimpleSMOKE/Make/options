@@ -6,6 +6,7 @@ EXE_INC = \
     $(EXTERNAL_ODE_SOLVERS) \
     -I../laminarSMOKE \
     -I../laminarSMOKE/unsteady \
+    -I../../libs/radiationOpenSMOKE++/lnInclude \
     -I$(OPENSMOKE_LIBRARY_PATH) \
     -I$(BOOST_LIBRARY_PATH)/include \
     -I$(EIGEN_LIBRARY_PATH) \
@@ -22,6 +23,7 @@ EXE_LIBS = \
     -L$(FOAM_USER_LIBBIN) \
     -L$(BOOST_LIBRARY_PATH)/lib \
     $(MKL_LIBS) \
+    -lradiationOpenSMOKE++ \
     -lfiniteVolume \
     -lfvOptions \
     -lmeshTools \

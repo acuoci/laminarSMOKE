@@ -1,0 +1,10 @@
+#ifndef SootPlanckCoefficient_H
+#define SootPlanckCoefficient_H
+
+namespace Foam
+{
+	enum SootPlanckCoefficient { SOOT_RADIATION_PLANCK_COEFFICIENT_NONE, SOOT_RADIATION_PLANCK_COEFFICIENT_SMOOKE, SOOT_RADIATION_PLANCK_COEFFICIENT_KENT, SOOT_RADIATION_PLANCK_COEFFICIENT_SAZHIN };
+}
+
+#endif
+

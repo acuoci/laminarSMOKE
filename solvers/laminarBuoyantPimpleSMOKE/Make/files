@@ -1,4 +1,4 @@
 laminarBuoyantPimpleSMOKE.C
 
-EXE = $(FOAM_USER_APPBIN)/laminarBuoyantPimpleSMOKE.old.dev24
+EXE = $(FOAM_USER_APPBIN)/laminarBuoyantPimpleSMOKE
 

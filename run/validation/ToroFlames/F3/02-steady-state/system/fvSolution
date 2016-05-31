@@ -73,6 +73,30 @@ solvers
         relTol          1e-06;
 	minIter		1;
     }
+
+    Ii
+    {
+        solver                  GAMG;
+        tolerance               1e-4;
+        relTol                  0.1;
+        smoother                symGaussSeidel;
+        cacheAgglomeration      true;
+        nCellsInCoarsestLevel   10;
+        agglomerator            faceAreaPair;
+        mergeLevels             1;
+        maxIter                 3;
+        nPreSweeps              0;
+        nPostSweeps             1;
+    }
+
+    G
+    {
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-07;
+        relTol          1e-06;
+        minIter         1;
+    }
 }
 
 SIMPLE
@@ -112,6 +136,7 @@ relaxationFactors
         T               0.2;
 	zMix		0.2;
 	tau		0.2;
+	G		0.2;
     }
 }
 

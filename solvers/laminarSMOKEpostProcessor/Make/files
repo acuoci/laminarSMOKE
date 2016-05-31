@@ -1,4 +1,4 @@
 laminarSMOKEpostProcessor.C
 
-EXE = $(FOAM_USER_APPBIN)/laminarSMOKEpostProcessor.old.dev30
+EXE = $(FOAM_USER_APPBIN)/laminarSMOKEpostProcessor
 

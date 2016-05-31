@@ -3,4 +3,4 @@ backwardDiffusion/backwardDiffusionFvPatchScalarField.C
 speciesWall/speciesWallFvPatchScalarField.C
 depositionWall/depositionWallFvPatchScalarField.C
 
-LIB = $(FOAM_USER_LIBBIN)/libUserDefinedBoundaryConditions
+LIB = $(FOAM_USER_LIBBIN)/libboundaryConditionsOpenSMOKE++

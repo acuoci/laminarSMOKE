@@ -357,6 +357,14 @@ if (iPolimiSoot == true)
 	sootIntegralCounter++;
 }
 
+// Radiative loss
+{
+	if (runTime.outputTime() == true)
+	{
+		radiation->Qloss(T,Qrad);
+	}
+}
+
 // Formation rates
 {
 	if (runTime.outputTime() == true && outputFormationRatesIndices.size()>0)

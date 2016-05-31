@@ -45,12 +45,6 @@ PhysicalModel
 	zMixDmixSpecies			N2;
 }
 
-Radiation
-{
-	radiationModel "optically-thin";
-	environmentTemperature 300.;
-}
-
 Output
 {
 	gasProperties		off;

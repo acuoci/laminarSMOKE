@@ -71,7 +71,7 @@ if (soretEffect == true)
 			(
 				IOobject
 				(
-					"gas::Dsoret_"+ thermodynamicsMapXML->NamesOfSpecies()[index-1],
+					"gas_Dsoret_"+ thermodynamicsMapXML->NamesOfSpecies()[index-1],
 					mesh.time().timeName(),
 					mesh,
 					IOobject::NO_READ,
@@ -106,7 +106,7 @@ for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 			(
 			IOobject
 			(
-				"gas::Dmix_"+ thermodynamicsMapXML->NamesOfSpecies()[i],
+				"gas_Dmix_"+ thermodynamicsMapXML->NamesOfSpecies()[i],
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -124,7 +124,7 @@ for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
                         (
                                 IOobject
                                 (
-                                "thermo::Cp_"+ thermodynamicsMapXML->NamesOfSpecies()[i],
+                                "thermo_Cp_"+ thermodynamicsMapXML->NamesOfSpecies()[i],
                                 mesh.time().timeName(),
                                 mesh,
                                 IOobject::NO_READ,
@@ -142,7 +142,7 @@ for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
                         (
                                 IOobject
                                 (
-                                "thermo::X_"+ thermodynamicsMapXML->NamesOfSpecies()[i],
+                                "thermo_X_"+ thermodynamicsMapXML->NamesOfSpecies()[i],
                                 mesh.time().timeName(),
                                 mesh,
                                 IOobject::NO_READ,
@@ -222,7 +222,7 @@ for (int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 		(
 			IOobject
 			(
-				"SI::" + thermodynamicsMapXML->NamesOfSpecies()[i],
+				"SI_" + thermodynamicsMapXML->NamesOfSpecies()[i],
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -240,7 +240,7 @@ for (int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 		(
 			IOobject
 			(
-				"SE::" + thermodynamicsMapXML->NamesOfSpecies()[i],
+				"SE_" + thermodynamicsMapXML->NamesOfSpecies()[i],
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -259,7 +259,7 @@ sourceImplicit.set
 	(
 		IOobject
 		(
-			"SI::T",
+			"SI_T",
 			mesh.time().timeName(),
 			mesh,
 			IOobject::NO_READ,
@@ -277,7 +277,7 @@ sourceExplicit.set
 	(
 		IOobject
 		(
-			"SE::T",
+			"SE_T",
 			mesh.time().timeName(),
 			mesh,
 			IOobject::NO_READ,
@@ -301,7 +301,7 @@ if (outputFormationRatesIndices.size() != 0)
 			(
 				IOobject
 				(
-					"R::" + thermodynamicsMapXML->NamesOfSpecies()[outputFormationRatesIndices(i)],
+					"R_" + thermodynamicsMapXML->NamesOfSpecies()[outputFormationRatesIndices(i)],
 					mesh.time().timeName(),
 					mesh,
 					IOobject::NO_READ,
@@ -324,7 +324,7 @@ if (sootOnTheFlyFill == true)
 		(
 			IOobject
 			(
-				"soot::fv_large",
+				"soot_fv_large",
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -342,7 +342,7 @@ if (sootOnTheFlyFill == true)
 		(
 			IOobject
 			(
-				"soot::fv_small",
+				"soot_fv_small",
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -360,7 +360,7 @@ if (sootOnTheFlyFill == true)
 		(
 			IOobject
 			(
-				"soot::rho_large",
+				"soot_rho_large",
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -378,7 +378,7 @@ if (sootOnTheFlyFill == true)
 		(
 			IOobject
 			(
-				"soot::rho_small",
+				"soot_rho_small",
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -396,7 +396,7 @@ if (sootOnTheFlyFill == true)
 		(
 			IOobject
 			(
-				"soot::N_large",
+				"soot_N_large",
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -414,7 +414,7 @@ if (sootOnTheFlyFill == true)
 		(
 			IOobject
 			(
-				"soot::N_small",
+				"soot_N_small",
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -432,7 +432,7 @@ if (sootOnTheFlyFill == true)
 		(
 			IOobject
 			(
-				"soot::x_large",
+				"soot_x_large",
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -450,7 +450,7 @@ if (sootOnTheFlyFill == true)
 		(
 			IOobject
 			(
-				"soot::x_small",
+				"soot_x_small",
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -468,7 +468,7 @@ if (sootOnTheFlyFill == true)
 		(
 			IOobject
 			(
-				"soot::omega_large",
+				"soot_omega_large",
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -486,7 +486,7 @@ if (sootOnTheFlyFill == true)
 		(
 			IOobject
 			(
-				"soot::omega_small",
+				"soot_omega_small",
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -504,7 +504,7 @@ if (sootOnTheFlyFill == true)
 		(
 			IOobject
 			(
-				"pah::omega_1_2",
+				"pah_omega_1_2",
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -522,7 +522,7 @@ if (sootOnTheFlyFill == true)
 		(
 			IOobject
 			(
-				"pah::omega_3_4",
+				"pah_omega_3_4",
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -540,7 +540,7 @@ if (sootOnTheFlyFill == true)
 		(
 			IOobject
 			(
-				"pah::omega_more_4",
+				"pah_omega_more_4",
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -558,7 +558,7 @@ if (sootOnTheFlyFill == true)
 		(
 			IOobject
 			(
-				"soot::R_large",
+				"soot_R_large",
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -576,7 +576,7 @@ if (sootOnTheFlyFill == true)
 		(
 			IOobject
 			(
-				"soot::R_small",
+				"soot_R_small",
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -594,7 +594,7 @@ if (sootOnTheFlyFill == true)
 		(
 			IOobject
 			(
-				"pah::R_1_2",
+				"pah_R_1_2",
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -612,7 +612,7 @@ if (sootOnTheFlyFill == true)
 		(
 			IOobject
 			(
-				"pah::R_3_4",
+				"pah_R_3_4",
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -630,7 +630,7 @@ if (sootOnTheFlyFill == true)
 		(
 			IOobject
 			(
-				"pah::R_more_4",
+				"pah_R_more_4",
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,

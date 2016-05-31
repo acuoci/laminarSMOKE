@@ -240,27 +240,6 @@ const dictionary& outputDictionary = solverOptions.subDict("Output");
 	}
 }
 
-// Radiative heat transfer
-radiativeHeatTransferClass radiativeHeatTransfer;
-
-const dictionary& radiativeHeatTransferDictionary = solverOptions.subDict("Radiation");
-{
-	word radiation(radiativeHeatTransferDictionary.lookup("radiationModel"));
-	     if (radiation == "none") 		radiativeHeatTransfer.SetRadiationModel(RADIATION_NONE);
-	else if (radiation == "optically-thin") radiativeHeatTransfer.SetRadiationModel(RADIATION_OPTICALLY_THIN);
-	else
-	{
-		Info << "Wrong radiationModel option: none || optically-thin" << endl;
-		abort();
-	}
-
-	if (radiativeHeatTransfer.radiationModel() == RADIATION_OPTICALLY_THIN)
-	{
-		radiativeHeatTransfer.SetThermodynamics(*thermodynamicsMapXML);
-		radiativeHeatTransfer.SetEnvironmentTemperature( readScalar(radiativeHeatTransferDictionary.lookup("environmentTemperature")) );
-	}
-}
-
 // Thermophoretic effect
 std::vector<bool> thermophoreticEffectList;
 Switch physicalSootDiffusivity = false;

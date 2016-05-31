@@ -1,0 +1,12 @@
+EXE_INC = \
+    -I$(OPENSMOKE_LIBRARY_PATH) \
+    -I$(BOOST_LIBRARY_PATH)/include \
+    -I$(EIGEN_LIBRARY_PATH) \
+    -I$(RAPIDXML_LIBRARY_PATH) \
+    -I../../solvers/laminarSMOKE \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude
+
+LIB_LIBS = \
+    -lfiniteVolume \
+    -lmeshTools
