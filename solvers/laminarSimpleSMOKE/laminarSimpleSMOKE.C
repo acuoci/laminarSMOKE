@@ -63,11 +63,12 @@
 #include "simpleControl.H"
 #include "fvIOoptionList.H"
 #include "interpolation.H"
+#include "radiationModel.H"
 
 // Additional include files
 #include "sparkModel.H"
-#include "radiativeHeatTransferClass.H"
 #include "utilities.H"
+#include "laminarSMOKEthermoClass.H"
 
 // Linearization
 #include "linearModel.H"

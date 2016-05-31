@@ -55,6 +55,8 @@
 	#include "createGasFields.H"
 	#include "createChemicalFields.H"
 	#include "createFvOptions.H"
+	#include "createRadiationModel.H"
+	#include "createLaminarSMOKEThermoClass.H"
 	#include "memoryAllocation.H"
 	#include "properties.H"
 	#include "createAdditionalFields.H"

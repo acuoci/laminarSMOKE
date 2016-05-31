@@ -49,7 +49,7 @@ forAll (Y,i)
 		(
 			IOobject
 			(
-				"J::"+ thermodynamicsMapXML->NamesOfSpecies()[i],
+				"J_"+ thermodynamicsMapXML->NamesOfSpecies()[i],
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
@@ -65,12 +65,12 @@ surfaceScalarField Jc
 (
     IOobject
     (
-	"fluxes::Jc",
+	"fluxes_Jc",
 	runTime.timeName(),
 	mesh,
 	IOobject::NO_READ,
 	IOobject::NO_WRITE
     ),
     mesh,
-    dimensionedScalar("J::Jc", dimensionSet(1, 0, -1, 0, 0), 0.0)
+    dimensionedScalar("J_Jc", dimensionSet(1, 0, -1, 0, 0), 0.0)
 );

@@ -61,9 +61,6 @@
 		scalarField& cvCells = cv.internalField();
 		scalarField& hCells = h.internalField();
 		scalarField& MWmixCells = MWmix.internalField();
-		scalarField& aPlanckGasCells = aPlanckGas.internalField();
-		scalarField& aPlanckSootCells = aPlanckSoot.internalField();
-		scalarField& QradCells = Qrad.internalField();
 
 		forAll(TCells, celli)
 		{
@@ -137,25 +134,6 @@
 					Dsoret[i].internalField()[celli] =Dmix[index-1].internalField()[celli]*tetamixvector[index]*thermodynamicsMapXML->MW()[index]/MWmixCells[celli];
 				} 
 			}
-
-			if (radiativeHeatTransfer.radiationModel() != RADIATION_NONE)
-			{
-				if (iPolimiSoot == true)
-				{
-					massFractions.CopyTo(massFractionsEigen.data());
-					const double aPlanckSoot = sootAnalyzer->planck_coefficient(cTotCells[celli]*MWmixCells[celli], TCells[celli], massFractionsEigen);
-					const double aPlanckGas  = radiativeHeatTransfer.aPlanck(TCells[celli], pCells[celli], moleFractions);
-					aPlanckGasCells[celli]  = aPlanckGas;
-					aPlanckSootCells[celli] = aPlanckSoot;
-				}
-				else
-				{
-					const double aPlanckGas  = radiativeHeatTransfer.aPlanck(TCells[celli], pCells[celli], moleFractions);
-					aPlanckGasCells[celli]  = aPlanckGas;
-				}
-
-				QradCells[celli] = radiativeHeatTransfer.Q(TCells[celli], aPlanckGasCells[celli], aPlanckSootCells[celli]);
-			}
 		}
     }
 
@@ -173,9 +151,6 @@
 		fvPatchScalarField& pcv = cv.boundaryField()[patchi];
 		fvPatchScalarField& ph = h.boundaryField()[patchi];
 		fvPatchScalarField& pMWmix = MWmix.boundaryField()[patchi];
-		fvPatchScalarField& paPlanckGas = aPlanckGas.boundaryField()[patchi];
-		fvPatchScalarField& paPlanckSoot = aPlanckSoot.boundaryField()[patchi];
-		fvPatchScalarField& pQrad = Qrad.boundaryField()[patchi];
         
 		forAll(pT, facei)
 		{
@@ -248,25 +223,6 @@
 					unsigned int index = transportMapXML->iThermalDiffusionRatios()[i];
 					Dsoret[i].boundaryField()[patchi][facei] = Dmix[index-1].boundaryField()[patchi][facei]*tetamixvector[index]*thermodynamicsMapXML->MW()[index]/pMWmix[facei];
 				}
-			}
-
-			if (radiativeHeatTransfer.radiationModel() != RADIATION_NONE)
-			{
-				if (iPolimiSoot == true)
-				{
-					massFractions.CopyTo(massFractionsEigen.data());
-					const double aPlanckSoot = sootAnalyzer->planck_coefficient(pcTot[facei]*pMWmix[facei], pT[facei], massFractionsEigen);
-					const double aPlanckGas  = radiativeHeatTransfer.aPlanck(pT[facei], pp[facei], moleFractions);
-					paPlanckSoot[facei] = aPlanckSoot;
-					paPlanckGas[facei]  = aPlanckGas;
-				}
-				else
-				{
-					const double aPlanckGas  = radiativeHeatTransfer.aPlanck(pT[facei], pp[facei], moleFractions);
-					paPlanckGas[facei]  = aPlanckGas;
-				}
-
-				pQrad[facei] = radiativeHeatTransfer.Q(pT[facei], paPlanckGas[facei], paPlanckSoot[facei]);
 			}
 		}
 	}

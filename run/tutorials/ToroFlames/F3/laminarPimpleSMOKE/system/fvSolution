@@ -112,6 +112,29 @@ solvers
         relTol          0;
 	minIter		1;
     }
+
+    Ii
+    {
+        solver                  GAMG;
+        tolerance               1e-4;
+        relTol                  0.1;
+        smoother                symGaussSeidel;
+        cacheAgglomeration      true;
+        nCellsInCoarsestLevel   10;
+        agglomerator            faceAreaPair;
+        mergeLevels             1;
+        maxIter                 3;
+        nPreSweeps              0;
+        nPostSweeps             1;
+    }
+
+    "(G)Final"
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-04;
+        relTol          0;
+    }
 }
 
 PIMPLE

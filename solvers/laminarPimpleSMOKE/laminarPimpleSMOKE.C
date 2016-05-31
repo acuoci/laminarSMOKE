@@ -67,6 +67,7 @@
 #include "pimpleControl.H"
 #include "fvIOoptionList.H"
 #include "interpolation.H"
+#include "radiationModel.H"
 
 #if OPENFOAM_VERSION == 30
 #include "localEulerDdtScheme.H"
@@ -75,8 +76,8 @@
 
 // Additional include files
 #include "sparkModel.H"
-#include "radiativeHeatTransferClass.H"
 #include "utilities.H"
+#include "laminarSMOKEthermoClass.H"
 
 // Homogeneous reactors
 #include "BatchReactorHomogeneousConstantPressure.H"

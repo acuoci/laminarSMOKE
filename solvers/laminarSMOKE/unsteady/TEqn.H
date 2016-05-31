@@ -41,6 +41,8 @@
 {
     if(energyEquation == true)
     {
+		radiation->correct();
+
 		massDiffusionInEnergyEquation *= 0.;
 		if (iMassDiffusionInEnergyEquation == true)
 		{
@@ -48,43 +50,24 @@
 			       massDiffusionInEnergyEquation -= CpSpecies[i]*( fvc::reconstruct(J[i]) & fvc::grad(T));
 		}
 
-		if (radiativeHeatTransfer.radiationModel() == RADIATION_NONE)
-		{
-			fvScalarMatrix TEqn
-			(
-				  cp*fvm::ddt(rho,T)
-				+ cp*fvm::div(phi, T)		    
-				 ==
-		    		fvm::laplacian(lambda,T) + 
-		   	 	massDiffusionInEnergyEquation + 
-				DpDt +
-		    		cp*fvOptions(rho, T)
-			);
+		
+		fvScalarMatrix TEqn
+		(
+			  cp*fvm::ddt(rho,T)
+			+ cp*fvm::div(phi, T)		    
+			 ==
+	    		fvm::laplacian(lambda,T) + 
+	   	 	massDiffusionInEnergyEquation +
+			DpDt +
+			radiation->divq(T) +
+	    		cp*fvOptions(rho, T)
+		);
 
-			TEqn.relax();
-			fvOptions.constrain(TEqn);
-			TEqn.solve(mesh.solver("T"));
-			fvOptions.correct(T);	
-		}
-		else
-		{
-			fvScalarMatrix TEqn
-			(
-				  cp*fvm::ddt(rho,T)
-				+ cp*fvm::div(phi, T)		    
-				 ==
-		    		fvm::laplacian(lambda,T) + 
-		   	 	massDiffusionInEnergyEquation +
-				DpDt - 
-				Qrad +
-		    		cp*fvOptions(rho, T)
-			);
-
-			TEqn.relax();
-			fvOptions.constrain(TEqn);
-			TEqn.solve(mesh.solver("T"));
-			fvOptions.correct(T);
-		}
+		TEqn.relax();
+		fvOptions.constrain(TEqn);
+		TEqn.solve(mesh.solver("T"));
+		fvOptions.correct(T);
+		
     }
 
     Info<< " * T gas min/max (after transport)   = " << min(T).value() << ", " << max(T).value() << endl;

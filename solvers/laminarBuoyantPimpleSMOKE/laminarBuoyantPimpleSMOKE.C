@@ -68,11 +68,12 @@
 #include "fvIOoptionList.H"
 #include "interpolation.H"
 #include "fixedFluxPressureFvPatchScalarField.H"
+#include "radiationModel.H"
 
 // Additional include files
 #include "sparkModel.H"
-#include "radiativeHeatTransferClass.H"
 #include "utilities.H"
+#include "laminarSMOKEthermoClass.H"
 
 // Homogeneous reactors
 #include "BatchReactorHomogeneousConstantPressure.H"

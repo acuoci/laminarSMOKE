@@ -234,8 +234,10 @@ Foam::tmp<Foam::fvScalarMatrix> Foam::radiation::radiationModel::divq( volScalar
 
 void Foam::radiation::radiationModel::Qloss( volScalarField& T, volScalarField& Qloss)
 {
-	// TODO
-        Qloss = Rp()*pow4(T);// - Ru();
+	// TODO: Ru is an external source
+	//       Thus it can be neglected in the expression below, unless the user
+	//	 explicitly defined it
+        Qloss = Rp()*pow4(T);	// - Ru();
 }
 
 /* 

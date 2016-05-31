@@ -41,6 +41,8 @@
 {
     if(energyEquation == true)
     {
+		radiation->correct();
+
 		massDiffusionInEnergyEquation *= 0.;
 		if (iMassDiffusionInEnergyEquation == true)
 		{
@@ -48,46 +50,27 @@
 			       massDiffusionInEnergyEquation -= CpSpecies[i]*( fvc::reconstruct(J[i]) & fvc::grad(T));
 		}
 
-		if (radiativeHeatTransfer.radiationModel() == RADIATION_NONE)
-		{
-			fvScalarMatrix TEqn
-			(
-				cp*fvm::div(phi, T) 
-			   // - cp*fvm::Sp(fvc::div(phi), T)	    
-				 ==
-		    		fvm::laplacian(lambda,T) + 
-		   	 	massDiffusionInEnergyEquation +
-                                sourceExplicit[Y.size()] + fvm::Sp(sourceImplicit[Y.size()],T) +
-		    		cp*fvOptions(rho, T)
-			);
+	
+		fvScalarMatrix TEqn
+		(
+			cp*fvm::div(phi, T) 
+		   // - cp*fvm::Sp(fvc::div(phi), T)		    
+			 ==
+	    		fvm::laplacian(lambda,T) + 
+	   	 	massDiffusionInEnergyEquation + 
+                        radiation->divq(T) +
+                        sourceExplicit[Y.size()] + fvm::Sp(sourceImplicit[Y.size()],T) +
+	    		cp*fvOptions(rho, T)
+		);
 
-			TEqn.relax();
-			fvOptions.constrain(TEqn);
-			TEqn.solve(mesh.solver("T"));
-			fvOptions.correct(T);	
-		}
-		else
-		{
-			fvScalarMatrix TEqn
-			(
-				cp*fvm::div(phi, T) 
-			   // - cp*fvm::Sp(fvc::div(phi), T)		    
-				 ==
-		    		fvm::laplacian(lambda,T) + 
-		   	 	massDiffusionInEnergyEquation - 
-                                Qrad +
-                                sourceExplicit[Y.size()] + fvm::Sp(sourceImplicit[Y.size()],T) +
-		    		cp*fvOptions(rho, T)
-			);
-
-			TEqn.relax();
-			fvOptions.constrain(TEqn);
-			TEqn.solve(mesh.solver("T"));
-			fvOptions.correct(T);
-		}
+		TEqn.relax();
+		fvOptions.constrain(TEqn);
+		TEqn.solve(mesh.solver("T"));
+		fvOptions.correct(T);
+		
     }
 
-    T.max(270.);
+    T.max(260.);
     T.min(5000.);
     Info<< " * T gas min/max (after transport)   = " << min(T).value() << ", " << max(T).value() << endl;
 

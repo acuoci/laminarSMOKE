@@ -64,11 +64,12 @@
 #include "fvIOoptionList.H"
 #include "interpolation.H"
 #include "fixedFluxPressureFvPatchScalarField.H"
+#include "radiationModel.H"
 
 // Additional include files
 #include "sparkModel.H"
-#include "radiativeHeatTransferClass.H"
 #include "utilities.H"
+#include "laminarSMOKEthermoClass.H"
 
 // Linearization
 #include "linearModel.H"
@@ -95,10 +96,12 @@ int main(int argc, char *argv[])
 	
 	#include "createGasFields.H"
 	#include "createChemicalFields.H"
+	#include "createLaminarSMOKEThermoClass.H"
         #if OPENFOAM_VERSION == 30
         #include "createMRF.H"
         #endif
 	#include "createFvOptions.H"
+	#include "createRadiationModel.H"
 	#include "memoryAllocation.H"
 	#include "properties.H"
 	#include "createBuoyantAdditionalFields.H"
