@@ -49,6 +49,7 @@ public:
 					OpenSMOKE::KineticsMap_CHEMKIN<double>& kineticsMap);
 
 	void SetReactor( const double V0, const double P0, const double rho0);
+	void SetTemperature( const double T, double* y);
 	
 	void SetEnergyEquation(const bool flag) { energyEquation_ = flag; }
 	
@@ -60,8 +61,11 @@ public:
 	unsigned int NumberOfEquations() { return NE_; }
 
 	virtual int Equations(const double t, const OpenSMOKE::OpenSMOKEVectorDouble& y, OpenSMOKE::OpenSMOKEVectorDouble& dy);
+	void Equations(double* y, std::vector<double>& q, std::vector<double>& d, const double t);
 
 	virtual int Print(const double t, const OpenSMOKE::OpenSMOKEVectorDouble& y);
+
+	double GetTemperature() const;
 
 private:
 
@@ -88,6 +92,8 @@ private:
 	
 	bool checkMassFractions_;
 	bool energyEquation_;
+
+	double enthalpy_;
 };
 
 BatchReactorHomogeneousConstantVolume::BatchReactorHomogeneousConstantVolume(	OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermodynamicsMap, 
@@ -113,6 +119,30 @@ void BatchReactorHomogeneousConstantVolume::SetReactor( const double V0, const d
 	P_    = P0;
 	V0_   = V0;
 	rho0_ = rho0;
+}
+
+void BatchReactorHomogeneousConstantVolume::SetTemperature( const double T, double* y)
+{
+	// Temperature
+	T_    = T;
+
+	// Recover mass fractions
+	for(unsigned int i=1;i<=NC_;++i)
+		omega_[i] = y[i-1];
+
+	// Mole fractions
+	thermodynamicsMap_.MoleFractions_From_MassFractions(x_, MW_, omega_);
+
+	// Enthalpy
+	thermodynamicsMap_.SetTemperature(T_);
+	thermodynamicsMap_.SetPressure(P_);
+	thermodynamicsMap_.hMolar_Mixture_From_MoleFractions(enthalpy_, x_);
+	enthalpy_ /= MW_;
+}
+
+double BatchReactorHomogeneousConstantVolume::GetTemperature() const
+{
+	return T_;
 }
 
 int BatchReactorHomogeneousConstantVolume::Equations(const double t, const OpenSMOKE::OpenSMOKEVectorDouble& y, OpenSMOKE::OpenSMOKEVectorDouble& dy)
@@ -167,6 +197,12 @@ int BatchReactorHomogeneousConstantVolume::Equations(const double t, const OpenS
 	}
 	
 	return 0;
+}
+
+void BatchReactorHomogeneousConstantVolume::Equations(double* y, std::vector<double>& q, std::vector<double>& d, const double t)
+{
+	// TODO
+	OpenSMOKE::ErrorMessage("BatchReactorHomogeneousConstantVolume::Equations(double* y, std::vector<double>& q, std::vector<double>& d, const double t)", "It is not available (yet)");
 }
 
 int BatchReactorHomogeneousConstantVolume::Print(const double t, const OpenSMOKE::OpenSMOKEVectorDouble& y)

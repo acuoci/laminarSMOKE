@@ -44,6 +44,9 @@
 #include "math/OpenSMOKEVector.h"
 #include "ode/OpenSMOKE_OdeSystemObject.h"
 
+#include "ode/OpenSMOKE_CHEMEQ2.h"
+#include "ode/OpenSMOKE_CHEMEQ2_Interface.h"
+
 #if OPENSMOKE_USE_DVODE == 1
 #include "ode/OpenSMOKE_DVODE_Interface.h"
 #include "ode/OpenSMOKE_DVODE.h"
@@ -103,6 +106,45 @@ namespace OpenSMOKE
 
 		BatchReactorHomogeneousConstantVolume* reactor_;
 	};
+
+	class BatchReactorHomogeneousConstantVolume_ODE_CHEMEQ2 : public OpenSMOKE::OpenSMOKE_OdeSystemObject
+	{
+		DEFINE_ODESOLVERINTERFACE_CHEMEQ2(BatchReactorHomogeneousConstantVolume_ODE_CHEMEQ2)
+
+		BatchReactorHomogeneousConstantVolume* batch_;
+		OpenSMOKE::OpenSMOKEVectorDouble y_;
+		OpenSMOKE::OpenSMOKEVectorDouble dy_;
+	
+	public:
+
+		void SetBatchReactorHomogeneousConstantVolume(BatchReactorHomogeneousConstantVolume* batch)
+		{
+			batch_ = batch;
+			ChangeDimensions(batch_->NumberOfEquations(), &y_, true);
+			ChangeDimensions(batch_->NumberOfEquations(), &dy_, false);
+		}
+
+		void Equations(double* y, std::vector<double>& q, std::vector<double>& d, const double t)
+		{
+			batch_->Equations(y, q, d, t);
+		}
+	 
+		int GetSystemFunctions(const double t, double* y,  double* dy)
+		{
+			return(0);
+		}
+	
+		int GetAnalyticalJacobian(const double t,  double* y,  double* J)
+		{
+			return(0);
+		}
+	 
+		int GetWriteFunction(const double t, double *y)
+		{
+			return 0;
+ 		}
+	}; 
+	COMPLETE_ODESOLVERINTERFACE_CHEMEQ2(BatchReactorHomogeneousConstantVolume_ODE_CHEMEQ2)
 	
 	#if OPENSMOKE_USE_DVODE == 1
 	class BatchReactorHomogeneousConstantVolume_ODE_DVODE : public OpenSMOKE::OpenSMOKE_OdeSystemObject
