@@ -47,6 +47,12 @@ Three different options are available to compile the code, according to the leve
 
 4. Compile the solvers
 -----------------------------------------------------
+1. Compile the user-defined boundary condition library: from the `libs/boundaryConditionsOpenSMOKE++` folder type `wmake`
+2. Compile the customized radiation library: from the `libs/radiationOpenSMOKE++` folder type `wmake`
+3. Go to Section 5
+
+5. Compile the solvers
+-----------------------------------------------------
 1. Compile the steady-state (accounting for buoyancy) solver: from the `solver/laminarBuoyantSimpleSMOKE` folder type `wmake`
 2. Compile the steady-state solver: from the `solver/laminarSimpleSMOKE` folder type `wmake`
 3. Compile the unsteady (accounting for buoyancy) solver: from the `solver/laminarBuoyantPimpleSMOKE` folder type `wmake`

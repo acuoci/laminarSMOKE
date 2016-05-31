@@ -63,7 +63,6 @@ namespace radiation
 // Forward declaration of classes
 class absorptionEmissionModel;
 class scatterModel;
-class sootModel;
 
 /*---------------------------------------------------------------------------*\
                        Class radiationModel Declaration
@@ -107,9 +106,6 @@ protected:
 
             //- Scatter model
             autoPtr<scatterModel> scatter_;
-
-            //- Soot model
-            autoPtr<sootModel> soot_;
 
 
 private:
@@ -236,9 +232,6 @@ public:
 
             //- Access to absorptionEmission model
             const absorptionEmissionModel& absorptionEmission() const;
-
-            //- Access to soot Model
-            const sootModel& soot() const;
 };
 
 

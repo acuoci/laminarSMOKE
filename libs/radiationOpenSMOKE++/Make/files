@@ -28,13 +28,6 @@ submodels/absorptionEmissionModel/constantAbsorptionEmission/constantAbsorptionE
 submodels/absorptionEmissionModel/binaryAbsorptionEmission/binaryAbsorptionEmission.C
 submodels/absorptionEmissionModel/greyMeanAbsorptionEmission/greyMeanAbsorptionEmission.C
 submodels/absorptionEmissionModel/wideBandAbsorptionEmission/wideBandAbsorptionEmission.C
-submodels/absorptionEmissionModel/greyMeanSolidAbsorptionEmission/greyMeanSolidAbsorptionEmission.C
-
-/* Soot model */
-submodels/sootModel/sootModel/sootModel.C
-submodels/sootModel/sootModel/sootModelNew.C
-submodels/sootModel/mixtureFractionSoot/mixtureFractionSoots.C
-submodels/sootModel/noSoot/noSoot.C
 
 /* Boundary conditions */
 derivedFvPatchFields/MarshakRadiation/MarshakRadiationFvPatchScalarField.C
