@@ -77,6 +77,28 @@ void normalizeMassFractions(double* omega, const label celli, const double massF
 		omega[i] /= sumFractions;
 }
 
+void normalizeMassFractions(Eigen::VectorXd& omega_plus_additional_variables, const int N, const label celli, const double massFractionsTol)
+{
+    double sumFractions = 0.;
+    for(int i=0; i < N; i++)	
+	sumFractions += omega_plus_additional_variables(i);
+
+    if (sumFractions > 1.+massFractionsTol || sumFractions < 1.-massFractionsTol)
+    {
+        Info << "WARNING: sum of mass-fractions = " << sumFractions << " in cell " << celli <<endl;
+        
+        if (time == 0)
+        {
+            Info << "\nFATAL ERROR: sum of Yi is not 1" <<endl;
+            Info << "Check internal field on cell: " << celli <<endl;
+            abort();
+        }    
+    }
+	
+    for(int i=0; i < N; i++)
+	omega_plus_additional_variables(i) /= sumFractions;
+}
+
 
 void normalizeMassFractions(Eigen::VectorXd& omega_plus_temperature, const label celli, const double massFractionsTol)
 {

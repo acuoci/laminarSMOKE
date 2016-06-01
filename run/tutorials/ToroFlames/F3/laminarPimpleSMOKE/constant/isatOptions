@@ -42,6 +42,8 @@ ISAT
 	scalingFactors
 	{
 		T 	1.e3;
+		tau	1e-5;
+
 		H	1.e-3;
 		H2	1.e-2;
 		H2O	1.e0;
@@ -58,6 +60,8 @@ ISAT
 	scalingErrors
 	{
 		T 	1.;
+		tau	1.e-5;
+
 		others	1.;		
 	}
 }

@@ -100,7 +100,7 @@ if (isatCheck == true)
 
 
 	//- ISAT scale factor 
-	scalingFactors_ISAT.setConstant(thermodynamicsMapXML->NumberOfSpecies()+1,1.);
+	scalingFactors_ISAT.setConstant(thermodynamicsMapXML->NumberOfSpecies()+2,1.);
 	if(isatCheck == true) 
 	{
 		const unsigned int NC  = thermodynamicsMapXML->NumberOfSpecies();
@@ -116,10 +116,11 @@ if (isatCheck == true)
 				scalingFactors_ISAT(i) = 1./readScalar(scalingFactors.lookup("others"));
 		}
 		scalingFactors_ISAT(NC) = 1./readScalar(scalingFactors.lookup("T"));
+		scalingFactors_ISAT(NC+1) = 1./readScalar(scalingFactors.lookup("tau"));
 	}
 	//- ISAT scaling error factors
 	Eigen::VectorXd scalingErrors_ISAT;
-	scalingErrors_ISAT.setConstant(thermodynamicsMapXML->NumberOfSpecies()+1,1.);
+	scalingErrors_ISAT.setConstant(thermodynamicsMapXML->NumberOfSpecies()+2,1.);
 	if(isatCheck == true) 
 	{
 		const unsigned int NC  = thermodynamicsMapXML->NumberOfSpecies();
@@ -134,10 +135,11 @@ if (isatCheck == true)
 				scalingErrors_ISAT(i) = readScalar(scalingErrors.lookup("others"));
 		}
 		scalingErrors_ISAT(NC) = readScalar(scalingErrors.lookup("T"));
+		scalingErrors_ISAT(NC+1) = readScalar(scalingErrors.lookup("tau"));
 	}
 
 	//- ISAT HOM
-	isat_HOM = new ISAT(scalingErrors_ISAT, epsilon_ISAT, thermodynamicsMapXML->NumberOfSpecies()+1);	
+	isat_HOM = new ISAT(scalingErrors_ISAT, epsilon_ISAT, thermodynamicsMapXML->NumberOfSpecies()+2);	
 
 	// - Setting ISAT_HOM param
 	isat_HOM->setMaxSizeBT(maxSizeBT);
@@ -173,6 +175,7 @@ if (isatCheck == true)
 		}
 		Info << "       others          : " << readScalar(solverOptions.subDict("ISAT").subDict("scalingFactors").lookup("others")) << endl;
 		Info << "       T               : " << scalingFactors_ISAT(NC) << endl;
+		Info << "       tau             : " << scalingFactors_ISAT(NC+1) << endl;
 
 
 		Info << "   clear if BT full    : " << clearIfFull << endl;
@@ -213,6 +216,7 @@ if (isatCheck == true)
 		}
 		Info << "       others          : " << readScalar(solverOptions.subDict("ISAT").subDict("scalingErrors").lookup("others")) << endl;
 		Info << "       T               : " << scalingErrors_ISAT(NC) << endl;
+		Info << "       tau             : " << scalingErrors_ISAT(NC+1) << endl;
 	
 		Info << endl;
 	}
