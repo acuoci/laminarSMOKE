@@ -9,7 +9,7 @@
 ISAT 
 {
 	// Basic parameters
- 	ISAT		 			off;		// ISAT on/off
+	ISAT		 			off;		// ISAT on/off
 	tolerance 				1e-4;		// ISAT tolerance [default: 1e-4]
 	numberSubSteps				1;		// ISAT number of substeps for calculating gradient mapping [default: 1]
 
@@ -42,22 +42,22 @@ ISAT
 	scalingFactors
 	{
 		T 	1.e3;
-		H	1.e-3;
-		H2	1.e-2;
-		H2O	1.e0;
-		H2O2	1.e-4;
-		HO2	1.e-4;
-		N2	1.e0;
-		O	1.e-3;
-		O2	1.e0;
-		OH	1.e-2;
-		others 	1.;		
+		tau	1e-5;
+		N2	1.;
+		O2	0.1;
+		H2	0.1;
+		OH	0.001;
+		H2O	0.1;
+		H2O2	0.01;
+		HO2	0.01;
+		others 	0.1;		
 	}
 
 	// Absoute weights to scale the errors
 	scalingErrors
 	{
 		T 	1.;
+		tau	1.;
 		others	1.;		
 	}
 }

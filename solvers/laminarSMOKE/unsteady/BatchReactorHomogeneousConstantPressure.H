@@ -54,11 +54,12 @@ public:
 	void SetEnergyEquation(const bool flag) { energyEquation_ = flag; }
 	
 	void SetCheckMassFractions( const bool flag ) { checkMassFractions_ = flag; };
+	void SetISAT( const bool flag ) { isat_ = flag; };
 
 	const OpenSMOKE::OpenSMOKEVectorDouble& R() const { return R_; }
 	double QR() const { return QR_; }
 
-	unsigned int NumberOfEquations() const { return NE_; }
+	unsigned int NumberOfEquations() const;
 
 	virtual int Equations(const double t, const OpenSMOKE::OpenSMOKEVectorDouble& y, OpenSMOKE::OpenSMOKEVectorDouble& dy);
 	void Equations(double* y, std::vector<double>& q, std::vector<double>& d, const double t);
@@ -79,7 +80,6 @@ private:
 	double QR_;
 
 	unsigned int NC_;
-	unsigned int NE_;
 
 	OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>&	thermodynamicsMap_;		//!< thermodynamic map
 	OpenSMOKE::KineticsMap_CHEMKIN<double>&			kineticsMap_;			//!< kinetic map
@@ -91,12 +91,18 @@ private:
 	OpenSMOKE::OpenSMOKEVectorDouble Rf_;
 	OpenSMOKE::OpenSMOKEVectorDouble Rb_;
 
-	
+	bool isat_;
 	bool checkMassFractions_;
 	bool energyEquation_;
 
 	double enthalpy_;
 };
+
+unsigned int BatchReactorHomogeneousConstantPressure::NumberOfEquations() const
+{
+	if (isat_ == false)	return NC_+1;
+	else			return NC_+2;
+}
 
 BatchReactorHomogeneousConstantPressure::BatchReactorHomogeneousConstantPressure
 (	OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermodynamicsMap, OpenSMOKE::KineticsMap_CHEMKIN<double>& kineticsMap ):
@@ -104,7 +110,6 @@ BatchReactorHomogeneousConstantPressure::BatchReactorHomogeneousConstantPressure
 	kineticsMap_(kineticsMap)
 	{
 		NC_ = thermodynamicsMap_.NumberOfSpecies();
-		NE_ = NC_+1;
 		QR_ = 0.;
 		
 		ChangeDimensions(NC_, &omega_, true);
@@ -116,6 +121,7 @@ BatchReactorHomogeneousConstantPressure::BatchReactorHomogeneousConstantPressure
 		
 		checkMassFractions_ = false;
 		energyEquation_ = true;
+		isat_ = false;
 	}
 
 void BatchReactorHomogeneousConstantPressure::SetReactor( const double P0 )
@@ -195,6 +201,10 @@ int BatchReactorHomogeneousConstantPressure::Equations(const double t, const Ope
 		
 		dy[NC_+1]  = QR_ / (rho_*CpMixMass_);
 	}
+
+	// ISAT Equation
+	if (isat_ == true)
+		dy[NC_+2] = 0.;
 	
 	return 0;
 }

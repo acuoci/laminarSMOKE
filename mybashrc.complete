@@ -10,7 +10,7 @@ export OPENSMOKE_LIBRARY_PATH=$HOME/Development/MyCodes/OpenSMOKEpp/source
 #Options: ISAT support
 export ISAT_SUPPORT='-DOPENSMOKE_USE_ISAT=1'
 export ISAT_INCLUDE=$HOME/Development/ExternalNumericalLibraries/ISATLib/src
-export ISAT_LIBS=$HOME/Development/ExternalNumericalLibraries/ISATLib/lib/libISATLib_gcc_mkl_64bit.a
+export ISAT_LIBS=-lISATLib4OpenFOAM
 
 #Options
 export MKL_SUPPORT='-DOPENSMOKE_USE_MKL=1'
