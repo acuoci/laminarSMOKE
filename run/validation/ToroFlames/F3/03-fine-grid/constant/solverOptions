@@ -93,11 +93,7 @@ PostProcessing
 	soot	off;
 }
 
-DRG
-{
-	drg	off;
-}
-
+#include "drgOptions"
 #include "lewisNumbers"
 #include "isatOptions"
 

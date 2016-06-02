@@ -92,11 +92,7 @@ Spark
 	diameter 	1.5e-3;
 }
 
-DRG
-{
-	drg	off;
-}
-
+#include "drgOptions"
 #include "isatOptions"
 #include "lewisNumbers"
 

@@ -45,8 +45,16 @@ if(isatCheck == true)
 }
 else
 {
-	#include "chemistry_DI.H"
+	if (drg_analysis == false)
+		#include "chemistry_DI.H"
+	else
+		#include "chemistry_DRG.H"
 }
 #else
-	#include "chemistry_DI.H"
+	if (drg_analysis == false)
+		#include "chemistry_DI.H"
+	else
+		#include "chemistry_DRG.H"
 #endif
+
+

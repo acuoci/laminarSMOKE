@@ -80,6 +80,7 @@
 #include "laminarSMOKEthermoClass.H"
 
 // Homogeneous reactors
+#include "DRG.h"
 #include "BatchReactorHomogeneousConstantPressure.H"
 #include "BatchReactorHomogeneousConstantPressure_ODE_Interface.H"
 #include "BatchReactorHomogeneousConstantVolume.H"
