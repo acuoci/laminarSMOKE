@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "absorptionEmissionModel.H"
+#include "OpenSMOKEabsorptionEmissionModel.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -31,14 +31,14 @@ namespace Foam
 {
     namespace radiation
     {
-        defineTypeNameAndDebug(absorptionEmissionModel, 0);
-        defineRunTimeSelectionTable(absorptionEmissionModel, dictionary);
+        defineTypeNameAndDebug(OpenSMOKEabsorptionEmissionModel, 0);
+        defineRunTimeSelectionTable(OpenSMOKEabsorptionEmissionModel, dictionary);
     }
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::radiation::absorptionEmissionModel::absorptionEmissionModel
+Foam::radiation::OpenSMOKEabsorptionEmissionModel::OpenSMOKEabsorptionEmissionModel
 (
     const dictionary& dict,
     const fvMesh& mesh
@@ -51,21 +51,21 @@ Foam::radiation::absorptionEmissionModel::absorptionEmissionModel
 
 // * * * * * * * * * * * * * * * * Destructor    * * * * * * * * * * * * * * //
 
-Foam::radiation::absorptionEmissionModel::~absorptionEmissionModel()
+Foam::radiation::OpenSMOKEabsorptionEmissionModel::~OpenSMOKEabsorptionEmissionModel()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 Foam::tmp<Foam::volScalarField>
-Foam::radiation::absorptionEmissionModel::a(const label bandI) const
+Foam::radiation::OpenSMOKEabsorptionEmissionModel::a(const label bandI) const
 {
     return aDisp(bandI) + aCont(bandI);
 }
 
 
 Foam::tmp<Foam::volScalarField>
-Foam::radiation::absorptionEmissionModel::aCont(const label bandI) const
+Foam::radiation::OpenSMOKEabsorptionEmissionModel::aCont(const label bandI) const
 {
     return tmp<volScalarField>
     (
@@ -88,7 +88,7 @@ Foam::radiation::absorptionEmissionModel::aCont(const label bandI) const
 
 
 Foam::tmp<Foam::volScalarField>
-Foam::radiation::absorptionEmissionModel::aDisp(const label bandI) const
+Foam::radiation::OpenSMOKEabsorptionEmissionModel::aDisp(const label bandI) const
 {
     return tmp<volScalarField>
     (
@@ -111,14 +111,14 @@ Foam::radiation::absorptionEmissionModel::aDisp(const label bandI) const
 
 
 Foam::tmp<Foam::volScalarField>
-Foam::radiation::absorptionEmissionModel::e(const label bandI) const
+Foam::radiation::OpenSMOKEabsorptionEmissionModel::e(const label bandI) const
 {
     return eDisp(bandI) + eCont(bandI);
 }
 
 
 Foam::tmp<Foam::volScalarField>
-Foam::radiation::absorptionEmissionModel::eCont(const label bandI) const
+Foam::radiation::OpenSMOKEabsorptionEmissionModel::eCont(const label bandI) const
 {
     return tmp<volScalarField>
     (
@@ -141,7 +141,7 @@ Foam::radiation::absorptionEmissionModel::eCont(const label bandI) const
 
 
 Foam::tmp<Foam::volScalarField>
-Foam::radiation::absorptionEmissionModel::eDisp(const label bandI) const
+Foam::radiation::OpenSMOKEabsorptionEmissionModel::eDisp(const label bandI) const
 {
     return tmp<volScalarField>
     (
@@ -164,14 +164,14 @@ Foam::radiation::absorptionEmissionModel::eDisp(const label bandI) const
 
 
 Foam::tmp<Foam::volScalarField>
-Foam::radiation::absorptionEmissionModel::E(const label bandI) const
+Foam::radiation::OpenSMOKEabsorptionEmissionModel::E(const label bandI) const
 {
     return EDisp(bandI) + ECont(bandI);
 }
 
 
 Foam::tmp<Foam::volScalarField>
-Foam::radiation::absorptionEmissionModel::ECont(const label bandI) const
+Foam::radiation::OpenSMOKEabsorptionEmissionModel::ECont(const label bandI) const
 {
     return tmp<volScalarField>
     (
@@ -194,7 +194,7 @@ Foam::radiation::absorptionEmissionModel::ECont(const label bandI) const
 
 
 Foam::tmp<Foam::volScalarField>
-Foam::radiation::absorptionEmissionModel::EDisp(const label bandI) const
+Foam::radiation::OpenSMOKEabsorptionEmissionModel::EDisp(const label bandI) const
 {
     return tmp<volScalarField>
     (
@@ -216,26 +216,26 @@ Foam::radiation::absorptionEmissionModel::EDisp(const label bandI) const
 }
 
 
-Foam::label Foam::radiation::absorptionEmissionModel::nBands() const
+Foam::label Foam::radiation::OpenSMOKEabsorptionEmissionModel::nBands() const
 {
     return pTraits<label>::one;
 }
 
 
 const Foam::Vector2D<Foam::scalar>&
-Foam::radiation::absorptionEmissionModel::bands(const label n) const
+Foam::radiation::OpenSMOKEabsorptionEmissionModel::bands(const label n) const
 {
     return Vector2D<scalar>::one;
 }
 
 
-bool Foam::radiation::absorptionEmissionModel::isGrey() const
+bool Foam::radiation::OpenSMOKEabsorptionEmissionModel::isGrey() const
 {
     return false;
 }
 
 
-void Foam::radiation::absorptionEmissionModel::correct
+void Foam::radiation::OpenSMOKEabsorptionEmissionModel::correct
 (
     volScalarField& a,
     PtrList<volScalarField>& aj

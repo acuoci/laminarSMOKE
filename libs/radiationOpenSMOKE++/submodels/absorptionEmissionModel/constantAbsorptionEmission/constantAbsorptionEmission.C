@@ -36,7 +36,7 @@ namespace Foam
 
         addToRunTimeSelectionTable
         (
-            absorptionEmissionModel,
+            OpenSMOKEabsorptionEmissionModel,
             constantAbsorptionEmission,
             dictionary
         );
@@ -52,7 +52,7 @@ Foam::radiation::constantAbsorptionEmission::constantAbsorptionEmission
     const fvMesh& mesh
 )
 :
-    absorptionEmissionModel(dict, mesh),
+    OpenSMOKEabsorptionEmissionModel(dict, mesh),
     coeffsDict_(dict.subDict(typeName + "Coeffs")),
     a_(coeffsDict_.lookup("absorptivity")),
     e_(coeffsDict_.lookup("emissivity")),

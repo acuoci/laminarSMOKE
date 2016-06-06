@@ -23,69 +23,20 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "radiationModel.H"
-#include "volFields.H"
+#include "error.H"
+#include "OpenSMOKEscatterModel.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::autoPtr<Foam::radiation::radiationModel>
-Foam::radiation::radiationModel::New
-(
-    const volScalarField& T
-)
-{
-    IOobject radIO
-    (
-        "radiationProperties",
-        T.time().constant(),
-        T.mesh(),
-        IOobject::MUST_READ_IF_MODIFIED,
-        IOobject::NO_WRITE,
-        false
-    );
-
-    word modelType("none");
-    if (radIO.headerOk())
-    {
-        IOdictionary(radIO).lookup("radiationModel") >> modelType;
-    }
-    else
-    {
-        Info<< "Radiation model not active: radiationProperties not found"
-            << endl;
-    }
-
-    Info<< "Selecting radiationModel " << modelType << endl;
-
-    TConstructorTable::iterator cstrIter =
-        TConstructorTablePtr_->find(modelType);
-
-    if (cstrIter == TConstructorTablePtr_->end())
-    {
-        FatalErrorIn
-        (
-            "radiationModel::New(const volScalarField&)"
-        )   << "Unknown radiationModel type "
-            << modelType << nl << nl
-            << "Valid radiationModel types are:" << nl
-            << TConstructorTablePtr_->sortedToc()
-            << exit(FatalError);
-    }
-
-    return autoPtr<radiationModel>(cstrIter()(T));
-}
-
-
-Foam::autoPtr<Foam::radiation::radiationModel>
-Foam::radiation::radiationModel::New
+Foam::autoPtr<Foam::radiation::OpenSMOKEscatterModel> Foam::radiation::OpenSMOKEscatterModel::New
 (
     const dictionary& dict,
-    const volScalarField& T
+    const fvMesh& mesh
 )
 {
-    const word modelType(dict.lookup("radiationModel"));
+    const word modelType(dict.lookup("scatterModel"));
 
-    Info<< "Selecting radiationModel " << modelType << endl;
+    Info<< "Selecting scatterModel " << modelType << endl;
 
     dictionaryConstructorTable::iterator cstrIter =
         dictionaryConstructorTablePtr_->find(modelType);
@@ -94,15 +45,15 @@ Foam::radiation::radiationModel::New
     {
         FatalErrorIn
         (
-            "radiationModel::New(const dictionary&, const volScalarField&)"
-        )   << "Unknown radiationModel type "
+            "OpenSMOKEscatterModel::New(const dictionary&, const fvMesh&)"
+        )   << "Unknown scatterModel type "
             << modelType << nl << nl
-            << "Valid radiationModel types are:" << nl
+            << "Valid scatterModel types are :" << nl
             << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 
-    return autoPtr<radiationModel>(cstrIter()(dict, T));
+    return autoPtr<OpenSMOKEscatterModel>(cstrIter()(dict, mesh));
 }
 
 

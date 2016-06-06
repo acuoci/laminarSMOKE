@@ -23,9 +23,9 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "radiationModel.H"
-#include "absorptionEmissionModel.H"
-#include "scatterModel.H"
+#include "OpenSMOKEradiationModel.H"
+#include "OpenSMOKEabsorptionEmissionModel.H"
+#include "OpenSMOKEscatterModel.H"
 #include "fvmSup.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -34,16 +34,16 @@ namespace Foam
 {
     namespace radiation
     {
-        defineTypeNameAndDebug(radiationModel, 0);
-        defineRunTimeSelectionTable(radiationModel, T);
-        defineRunTimeSelectionTable(radiationModel, dictionary);
+        defineTypeNameAndDebug(OpenSMOKEradiationModel, 0);
+        defineRunTimeSelectionTable(OpenSMOKEradiationModel, T);
+        defineRunTimeSelectionTable(OpenSMOKEradiationModel, dictionary);
     }
 }
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-Foam::IOobject Foam::radiation::radiationModel::createIOobject
+Foam::IOobject Foam::radiation::OpenSMOKEradiationModel::createIOobject
 (
     const fvMesh& mesh
 ) const
@@ -70,7 +70,7 @@ Foam::IOobject Foam::radiation::radiationModel::createIOobject
 }
 
 
-void Foam::radiation::radiationModel::initialise()
+void Foam::radiation::OpenSMOKEradiationModel::initialise()
 {
     if (radiation_)
     {
@@ -78,17 +78,17 @@ void Foam::radiation::radiationModel::initialise()
 
         absorptionEmission_.reset
         (
-            absorptionEmissionModel::New(*this, mesh_).ptr()
+            OpenSMOKEabsorptionEmissionModel::New(*this, mesh_).ptr()
         );
 
-        scatter_.reset(scatterModel::New(*this, mesh_).ptr());
+        scatter_.reset(OpenSMOKEscatterModel::New(*this, mesh_).ptr());
     }
 }
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::radiation::radiationModel::radiationModel(const volScalarField& T)
+Foam::radiation::OpenSMOKEradiationModel::OpenSMOKEradiationModel(const volScalarField& T)
 :
     IOdictionary
     (
@@ -113,7 +113,7 @@ Foam::radiation::radiationModel::radiationModel(const volScalarField& T)
 {}
 
 
-Foam::radiation::radiationModel::radiationModel
+Foam::radiation::OpenSMOKEradiationModel::OpenSMOKEradiationModel
 (
     const word& type,
     const volScalarField& T
@@ -139,7 +139,7 @@ Foam::radiation::radiationModel::radiationModel
 }
 
 
-Foam::radiation::radiationModel::radiationModel
+Foam::radiation::OpenSMOKEradiationModel::OpenSMOKEradiationModel
 (
     const word& type,
     const dictionary& dict,
@@ -174,13 +174,13 @@ Foam::radiation::radiationModel::radiationModel
 
 // * * * * * * * * * * * * * * * * Destructor    * * * * * * * * * * * * * * //
 
-Foam::radiation::radiationModel::~radiationModel()
+Foam::radiation::OpenSMOKEradiationModel::~OpenSMOKEradiationModel()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-bool Foam::radiation::radiationModel::read()
+bool Foam::radiation::OpenSMOKEradiationModel::read()
 {
     if (regIOobject::read())
     {
@@ -199,7 +199,7 @@ bool Foam::radiation::radiationModel::read()
 }
 
 
-void Foam::radiation::radiationModel::correct()
+void Foam::radiation::OpenSMOKEradiationModel::correct()
 {
     if (!radiation_)
     {
@@ -213,7 +213,7 @@ void Foam::radiation::radiationModel::correct()
     }
 }
 
-Foam::tmp<Foam::fvScalarMatrix> Foam::radiation::radiationModel::divq( volScalarField& T ) const
+Foam::tmp<Foam::fvScalarMatrix> Foam::radiation::OpenSMOKEradiationModel::divq( volScalarField& T ) const
 {
     return
     (
@@ -221,7 +221,7 @@ Foam::tmp<Foam::fvScalarMatrix> Foam::radiation::radiationModel::divq( volScalar
     );
 }
 
-void Foam::radiation::radiationModel::Qloss( volScalarField& T, volScalarField& Qloss)
+void Foam::radiation::OpenSMOKEradiationModel::Qloss( volScalarField& T, volScalarField& Qloss)
 {
 	// TODO: Ru is an external source
 	//       Thus it can be neglected in the expression below, unless the user
@@ -231,7 +231,7 @@ void Foam::radiation::radiationModel::Qloss( volScalarField& T, volScalarField& 
 
 /* 
 // To be used for the enthalpy equation
-Foam::tmp<Foam::fvScalarMatrix> Foam::radiation::radiationModel::Sh
+Foam::tmp<Foam::fvScalarMatrix> Foam::radiation::OpenSMOKEradiationModel::Sh
 (
     fluidThermo& thermo
 ) const
@@ -250,15 +250,15 @@ Foam::tmp<Foam::fvScalarMatrix> Foam::radiation::radiationModel::Sh
 
 */
 
-const Foam::radiation::absorptionEmissionModel&
-Foam::radiation::radiationModel::absorptionEmission() const
+const Foam::radiation::OpenSMOKEabsorptionEmissionModel&
+Foam::radiation::OpenSMOKEradiationModel::absorptionEmission() const
 {
     if (!absorptionEmission_.valid())
     {
         FatalErrorIn
         (
-            "const Foam::radiation::absorptionEmissionModel&"
-            "Foam::radiation::radiationModel::absorptionEmission() const"
+            "const Foam::radiation::OpenSMOKEabsorptionEmissionModel&"
+            "Foam::radiation::OpenSMOKEradiationModel::absorptionEmission() const"
         )
             << "Requested radiation absorptionEmission model, but model is "
             << "not activate" << abort(FatalError);

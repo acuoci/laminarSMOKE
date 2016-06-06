@@ -24,36 +24,37 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-#include "scatterModel.H"
-
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-namespace Foam
-{
-    namespace radiation
-    {
-        defineTypeNameAndDebug(scatterModel, 0);
-        defineRunTimeSelectionTable(scatterModel, dictionary);
-    }
-}
-
+#include "OpenSMOKEabsorptionEmissionModel.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::radiation::scatterModel::scatterModel
+Foam::autoPtr<Foam::radiation::OpenSMOKEabsorptionEmissionModel>
+Foam::radiation::OpenSMOKEabsorptionEmissionModel::New
 (
-    const dictionary&,
+    const dictionary& dict,
     const fvMesh& mesh
 )
-:
-    mesh_(mesh)
-{}
+{
+    const word modelType(dict.lookup("absorptionEmissionModel"));
 
+    Info<< "Selecting absorptionEmissionModel " << modelType << endl;
 
-// * * * * * * * * * * * * * * * * Destructor    * * * * * * * * * * * * * * //
+    dictionaryConstructorTable::iterator cstrIter =
+        dictionaryConstructorTablePtr_->find(modelType);
 
-Foam::radiation::scatterModel::~scatterModel()
-{}
+    if (cstrIter == dictionaryConstructorTablePtr_->end())
+    {
+        FatalErrorIn
+        (
+            "OpenSMOKEabsorptionEmissionModel::New(const dictionary&, const fvMesh&)"
+        )   << "Unknown absorptionEmissionModel type "
+            << modelType << nl << nl
+            << "Valid absorptionEmissionModel types are :" << nl
+            << dictionaryConstructorTablePtr_->sortedToc() << exit(FatalError);
+    }
+
+    return autoPtr<OpenSMOKEabsorptionEmissionModel>(cstrIter()(dict, mesh));
+}
 
 
 // ************************************************************************* //

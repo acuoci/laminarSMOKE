@@ -35,7 +35,7 @@ SourceFiles
 #ifndef radiationBinaryAbsorptionEmission_H
 #define radiationBinaryAbsorptionEmission_H
 
-#include "absorptionEmissionModel.H"
+#include "OpenSMOKEabsorptionEmissionModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,7 +50,7 @@ namespace radiation
 
 class binaryAbsorptionEmission
 :
-    public absorptionEmissionModel
+    public OpenSMOKEabsorptionEmissionModel
 {
     // Private data
 
@@ -58,10 +58,10 @@ class binaryAbsorptionEmission
         dictionary coeffsDict_;
 
         //- First absorption model
-        autoPtr<absorptionEmissionModel> model1_;
+        autoPtr<OpenSMOKEabsorptionEmissionModel> model1_;
 
         //- Second absorption model
-        autoPtr<absorptionEmissionModel> model2_;
+        autoPtr<OpenSMOKEabsorptionEmissionModel> model2_;
 
 
 public:

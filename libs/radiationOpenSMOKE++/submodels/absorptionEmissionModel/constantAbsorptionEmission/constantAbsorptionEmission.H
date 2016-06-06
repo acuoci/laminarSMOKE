@@ -36,7 +36,7 @@ SourceFiles
 #ifndef radiationConstantAbsorptionEmission_H
 #define radiationConstantAbsorptionEmission_H
 
-#include "absorptionEmissionModel.H"
+#include "OpenSMOKEabsorptionEmissionModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -51,7 +51,7 @@ namespace radiation
 
 class constantAbsorptionEmission
 :
-    public absorptionEmissionModel
+    public OpenSMOKEabsorptionEmissionModel
 {
     // Private data
 

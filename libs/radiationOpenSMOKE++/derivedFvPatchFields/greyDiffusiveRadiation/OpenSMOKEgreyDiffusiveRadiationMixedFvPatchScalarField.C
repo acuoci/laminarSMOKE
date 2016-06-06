@@ -23,13 +23,12 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "wideBandDiffusiveRadiationMixedFvPatchScalarField.H"
+#include "OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "fvPatchFieldMapper.H"
 #include "volFields.H"
 
 #include "fvDOM.H"
-#include "wideBandAbsorptionEmission.H"
 #include "constants.H"
 
 using namespace Foam::constant;
@@ -37,8 +36,8 @@ using namespace Foam::constant::mathematical;
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::radiation::wideBandDiffusiveRadiationMixedFvPatchScalarField::
-wideBandDiffusiveRadiationMixedFvPatchScalarField
+Foam::radiation::OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField::
+OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF
@@ -54,10 +53,10 @@ wideBandDiffusiveRadiationMixedFvPatchScalarField
 }
 
 
-Foam::radiation::wideBandDiffusiveRadiationMixedFvPatchScalarField::
-wideBandDiffusiveRadiationMixedFvPatchScalarField
+Foam::radiation::OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField::
+OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField
 (
-    const wideBandDiffusiveRadiationMixedFvPatchScalarField& ptf,
+    const OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField& ptf,
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
     const fvPatchFieldMapper& mapper
@@ -74,8 +73,8 @@ wideBandDiffusiveRadiationMixedFvPatchScalarField
 {}
 
 
-Foam::radiation::wideBandDiffusiveRadiationMixedFvPatchScalarField::
-wideBandDiffusiveRadiationMixedFvPatchScalarField
+Foam::radiation::OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField::
+OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
@@ -86,7 +85,7 @@ wideBandDiffusiveRadiationMixedFvPatchScalarField
     radiationCoupledBase(p, dict),
     TName_(dict.lookupOrDefault<word>("T", "T"))
 {
-    if (dict.found("value"))
+    if (dict.found("refValue"))
     {
         fvPatchScalarField::operator=
         (
@@ -98,22 +97,19 @@ wideBandDiffusiveRadiationMixedFvPatchScalarField
     }
     else
     {
-        const scalarField& Tp =
-            patch().lookupPatchField<volScalarField, scalar>(TName_);
-
-        refValue() =
-            4.0*physicoChemical::sigma.value()*pow4(Tp)*emissivity()/pi;
+        refValue() = 0.0;
         refGrad() = 0.0;
+        valueFraction() = 1.0;
 
         fvPatchScalarField::operator=(refValue());
     }
 }
 
 
-Foam::radiation::wideBandDiffusiveRadiationMixedFvPatchScalarField::
-wideBandDiffusiveRadiationMixedFvPatchScalarField
+Foam::radiation::OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField::
+OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField
 (
-    const wideBandDiffusiveRadiationMixedFvPatchScalarField& ptf
+    const OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField& ptf
 )
 :
     mixedFvPatchScalarField(ptf),
@@ -127,10 +123,10 @@ wideBandDiffusiveRadiationMixedFvPatchScalarField
 {}
 
 
-Foam::radiation::wideBandDiffusiveRadiationMixedFvPatchScalarField::
-wideBandDiffusiveRadiationMixedFvPatchScalarField
+Foam::radiation::OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField::
+OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField
 (
-    const wideBandDiffusiveRadiationMixedFvPatchScalarField& ptf,
+    const OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField& ptf,
     const DimensionedField<scalar, volMesh>& iF
 )
 :
@@ -147,7 +143,7 @@ wideBandDiffusiveRadiationMixedFvPatchScalarField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::radiation::wideBandDiffusiveRadiationMixedFvPatchScalarField::
+void Foam::radiation::OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField::
 updateCoeffs()
 {
     if (this->updated())
@@ -160,8 +156,11 @@ updateCoeffs()
     int oldTag = UPstream::msgType();
     UPstream::msgType() = oldTag+1;
 
-    const radiationModel& radiation =
-        db().lookupObject<radiationModel>("radiationProperties");
+    const scalarField& Tp =
+        patch().lookupPatchField<volScalarField, scalar>(TName_);
+
+    const OpenSMOKEradiationModel& radiation =
+        db().lookupObject<OpenSMOKEradiationModel>("radiationProperties");
 
     const fvDOM& dom(refCast<const fvDOM>(radiation));
 
@@ -171,18 +170,18 @@ updateCoeffs()
 
     const label patchI = patch().index();
 
-    if (dom.nLambda() == 0)
+    if (dom.nLambda() != 1)
     {
         FatalErrorIn
         (
             "Foam::radiation::"
-            "wideBandDiffusiveRadiationMixedFvPatchScalarField::updateCoeffs"
-        )   << " a non-grey boundary condition is used with a grey "
+            "OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField::updateCoeffs"
+        )   << " a grey boundary condition is used with a non-grey "
             << "absorption model" << nl << exit(FatalError);
     }
 
     scalarField& Iw = *this;
-    const vectorField n(patch().Sf()/patch().magSf());
+    const vectorField n(patch().nf());
 
     radiativeIntensityRay& ray =
         const_cast<radiativeIntensityRay&>(dom.IRay(rayId));
@@ -191,15 +190,12 @@ updateCoeffs()
 
     ray.Qr().boundaryField()[patchI] += Iw*nAve;
 
-    const scalarField Eb
-    (
-        dom.blackBody().bLambda(lambdaId).boundaryField()[patchI]
-    );
-
-    scalarField temissivity = emissivity();
+    const scalarField temissivity = emissivity();
 
     scalarField& Qem = ray.Qem().boundaryField()[patchI];
     scalarField& Qin = ray.Qin().boundaryField()[patchI];
+
+    const vector& myRayId = dom.IRay(rayId).d();
 
     // Use updated Ir while iterating over rays
     // avoids to used lagged Qin
@@ -212,17 +208,16 @@ updateCoeffs()
 
     forAll(Iw, faceI)
     {
-        const vector& d = dom.IRay(rayId).d();
-
-        if ((-n[faceI] & d) > 0.0)
+        if ((-n[faceI] & myRayId) > 0.0)
         {
             // direction out of the wall
             refGrad()[faceI] = 0.0;
             valueFraction()[faceI] = 1.0;
             refValue()[faceI] =
                 (
-                    Ir[faceI]*(1.0 - temissivity[faceI])
-                  + temissivity[faceI]*Eb[faceI]
+                    Ir[faceI]*(scalar(1.0) - temissivity[faceI])
+                  + temissivity[faceI]*physicoChemical::sigma.value()
+                  * pow4(Tp[faceI])
                 )/pi;
 
             // Emmited heat flux from this ray direction
@@ -247,7 +242,7 @@ updateCoeffs()
 }
 
 
-void Foam::radiation::wideBandDiffusiveRadiationMixedFvPatchScalarField::write
+void Foam::radiation::OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField::write
 (
     Ostream& os
 ) const
@@ -267,7 +262,7 @@ namespace radiation
     makePatchTypeField
     (
         fvPatchScalarField,
-        wideBandDiffusiveRadiationMixedFvPatchScalarField
+        OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField
     );
 }
 }

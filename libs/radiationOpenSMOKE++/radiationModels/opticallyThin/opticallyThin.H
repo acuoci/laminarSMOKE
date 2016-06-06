@@ -32,7 +32,7 @@ SourceFiles
 #ifndef radiationModelopticallyThin_H
 #define radiationModelopticallyThin_H
 
-#include "radiationModel.H"
+#include "OpenSMOKEradiationModel.H"
 #include "volFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -48,7 +48,7 @@ namespace radiation
 
 class opticallyThin
 :
-    public radiationModel
+    public OpenSMOKEradiationModel
 {
     // Private data
 

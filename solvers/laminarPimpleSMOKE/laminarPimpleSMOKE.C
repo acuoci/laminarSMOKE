@@ -67,7 +67,9 @@
 #include "pimpleControl.H"
 #include "fvIOoptionList.H"
 #include "interpolation.H"
-#include "radiationModel.H"
+
+// Customized radiation model
+#include "OpenSMOKEradiationModel.H"
 
 #if OPENFOAM_VERSION == 30
 #include "localEulerDdtScheme.H"

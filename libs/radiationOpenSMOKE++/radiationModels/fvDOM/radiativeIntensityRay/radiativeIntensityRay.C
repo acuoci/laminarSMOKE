@@ -47,7 +47,7 @@ Foam::radiation::radiativeIntensityRay::radiativeIntensityRay
     const scalar deltaPhi,
     const scalar deltaTheta,
     const label nLambda,
-    const absorptionEmissionModel& absorptionEmission,
+    const OpenSMOKEabsorptionEmissionModel& absorptionEmission,
     const blackBodyEmission& blackBody,
     const label rayId
 )

@@ -46,7 +46,7 @@ namespace Foam
 
 Foam::radiation::noRadiation::noRadiation(const volScalarField& T)
 :
-    radiationModel(T)
+    OpenSMOKEradiationModel(T)
 {}
 
 
@@ -56,7 +56,7 @@ Foam::radiation::noRadiation::noRadiation
     const volScalarField& T
 )
 :
-    radiationModel(T)
+    OpenSMOKEradiationModel(T)
 {}
 
 
@@ -70,7 +70,7 @@ Foam::radiation::noRadiation::~noRadiation()
 
 bool Foam::radiation::noRadiation::read()
 {
-    return radiationModel::read();
+    return OpenSMOKEradiationModel::read();
 }
 
 

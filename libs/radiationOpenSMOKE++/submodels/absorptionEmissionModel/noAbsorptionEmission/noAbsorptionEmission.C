@@ -36,7 +36,7 @@ namespace Foam
 
         addToRunTimeSelectionTable
         (
-            absorptionEmissionModel,
+            OpenSMOKEabsorptionEmissionModel,
             noAbsorptionEmission,
             dictionary
         );
@@ -52,7 +52,7 @@ Foam::radiation::noAbsorptionEmission::noAbsorptionEmission
     const fvMesh& mesh
 )
 :
-    absorptionEmissionModel(dict, mesh)
+    OpenSMOKEabsorptionEmissionModel(dict, mesh)
 {}
 
 

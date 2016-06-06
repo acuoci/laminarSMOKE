@@ -27,8 +27,8 @@ License
 #include "volFields.H"
 #include "mappedPatchBase.H"
 #include "fvPatchFieldMapper.H"
-#include "radiationModel.H"
-#include "absorptionEmissionModel.H"
+#include "OpenSMOKEradiationModel.H"
+#include "OpenSMOKEabsorptionEmissionModel.H"
 
 // * * * * * * * * * * * * * Static Member Data  * * * * * * * * * * * * * * //
 
@@ -165,8 +165,8 @@ Foam::scalarField Foam::radiationCoupledBase::emissivity() const
 
             const polyMesh& nbrMesh = mpp.sampleMesh();
 
-            const radiation::radiationModel& radiation =
-                nbrMesh.lookupObject<radiation::radiationModel>
+            const radiation::OpenSMOKEradiationModel& radiation =
+                nbrMesh.lookupObject<radiation::OpenSMOKEradiationModel>
                 (
                     "radiationProperties"
                 );

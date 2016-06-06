@@ -28,19 +28,19 @@ Description
     Namespace for radiation modelling
 
 Class
-    Foam::radiation::radiationModel
+    Foam::radiation::OpenSMOKEradiationModel
 
 Description
     Top level model for radiation modelling
 
 SourceFiles
-    radiationModel.C
-    radiationModelNew.C
+    OpenSMOKEradiationModel.C
+    OpenSMOKEradiationModelNew.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef radiationModel_H
-#define radiationModel_H
+#ifndef OpenSMOKEradiationModel_H
+#define OpenSMOKEradiationModel_H
 
 #include "IOdictionary.H"
 #include "autoPtr.H"
@@ -61,14 +61,14 @@ namespace radiation
 {
 
 // Forward declaration of classes
-class absorptionEmissionModel;
-class scatterModel;
+class OpenSMOKEabsorptionEmissionModel;
+class OpenSMOKEscatterModel;
 
 /*---------------------------------------------------------------------------*\
-                       Class radiationModel Declaration
+                   Class OpenSMOKEradiationModel Declaration
 \*---------------------------------------------------------------------------*/
 
-class radiationModel
+class OpenSMOKEradiationModel
 :
     public IOdictionary
 {
@@ -102,10 +102,10 @@ protected:
         // References to the radiation sub-models
 
             //- Absorption/emission model
-            autoPtr<absorptionEmissionModel> absorptionEmission_;
+            autoPtr<OpenSMOKEabsorptionEmissionModel> absorptionEmission_;
 
             //- Scatter model
-            autoPtr<scatterModel> scatter_;
+            autoPtr<OpenSMOKEscatterModel> scatter_;
 
 
 private:
@@ -119,16 +119,16 @@ private:
         void initialise();
 
         //- Disallow default bitwise copy construct
-        radiationModel(const radiationModel&);
+        OpenSMOKEradiationModel(const OpenSMOKEradiationModel&);
 
         //- Disallow default bitwise assignment
-        void operator=(const radiationModel&);
+        void operator=(const OpenSMOKEradiationModel&);
 
 
 public:
 
     //- Runtime type information
-    TypeName("radiationModel");
+    TypeName("OpenSMOKEradiationModel");
 
 
     // Declare runtime constructor selection table
@@ -136,7 +136,7 @@ public:
         declareRunTimeSelectionTable
         (
             autoPtr,
-            radiationModel,
+            OpenSMOKEradiationModel,
             T,
             (
                 const volScalarField& T
@@ -147,7 +147,7 @@ public:
         declareRunTimeSelectionTable
         (
             autoPtr,
-            radiationModel,
+            OpenSMOKEradiationModel,
             dictionary,
             (
                 const dictionary& dict,
@@ -160,13 +160,13 @@ public:
     // Constructors
 
         //- Null constructor
-        radiationModel(const volScalarField& T);
+        OpenSMOKEradiationModel(const volScalarField& T);
 
         //- Construct from components
-        radiationModel(const word& type, const volScalarField& T);
+        OpenSMOKEradiationModel(const word& type, const volScalarField& T);
 
         //- Construct from components
-        radiationModel
+        OpenSMOKEradiationModel
         (
             const word& type,
             const dictionary& dict,
@@ -177,10 +177,10 @@ public:
     // Selectors
 
         //- Return a reference to the selected radiation model
-        static autoPtr<radiationModel> New(const volScalarField& T);
+        static autoPtr<OpenSMOKEradiationModel> New(const volScalarField& T);
 
         //- Return a reference to the selected radiation model
-        static autoPtr<radiationModel> New
+        static autoPtr<OpenSMOKEradiationModel> New
         (
             const dictionary& dict,
             const volScalarField& T
@@ -188,7 +188,7 @@ public:
 
 
     //- Destructor
-    virtual ~radiationModel();
+    virtual ~OpenSMOKEradiationModel();
 
 
     // Member Functions
@@ -231,7 +231,7 @@ public:
             */
 
             //- Access to absorptionEmission model
-            const absorptionEmissionModel& absorptionEmission() const;
+            const OpenSMOKEabsorptionEmissionModel& absorptionEmission() const;
 };
 
 
@@ -241,14 +241,14 @@ public:
                                                                               \
     addToRunTimeSelectionTable                                                \
     (                                                                         \
-        radiationModel,                                                       \
+        OpenSMOKEradiationModel,                                              \
         model,                                                                \
         dictionary                                                            \
     );                                                                        \
                                                                               \
     addToRunTimeSelectionTable                                                \
     (                                                                         \
-        radiationModel,                                                       \
+        OpenSMOKEradiationModel,                                              \
         model,                                                                \
         T                                                                     \
     );

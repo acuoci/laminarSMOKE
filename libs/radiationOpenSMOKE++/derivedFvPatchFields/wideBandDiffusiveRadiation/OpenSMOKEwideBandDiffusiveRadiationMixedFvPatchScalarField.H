@@ -22,17 +22,14 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::MarshakRadiationFvPatchScalarField
+    Foam::radiation::OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField
 
 Group
     grpThermoBoundaryConditions
 
 Description
-    A 'mixed' boundary condition that implements a Marshak condition for the
-    incident radiation field (usually written as G)
-
-    The radiation temperature is retrieved from the mesh database, using a
-    user specified temperature field name.
+    This boundary condition provides a wide-band, diffusive radiation
+    condition, where the patch temperature is specified.
 
     \heading Patch usage
 
@@ -45,23 +42,22 @@ Description
     \verbatim
     myPatch
     {
-        type            MarshakRadiation;
-        T               T;
+        type            wideBandDiffusiveRadiation;
         value           uniform 0;
     }
     \endverbatim
 
 SeeAlso
+    Foam::mixedFvPatchScalarField
     Foam::radiationCoupledBase
-    Foam::mixedFvPatchField
 
 SourceFiles
-    MarshakRadiationFvPatchScalarField.C
+    OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef MarshakRadiationMixedFvPatchField_H
-#define MarshakRadiationMixedFvPatchField_H
+#ifndef OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField_H
+#define OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField_H
 
 #include "mixedFvPatchFields.H"
 #include "radiationCoupledBase.H"
@@ -70,17 +66,17 @@ SourceFiles
 
 namespace Foam
 {
-
+namespace radiation
+{
 /*---------------------------------------------------------------------------*\
-             Class MarshakRadiationFvPatchScalarField Declaration
+ Class OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField Declaration
 \*---------------------------------------------------------------------------*/
 
-class MarshakRadiationFvPatchScalarField
+class OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField
 :
     public mixedFvPatchScalarField,
     public radiationCoupledBase
 {
-
     // Private data
 
         //- Name of temperature field
@@ -90,40 +86,40 @@ class MarshakRadiationFvPatchScalarField
 public:
 
     //- Runtime type information
-    TypeName("MarshakRadiation");
+    TypeName("OpenSMOKEwideBandDiffusiveRadiation");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        MarshakRadiationFvPatchScalarField
+        OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        MarshakRadiationFvPatchScalarField
+        OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
             const dictionary&
         );
 
-        //- Construct by mapping given MarshakRadiationFvPatchField onto a new
-        //  patch
-        MarshakRadiationFvPatchScalarField
+        //- Construct by mapping given GreyDiffusiveRadiationMixedFvPatchField
+        //  onto a new patch
+        OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField
         (
-            const MarshakRadiationFvPatchScalarField&,
+            const OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField&,
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        MarshakRadiationFvPatchScalarField
+        OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField
         (
-            const MarshakRadiationFvPatchScalarField&
+            const OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField&
         );
 
         //- Construct and return a clone
@@ -131,14 +127,14 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new MarshakRadiationFvPatchScalarField(*this)
+                new OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField(*this)
             );
         }
 
         //- Construct as copy setting internal field reference
-        MarshakRadiationFvPatchScalarField
+        OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField
         (
-            const MarshakRadiationFvPatchScalarField&,
+            const OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField&,
             const DimensionedField<scalar, volMesh>&
         );
 
@@ -150,7 +146,7 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new MarshakRadiationFvPatchScalarField(*this, iF)
+                new OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField(*this, iF)
             );
         }
 
@@ -173,22 +169,6 @@ public:
             }
 
 
-        // Mapping functions
-
-            //- Map (and resize as needed) from self given a mapping object
-            virtual void autoMap
-            (
-                const fvPatchFieldMapper&
-            );
-
-            //- Reverse map the given fvPatchField onto this fvPatchField
-            virtual void rmap
-            (
-                const fvPatchScalarField&,
-                const labelList&
-            );
-
-
         // Evaluation functions
 
             //- Update the coefficients associated with the patch field
@@ -205,6 +185,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

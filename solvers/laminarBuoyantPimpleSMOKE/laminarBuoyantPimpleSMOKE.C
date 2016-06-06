@@ -68,7 +68,9 @@
 #include "fvIOoptionList.H"
 #include "interpolation.H"
 #include "fixedFluxPressureFvPatchScalarField.H"
-#include "radiationModel.H"
+
+// Customized radiation model
+#include "OpenSMOKEradiationModel.H"
 
 // Additional include files
 #include "sparkModel.H"

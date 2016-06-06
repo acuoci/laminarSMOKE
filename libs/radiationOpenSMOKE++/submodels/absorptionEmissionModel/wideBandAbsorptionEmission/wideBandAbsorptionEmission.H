@@ -103,7 +103,7 @@ SourceFiles
 #define wideBandAbsorptionEmission_H
 
 #include "interpolationLookUpTable.H"
-#include "absorptionEmissionModel.H"
+#include "OpenSMOKEabsorptionEmissionModel.H"
 #include "HashTable.H"
 #include "absorptionCoeffs.H"
 #include "laminarSMOKEthermoClass.H"
@@ -121,7 +121,7 @@ namespace radiation
 
 class wideBandAbsorptionEmission
 :
-    public absorptionEmissionModel
+    public OpenSMOKEabsorptionEmissionModel
 {
 public:
 

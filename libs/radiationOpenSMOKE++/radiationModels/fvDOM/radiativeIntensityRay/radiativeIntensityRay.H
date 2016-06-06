@@ -35,7 +35,7 @@ SourceFiles
 #ifndef radiativeIntensityRay_H
 #define radiativeIntensityRay_H
 
-#include "absorptionEmissionModel.H"
+#include "OpenSMOKEabsorptionEmissionModel.H"
 #include "blackBodyEmission.H"
 
 
@@ -71,7 +71,7 @@ private:
         const fvMesh& mesh_;
 
         //- Absorption/emission model
-        const absorptionEmissionModel& absorptionEmission_;
+        const OpenSMOKEabsorptionEmissionModel& absorptionEmission_;
 
         //- Black body
         const blackBodyEmission& blackBody_;
@@ -139,7 +139,7 @@ public:
             const scalar deltaPhi,
             const scalar deltaTheta,
             const label lambda,
-            const absorptionEmissionModel& absEmmModel_,
+            const OpenSMOKEabsorptionEmissionModel& absEmmModel_,
             const blackBodyEmission& blackBody,
             const label rayId
         );

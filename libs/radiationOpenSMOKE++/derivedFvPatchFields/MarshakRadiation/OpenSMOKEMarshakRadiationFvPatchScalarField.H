@@ -22,49 +22,46 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::radiation::greyDiffusiveRadiationMixedFvPatchScalarField
+    Foam::OpenSMOKEMarshakRadiationFvPatchScalarField
 
 Group
     grpThermoBoundaryConditions
 
 Description
-    This boundary condition provides a grey-diffuse condition for radiation
-    intensity, \c I, for use with the finite-volume discrete-ordinates model
-    (fvDOM), in which the radiation temperature is retrieved from the
-    temperature field boundary condition.
+    A 'mixed' boundary condition that implements a Marshak condition for the
+    incident radiation field (usually written as G)
+
+    The radiation temperature is retrieved from the mesh database, using a
+    user specified temperature field name.
 
     \heading Patch usage
 
     \table
         Property     | Description             | Required    | Default value
         T            | temperature field name  | no          | T
-        emissivityMode | emissivity mode: solidRadiation or lookup | yes |
     \endtable
 
     Example of the boundary condition specification:
     \verbatim
     myPatch
     {
-        type            greyDiffusiveRadiation;
+        type            MarshakRadiation;
         T               T;
-        emissivityMode  solidRadiation;
         value           uniform 0;
     }
     \endverbatim
 
 SeeAlso
     Foam::radiationCoupledBase
-    Foam::radiation::radiationModel
-    Foam::radiation::fvDOM
     Foam::mixedFvPatchField
 
 SourceFiles
-    greyDiffusiveRadiationMixedFvPatchScalarField.C
+    OpenSMOKEMarshakRadiationFvPatchScalarField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef greyDiffusiveRadiationMixedFvPatchScalarField_H
-#define greyDiffusiveRadiationMixedFvPatchScalarField_H
+#ifndef OpenSMOKEMarshakRadiationMixedFvPatchField_H
+#define OpenSMOKEMarshakRadiationMixedFvPatchField_H
 
 #include "mixedFvPatchFields.H"
 #include "radiationCoupledBase.H"
@@ -73,17 +70,17 @@ SourceFiles
 
 namespace Foam
 {
-namespace radiation
-{
+
 /*---------------------------------------------------------------------------*\
-        Class greyDiffusiveRadiationMixedFvPatchScalarField Declaration
+         Class OpenSMOKEMarshakRadiationFvPatchScalarField Declaration
 \*---------------------------------------------------------------------------*/
 
-class greyDiffusiveRadiationMixedFvPatchScalarField
+class OpenSMOKEMarshakRadiationFvPatchScalarField
 :
     public mixedFvPatchScalarField,
     public radiationCoupledBase
 {
+
     // Private data
 
         //- Name of temperature field
@@ -93,40 +90,40 @@ class greyDiffusiveRadiationMixedFvPatchScalarField
 public:
 
     //- Runtime type information
-    TypeName("greyDiffusiveRadiation");
+    TypeName("OpenSMOKEMarshakRadiation");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        greyDiffusiveRadiationMixedFvPatchScalarField
+        OpenSMOKEMarshakRadiationFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        greyDiffusiveRadiationMixedFvPatchScalarField
+        OpenSMOKEMarshakRadiationFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
             const dictionary&
         );
 
-        //- Construct by mapping given a
-        //  greyDiffusiveRadiationMixedFvPatchScalarField onto a new patch
-        greyDiffusiveRadiationMixedFvPatchScalarField
+        //- Construct by mapping given MarshakRadiationFvPatchField onto a new
+        //  patch
+        OpenSMOKEMarshakRadiationFvPatchScalarField
         (
-            const greyDiffusiveRadiationMixedFvPatchScalarField&,
+            const OpenSMOKEMarshakRadiationFvPatchScalarField&,
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        greyDiffusiveRadiationMixedFvPatchScalarField
+        OpenSMOKEMarshakRadiationFvPatchScalarField
         (
-            const greyDiffusiveRadiationMixedFvPatchScalarField&
+            const OpenSMOKEMarshakRadiationFvPatchScalarField&
         );
 
         //- Construct and return a clone
@@ -134,14 +131,14 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new greyDiffusiveRadiationMixedFvPatchScalarField(*this)
+                new OpenSMOKEMarshakRadiationFvPatchScalarField(*this)
             );
         }
 
         //- Construct as copy setting internal field reference
-        greyDiffusiveRadiationMixedFvPatchScalarField
+        OpenSMOKEMarshakRadiationFvPatchScalarField
         (
-            const greyDiffusiveRadiationMixedFvPatchScalarField&,
+            const OpenSMOKEMarshakRadiationFvPatchScalarField&,
             const DimensionedField<scalar, volMesh>&
         );
 
@@ -153,7 +150,7 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new greyDiffusiveRadiationMixedFvPatchScalarField(*this, iF)
+                new OpenSMOKEMarshakRadiationFvPatchScalarField(*this, iF)
             );
         }
 
@@ -176,6 +173,22 @@ public:
             }
 
 
+        // Mapping functions
+
+            //- Map (and resize as needed) from self given a mapping object
+            virtual void autoMap
+            (
+                const fvPatchFieldMapper&
+            );
+
+            //- Reverse map the given fvPatchField onto this fvPatchField
+            virtual void rmap
+            (
+                const fvPatchScalarField&,
+                const labelList&
+            );
+
+
         // Evaluation functions
 
             //- Update the coefficients associated with the patch field
@@ -191,7 +204,6 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace radiation
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

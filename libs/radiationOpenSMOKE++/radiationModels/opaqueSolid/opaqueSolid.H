@@ -37,7 +37,7 @@ SourceFiles
 #ifndef opaqueSolid_H
 #define opaqueSolid_H
 
-#include "radiationModel.H"
+#include "OpenSMOKEradiationModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -52,7 +52,7 @@ namespace radiation
 
 class opaqueSolid
 :
-    public radiationModel
+    public OpenSMOKEradiationModel
 {
     // Private Member Functions
 

@@ -63,7 +63,9 @@
 #include "simpleControl.H"
 #include "fvIOoptionList.H"
 #include "interpolation.H"
-#include "radiationModel.H"
+
+// Customized radiation model
+#include "OpenSMOKEradiationModel.H"
 
 // Additional include files
 #include "sparkModel.H"

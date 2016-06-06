@@ -28,14 +28,14 @@ Description
     Dummy scatter model for 'none'
 
 SourceFiles
-    scatterModel.C
+    OpenSMOKEscatterModel.C
 
 \*---------------------------------------------------------------------------*/
 
 #ifndef radiationConstantScatter_H
 #define radiationConstantScatter_H
 
-#include "scatterModel.H"
+#include "OpenSMOKEscatterModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,7 +50,7 @@ namespace radiation
 
 class noScatter
 :
-    public scatterModel
+    public OpenSMOKEscatterModel
 {
 
 public:

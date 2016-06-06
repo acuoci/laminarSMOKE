@@ -26,8 +26,8 @@ License
 #include "P1.H"
 #include "fvmLaplacian.H"
 #include "fvmSup.H"
-#include "absorptionEmissionModel.H"
-#include "scatterModel.H"
+#include "OpenSMOKEabsorptionEmissionModel.H"
+#include "OpenSMOKEscatterModel.H"
 #include "constants.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -49,7 +49,7 @@ namespace Foam
 
 Foam::radiation::P1::P1(const volScalarField& T)
 :
-    radiationModel(typeName, T),
+    OpenSMOKEradiationModel(typeName, T),
     G_
     (
         IOobject
@@ -119,7 +119,7 @@ Foam::radiation::P1::P1(const volScalarField& T)
 
 Foam::radiation::P1::P1(const dictionary& dict, const volScalarField& T)
 :
-    radiationModel(typeName, dict, T),
+    OpenSMOKEradiationModel(typeName, dict, T),
     G_
     (
         IOobject
@@ -197,7 +197,7 @@ Foam::radiation::P1::~P1()
 
 bool Foam::radiation::P1::read()
 {
-    if (radiationModel::read())
+    if (OpenSMOKEradiationModel::read())
     {
         // nothing to read
 

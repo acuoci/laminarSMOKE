@@ -33,7 +33,7 @@ namespace Foam
     namespace radiation
     {
         defineTypeNameAndDebug(noScatter, 0);
-        addToRunTimeSelectionTable(scatterModel, noScatter, dictionary);
+        addToRunTimeSelectionTable(OpenSMOKEscatterModel, noScatter, dictionary);
     }
 }
 
@@ -46,7 +46,7 @@ Foam::radiation::noScatter::noScatter
     const fvMesh& mesh
 )
 :
-    scatterModel(dict, mesh)
+    OpenSMOKEscatterModel(dict, mesh)
 {}
 
 

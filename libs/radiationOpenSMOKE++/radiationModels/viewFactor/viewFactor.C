@@ -26,7 +26,7 @@ License
 #include "viewFactor.H"
 #include "surfaceFields.H"
 #include "constants.H"
-#include "greyDiffusiveViewFactorFixedValueFvPatchScalarField.H"
+#include "OpenSMOKEgreyDiffusiveViewFactorFixedValueFvPatchScalarField.H"
 #include "typeInfo.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -242,7 +242,7 @@ void Foam::radiation::viewFactor::initialise()
 
 Foam::radiation::viewFactor::viewFactor(const volScalarField& T)
 :
-    radiationModel(typeName, T),
+    OpenSMOKEradiationModel(typeName, T),
     finalAgglom_
     (
         IOobject
@@ -300,7 +300,7 @@ Foam::radiation::viewFactor::viewFactor
     const volScalarField& T
 )
 :
-    radiationModel(typeName, dict, T),
+    OpenSMOKEradiationModel(typeName, dict, T),
     finalAgglom_
     (
         IOobject
@@ -362,7 +362,7 @@ Foam::radiation::viewFactor::~viewFactor()
 
 bool Foam::radiation::viewFactor::read()
 {
-    if (radiationModel::read())
+    if (OpenSMOKEradiationModel::read())
     {
         return true;
     }
@@ -421,10 +421,10 @@ void Foam::radiation::viewFactor::calculate()
 
         fvPatchScalarField& QrPatch = Qr_.boundaryField()[patchID];
 
-        greyDiffusiveViewFactorFixedValueFvPatchScalarField& Qrp =
+        OpenSMOKEgreyDiffusiveViewFactorFixedValueFvPatchScalarField& Qrp =
             refCast
             <
-                greyDiffusiveViewFactorFixedValueFvPatchScalarField
+                OpenSMOKEgreyDiffusiveViewFactorFixedValueFvPatchScalarField
             >(QrPatch);
 
         const scalarList eb = Qrp.emissivity();

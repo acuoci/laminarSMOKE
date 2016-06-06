@@ -22,15 +22,15 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::radiation::scatterModel
+    Foam::radiation::OpenSMOKEscatterModel
 
 Description
     Base class for radiation scattering
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef scatterModel_H
-#define scatterModel_H
+#ifndef OpenSMOKEscatterModel_H
+#define OpenSMOKEscatterModel_H
 
 #include "IOdictionary.H"
 #include "autoPtr.H"
@@ -45,10 +45,10 @@ namespace radiation
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class scatterModel Declaration
+                  Class OpenSMOKEscatterModel Declaration
 \*---------------------------------------------------------------------------*/
 
-class scatterModel
+class OpenSMOKEscatterModel
 {
 
 protected:
@@ -61,14 +61,14 @@ protected:
 public:
 
     //- Runtime type information
-    TypeName("scatterModel");
+    TypeName("OpenSMOKEscatterModel");
 
     // Declare runtime constructor selection table
 
         declareRunTimeSelectionTable
         (
             autoPtr,
-            scatterModel,
+            OpenSMOKEscatterModel,
             dictionary,
             (
                 const dictionary& dict,
@@ -81,12 +81,12 @@ public:
     // Constructors
 
         //- Construct from components
-        scatterModel(const dictionary& dict, const fvMesh& mesh);
+        OpenSMOKEscatterModel(const dictionary& dict, const fvMesh& mesh);
 
 
     // Selector
 
-        static autoPtr<scatterModel> New
+        static autoPtr<OpenSMOKEscatterModel> New
         (
             const dictionary& dict,
             const fvMesh& mesh
@@ -94,7 +94,7 @@ public:
 
 
     //- Destructor
-    virtual ~scatterModel();
+    virtual ~OpenSMOKEscatterModel();
 
 
     // Member Functions

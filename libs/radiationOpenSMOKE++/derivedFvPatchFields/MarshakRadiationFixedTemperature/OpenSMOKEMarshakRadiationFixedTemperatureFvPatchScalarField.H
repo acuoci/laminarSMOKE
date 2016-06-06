@@ -22,7 +22,7 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::MarshakRadiationFixedTemperatureFvPatchScalarField
+    Foam::OpenSMOKEMarshakRadiationFixedTemperatureFvPatchScalarField
 
 Group
     grpThermoBoundaryConditions
@@ -56,12 +56,12 @@ SeeAlso
     Foam::mixedFvPatchField
 
 SourceFiles
-    MarshakRadiationFixedTemperatureFvPatchScalarField.C
+    OpenSMOKEMarshakRadiationFixedTemperatureFvPatchScalarField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef MarshakRadiationFixedTemperatureFvPatchScalarField_H
-#define MarshakRadiationFixedTemperatureFvPatchScalarField_H
+#ifndef OpenSMOKEMarshakRadiationFixedTemperatureFvPatchScalarField_H
+#define OpenSMOKEMarshakRadiationFixedTemperatureFvPatchScalarField_H
 
 #include "mixedFvPatchFields.H"
 #include "radiationCoupledBase.H"
@@ -72,10 +72,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-     Class MarshakRadiationFixedTemperatureFvPatchScalarField Declaration
+ Class OpenSMOKEMarshakRadiationFixedTemperatureFvPatchScalarField Declaration
 \*---------------------------------------------------------------------------*/
 
-class MarshakRadiationFixedTemperatureFvPatchScalarField
+class OpenSMOKEMarshakRadiationFixedTemperatureFvPatchScalarField
 :
     public mixedFvPatchScalarField,
     public radiationCoupledBase
@@ -90,20 +90,20 @@ class MarshakRadiationFixedTemperatureFvPatchScalarField
 public:
 
     //- Runtime type information
-    TypeName("MarshakRadiationFixedTemperature");
+    TypeName("OpenSMOKEMarshakRadiationFixedTemperature");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        MarshakRadiationFixedTemperatureFvPatchScalarField
+        OpenSMOKEMarshakRadiationFixedTemperatureFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        MarshakRadiationFixedTemperatureFvPatchScalarField
+        OpenSMOKEMarshakRadiationFixedTemperatureFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
@@ -112,18 +112,18 @@ public:
 
         //- Construct by mapping given MarshakRadiationFvPatchField onto a new
         //  patch
-        MarshakRadiationFixedTemperatureFvPatchScalarField
+        OpenSMOKEMarshakRadiationFixedTemperatureFvPatchScalarField
         (
-            const MarshakRadiationFixedTemperatureFvPatchScalarField&,
+            const OpenSMOKEMarshakRadiationFixedTemperatureFvPatchScalarField&,
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        MarshakRadiationFixedTemperatureFvPatchScalarField
+        OpenSMOKEMarshakRadiationFixedTemperatureFvPatchScalarField
         (
-            const MarshakRadiationFixedTemperatureFvPatchScalarField&
+            const OpenSMOKEMarshakRadiationFixedTemperatureFvPatchScalarField&
         );
 
         //- Construct and return a clone
@@ -131,14 +131,14 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new MarshakRadiationFixedTemperatureFvPatchScalarField(*this)
+                new OpenSMOKEMarshakRadiationFixedTemperatureFvPatchScalarField(*this)
             );
         }
 
         //- Construct as copy setting internal field reference
-        MarshakRadiationFixedTemperatureFvPatchScalarField
+        OpenSMOKEMarshakRadiationFixedTemperatureFvPatchScalarField
         (
-            const MarshakRadiationFixedTemperatureFvPatchScalarField&,
+            const OpenSMOKEMarshakRadiationFixedTemperatureFvPatchScalarField&,
             const DimensionedField<scalar, volMesh>&
         );
 
@@ -150,7 +150,7 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new MarshakRadiationFixedTemperatureFvPatchScalarField
+                new OpenSMOKEMarshakRadiationFixedTemperatureFvPatchScalarField
                 (
                     *this,
                     iF

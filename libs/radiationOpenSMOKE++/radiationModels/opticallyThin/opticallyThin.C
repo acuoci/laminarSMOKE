@@ -26,8 +26,8 @@ License
 #include "opticallyThin.H"
 #include "fvmLaplacian.H"
 #include "fvmSup.H"
-#include "absorptionEmissionModel.H"
-#include "scatterModel.H"
+#include "OpenSMOKEabsorptionEmissionModel.H"
+#include "OpenSMOKEscatterModel.H"
 #include "constants.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -49,7 +49,7 @@ namespace Foam
 
 Foam::radiation::opticallyThin::opticallyThin(const volScalarField& T)
 :
-    radiationModel(typeName, T),
+    OpenSMOKEradiationModel(typeName, T),
     Qr_
     (
         IOobject
@@ -108,7 +108,7 @@ Foam::radiation::opticallyThin::opticallyThin(const volScalarField& T)
 
 Foam::radiation::opticallyThin::opticallyThin(const dictionary& dict, const volScalarField& T)
 :
-    radiationModel(typeName, dict, T),
+    OpenSMOKEradiationModel(typeName, dict, T),
     Qr_
     (
         IOobject
@@ -175,7 +175,7 @@ Foam::radiation::opticallyThin::~opticallyThin()
 
 bool Foam::radiation::opticallyThin::read()
 {
-    if (radiationModel::read())
+    if (OpenSMOKEradiationModel::read())
     {
         // nothing to read
 

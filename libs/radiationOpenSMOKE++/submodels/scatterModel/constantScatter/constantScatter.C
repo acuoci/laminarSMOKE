@@ -36,7 +36,7 @@ namespace Foam
 
         addToRunTimeSelectionTable
         (
-            scatterModel,
+            OpenSMOKEscatterModel,
             constantScatter,
             dictionary
         );
@@ -52,7 +52,7 @@ Foam::radiation::constantScatter::constantScatter
     const fvMesh& mesh
 )
 :
-    scatterModel(dict, mesh),
+    OpenSMOKEscatterModel(dict, mesh),
     coeffsDict_(dict.subDict(typeName + "Coeffs")),
     sigma_(coeffsDict_.lookup("sigma")),
     C_(coeffsDict_.lookup("C"))

@@ -22,42 +22,49 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::radiation::OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField
+    Foam::radiation::OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField
 
 Group
     grpThermoBoundaryConditions
 
 Description
-    This boundary condition provides a wide-band, diffusive radiation
-    condition, where the patch temperature is specified.
+    This boundary condition provides a grey-diffuse condition for radiation
+    intensity, \c I, for use with the finite-volume discrete-ordinates model
+    (fvDOM), in which the radiation temperature is retrieved from the
+    temperature field boundary condition.
 
     \heading Patch usage
 
     \table
         Property     | Description             | Required    | Default value
         T            | temperature field name  | no          | T
+        emissivityMode | emissivity mode: solidRadiation or lookup | yes |
     \endtable
 
     Example of the boundary condition specification:
     \verbatim
     myPatch
     {
-        type            wideBandDiffusiveRadiation;
+        type            greyDiffusiveRadiation;
+        T               T;
+        emissivityMode  solidRadiation;
         value           uniform 0;
     }
     \endverbatim
 
 SeeAlso
-    Foam::mixedFvPatchScalarField
     Foam::radiationCoupledBase
+    Foam::radiation::OpenSMOKEradiationModel
+    Foam::radiation::fvDOM
+    Foam::mixedFvPatchField
 
 SourceFiles
-    OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField.C
+    OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField_H
-#define OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField_H
+#ifndef OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField_H
+#define OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField_H
 
 #include "mixedFvPatchFields.H"
 #include "radiationCoupledBase.H"
@@ -69,10 +76,10 @@ namespace Foam
 namespace radiation
 {
 /*---------------------------------------------------------------------------*\
- Class OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField Declaration
+  Class OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField Declaration
 \*---------------------------------------------------------------------------*/
 
-class OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField
+class OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField
 :
     public mixedFvPatchScalarField,
     public radiationCoupledBase
@@ -86,40 +93,40 @@ class OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField
 public:
 
     //- Runtime type information
-    TypeName("OpenSMOKEwideBandDiffusiveRadiation");
+    TypeName("OpenSMOKEgreyDiffusiveRadiation");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField
+        OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField
+        OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
             const dictionary&
         );
 
-        //- Construct by mapping given GreyDiffusiveRadiationMixedFvPatchField
-        //  onto a new patch
-        OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField
+        //- Construct by mapping given a
+        //  OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField onto a new patch
+        OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField
         (
-            const OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField&,
+            const OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField&,
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField
+        OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField
         (
-            const OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField&
+            const OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField&
         );
 
         //- Construct and return a clone
@@ -127,14 +134,14 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField(*this)
+                new OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField(*this)
             );
         }
 
         //- Construct as copy setting internal field reference
-        OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField
+        OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField
         (
-            const OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField&,
+            const OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField&,
             const DimensionedField<scalar, volMesh>&
         );
 
@@ -146,7 +153,7 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new OpenSMOKEwideBandDiffusiveRadiationMixedFvPatchScalarField(*this, iF)
+                new OpenSMOKEgreyDiffusiveRadiationMixedFvPatchScalarField(*this, iF)
             );
         }
 
@@ -184,8 +191,8 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace radiation
 } // End namespace Foam
-}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

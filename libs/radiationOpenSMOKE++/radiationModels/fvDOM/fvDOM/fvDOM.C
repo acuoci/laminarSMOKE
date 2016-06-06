@@ -24,8 +24,8 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "fvDOM.H"
-#include "absorptionEmissionModel.H"
-#include "scatterModel.H"
+#include "OpenSMOKEabsorptionEmissionModel.H"
+#include "OpenSMOKEscatterModel.H"
 #include "constants.H"
 #include "fvm.H"
 #include "addToRunTimeSelectionTable.H"
@@ -233,7 +233,7 @@ void Foam::radiation::fvDOM::initialise()
 
 Foam::radiation::fvDOM::fvDOM(const volScalarField& T)
 :
-    radiationModel(typeName, T),
+    OpenSMOKEradiationModel(typeName, T),
     G_
     (
         IOobject
@@ -322,7 +322,7 @@ Foam::radiation::fvDOM::fvDOM
     const volScalarField& T
 )
 :
-    radiationModel(typeName, dict, T),
+    OpenSMOKEradiationModel(typeName, dict, T),
     G_
     (
         IOobject
@@ -415,7 +415,7 @@ Foam::radiation::fvDOM::~fvDOM()
 
 bool Foam::radiation::fvDOM::read()
 {
-    if (radiationModel::read())
+    if (OpenSMOKEradiationModel::read())
     {
         // Only reading solution parameters - not changing ray geometry
         coeffs_.readIfPresent("convergence", convergence_);

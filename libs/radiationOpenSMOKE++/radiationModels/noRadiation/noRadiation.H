@@ -36,7 +36,7 @@ SourceFiles
 #ifndef noRadiation_H
 #define noRadiation_H
 
-#include "radiationModel.H"
+#include "OpenSMOKEradiationModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -51,7 +51,7 @@ namespace radiation
 
 class noRadiation
 :
-    public radiationModel
+    public OpenSMOKEradiationModel
 {
     // Private Member Functions
 

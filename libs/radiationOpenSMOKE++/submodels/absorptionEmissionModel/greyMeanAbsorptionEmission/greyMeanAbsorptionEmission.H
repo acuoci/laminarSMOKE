@@ -86,7 +86,7 @@ SourceFiles
 #define greyMeanAbsorptionEmission_H
 
 #include "interpolationLookUpTable.H"
-#include "absorptionEmissionModel.H"
+#include "OpenSMOKEabsorptionEmissionModel.H"
 #include "HashTable.H"
 #include "absorptionCoeffs.H"
 #include "laminarSMOKEthermoClass.H"
@@ -105,7 +105,7 @@ namespace radiation
 
 class greyMeanAbsorptionEmission
 :
-    public absorptionEmissionModel
+    public OpenSMOKEabsorptionEmissionModel
 {
 public:
 

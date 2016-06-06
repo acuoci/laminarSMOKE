@@ -45,7 +45,7 @@ SourceFiles
 #ifndef radiationModelviewFactor_H
 #define radiationModelviewFactor_H
 
-#include "radiationModel.H"
+#include "OpenSMOKEradiationModel.H"
 #include "singleCellFvMesh.H"
 #include "scalarMatrices.H"
 #include "globalIndex.H"
@@ -66,7 +66,7 @@ namespace radiation
 
 class viewFactor
 :
-    public radiationModel
+    public OpenSMOKEradiationModel
 {
     // Private data
 

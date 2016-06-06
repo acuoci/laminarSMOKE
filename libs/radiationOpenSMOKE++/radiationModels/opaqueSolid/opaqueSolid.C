@@ -47,7 +47,7 @@ namespace Foam
 
 Foam::radiation::opaqueSolid::opaqueSolid(const volScalarField& T)
 :
-    radiationModel(typeName, T)
+    OpenSMOKEradiationModel(typeName, T)
 {}
 
 
@@ -57,7 +57,7 @@ Foam::radiation::opaqueSolid::opaqueSolid
     const volScalarField& T
 )
 :
-    radiationModel(typeName, dict, T)
+    OpenSMOKEradiationModel(typeName, dict, T)
 {}
 
 
@@ -71,7 +71,7 @@ Foam::radiation::opaqueSolid::~opaqueSolid()
 
 bool Foam::radiation::opaqueSolid::read()
 {
-    return radiationModel::read();
+    return OpenSMOKEradiationModel::read();
 }
 
 

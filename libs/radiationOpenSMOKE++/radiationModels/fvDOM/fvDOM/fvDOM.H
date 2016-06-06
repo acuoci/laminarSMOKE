@@ -67,7 +67,7 @@ SourceFiles
 #define radiationModelfvDOM_H
 
 #include "radiativeIntensityRay.H"
-#include "radiationModel.H"
+#include "OpenSMOKEradiationModel.H"
 #include "fvMatrices.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -83,7 +83,7 @@ namespace radiation
 
 class fvDOM
 :
-    public radiationModel
+    public OpenSMOKEradiationModel
 {
     // Private data
 

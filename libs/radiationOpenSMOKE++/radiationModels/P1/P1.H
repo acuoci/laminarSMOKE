@@ -41,7 +41,7 @@ SourceFiles
 #ifndef radiationModelP1_H
 #define radiationModelP1_H
 
-#include "radiationModel.H"
+#include "OpenSMOKEradiationModel.H"
 #include "volFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -57,7 +57,7 @@ namespace radiation
 
 class P1
 :
-    public radiationModel
+    public OpenSMOKEradiationModel
 {
     // Private data
 

@@ -1,4 +1,4 @@
-    autoPtr<radiation::radiationModel> radiation
+    autoPtr<radiation::OpenSMOKEradiationModel> radiation
     (
-        radiation::radiationModel::New(T)
+        radiation::OpenSMOKEradiationModel::New(T)
     );

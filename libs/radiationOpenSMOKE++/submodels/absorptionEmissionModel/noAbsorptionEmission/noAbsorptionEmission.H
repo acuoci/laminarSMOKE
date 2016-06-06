@@ -35,7 +35,7 @@ SourceFiles
 #ifndef radiationNoAbsorptionEmission_H
 #define radiationNoAbsorptionEmission_H
 
-#include "absorptionEmissionModel.H"
+#include "OpenSMOKEabsorptionEmissionModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,7 +50,7 @@ namespace radiation
 
 class noAbsorptionEmission
 :
-    public absorptionEmissionModel
+    public OpenSMOKEabsorptionEmissionModel
 {
 
 public:

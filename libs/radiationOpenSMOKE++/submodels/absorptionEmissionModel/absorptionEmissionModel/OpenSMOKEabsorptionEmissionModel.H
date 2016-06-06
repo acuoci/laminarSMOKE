@@ -22,7 +22,7 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::radiation::absorptionEmissionModel
+    Foam::radiation::OpenSMOKEabsorptionEmissionModel
 
 Description
     Model to supply absorption and emission coefficients for radiation
@@ -47,10 +47,10 @@ namespace radiation
 {
 
 /*---------------------------------------------------------------------------*\
-                   Class absorptionEmissionModel Declaration
+            Class OpenSMOKEabsorptionEmissionModel Declaration
 \*---------------------------------------------------------------------------*/
 
-class absorptionEmissionModel
+class OpenSMOKEabsorptionEmissionModel
 {
 
 protected:
@@ -67,14 +67,14 @@ protected:
 public:
 
     //- Runtime type information
-    TypeName("absorptionEmissionModel");
+    TypeName("OpenSMOKEabsorptionEmissionModel");
 
     //- Declare runtime constructor selection table
 
         declareRunTimeSelectionTable
         (
             autoPtr,
-            absorptionEmissionModel,
+            OpenSMOKEabsorptionEmissionModel,
             dictionary,
             (
                 const dictionary& dict,
@@ -87,7 +87,7 @@ public:
     // Constructors
 
         //- Construct from components
-        absorptionEmissionModel
+        OpenSMOKEabsorptionEmissionModel
         (
             const dictionary& dict,
             const fvMesh& mesh
@@ -95,7 +95,7 @@ public:
 
 
     //- Selector
-    static autoPtr<absorptionEmissionModel> New
+    static autoPtr<OpenSMOKEabsorptionEmissionModel> New
     (
         const dictionary& dict,
         const fvMesh& mesh
@@ -103,7 +103,7 @@ public:
 
 
     //- Destructor
-    virtual ~absorptionEmissionModel();
+    virtual ~OpenSMOKEabsorptionEmissionModel();
 
 
     // Member Functions
