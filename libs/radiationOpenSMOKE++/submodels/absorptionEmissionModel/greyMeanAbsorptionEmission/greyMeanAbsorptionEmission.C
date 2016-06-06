@@ -280,7 +280,7 @@ Foam::radiation::greyMeanAbsorptionEmission::aCont(const label bandI) const
     // Soot contribution
     if (soot_planck_coefficient_ != SOOT_RADIATION_PLANCK_COEFFICIENT_NONE)
     {
-	const scalarField& fvsoot = T.db().objectRegistry::lookupObject<volScalarField>("soot::fv_large").internalField();
+	const scalarField& fvsoot = T.db().objectRegistry::lookupObject<volScalarField>("soot_fv_large").internalField();
 
 	forAll(a, cellI)
     	{
