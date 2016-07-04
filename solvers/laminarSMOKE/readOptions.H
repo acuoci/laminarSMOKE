@@ -110,6 +110,7 @@ std::vector<bool> soretEffectList;
 std::vector<int> indexSoret;
 scalar thermodynamicPressure = 101325.;
 label zMixDmixIndex = inertIndex;
+scalar direct_integration_minimum_temperature_for_chemistry = 200.;
 
 const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel");
 {
@@ -121,6 +122,7 @@ const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel
 	homogeneousReactions = Switch(physicalModelDictionary.lookup(word("homogeneousReactions")));
 	includeDpDt = Switch(physicalModelDictionary.lookup(word("includeDpDt")));
 	iMassDiffusionInEnergyEquation = Switch(physicalModelDictionary.lookup(word("massDiffusionInEnergyEquation")));
+	//direct_integration_minimum_temperature_for_chemistry  = readScalar(physicalModelDictionary.lookup("minTemperature4Chemistry"));
 	
 	// Thermophoretic effect
 	thermophoreticEffect = Switch(physicalModelDictionary.lookup(word("thermophoreticEffect")));

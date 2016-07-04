@@ -75,7 +75,7 @@ if (soretEffect == true)
 					mesh.time().timeName(),
 					mesh,
 					IOobject::NO_READ,
-					IOobject::AUTO_WRITE
+					IOobject::NO_WRITE
 				),
 				mesh,
 				dimensionedScalar("Dsoret", dimensionSet(0, 2, -1, 0, 0), 1e-10)
