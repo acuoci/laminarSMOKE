@@ -70,7 +70,19 @@
 						for(unsigned int i=0;i<NC;i++)
 							y0(i) = Y[i].internalField()[celli];
 						y0(NC) = TCells[celli];
-					
+
+						// Check and normalize the composition
+						{
+							double sum = 0.;
+							for(unsigned int i=0;i<NC;i++)
+							{
+								if (y0(i) < 0.)	y0(i) = 0.;
+								sum += y0(i);
+							}
+							for(unsigned int i=0;i<NC;i++)
+								y0(i) /= sum;
+						}
+
 						if (constPressureBatchReactor == true)
 						{
 							// Set reactor

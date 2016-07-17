@@ -190,8 +190,8 @@ int BatchReactorHomogeneousConstantPressure::Equations(const double t, const Ope
 		// Calculates the pressure and the concentrations of species
 		thermodynamicsMap_.MoleFractions_From_MassFractions(x_, MW_, omega_);
 		cTot_ = P0_/PhysicalConstants::R_J_kmol/T_;
-	    	rho_ = cTot_*MW_;
 		Product(cTot_, x_, &c_);
+	    	rho_ = cTot_*MW_;
 
 		// Calculates thermodynamic properties
 		thermodynamicsMap_.SetTemperature(T_);
