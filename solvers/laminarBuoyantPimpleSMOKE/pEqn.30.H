@@ -80,9 +80,7 @@ while (pimple.correctNonOrthogonal())
       + fvm::ddt(psi, p_rgh)
       - fvm::laplacian(rhorAUf, p_rgh)
      ==
-        parcels.Srho()
-      + surfaceFilm.Srho()
-      + fvOptions(psi, p_rgh, rho.name())
+        fvOptions(psi, p_rgh, rho.name())
     );
 
     p_rghEqn.solve(mesh.solver(p_rgh.select(pimple.finalInnerIter())));
