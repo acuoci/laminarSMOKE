@@ -7,7 +7,7 @@ EXE_INC = \
     -I../laminarSMOKE \
     -I../laminarSMOKE/unsteady \
     -I../../libs/radiationOpenSMOKE++/lnInclude \
-    -I$(OPENSMOKE_LIBRARY_PATH) \
+    -I../openSMOKEpp4laminarSMOKE/  \
     -I$(BOOST_LIBRARY_PATH)/include \
     -I$(EIGEN_LIBRARY_PATH) \
     -I$(RAPIDXML_LIBRARY_PATH) \

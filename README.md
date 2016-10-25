@@ -7,7 +7,7 @@ Compulsory libraries
 - Eigen (http://eigen.tuxfamily.org/index.php?title=Main_Page)
 - RapidXML (http://rapidxml.sourceforge.net/)
 - Boost C++ (http://www.boost.org/)
-- OpenSMOKE++ (alberto.cuoci@polimi.it)
+- OpenSMOKE++ (provided with the current verion of laminarSMOKE)
 
 Optional libraries
 ------------------

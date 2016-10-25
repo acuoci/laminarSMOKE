@@ -648,7 +648,7 @@ if (postProcessingPolimiSoot == true)
 				// Soot analysis
 				sootAnalyzer->Analysis(pT[facei], pp[facei], rhoGas, y_eigen, x_eigen);	
 				sootAnalyzer->Distribution();
-				sootAnalyzer->WriteDistribution(fOutput, face_x, 0., 0., pT[facei]);
+				sootAnalyzer->WriteDistribution(fOutput, 0., face_x, 0., 0., pT[facei]);
 			}
 		
 			fOutput.close();
@@ -721,7 +721,7 @@ if (postProcessingPolimiSoot == true)
 				// Soot analysis
 				sootAnalyzer->Analysis(Tint, pint, rhoGas, y_eigen, x_eigen);	
 				sootAnalyzer->Distribution();
-				sootAnalyzer->WriteDistribution(fOutput, xx, yy, zz, Tint);
+				sootAnalyzer->WriteDistribution(fOutput, 0., xx, yy, zz, Tint);
 				fOutput.close();
 			}
 		}

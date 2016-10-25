@@ -5,7 +5,6 @@ export OPENFOAM_VERSION='-DOPENFOAM_VERSION=30'
 export EIGEN_LIBRARY_PATH=/software/chimica2/libraries/eigen/eigen-3.3-dev
 export BOOST_LIBRARY_PATH=/software/chimica2/libraries/boost/boost-1.60.0-gcc-4.8.2
 export RAPIDXML_LIBRARY_PATH=/software/chimica2/libraries/rapidxml/rapidxml-1.13
-export OPENSMOKE_LIBRARY_PATH=$HOME/Development/MyCodes/OpenSMOKEpp/source
  
 #Options: ISAT support
 export ISAT_SUPPORT='-DOPENSMOKE_USE_ISAT=0'
