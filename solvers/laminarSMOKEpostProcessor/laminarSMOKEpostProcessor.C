@@ -204,6 +204,7 @@ int main(int argc, char *argv[])
 	bool calculateConcentrations = false;
 	bool reconstructMixtureFraction = false;
 	bool xmlProbeLocations = false;
+	bool exportDisks = false;
 
 	std::vector<std::string> 	fuel_names;
 	std::vector<std::string> 	oxidizer_names;
@@ -228,6 +229,8 @@ int main(int argc, char *argv[])
 		reconstructMixtureFraction = Switch(postProcessingDictionary.lookup(word("reconstructMixtureFraction")));
 		postProcessingPolimiSoot = Switch(postProcessingDictionary.lookup(word("soot")));
 		xmlProbeLocations = Switch(postProcessingDictionary.lookup(word("xmlProbeLocations")));
+
+		exportDisks = Switch(postProcessingDictionary.lookup(word("exportDisks")));
 
 		if (xmlProbeLocations == true)
 		{
@@ -340,6 +343,9 @@ int main(int argc, char *argv[])
 
 		// Local strain rate
 		#include "calculateLocalStrainRate.H"
+
+		// Export Disks
+		#include "exportDisks.H"
 
         	Info<< endl;
     	}
