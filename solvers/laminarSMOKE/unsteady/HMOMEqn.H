@@ -39,84 +39,86 @@
 \*-----------------------------------------------------------------------*/
 
 {
-	#include "setRootCase.H"
-	#include "createTime.H"
-	#include "createMesh.H"
-	#include "readGravitationalAcceleration.H"
+	volScalarField Dhmom
+	(
+	    IOobject
+	    (
+		"Dhmom",
+		runTime.timeName(),
+		mesh,
+		IOobject::NO_READ,
+		IOobject::NO_WRITE
+	    ),
+	    mesh,
+	    dimensionedScalar("Dhmom", dimensionSet(0., 2., -1., 0., 0.), 1.e-6)
+	);
 
-	simpleControl simple(mesh);
+	{
+		fvScalarMatrix HMOM_Norm_N0Eqn
+		(
+			fvm::ddt(rho,HMOM_Norm_N0)
+		      + fvm::div(phi, HMOM_Norm_N0) 
+		      - fvm::laplacian(rho*Dhmom, HMOM_Norm_N0) 
+		        == 
+		        // source terms
+		     	fvOptions(rho, HMOM_Norm_N0)
+		);
 
-	#include "createBasicFields.H"
-	#include "readOptions.H"
-	#include "readOptionsSteadyState.H"
+		// Solve
+		HMOM_Norm_N0Eqn.relax();
+		fvOptions.constrain(HMOM_Norm_N0Eqn);
+		HMOM_Norm_N0Eqn.solve(mesh.solver("HMOM_Norm_N0"));
+	}
 
-	linearModel linear_model(*thermodynamicsMapXML, *kineticsMapXML);
-	
-	#include "createGasFields.H"
-	#include "createChemicalFields.H"
-	#include "createFvOptions.H"
-	#include "createRadiationModel.H"
-	#include "createLaminarSMOKEThermoClass.H"
-	#include "createHMOMFields.H"
-	#include "memoryAllocation.H"
-	#include "properties.H"
-	#include "createAdditionalFields.H"
-	#include "initContinuityErrs.H"
+	{
+		fvScalarMatrix HMOM_Norm_M00Eqn
+		(
+			fvm::ddt(rho,HMOM_Norm_M00)
+		      + fvm::div(phi, HMOM_Norm_M00) 
+		      - fvm::laplacian(rho*Dhmom, HMOM_Norm_M00) 
+		        == 
+		        // source terms
+		     	fvOptions(rho, HMOM_Norm_M00)
+		);
 
-	dimensionedScalar initialMass = fvc::domainIntegrate(rho);
+		// Solve
+		HMOM_Norm_M00Eqn.relax();
+		fvOptions.constrain(HMOM_Norm_M00Eqn);
+		HMOM_Norm_M00Eqn.solve(mesh.solver("HMOM_Norm_M00"));
+	}
 
-    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+	{
+		fvScalarMatrix HMOM_Norm_M10Eqn
+		(
+			fvm::ddt(rho,HMOM_Norm_M10)
+		      + fvm::div(phi, HMOM_Norm_M10) 
+		      - fvm::laplacian(rho*Dhmom, HMOM_Norm_M10) 
+		        == 
+		        // source terms
+		     	fvOptions(rho, HMOM_Norm_M10)
+		);
 
-    Info<< "\nStarting time loop\n" << endl;
+		// Solve
+		HMOM_Norm_M10Eqn.relax();
+		fvOptions.constrain(HMOM_Norm_M10Eqn);
+		HMOM_Norm_M10Eqn.solve(mesh.solver("HMOM_Norm_M10"));
+	}
 
-    while (simple.loop())
-    {
-         Info<< "Time = " << runTime.timeName() << nl << endl;
-		
-	 double t0 = runTime.value() - runTime.deltaT().value();
-	 double tf = runTime.value();
+	{
+		fvScalarMatrix HMOM_Norm_M01Eqn
+		(
+			fvm::ddt(rho,HMOM_Norm_M01)
+		      + fvm::div(phi, HMOM_Norm_M01) 
+		      - fvm::laplacian(rho*Dhmom, HMOM_Norm_M01) 
+		        == 
+		        // source terms
+		     	fvOptions(rho, HMOM_Norm_M01)
+		);
 
-	 // Pressure-velocity SIMPLE corrector
-         {
-		if (momentumEquations == true)
-		{
-		    #include "UEqn.H"
+		// Solve
+		HMOM_Norm_M01Eqn.relax();
+		fvOptions.constrain(HMOM_Norm_M01Eqn);
+		HMOM_Norm_M01Eqn.solve(mesh.solver("HMOM_Norm_M01"));
+	}
 
-		    #include "updateProperties.H"
-		    #include "jacobianEvaluation.H"
-
-		    #include "fluxes.H"
-		    #include "YEqn.H"
-		    #include "HMOMEqn.H"
-		    #include "TEqn.H" 
-		    #include "pEqn.H"
-		}
-		else
-		{
-		    #include "updateProperties.H"
-		    #include "jacobianEvaluation.H"
-
-		    #include "fluxes.H"
-		    #include "YEqn.H"
-		    #include "HMOMEqn.H"
-		    #include "TEqn.H" 
-		}
-	    
-		// Passive scalars
-	        #include "zMixEqn.H"
-		#include "tauEqn.H"
-         }	
-
-	 #include "localPostProcessing.H"
-				
-	 runTime.write();
-		
-         Info << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-              << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-              << nl << endl;
-    }
-
-    Info<< "End\n" << endl;
-
-    return 0;
 }

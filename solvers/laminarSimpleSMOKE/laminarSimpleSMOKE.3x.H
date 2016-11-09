@@ -87,6 +87,7 @@
 
 		    #include "fluxes.H"
 		    #include "YEqn.H"
+		    #include "HMOMEqn.H"
 		    #include "TEqn.H" 
 		    if (simple.consistent())
 		    {
@@ -104,6 +105,7 @@
 
 		    #include "fluxes.H"
 		    #include "YEqn.H"
+		    #include "HMOMEqn.H"
 		    #include "TEqn.H" 
 		}
 	    

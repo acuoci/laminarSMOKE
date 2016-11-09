@@ -99,6 +99,7 @@ int main(int argc, char *argv[])
 	#include "createGasFields.H"
 	#include "createChemicalFields.H"
 	#include "createLaminarSMOKEThermoClass.H"
+	#include "createHMOMFields.H"
         #if OPENFOAM_VERSION == 30
         #include "createMRF.H"
         #endif
@@ -133,6 +134,7 @@ int main(int argc, char *argv[])
 
 		    #include "fluxes.H"
 		    #include "YEqn.H"
+		    #include "HMOMEqn.H"
 		    #include "TEqn.H" 
 
 		    // Pressure equations

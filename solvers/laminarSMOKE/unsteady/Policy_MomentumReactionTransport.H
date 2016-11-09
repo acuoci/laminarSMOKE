@@ -54,6 +54,7 @@
 		}
 
 		#include "YEqn.H"
+		#include "HMOMEqn.H"
 		#include "TEqn.H"
 
 		// --- Pressure corrector loop

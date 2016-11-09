@@ -38,6 +38,19 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
+// Denormalize moments
+{
+	HMOM_N0  = HMOM_Norm_N0*NAV;
+	HMOM_M00 = HMOM_Norm_M00*NAV + dimensionedScalar("eps", dimensionSet(0., -3., 0., 0., 0.), 1e-16);
+	HMOM_M10 = HMOM_Norm_M10*NAV*V0;
+	HMOM_M01 = HMOM_Norm_M01*NAV*S0;
+
+	HMOM_N  = HMOM_M00;
+	HMOM_fv = HMOM_M10;
+	HMOM_S  = HMOM_M01/HMOM_M00;
+	HMOM_V  = HMOM_M10/HMOM_M00;
+}
+
 if (iPolimiSoot == true)
 {
 	// Soot Analysis

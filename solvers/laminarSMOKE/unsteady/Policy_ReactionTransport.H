@@ -48,6 +48,7 @@
 	}
 
 	#include "YEqn.H"
+	#include "HMOMEqn.H"
 	#include "TEqn.H"
 
 	rho = Rho(p,psi);
