@@ -28,7 +28,7 @@ SteadyState
 	propertiesUpdate	10;
 	implicitSourceTerm 	true;
 	orderSpecies		"sweep";
-	exceptionalSpecies	(none );
+	exceptionalSpecies	( none );
 }
 
 PhysicalModel
@@ -53,6 +53,8 @@ PhysicalModel
 	zMixEquation			on;
 	tauEquation			on;
 	zMixDmixSpecies			N2;
+
+	minTemperature4Chemistry	0;
 }
 
 Radiation

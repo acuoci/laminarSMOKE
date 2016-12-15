@@ -88,6 +88,10 @@
 			{
 				#include "Policy_ReactionTransport.H"
 			}
+			else if (strangAlgorithm == STRANG_COMPACT)
+			{
+				#include "Policy_Compact.H"
+			}
 		}
 		else
 		{
@@ -98,7 +102,11 @@
 			else if (strangAlgorithm == STRANG_MOMENTUM_REACTION_TRANSPORT)
 			{
 				#include "Policy_MomentumReactionTransport.H"
-			}		
+			}	
+			else if (strangAlgorithm == STRANG_COMPACT)
+			{
+				#include "Policy_MomentumCompact.H"
+			}	
 		}
 
 		// Passive scalars

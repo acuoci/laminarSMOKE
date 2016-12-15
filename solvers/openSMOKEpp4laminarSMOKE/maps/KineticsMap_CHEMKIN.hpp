@@ -271,7 +271,7 @@ namespace OpenSMOKE
 		log_Patm_over_RT_ = std::log(Patm_over_RT_);
 
 		const double epsilon = 0.;
-		if (std::fabs(this->T_-this->T_old_)/this->T_>epsilon)
+	//	if (std::fabs(this->T_-this->T_old_)/this->T_>epsilon)
 		{
 			arrhenius_kinetic_constants_must_be_recalculated_ = true;
 			nonconventional_kinetic_constants_must_be_recalculated_ = true;

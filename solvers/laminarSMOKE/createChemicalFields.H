@@ -46,6 +46,7 @@ PtrList<volScalarField> X(thermodynamicsMapXML->NumberOfSpecies());
 PtrList<volScalarField> Dmix(thermodynamicsMapXML->NumberOfSpecies());
 PtrList<volScalarField> CpSpecies(thermodynamicsMapXML->NumberOfSpecies());
 PtrList<volScalarField> FormationRates(outputFormationRatesIndices.size());
+PtrList<volScalarField> RR(thermodynamicsMapXML->NumberOfSpecies());
 
 #if STEADYSTATE == 1
 PtrList<volScalarField> sourceImplicit(thermodynamicsMapXML->NumberOfSpecies()+1);
@@ -152,6 +153,26 @@ for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
                                 dimensionSet(0, 0, 0, 0, 0)
                         )
                 );
+
+		#if STEADYSTATE == 0
+		RR.set
+                (
+                        i,
+                        new volScalarField
+                        (
+                                IOobject
+                                (
+                                "thermo_RR_"+ thermodynamicsMapXML->NamesOfSpecies()[i],
+                                mesh.time().timeName(),
+                                mesh,
+                                IOobject::NO_READ,
+                                IOobject::NO_WRITE
+                                ),
+                                mesh,
+                                dimensionedScalar("RR", dimensionSet(1, -3, -1, 0, 0), 0.0)
+                        )
+                );
+		#endif
 	}
 
 	// check if field exists and can be read
@@ -210,6 +231,25 @@ for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 		);
 	}
 }
+
+#if STEADYSTATE == 0
+
+Info<< "Creating field RT\n" << endl;
+volScalarField RT
+(
+	IOobject
+	(
+		"RT",
+		runTime.timeName(),
+		mesh,
+		IOobject::NO_READ,
+		IOobject::NO_WRITE
+	),
+	mesh,
+	dimensionedScalar("RT", dimensionSet(1, -1, -3, 0, 0), 0.0)
+);
+
+#endif
 
 #if STEADYSTATE == 1
 

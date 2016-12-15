@@ -60,6 +60,7 @@
 	   	 	massDiffusionInEnergyEquation +
 			DpDt +
 			radiation->divq(T) +
+			RT +
 	    		cp*fvOptions(rho, T)
 		);
 

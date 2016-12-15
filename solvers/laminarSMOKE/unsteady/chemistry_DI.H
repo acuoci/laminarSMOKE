@@ -43,6 +43,7 @@
 	scalarField& TCells = T.internalField();
 	scalarField& QCells = Q.internalField();
 	const scalarField& rhoCells = rho.internalField();
+	const scalarField& cpCells = cp.internalField();
 	const scalarField& vCells = mesh.V();
 
 	if (homogeneousReactions == true && odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_OPENSMOKE)
@@ -93,7 +94,7 @@
 							odeSolverConstantPressure().SetInitialConditions(t0, y0);
 
 							// Additional ODE solver options
-							if (celli == 0)
+							//if (celli == 0)
 							{
 								// Set linear algebra options
 								odeSolverConstantPressure().SetLinearAlgebraSolver(odeParameterBatchReactorHomogeneous.linear_algebra());
@@ -111,6 +112,14 @@
 							// Solve
 							OdeSMOKE::OdeStatus status = odeSolverConstantPressure().Solve(tf);
 							odeSolverConstantPressure().Solution(yf);
+
+							if (status == -6)	// Time step too small
+							{
+								Info << "Constant pressure reactor: " << celli << endl;
+								Info << " * T: " << TCells[celli] << endl;
+								for(unsigned int i=0;i<NC;i++)
+								 	Info << " * " << thermodynamicsMapXML->NamesOfSpecies()[i] << ": " << y0(i) << endl;
+							}
 						}
 						else
 						{
@@ -122,7 +131,7 @@
 							odeSolverConstantVolume().SetInitialConditions(t0, y0);
 
 							// Additional ODE solver options
-							if (celli == 0)
+							//if (celli == 0)
 							{
 								// Set linear algebra options
 								odeSolverConstantVolume().SetLinearAlgebraSolver(odeParameterBatchReactorHomogeneous.linear_algebra());
@@ -140,6 +149,14 @@
 							// Solve
 							OdeSMOKE::OdeStatus status = odeSolverConstantVolume().Solve(tf);
 							odeSolverConstantVolume().Solution(yf);
+
+							if (status == -6)	// Time step too small
+							{
+								Info << "Constant volume reactor: " << celli << endl;
+								Info << " * T: " << TCells[celli] << endl;
+								for(unsigned int i=0;i<NC;i++)
+								 	Info << " * " << thermodynamicsMapXML->NamesOfSpecies()[i] << ": " << y0(i) << endl;
+							}
 						}
 					}
 				}
@@ -153,13 +170,53 @@
 				// Check mass fractions
 				normalizeMassFractions(yf, celli, massFractionsTol);
 
-				// Assign mass fractions
-				for(int i=0;i<NC;i++)
-					Y[i].internalField()[celli] = yf(i);
+				if (strangAlgorithm != STRANG_COMPACT)
+				{
+					// Assign mass fractions
+					for(int i=0;i<NC;i++)
+						Y[i].internalField()[celli] = yf(i);
 
-				//- Allocating final values: temperature
-				if (energyEquation == true)
-					TCells[celli] = yf(NC);
+					//- Allocating final values: temperature
+					if (energyEquation == true)
+						TCells[celli] = yf(NC);
+				}
+				else
+				{
+					const double deltat = tf-t0;
+
+					if (deltat>1e-14)
+					{
+						thermodynamicsMapXML->SetPressure(thermodynamicPressure);
+						thermodynamicsMapXML->SetTemperature(yf(NC));
+
+						double mwmix;
+						double cpmix;
+						for(int i=1;i<=NC;i++)
+							massFractions[i] = yf(i-1);
+						thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions,mwmix,massFractions);
+						thermodynamicsMapXML->cpMolar_Mixture_From_MoleFractions(cpmix, moleFractions);			//[J/Kmol/K]
+						cpmix /= mwmix;
+						const double rhomix = thermodynamicPressure*mwmix/PhysicalConstants::R_J_kmol/yf(NC);
+				
+						// Assign source mass fractions
+						for(int i=0;i<NC;i++)
+							RR[i].internalField()[celli] = rhomix*(yf(i)-Y[i].internalField()[celli])/deltat;
+
+						//- Allocating source temperature
+						if (energyEquation == true)
+							RT[celli] = rhomix*cpmix*(yf(NC)-TCells[celli])/deltat;
+					}
+					else
+					{
+						// Assign source mass fractions
+						for(int i=0;i<NC;i++)
+							RR[i].internalField()[celli] = 0.;
+
+						//- Allocating source temperature
+						if (energyEquation == true)
+							RT[celli] = 0.;
+					}
+				}
 
 				if (counter%(int(0.20*mesh.nCells())+1) == 0)
 					Info <<"   Accomplished: " << counter << "/" << mesh.nCells() << endl;
@@ -276,7 +333,7 @@
 
 							// Recover solution
 							odeSolverConstantVolume.Solution(yf.data());
-							if (energyEquation == true)
+							if (energyEquation == true && strangAlgorithm != STRANG_COMPACT)
 								TCells[celli] = batchReactorHomogeneousConstantVolume.GetTemperature();
 						}
 					}
@@ -284,9 +341,51 @@
 					// Check mass fractions
 					normalizeMassFractions(yf.data(), celli, massFractionsTol, NC);
 
-					// Assign mass fractions
-					for(int i=0;i<NC;i++)
-						Y[i].internalField()[celli] = yf(i);
+					
+
+					if (strangAlgorithm != STRANG_COMPACT)
+					{
+						// Assign mass fractions
+						for(int i=0;i<NC;i++)
+							Y[i].internalField()[celli] = yf(i);
+					}
+					else
+					{
+						const double deltat = tf-t0;
+
+						if (deltat>1e-14)
+						{
+							thermodynamicsMapXML->SetPressure(thermodynamicPressure);
+							thermodynamicsMapXML->SetTemperature(yf(NC));
+
+							double mwmix;
+							double cpmix;
+							for(int i=1;i<=NC;i++)
+								massFractions[i] = yf(i-1);
+							thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions,mwmix,massFractions);
+							thermodynamicsMapXML->cpMolar_Mixture_From_MoleFractions(cpmix, moleFractions);			//[J/Kmol/K]
+							cpmix /= mwmix;
+							const double rhomix = thermodynamicPressure*mwmix/PhysicalConstants::R_J_kmol/yf(NC);
+				
+							// Assign source mass fractions
+							for(int i=0;i<NC;i++)
+								RR[i].internalField()[celli] = rhomix*(yf(i)-Y[i].internalField()[celli])/deltat;
+
+							//- Allocating source temperature
+							if (energyEquation == true)
+								RT[celli] = rhomix*cpmix*(batchReactorHomogeneousConstantVolume.GetTemperature()-TCells[celli])/deltat;
+						}
+						else
+						{
+							// Assign source mass fractions
+							for(int i=0;i<NC;i++)
+								RR[i].internalField()[celli] = 0.;
+
+							//- Allocating source temperature
+							if (energyEquation == true)
+								RT[celli] = 0.;
+						}
+					}
 				}
 
 				if (counter%(int(0.20*mesh.nCells())+1) == 0)
@@ -442,13 +541,53 @@
 					// Check mass fractions
 					normalizeMassFractions(yf, celli, massFractionsTol);
 
-					// Assign mass fractions
-					for(int i=0;i<NC;i++)
-						Y[i].internalField()[celli] = yf[i+1];
+					if (strangAlgorithm != STRANG_COMPACT)
+					{
+						// Assign mass fractions
+						for(int i=0;i<NC;i++)
+							Y[i].internalField()[celli] = yf[i+1];
 
-					//- Allocating final values: temperature
-					if (energyEquation == true)
-						TCells[celli] = yf[NC+1];
+						//- Allocating final values: temperature
+						if (energyEquation == true)
+							TCells[celli] = yf[NC+1];
+					}
+					else
+					{
+						const double deltat = tf-t0;
+
+						if (deltat>1e-14)
+						{
+							thermodynamicsMapXML->SetPressure(thermodynamicPressure);
+							thermodynamicsMapXML->SetTemperature(yf[NC+1]);
+
+							double mwmix;
+							double cpmix;
+							for(int i=1;i<=NC;i++)
+								massFractions[i] = yf[i];
+							thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions,mwmix,massFractions);
+							thermodynamicsMapXML->cpMolar_Mixture_From_MoleFractions(cpmix, moleFractions);			//[J/Kmol/K]
+							cpmix /= mwmix;
+							const double rhomix = thermodynamicPressure*mwmix/PhysicalConstants::R_J_kmol/yf[NC+1];
+				
+							// Assign source mass fractions
+							for(int i=0;i<NC;i++)
+								RR[i].internalField()[celli] = rhomix*(yf[i+1]-Y[i].internalField()[celli])/deltat;
+
+							//- Allocating source temperature
+							if (energyEquation == true)
+								RT[celli] = rhomix*cpmix*(yf[NC+1]-TCells[celli])/deltat;
+						}
+						else
+						{
+							// Assign source mass fractions
+							for(int i=0;i<NC;i++)
+								RR[i].internalField()[celli] = 0.;
+
+							//- Allocating source temperature
+							if (energyEquation == true)
+								RT[celli] = 0.;
+						}
+					}
 				}
 
 				if (counter%(int(0.20*mesh.nCells())+1) == 0)

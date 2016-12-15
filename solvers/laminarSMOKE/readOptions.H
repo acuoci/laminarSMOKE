@@ -90,7 +90,7 @@ const dictionary& kineticsDictionary = solverOptions.subDict("Kinetics");
 scalar massFractionsTol = 1e-10;
 
 //- Internal models
-enum { STRANG_MOMENTUM_TRANSPORT_REACTION, STRANG_MOMENTUM_REACTION_TRANSPORT} strangAlgorithm;
+enum { STRANG_MOMENTUM_TRANSPORT_REACTION, STRANG_MOMENTUM_REACTION_TRANSPORT, STRANG_COMPACT } strangAlgorithm;
 enum { DIFFUSIVITY_MODEL_MULTICOMPONENT, DIFFUSIVITY_MODEL_LEWIS_NUMBERS} diffusivityModel;
 
 // Physical model
@@ -122,7 +122,7 @@ const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel
 	homogeneousReactions = Switch(physicalModelDictionary.lookup(word("homogeneousReactions")));
 	includeDpDt = Switch(physicalModelDictionary.lookup(word("includeDpDt")));
 	iMassDiffusionInEnergyEquation = Switch(physicalModelDictionary.lookup(word("massDiffusionInEnergyEquation")));
-	//direct_integration_minimum_temperature_for_chemistry  = readScalar(physicalModelDictionary.lookup("minTemperature4Chemistry"));
+	direct_integration_minimum_temperature_for_chemistry  = readScalar(physicalModelDictionary.lookup("minTemperature4Chemistry"));
 	
 	// Thermophoretic effect
 	thermophoreticEffect = Switch(physicalModelDictionary.lookup(word("thermophoreticEffect")));
@@ -142,9 +142,10 @@ const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel
 		word strang(physicalModelDictionary.lookup("strangAlgorithm"));
 		if (strang == "MomentumTransportReaction")	strangAlgorithm = STRANG_MOMENTUM_TRANSPORT_REACTION;
 		else if (strang == "MomentumReactionTransport")	strangAlgorithm = STRANG_MOMENTUM_REACTION_TRANSPORT;
+		else if (strang == "Compact")			strangAlgorithm = STRANG_COMPACT;
 		else
 		{
-			Info << "Wrong strangAlgorithm option: MomentumTransportReaction || MomentumReactionTransport" << endl;
+			Info << "Wrong strangAlgorithm option: MomentumTransportReaction || MomentumReactionTransport || Compact" << endl;
 			abort();
 		}
 	}

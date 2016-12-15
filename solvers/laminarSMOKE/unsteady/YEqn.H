@@ -88,8 +88,9 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 		        == 
 	              - fvm::laplacian(rho*Dmixi*MWmix*Yi/Mi, Yi)
 		      - sumDiffusionCorrections + 
-                      - fvm::div(Jc,Yi, "div(Jc,Yi)") + 
-		     	fvOptions(rho, Yi)
+                      - fvm::div(Jc,Yi, "div(Jc,Yi)")
+		      + RR[i]
+		      + fvOptions(rho, Yi)
 		);
 
 		// Add Soret effect

@@ -104,6 +104,8 @@ private:
 
 	OpenSMOKE::DRG* drg_;
 	bool drgAnalysis_;
+
+	bool debug_;
 };
 
 unsigned int BatchReactorHomogeneousConstantPressure::NumberOfEquations() const
@@ -133,6 +135,7 @@ BatchReactorHomogeneousConstantPressure::BatchReactorHomogeneousConstantPressure
 		energyEquation_ = true;
 		isat_ = false;
 		drgAnalysis_ = false;
+		debug_ = false;
 	}
 
 void BatchReactorHomogeneousConstantPressure::SetReactor( const double P0 )
@@ -203,7 +206,7 @@ int BatchReactorHomogeneousConstantPressure::Equations(const double t, const Ope
 		kineticsMap_.KineticConstants();
 		kineticsMap_.ReactionRates(c_);
 		kineticsMap_.FormationRates(&R_);
-	
+
 		// Species equations
 		for (unsigned int i=1;i<=NC_;++i)	
 			dy[i] = thermodynamicsMap_.MW()[i]*R_[i]/rho_;
@@ -223,6 +226,29 @@ int BatchReactorHomogeneousConstantPressure::Equations(const double t, const Ope
 		// ISAT Equation
 		if (isat_ == true)
 			dy[NC_+2] = 0.;
+
+		if (debug_ == true)
+		{
+			Info << " * T: " << T_ << endl;
+			Info << " * P: " << P0_ << endl;
+			for(unsigned int i=0;i<NC_;i++)
+				Info << " * " << thermodynamicsMap_.NamesOfSpecies()[i] << ": " << omega_[i+1] << endl;
+
+			Info << " * cTot: " << cTot_ << endl;
+			Info << " * xsum: " << x_.SumElements() << endl;
+			Info << " * MW: " << MW_ << endl;
+
+			double sum = 0.;
+			for(unsigned int i=0;i<NC_;i++)
+			{
+				Info << " * " << thermodynamicsMap_.NamesOfSpecies()[i] << ": " << thermodynamicsMap_.MW()[i+1]*R_[i+1] << endl;
+				sum += thermodynamicsMap_.MW()[i+1]*R_[i+1];
+			}
+			Info << " * sum: " << sum << endl;
+
+			Info << " * Cp: " << CpMixMass_ << endl;
+			Info << " * QR: " << QR_ << endl;
+		}
 	}
 	else
 	{
