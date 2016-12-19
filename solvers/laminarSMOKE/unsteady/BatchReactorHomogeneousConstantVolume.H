@@ -55,6 +55,8 @@ public:
 	
 	void SetCheckMassFractions( const bool flag ) { checkMassFractions_ = flag; };
 
+	void SetHMOMPrimaryParticles(const double HMOM_S0, const double HMOM_V0);
+
 	const OpenSMOKE::OpenSMOKEVectorDouble& R() const { return R_; }
 	double QR() const { return QR_; }
 
@@ -79,8 +81,28 @@ private:
 	double CvMixMass_;
 	double QR_;
 
+	double HMOM_Norm_N0_;
+	double HMOM_Norm_M00_;
+	double HMOM_Norm_M10_;
+	double HMOM_Norm_M01_;
+	double AvogadroNumber_;
+	double HMOM_S0_;
+	double HMOM_V0_;
+
+	double HMOM_N0_;
+	double HMOM_M00_;
+	double HMOM_M10_;
+	double HMOM_M01_;
+
+	double HMOM_N_;
+	double HMOM_fv_;
+	double HMOM_S_;
+	double HMOM_V_;
+	double HMOM_epsilon_M00_;
+
 	unsigned int NC_;
 	unsigned int NE_;
+	unsigned int NHMOM_;
 
 	OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>&	thermodynamicsMap_;		//!< thermodynamic map
 	OpenSMOKE::KineticsMap_CHEMKIN<double>&		kineticsMap_;			//!< kinetic map
@@ -94,6 +116,8 @@ private:
 	bool energyEquation_;
 
 	double enthalpy_;
+
+	void ProcessNormalizedHMOM();
 };
 
 BatchReactorHomogeneousConstantVolume::BatchReactorHomogeneousConstantVolume(	OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermodynamicsMap, 
@@ -101,8 +125,9 @@ BatchReactorHomogeneousConstantVolume::BatchReactorHomogeneousConstantVolume(	Op
 	thermodynamicsMap_(thermodynamicsMap), 
 	kineticsMap_(kineticsMap)
 	{
+		NHMOM_ = 4;
 		NC_ = thermodynamicsMap_.NumberOfSpecies();
-		NE_ = NC_+1;
+		NE_ = NC_+1+NHMOM_;;
 		QR_ = 0.;
 		
 		ChangeDimensions(NC_, &omega_, true);
@@ -112,7 +137,16 @@ BatchReactorHomogeneousConstantVolume::BatchReactorHomogeneousConstantVolume(	Op
 		
 		checkMassFractions_ = false;
 		energyEquation_ = true;
+
+		HMOM_epsilon_M00_ = 1.e-16;
 	}
+
+void BatchReactorHomogeneousConstantVolume::SetHMOMPrimaryParticles(const double HMOM_S0, const double HMOM_V0)
+{
+	AvogadroNumber_ = 6.022e23;	// [#/mol]
+	HMOM_S0_ = HMOM_S0;
+	HMOM_V0_ = HMOM_V0;
+}
 
 void BatchReactorHomogeneousConstantVolume::SetReactor( const double V0, const double P0, const double rho0)
 {
@@ -120,6 +154,22 @@ void BatchReactorHomogeneousConstantVolume::SetReactor( const double V0, const d
 	V0_   = V0;
 	rho0_ = rho0;
 }
+
+void BatchReactorHomogeneousConstantVolume::ProcessNormalizedHMOM()
+{
+	// Denormalize
+	HMOM_N0_  = HMOM_Norm_N0_*AvogadroNumber_;
+	HMOM_M00_ = HMOM_Norm_M00_*AvogadroNumber_ + HMOM_epsilon_M00_;
+	HMOM_M10_ = HMOM_Norm_M10_*AvogadroNumber_*HMOM_V0_;
+	HMOM_M01_ = HMOM_Norm_M01_*AvogadroNumber_*HMOM_S0_;
+
+	// Soot variables
+	HMOM_N_  = HMOM_M00_;			// [#/m3]
+	HMOM_fv_ = HMOM_M10_+1.e-16;		// [#/m3]
+	HMOM_S_  = HMOM_M01_/HMOM_M00_;		// [m2]
+	HMOM_V_  = HMOM_M10_/HMOM_M00_;		// [m3]
+}
+
 
 void BatchReactorHomogeneousConstantVolume::SetTemperature( const double T, double* y)
 {
@@ -129,6 +179,15 @@ void BatchReactorHomogeneousConstantVolume::SetTemperature( const double T, doub
 	// Recover mass fractions
 	for(unsigned int i=1;i<=NC_;++i)
 		omega_[i] = y[i-1];
+
+	// Recover normalized moments
+	HMOM_Norm_N0_  = y[NC_+0];
+	HMOM_Norm_M00_ = y[NC_+1];
+	HMOM_Norm_M10_ = y[NC_+2];
+	HMOM_Norm_M01_ = y[NC_+3];
+
+	// Process normalized moments 
+	ProcessNormalizedHMOM();
 
 	// Mole fractions
 	thermodynamicsMap_.MoleFractions_From_MassFractions(x_, MW_, omega_);
@@ -161,6 +220,15 @@ int BatchReactorHomogeneousConstantVolume::Equations(const double t, const OpenS
 	// Recover temperature
 	T_ = y[NC_+1];
 
+	// Recover normalized moments	
+	HMOM_Norm_N0_  = y[NC_+2];
+	HMOM_Norm_M00_ = y[NC_+3];
+	HMOM_Norm_M10_ = y[NC_+4];
+	HMOM_Norm_M01_ = y[NC_+5];
+
+	// Process normalized moments 
+	ProcessNormalizedHMOM();
+
 	// Calculates the pressure and the concentrations of species
 	thermodynamicsMap_.MoleFractions_From_MassFractions(x_, MW_, omega_);
 	cTot_ = rho0_/MW_;
@@ -182,20 +250,26 @@ int BatchReactorHomogeneousConstantVolume::Equations(const double t, const OpenS
 	for (unsigned int i=1;i<=NC_;++i)	
 		dy[i] = thermodynamicsMap_.MW()[i]*R_[i]/rho0_;
                 
-    // Energy equation
-    dy[NC_+1] = 0.;   
-    if (energyEquation_ == true)
-    {
+	// Energy equation
+	dy[NC_+1] = 0.;   
+	if (energyEquation_ == true)
+	{
 		double CpMixMolar; 
 		thermodynamicsMap_.cpMolar_Mixture_From_MoleFractions(CpMixMolar,x_);
 		CvMixMass_ = (CpMixMolar - PhysicalConstants::R_J_kmol) / MW_;
-	
+
 		QR_ = kineticsMap_.HeatRelease(R_);
 		const double sumMoleFormationRates = R_.SumElements();
-		
+
 		dy[NC_+1]  = (QR_ + PhysicalConstants::R_J_kmol*T_*sumMoleFormationRates) / (rho0_*CvMixMass_);
 	}
-	
+
+	// Moments equations
+	dy[NC_+2] = 0.;
+	dy[NC_+3] = 0.;
+	dy[NC_+4] = 0.;
+	dy[NC_+5] = 0.;
+
 	return 0;
 }
 

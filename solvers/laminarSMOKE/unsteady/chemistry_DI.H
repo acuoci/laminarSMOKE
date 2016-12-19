@@ -44,15 +44,28 @@
 	scalarField& QCells = Q.internalField();
 	const scalarField& rhoCells = rho.internalField();
 	const scalarField& vCells = mesh.V();
+	scalarField& HMOM_Norm_N0Cells = HMOM_Norm_N0.internalField();
+	scalarField& HMOM_Norm_M00Cells = HMOM_Norm_M00.internalField();
+	scalarField& HMOM_Norm_M10Cells = HMOM_Norm_M10.internalField();
+	scalarField& HMOM_Norm_M01Cells = HMOM_Norm_M01.internalField();
 
 	if (homogeneousReactions == true && odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_OPENSMOKE)
 	{
-		const unsigned int NC  = thermodynamicsMapXML->NumberOfSpecies();
-		const unsigned int NEQ = thermodynamicsMapXML->NumberOfSpecies()+1;
+		const unsigned int NC     = thermodynamicsMapXML->NumberOfSpecies();
+		const unsigned int NHMOM  = hmom_number_moments;
+		const unsigned int NEQ    = thermodynamicsMapXML->NumberOfSpecies()+1+NHMOM;
 		
 		// Min and max values
-		Eigen::VectorXd yMin(NEQ); for(unsigned int i=0;i<NEQ;i++) yMin(i) = 0.;  yMin(NC) = 200.;
-		Eigen::VectorXd yMax(NEQ); for(unsigned int i=0;i<NEQ;i++) yMax(i) = 1.;  yMax(NC) = 6000.;
+		Eigen::VectorXd yMin(NEQ);
+		for(unsigned int i=0;i<NEQ;i++)   yMin(i)      = 0.;  
+						  yMin(NC)     = 200.;
+		for(unsigned int i=0;i<NHMOM;i++) yMin(NC+1+i) = 0.;  
+
+		Eigen::VectorXd yMax(NEQ); 
+		for(unsigned int i=0;i<NEQ;i++)   yMax(i) = 1.;  
+						  yMax(NC) = 6000.;
+		for(unsigned int i=0;i<NHMOM;i++) yMax(NC+1+i) = 1e16;  
+
 		Eigen::VectorXd y0(NEQ);
 		Eigen::VectorXd yf(NEQ);
 
@@ -70,6 +83,10 @@
 						for(unsigned int i=0;i<NC;i++)
 							y0(i) = Y[i].internalField()[celli];
 						y0(NC) = TCells[celli];
+						y0(NC+1) = HMOM_Norm_N0Cells[celli];
+						y0(NC+2) = HMOM_Norm_M00Cells[celli];
+						y0(NC+3) = HMOM_Norm_M10Cells[celli];
+						y0(NC+4) = HMOM_Norm_M01Cells[celli];
 
 						// Check and normalize the composition
 						{
@@ -88,6 +105,11 @@
 							// Set reactor
 							batchReactorHomogeneousConstantPressure.SetReactor(thermodynamicPressure);
 							batchReactorHomogeneousConstantPressure.SetEnergyEquation(energyEquation);
+							batchReactorHomogeneousConstantPressure.SetHMOMTest(hmom_test);
+							batchReactorHomogeneousConstantPressure.SetHMOMAnalysis(hmom_analysis);
+							batchReactorHomogeneousConstantPressure.SetHMOMPrimaryParticles(S0.value(), V0.value());
+							batchReactorHomogeneousConstantPressure.SetHMOMOptions(hmom_index_H, hmom_index_OH, hmom_index_H2, hmom_index_H2O, hmom_index_C2H2, hmom_index_O2, hmom_index_PAHs);
+
 						
 							// Set initial conditions
 							odeSolverConstantPressure().SetInitialConditions(t0, y0);
@@ -117,7 +139,11 @@
 							// Set reactor pressure
 							batchReactorHomogeneousConstantVolume.SetReactor(vCells[celli], thermodynamicPressure, rhoCells[celli]);
 							batchReactorHomogeneousConstantVolume.SetEnergyEquation(energyEquation);
-						
+							batchReactorHomogeneousConstantPressure.SetHMOMTest(hmom_test);
+							batchReactorHomogeneousConstantPressure.SetHMOMAnalysis(hmom_analysis);
+							batchReactorHomogeneousConstantVolume.SetHMOMPrimaryParticles(S0.value(), V0.value());
+							batchReactorHomogeneousConstantPressure.SetHMOMOptions(hmom_index_H, hmom_index_OH, hmom_index_H2, hmom_index_H2O, hmom_index_C2H2, hmom_index_O2, hmom_index_PAHs);
+
 							// Set initial conditions
 							odeSolverConstantVolume().SetInitialConditions(t0, y0);
 
@@ -148,10 +174,14 @@
 					for(unsigned int i=0;i<NC;i++)
 						yf(i) = Y[i].internalField()[celli];
 					yf(NC) = TCells[celli];
+					yf(NC+1) = HMOM_Norm_N0Cells[celli];
+					yf(NC+2) = HMOM_Norm_M00Cells[celli];
+					yf(NC+3) = HMOM_Norm_M10Cells[celli];
+					yf(NC+4) = HMOM_Norm_M01Cells[celli];
 				}
 
 				// Check mass fractions
-				normalizeMassFractions(yf, celli, massFractionsTol);
+				normalizeMassFractions(yf, NC, celli, massFractionsTol);
 
 				// Assign mass fractions
 				for(int i=0;i<NC;i++)
@@ -160,6 +190,12 @@
 				//- Allocating final values: temperature
 				if (energyEquation == true)
 					TCells[celli] = yf(NC);
+
+				// Moments
+				HMOM_Norm_N0Cells[celli]  = yf(NC+1);
+				HMOM_Norm_M00Cells[celli] = yf(NC+2);
+				HMOM_Norm_M10Cells[celli] = yf(NC+3);
+				HMOM_Norm_M01Cells[celli] = yf(NC+4);
 
 				if (counter%(int(0.20*mesh.nCells())+1) == 0)
 					Info <<"   Accomplished: " << counter << "/" << mesh.nCells() << endl;
@@ -194,7 +230,7 @@
 			}
 			double tEnd = OpenSMOKE::OpenSMOKEGetCpuTime();
 			
-			Info << "   Homogeneous chemistry solved in " << tEnd - tStart << " s  (" << (tEnd-tStart)/double(mesh.nCells())*1000. << " ms per reactor)" << endl;
+			Info << "   Homogeneous+HMOM chemistry solved in " << tEnd - tStart << " s  (" << (tEnd-tStart)/double(mesh.nCells())*1000. << " ms per reactor)" << endl;
 		}
 	}
 	else if (homogeneousReactions == true && odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_CHEMEQ2)

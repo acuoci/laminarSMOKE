@@ -62,6 +62,18 @@
 		scalarField& hCells = h.internalField();
 		scalarField& MWmixCells = MWmix.internalField();
 
+		scalarField& HMOM_Norm_N0Cells  = HMOM_Norm_N0.internalField();
+		scalarField& HMOM_Norm_M00Cells = HMOM_Norm_M00.internalField();
+		scalarField& HMOM_Norm_M01Cells = HMOM_Norm_M01.internalField();
+		scalarField& HMOM_Norm_M10Cells = HMOM_Norm_M10.internalField();
+
+		scalarField& HMOM_fvCells = HMOM_fv.internalField(); 
+		scalarField& HMOM_NCells  = HMOM_N.internalField(); 
+		scalarField& HMOM_dpCells = HMOM_dp.internalField(); 
+		scalarField& HMOM_dcCells = HMOM_dc.internalField(); 
+		scalarField& HMOM_npCells = HMOM_np.internalField(); 
+
+
 		forAll(TCells, celli)
 		{
 			thermodynamicsMapXML->SetPressure(pCells[celli]);
@@ -134,6 +146,29 @@
 					Dsoret[i].internalField()[celli] =Dmix[index-1].internalField()[celli]*tetamixvector[index]*thermodynamicsMapXML->MW()[index]/MWmixCells[celli];
 				} 
 			}
+
+			// HMOM
+			if (hmom_analysis == true)
+			{
+				// Calculating derived moments
+				__mod_soot_hmom_MOD_calc_mom_var (&HMOM_Norm_M00Cells[celli], &HMOM_Norm_M10Cells[celli], &HMOM_Norm_M01Cells[celli], &HMOM_Norm_N0Cells[celli]);
+
+				// Calculating soot volume fraction [-]
+				HMOM_fvCells[celli] = __mod_soot_hmom_MOD_soot_mom (&hmom_one, &hmom_zero);
+
+				// Calculating soot particle number density [???]
+				const double mom0 = __mod_soot_hmom_MOD_soot_mom (&hmom_zero, &hmom_zero);
+				HMOM_NCells[celli] = mom0*1e-6;
+
+				// Calculating particle diameters [nm]
+				HMOM_dpCells[celli] = 6.*__mod_soot_hmom_MOD_soot_mom (&hmom_one, &hmom_minus_one)/mom0 * 1.e9;
+
+				// Calculating collision diameters [nm]
+				HMOM_dcCells[celli] = hmom_K_coll*__mod_soot_hmom_MOD_soot_mom(&hmom_Avcoll, &hmom_Ascoll)/mom0 * 1.e9;
+	
+				// Calculating number of primary particles [-]
+				HMOM_npCells[celli] = std::pow(hmom_K_sphe, -3.)*__mod_soot_hmom_MOD_soot_mom (&hmom_minus_two, &hmom_three)/mom0;
+			}
 		}
     }
 
@@ -151,6 +186,17 @@
 		fvPatchScalarField& pcv = cv.boundaryField()[patchi];
 		fvPatchScalarField& ph = h.boundaryField()[patchi];
 		fvPatchScalarField& pMWmix = MWmix.boundaryField()[patchi];
+
+		fvPatchScalarField& pHMOM_Norm_N0  = HMOM_Norm_N0.boundaryField()[patchi];
+		fvPatchScalarField& pHMOM_Norm_M00 = HMOM_Norm_M00.boundaryField()[patchi];
+		fvPatchScalarField& pHMOM_Norm_M01 = HMOM_Norm_M01.boundaryField()[patchi];
+		fvPatchScalarField& pHMOM_Norm_M10 = HMOM_Norm_M10.boundaryField()[patchi];
+
+		fvPatchScalarField& pHMOM_fv = HMOM_fv.boundaryField()[patchi]; 
+		fvPatchScalarField& pHMOM_N  = HMOM_N.boundaryField()[patchi];
+		fvPatchScalarField& pHMOM_dp = HMOM_dp.boundaryField()[patchi];
+		fvPatchScalarField& pHMOM_dc = HMOM_dc.boundaryField()[patchi];
+		fvPatchScalarField& pHMOM_np = HMOM_np.boundaryField()[patchi];
         
 		forAll(pT, facei)
 		{
@@ -170,16 +216,16 @@
 
 			pcTot[facei] = pp[facei]/(PhysicalConstants::R_J_kmol*pT[facei]);
 			ppsi[facei]  = pcTot[facei]*pMWmix[facei]/pp[facei];
-			thermodynamicsMapXML->hMolar_Mixture_From_MoleFractions(ph[facei], moleFractions);		// [J/kmol]
-			ph[facei] /= pMWmix[facei];																// [J/kg]
+			thermodynamicsMapXML->hMolar_Mixture_From_MoleFractions(ph[facei], moleFractions);	// [J/kmol]
+			ph[facei] /= pMWmix[facei];								// [J/kg]
 			
 			//if (viscositySpecies == true)
 			{
 				transportMapXML->DynamicViscosity(pmu[facei],moleFractions);
 			}
 						
-            if (energyEquation == true || diffusivityModel == DIFFUSIVITY_MODEL_LEWIS_NUMBERS)
-            {
+            		if (energyEquation == true || diffusivityModel == DIFFUSIVITY_MODEL_LEWIS_NUMBERS)
+            		{
 				transportMapXML->ThermalConductivity(plambda[facei],moleFractions);
 				
 				thermodynamicsMapXML->cpMolar_Mixture_From_MoleFractions(pcp[facei], moleFractions);			//[J/Kmol/K]
@@ -223,6 +269,29 @@
 					unsigned int index = transportMapXML->iThermalDiffusionRatios()[i];
 					Dsoret[i].boundaryField()[patchi][facei] = Dmix[index-1].boundaryField()[patchi][facei]*tetamixvector[index]*thermodynamicsMapXML->MW()[index]/pMWmix[facei];
 				}
+			}
+
+			// HMOM
+			if (hmom_analysis == true)
+			{
+				// Calculating derived moments
+				__mod_soot_hmom_MOD_calc_mom_var (&pHMOM_Norm_M00[facei], &pHMOM_Norm_M10[facei], &pHMOM_Norm_M01[facei], &pHMOM_Norm_N0[facei]);
+
+				// Calculating soot volume fraction [-]
+				pHMOM_fv[facei] = __mod_soot_hmom_MOD_soot_mom (&hmom_one, &hmom_zero);
+
+				// Calculating soot particle number density [???]
+				const double mom0 = __mod_soot_hmom_MOD_soot_mom (&hmom_zero, &hmom_zero);
+				pHMOM_N[facei] = mom0*1e-6;
+
+				// Calculating particle diameters [nm]
+				pHMOM_dp[facei] = 6.*__mod_soot_hmom_MOD_soot_mom (&hmom_one, &hmom_minus_one)/mom0 * 1.e9;
+
+				// Calculating collision diameters [nm]
+				pHMOM_dc[facei] = hmom_K_coll*__mod_soot_hmom_MOD_soot_mom(&hmom_Avcoll, &hmom_Ascoll)/mom0 * 1.e9;
+	
+				// Calculating number of primary particles [-]
+				pHMOM_np[facei] = std::pow(hmom_K_sphe, -3.)*__mod_soot_hmom_MOD_soot_mom (&hmom_minus_two, &hmom_three)/mom0;
 			}
 		}
 	}

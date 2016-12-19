@@ -190,6 +190,51 @@ const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel
 	}
 }
 
+Switch hmom_analysis = false;
+Switch hmom_test = false;
+int hmom_index_H = -1;
+int hmom_index_OH = -1;
+int hmom_index_H2O = -1;
+int hmom_index_H2 = -1;
+int hmom_index_O2 = -1;
+int hmom_index_C2H2 = -1;
+std::vector<int> hmom_index_PAHs;
+double hmom_soot_density = 1800.;
+int hmom_pah_nc = 16;
+int hmom_bivariate = 2;
+int hmom_number_moments = 4;
+int hmom_collision_model = 2;
+int hmom_volume_surface = 1;
+
+const dictionary& hmomDictionary = solverOptions.subDict("HMOM");
+{
+	hmom_analysis = Switch(hmomDictionary.lookup(word("hmom")));
+	hmom_test = Switch(hmomDictionary.lookup(word("test")));
+	
+	if ( hmom_analysis == true)
+	{
+		hmom_index_H = thermodynamicsMapXML->IndexOfSpecies("H")-1;
+		hmom_index_OH = thermodynamicsMapXML->IndexOfSpecies("OH")-1;
+		hmom_index_H2O = thermodynamicsMapXML->IndexOfSpecies("H2O")-1;
+		hmom_index_H2 = thermodynamicsMapXML->IndexOfSpecies("H2")-1;
+		hmom_index_O2 = thermodynamicsMapXML->IndexOfSpecies("O2")-1;
+		hmom_index_C2H2 = thermodynamicsMapXML->IndexOfSpecies("C2H2")-1;
+
+		List<word>  pah_list_species(hmomDictionary.lookup("pah_species"));
+		hmom_index_PAHs.resize(pah_list_species.size());
+		for (int i=0;i<pah_list_species.size();i++)
+			hmom_index_PAHs[i] = thermodynamicsMapXML->IndexOfSpecies(pah_list_species[i])-1;
+
+		hmom_soot_density = readScalar(hmomDictionary.lookup("soot_density"));
+		hmom_pah_nc = readLabel(hmomDictionary.lookup("pah_nc"));
+
+		hmom_bivariate = readLabel(hmomDictionary.lookup("bivariate"));
+		hmom_number_moments = readLabel(hmomDictionary.lookup("number_moments"));
+		hmom_collision_model = readLabel(hmomDictionary.lookup("collision_model"));
+		hmom_volume_surface = readLabel(hmomDictionary.lookup("volume_surface"));
+	}
+}
+
 //- Detect spark
 const dictionary& sparkDictionary = solverOptions.subDict("Spark");
 sparkModel spark;
