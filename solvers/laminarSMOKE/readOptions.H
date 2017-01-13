@@ -198,13 +198,20 @@ int hmom_index_H2O = -1;
 int hmom_index_H2 = -1;
 int hmom_index_O2 = -1;
 int hmom_index_C2H2 = -1;
-std::vector<int> hmom_index_PAHs;
-double hmom_soot_density = 1800.;
+int hmom_index_PAH = -1;
+
 int hmom_pah_nc = 16;
-int hmom_bivariate = 2;
 int hmom_number_moments = 4;
-int hmom_collision_model = 2;
-int hmom_volume_surface = 1;
+int hmom_collision_diameter_model = 2;
+int hmom_fractal_diameter_model = 1;
+
+int hmom_nucleation = 1;
+int hmom_surface_growth = 1;
+int hmom_oxidation = 1;
+int hmom_condensation = 1;
+int hmom_coagulation = 1;
+int hmom_coagulation_continous = 1;
+
 
 const dictionary& hmomDictionary = solverOptions.subDict("HMOM");
 {
@@ -219,19 +226,20 @@ const dictionary& hmomDictionary = solverOptions.subDict("HMOM");
 		hmom_index_H2 = thermodynamicsMapXML->IndexOfSpecies("H2")-1;
 		hmom_index_O2 = thermodynamicsMapXML->IndexOfSpecies("O2")-1;
 		hmom_index_C2H2 = thermodynamicsMapXML->IndexOfSpecies("C2H2")-1;
+		
+		word pah_name(hmomDictionary.lookup("pah_species"));
+		hmom_index_PAH = thermodynamicsMapXML->IndexOfSpecies(pah_name)-1;
 
-		List<word>  pah_list_species(hmomDictionary.lookup("pah_species"));
-		hmom_index_PAHs.resize(pah_list_species.size());
-		for (int i=0;i<pah_list_species.size();i++)
-			hmom_index_PAHs[i] = thermodynamicsMapXML->IndexOfSpecies(pah_list_species[i])-1;
-
-		hmom_soot_density = readScalar(hmomDictionary.lookup("soot_density"));
 		hmom_pah_nc = readLabel(hmomDictionary.lookup("pah_nc"));
+		hmom_collision_diameter_model = readLabel(hmomDictionary.lookup("collision_diameter_model"));
+		hmom_fractal_diameter_model = readLabel(hmomDictionary.lookup("fractal_diameter_model"));
 
-		hmom_bivariate = readLabel(hmomDictionary.lookup("bivariate"));
-		hmom_number_moments = readLabel(hmomDictionary.lookup("number_moments"));
-		hmom_collision_model = readLabel(hmomDictionary.lookup("collision_model"));
-		hmom_volume_surface = readLabel(hmomDictionary.lookup("volume_surface"));
+		hmom_nucleation = readLabel(hmomDictionary.lookup("nucleation"));
+		hmom_surface_growth = readLabel(hmomDictionary.lookup("surface_growth"));
+		hmom_oxidation = readLabel(hmomDictionary.lookup("oxidation"));
+		hmom_condensation = readLabel(hmomDictionary.lookup("condensation"));
+		hmom_coagulation = readLabel(hmomDictionary.lookup("coagulation"));
+		hmom_coagulation_continous = readLabel(hmomDictionary.lookup("coagulation_continous"));
 	}
 }
 

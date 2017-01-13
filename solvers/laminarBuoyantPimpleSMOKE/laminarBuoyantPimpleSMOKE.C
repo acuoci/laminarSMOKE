@@ -47,23 +47,6 @@
 // This is not a steady state simulation
 #define STEADYSTATE 0
 
-extern "C" {	extern void __mod_soot_init_MOD_init_soot_hmom (	int *Ncarbon_PAH, int *VarSpace, int *Num_mom, int *vs, int *dcm, 
-									int *Inucl, int *Icond, int *Isurf, int *Ioxi, int *Icoag, int* Icoagcon);
-
-
-		extern void source_terms_soot_hmom_ (	double *Y_H, double *Y_OH, 
-							double *C_OH, double *C_H, double *C_H2O, double *C_H2, double *C_C2H2, double *C_O2,
-							double *C_PAH, double *temp, double *press, double *vislam,
-							double *M00_norm, double *M10_norm, double *M01_norm, double *N0_norm, 
-							double *M00_source, double *M10_source, double *M01_source, double *N0_source); 
-
-
-		extern void __mod_soot_hmom_MOD_calc_mom (int *i); 
-		extern void __mod_soot_hmom_MOD_calc_mom_var (double *M00_norm, double *M10_norm, double *M01_norm, double *N0_norm); 
-		extern double __mod_soot_hmom_MOD_soot_mom (double *i, double *j); 
-		extern double __mod_soot_hmom_MOD_soot_mom_one (double *i, double *j); 
-}
-
 // OpenSMOKE++ Definitions
 #include "OpenSMOKEpp"
 
@@ -110,6 +93,7 @@ extern "C" {	extern void __mod_soot_init_MOD_init_soot_hmom (	int *Ncarbon_PAH, 
 
 // Soot
 #include "sootUtilities.H"
+#include "soot/hmom/HMOM.h"
 
 template<typename Solver, typename OdeBatch>
 void SolveOpenSourceSolvers(OdeBatch& ode, const double t0, const double tf, const OpenSMOKE::OpenSMOKEVectorDouble& y0, OpenSMOKE::OpenSMOKEVectorDouble& yf, const OpenSMOKE::ODE_Parameters& parameters)

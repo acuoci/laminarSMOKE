@@ -68,6 +68,8 @@
 		HMOM_Norm_N0Eqn.relax();
 		fvOptions.constrain(HMOM_Norm_N0Eqn);
 		HMOM_Norm_N0Eqn.solve(mesh.solver("HMOM_Norm_N0"));
+
+		HMOM_Norm_N0.max(1e-32);
 	}
 
 	{
@@ -85,6 +87,8 @@
 		HMOM_Norm_M00Eqn.relax();
 		fvOptions.constrain(HMOM_Norm_M00Eqn);
 		HMOM_Norm_M00Eqn.solve(mesh.solver("HMOM_Norm_M00"));
+
+		HMOM_Norm_M00.max(1e-32);
 	}
 
 	{
@@ -102,6 +106,8 @@
 		HMOM_Norm_M10Eqn.relax();
 		fvOptions.constrain(HMOM_Norm_M10Eqn);
 		HMOM_Norm_M10Eqn.solve(mesh.solver("HMOM_Norm_M10"));
+
+		HMOM_Norm_M10.max(1e-32);
 	}
 
 	{
@@ -119,6 +125,8 @@
 		HMOM_Norm_M01Eqn.relax();
 		fvOptions.constrain(HMOM_Norm_M01Eqn);
 		HMOM_Norm_M01Eqn.solve(mesh.solver("HMOM_Norm_M01"));
+
+		HMOM_Norm_M01.max(1e-32);
 	}
 
 }

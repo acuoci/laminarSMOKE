@@ -150,24 +150,23 @@
 			// HMOM
 			if (hmom_analysis == true)
 			{
-				// Calculating derived moments
-				__mod_soot_hmom_MOD_calc_mom_var (&HMOM_Norm_M00Cells[celli], &HMOM_Norm_M10Cells[celli], &HMOM_Norm_M01Cells[celli], &HMOM_Norm_N0Cells[celli]);
+				// Setup
+				hmom.SetNormalizedMoments(HMOM_Norm_M00Cells[celli], HMOM_Norm_M10Cells[celli], HMOM_Norm_M01Cells[celli], HMOM_Norm_N0Cells[celli]);
 
 				// Calculating soot volume fraction [-]
-				HMOM_fvCells[celli] = __mod_soot_hmom_MOD_soot_mom (&hmom_one, &hmom_zero);
+				HMOM_fvCells[celli] = hmom.SootVolumeFraction();
 
-				// Calculating soot particle number density [???]
-				const double mom0 = __mod_soot_hmom_MOD_soot_mom (&hmom_zero, &hmom_zero);
-				HMOM_NCells[celli] = mom0*1e-6;
+				// Calculating soot particle number density [#/m3]
+				HMOM_NCells[celli] = hmom.SootParticleNumberDensity();
 
 				// Calculating particle diameters [nm]
-				HMOM_dpCells[celli] = 6.*__mod_soot_hmom_MOD_soot_mom (&hmom_one, &hmom_minus_one)/mom0 * 1.e9;
+				HMOM_dpCells[celli] = hmom.SootParticleDiameter() * 1.e9;
 
 				// Calculating collision diameters [nm]
-				HMOM_dcCells[celli] = hmom_K_coll*__mod_soot_hmom_MOD_soot_mom(&hmom_Avcoll, &hmom_Ascoll)/mom0 * 1.e9;
+				HMOM_dcCells[celli] = hmom.SootCollisionParticleDiameter() * 1.e9;
 	
 				// Calculating number of primary particles [-]
-				HMOM_npCells[celli] = std::pow(hmom_K_sphe, -3.)*__mod_soot_hmom_MOD_soot_mom (&hmom_minus_two, &hmom_three)/mom0;
+				HMOM_npCells[celli] = hmom.SootNumberOfPrimaryParticles();
 			}
 		}
     }
@@ -274,24 +273,23 @@
 			// HMOM
 			if (hmom_analysis == true)
 			{
-				// Calculating derived moments
-				__mod_soot_hmom_MOD_calc_mom_var (&pHMOM_Norm_M00[facei], &pHMOM_Norm_M10[facei], &pHMOM_Norm_M01[facei], &pHMOM_Norm_N0[facei]);
+				// Setup
+				hmom.SetNormalizedMoments(pHMOM_Norm_M00[facei], pHMOM_Norm_M10[facei], pHMOM_Norm_M01[facei], pHMOM_Norm_N0[facei]);
 
 				// Calculating soot volume fraction [-]
-				pHMOM_fv[facei] = __mod_soot_hmom_MOD_soot_mom (&hmom_one, &hmom_zero);
+				pHMOM_fv[facei] = hmom.SootVolumeFraction();
 
-				// Calculating soot particle number density [???]
-				const double mom0 = __mod_soot_hmom_MOD_soot_mom (&hmom_zero, &hmom_zero);
-				pHMOM_N[facei] = mom0*1e-6;
+				// Calculating soot particle number density [#/m3]
+				pHMOM_N[facei] = hmom.SootParticleNumberDensity();
 
 				// Calculating particle diameters [nm]
-				pHMOM_dp[facei] = 6.*__mod_soot_hmom_MOD_soot_mom (&hmom_one, &hmom_minus_one)/mom0 * 1.e9;
+				pHMOM_dp[facei] = hmom.SootParticleDiameter() * 1.e9;
 
 				// Calculating collision diameters [nm]
-				pHMOM_dc[facei] = hmom_K_coll*__mod_soot_hmom_MOD_soot_mom(&hmom_Avcoll, &hmom_Ascoll)/mom0 * 1.e9;
+				pHMOM_dc[facei] = hmom.SootCollisionParticleDiameter() * 1.e9;
 	
 				// Calculating number of primary particles [-]
-				pHMOM_np[facei] = std::pow(hmom_K_sphe, -3.)*__mod_soot_hmom_MOD_soot_mom (&hmom_minus_two, &hmom_three)/mom0;
+				pHMOM_np[facei] = hmom.SootNumberOfPrimaryParticles();
 			}
 		}
 	}

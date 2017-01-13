@@ -44,7 +44,7 @@
 	scalarField& QCells = Q.internalField();
 	const scalarField& rhoCells = rho.internalField();
 	const scalarField& vCells = mesh.V();
-	scalarField& HMOM_Norm_N0Cells = HMOM_Norm_N0.internalField();
+	scalarField& HMOM_Norm_N0Cells  = HMOM_Norm_N0.internalField();
 	scalarField& HMOM_Norm_M00Cells = HMOM_Norm_M00.internalField();
 	scalarField& HMOM_Norm_M10Cells = HMOM_Norm_M10.internalField();
 	scalarField& HMOM_Norm_M01Cells = HMOM_Norm_M01.internalField();
@@ -107,8 +107,8 @@
 							batchReactorHomogeneousConstantPressure.SetEnergyEquation(energyEquation);
 							batchReactorHomogeneousConstantPressure.SetHMOMTest(hmom_test);
 							batchReactorHomogeneousConstantPressure.SetHMOMAnalysis(hmom_analysis);
-							batchReactorHomogeneousConstantPressure.SetHMOMPrimaryParticles(S0.value(), V0.value());
-							batchReactorHomogeneousConstantPressure.SetHMOMOptions(hmom_index_H, hmom_index_OH, hmom_index_H2, hmom_index_H2O, hmom_index_C2H2, hmom_index_O2, hmom_index_PAHs);
+							batchReactorHomogeneousConstantPressure.SetHMOM(&hmom);
+							batchReactorHomogeneousConstantPressure.SetHMOMOptions(hmom_index_H, hmom_index_OH, hmom_index_H2, hmom_index_H2O, hmom_index_C2H2, hmom_index_O2, hmom_index_PAH);
 
 						
 							// Set initial conditions
@@ -139,10 +139,10 @@
 							// Set reactor pressure
 							batchReactorHomogeneousConstantVolume.SetReactor(vCells[celli], thermodynamicPressure, rhoCells[celli]);
 							batchReactorHomogeneousConstantVolume.SetEnergyEquation(energyEquation);
-							batchReactorHomogeneousConstantPressure.SetHMOMTest(hmom_test);
-							batchReactorHomogeneousConstantPressure.SetHMOMAnalysis(hmom_analysis);
-							batchReactorHomogeneousConstantVolume.SetHMOMPrimaryParticles(S0.value(), V0.value());
-							batchReactorHomogeneousConstantPressure.SetHMOMOptions(hmom_index_H, hmom_index_OH, hmom_index_H2, hmom_index_H2O, hmom_index_C2H2, hmom_index_O2, hmom_index_PAHs);
+						//	batchReactorHomogeneousConstantVolume.SetHMOMTest(hmom_test);
+						//	batchReactorHomogeneousConstantVolume.SetHMOMAnalysis(hmom_analysis);
+						//	batchReactorHomogeneousConstantVolume.SetHMOM(&hmom);
+						//	batchReactorHomogeneousConstantVolume.SetHMOMOptions(hmom_index_H, hmom_index_OH, hmom_index_H2, hmom_index_H2O, hmom_index_C2H2, hmom_index_O2, hmom_index_PAH);
 
 							// Set initial conditions
 							odeSolverConstantVolume().SetInitialConditions(t0, y0);

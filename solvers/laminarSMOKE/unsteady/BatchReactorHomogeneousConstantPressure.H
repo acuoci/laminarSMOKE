@@ -41,6 +41,8 @@
 #ifndef BatchReactorHomogeneousConstantPressure_H
 #define	BatchReactorHomogeneousConstantPressure_H
 
+#include "soot/hmom/HMOM.h"
+
 class BatchReactorHomogeneousConstantPressure
 {
 public:
@@ -56,10 +58,10 @@ public:
 	void SetCheckMassFractions( const bool flag ) { checkMassFractions_ = flag; };
 	void SetISAT( const bool flag ) { isat_ = flag; };
 
+	void SetHMOM(OpenSMOKE::HMOM* hmom);
 	void SetHMOMTest(const bool flag);
 	void SetHMOMAnalysis(const bool flag);
-	void SetHMOMPrimaryParticles(const double HMOM_S0, const double HMOM_V0);
-	void SetHMOMOptions(const int index_H, const int index_OH, const int index_H2, const int index_H2O, const int index_C2H2, const int index_O2, const std::vector<int> index_PAHs);
+	void SetHMOMOptions(const int index_H, const int index_OH, const int index_H2, const int index_H2O, const int index_C2H2, const int index_O2, const int index_PAH);
 
 
 	const OpenSMOKE::OpenSMOKEVectorDouble& R() const { return R_; }
@@ -77,8 +79,6 @@ public:
 	void SetDRG(OpenSMOKE::DRG* drg) { drg_ = drg; drgAnalysis_ = true; }
 	void SetMassFractions( const OpenSMOKE::OpenSMOKEVectorDouble& omega );
 
-	void SetNormalizedHMOM( const double& HMOM_Norm_N0, const double& HMOM_Norm_M00, const double& HMOM_Norm_M10, const double& HMOM_Norm_M01);
-
 private:
 
 	double T_;
@@ -89,25 +89,6 @@ private:
 	double MW_;
 	double CpMixMass_;
 	double QR_;
-
-	double HMOM_Norm_N0_;
-	double HMOM_Norm_M00_;
-	double HMOM_Norm_M10_;
-	double HMOM_Norm_M01_;
-	double AvogadroNumber_;
-	double HMOM_S0_;
-	double HMOM_V0_;
-
-	double HMOM_N0_;
-	double HMOM_M00_;
-	double HMOM_M10_;
-	double HMOM_M01_;
-
-	double HMOM_N_;
-	double HMOM_fv_;
-	double HMOM_S_;
-	double HMOM_V_;
-	double HMOM_epsilon_M00_;
 
 	unsigned int NC_;
 	unsigned int NR_;
@@ -133,8 +114,6 @@ private:
 	OpenSMOKE::DRG* drg_;
 	bool drgAnalysis_;
 
-	void ProcessNormalizedHMOM();
-
 	bool hmom_analysis_;
 	bool hmom_test_;
 	int hmom_index_H_;
@@ -143,7 +122,9 @@ private:
 	int hmom_index_H2O_;
 	int hmom_index_C2H2_;
 	int hmom_index_O2_;
-	std::vector<int> hmom_index_PAHs_;
+	int hmom_index_PAH_;
+
+	OpenSMOKE::HMOM* hmom_;
 };
 
 void BatchReactorHomogeneousConstantPressure::SetHMOMAnalysis(const bool flag)
@@ -156,22 +137,20 @@ void BatchReactorHomogeneousConstantPressure::SetHMOMTest(const bool flag)
 	hmom_test_ = flag;
 }
 
-void BatchReactorHomogeneousConstantPressure::SetHMOMPrimaryParticles(const double HMOM_S0, const double HMOM_V0)
+void BatchReactorHomogeneousConstantPressure::SetHMOM(OpenSMOKE::HMOM* hmom)
 {
-	AvogadroNumber_ = 6.022e23;	// [#/mol]
-	HMOM_S0_ = HMOM_S0;
-	HMOM_V0_ = HMOM_V0;
+	hmom_ = hmom;
 }
 
-void BatchReactorHomogeneousConstantPressure::SetHMOMOptions(const int index_H, const int index_OH, const int index_H2, const int index_H2O, const int index_C2H2, const int index_O2, const std::vector<int> index_PAHs)
+void BatchReactorHomogeneousConstantPressure::SetHMOMOptions(const int index_H, const int index_OH, const int index_H2, const int index_H2O, const int index_C2H2, const int index_O2, const int index_PAH)
 {
-	hmom_index_H_ = index_H;
-	hmom_index_OH_ = index_OH;
-	hmom_index_H2_ = index_H2;
-	hmom_index_H2O_ = index_H2O;
+	hmom_index_H_    = index_H;
+	hmom_index_OH_   = index_OH;
+	hmom_index_H2_   = index_H2;
+	hmom_index_H2O_  = index_H2O;
 	hmom_index_C2H2_ = index_C2H2;
-	hmom_index_O2_ = index_O2;
-	hmom_index_PAHs_ = index_PAHs;
+	hmom_index_O2_   = index_O2;
+	hmom_index_PAH_  = index_PAH;
 }
 
 unsigned int BatchReactorHomogeneousConstantPressure::NumberOfEquations() const
@@ -202,8 +181,6 @@ BatchReactorHomogeneousConstantPressure::BatchReactorHomogeneousConstantPressure
 		energyEquation_ = true;
 		isat_ = false;
 		drgAnalysis_ = false;
-
-		HMOM_epsilon_M00_ = 1.e-16;
 	}
 
 void BatchReactorHomogeneousConstantPressure::SetReactor( const double P0 )
@@ -216,29 +193,6 @@ void BatchReactorHomogeneousConstantPressure::SetMassFractions( const OpenSMOKE:
 	omega_ = omega;
 }
 
-void BatchReactorHomogeneousConstantPressure::SetNormalizedHMOM( const double& HMOM_Norm_N0, const double& HMOM_Norm_M00, const double& HMOM_Norm_M10, const double& HMOM_Norm_M01)
-{
-	HMOM_Norm_N0_  = HMOM_Norm_N0;
-	HMOM_Norm_M00_ = HMOM_Norm_M00;
-	HMOM_Norm_M10_ = HMOM_Norm_M10;
-	HMOM_Norm_M01_ = HMOM_Norm_M01;
-}
-
-void BatchReactorHomogeneousConstantPressure::ProcessNormalizedHMOM()
-{
-	// Denormalize
-	HMOM_N0_  = HMOM_Norm_N0_*AvogadroNumber_;
-	HMOM_M00_ = HMOM_Norm_M00_*AvogadroNumber_ + HMOM_epsilon_M00_;
-	HMOM_M10_ = HMOM_Norm_M10_*AvogadroNumber_*HMOM_V0_;
-	HMOM_M01_ = HMOM_Norm_M01_*AvogadroNumber_*HMOM_S0_;
-
-	// Soot variables
-	HMOM_N_  = HMOM_M00_;			// [#/m3]
-	HMOM_fv_ = HMOM_M10_+1.e-16;		// [#/m3]
-	HMOM_S_  = HMOM_M01_/HMOM_M00_;		// [m2]
-	HMOM_V_  = HMOM_M10_/HMOM_M00_;		// [m3]
-}
-
 void BatchReactorHomogeneousConstantPressure::SetTemperature( const double T, double* y)
 {
 	// Temperature
@@ -247,15 +201,6 @@ void BatchReactorHomogeneousConstantPressure::SetTemperature( const double T, do
 	// Recover mass fractions
 	for(unsigned int i=1;i<=NC_;++i)
 		omega_[i] = y[i-1];
-
-	// Recover normalized moments
-	HMOM_Norm_N0_  = y[NC_+0];
-	HMOM_Norm_M00_ = y[NC_+1];
-	HMOM_Norm_M10_ = y[NC_+2];
-	HMOM_Norm_M01_ = y[NC_+3];
-
-	// Process normalized moments 
-	ProcessNormalizedHMOM();
 
 	// Mole fractions
 	thermodynamicsMap_.MoleFractions_From_MassFractions(x_, MW_, omega_);
@@ -291,13 +236,10 @@ int BatchReactorHomogeneousConstantPressure::Equations(const double t, const Ope
 		T_ = y[NC_+1];
 
 		// Recover normalized moments	
-		HMOM_Norm_N0_  = y[NC_+2];
-		HMOM_Norm_M00_ = y[NC_+3];
-		HMOM_Norm_M10_ = y[NC_+4];
-		HMOM_Norm_M01_ = y[NC_+5];
-
-		// Process normalized moments 
-		ProcessNormalizedHMOM();
+		const double HMOM_Norm_N0_  = y[NC_+2];
+		const double HMOM_Norm_M00_ = y[NC_+3];
+		const double HMOM_Norm_M10_ = y[NC_+4];
+		const double HMOM_Norm_M01_ = y[NC_+5];
 		
 		// Test HMOM library
 		#include "testHMOM.H"
@@ -338,38 +280,23 @@ int BatchReactorHomogeneousConstantPressure::Equations(const double t, const Ope
 		// HMOM Equations
 		if (hmom_analysis_ == true)
 		{
-			double Y_H    = omega_[hmom_index_H_+1];	// [-]
-			double Y_OH   = omega_[hmom_index_OH_+1];	// [-]
-			double C_H    = c_[hmom_index_H_+1]/1000.;	// [mol/cm3]
-			double C_OH   = c_[hmom_index_OH_+1]/1000.;	// [mol/cm3]
-			double C_H2O  = c_[hmom_index_H2O_+1]/1000.;	// [mol/cm3]
-			double C_H2   = c_[hmom_index_H2_+1]/1000.;	// [mol/cm3]
-			double C_C2H2 = c_[hmom_index_C2H2_+1]/1000.;	// [mol/cm3]
-			double C_O2   = c_[hmom_index_O2_+1]/1000.;	// [mol/cm3]
+			const double viscosity = 1.716e-5*Foam::pow(T_/273.15,1.5)*(273.15+110.4)/(T_+110.4);		// [kg/m/s]
 
-			double C_PAH = 0.;
-			for (unsigned int i=0;i<hmom_index_PAHs_.size();i++)
-				C_PAH += c_[hmom_index_PAHs_[i]+1]/1000.;	// [mol/m3]
+			// Setup
+			hmom_->SetNormalizedMoments(HMOM_Norm_M00_, HMOM_Norm_M10_, HMOM_Norm_M01_, HMOM_Norm_N0_);
+			hmom_->SetTemperatureAndPressure(T_, P0_);
+			hmom_->SetMassFractions(omega_[hmom_index_OH_+1], omega_[hmom_index_H_+1]);
+			hmom_->SetConcentrations("kmol/m3", c_[hmom_index_OH_+1], c_[hmom_index_H_+1], c_[hmom_index_H2O_+1], c_[hmom_index_H2_+1], c_[hmom_index_C2H2_+1], c_[hmom_index_O2_+1], c_[hmom_index_PAH_+1]);
+			hmom_->SetViscosity(viscosity);
+			
+			// Calculates
+			hmom_->CalculateSourceMoments();
 
-			double P_atm  = P0_/101325.;							// [atm]
-			double mu_lam  = 1.716e-5*Foam::pow(T_/273.15,1.5)*(273.15+110.4)/(T_+110.4);		// [kg/m/s]
-
-			double HMOM_Norm_M00_Source = 0.;	// [mol/m3/s]
-			double HMOM_Norm_M10_Source = 0.;	// [mol/m3/s]
-			double HMOM_Norm_M01_Source = 0.;	// [mol/m3/s]
-			double HMOM_Norm_N0_Source  = 0.;	// [mol/m3/s]
-
-			source_terms_soot_hmom_ (	&Y_H, &Y_OH, 
-							&C_OH, &C_H, &C_H2O, &C_H2, &C_C2H2, &C_O2,
-							&C_PAH, &T_, &P_atm, &mu_lam, 
-							&HMOM_Norm_M00_, &HMOM_Norm_M10_, &HMOM_Norm_M01_, &HMOM_Norm_N0_, 
-							&HMOM_Norm_M00_Source, &HMOM_Norm_M10_Source, &HMOM_Norm_M01_Source, &HMOM_Norm_N0_Source);
-
-			// Moments equations
-			dy[NC_+2] = HMOM_Norm_N0_Source;
-			dy[NC_+3] = HMOM_Norm_M00_Source;
-			dy[NC_+4] = HMOM_Norm_M10_Source;
-			dy[NC_+5] = HMOM_Norm_M01_Source;
+			// Moments equations [mol/m3/s]
+			dy[NC_+2] = hmom_->SourceN0();
+			dy[NC_+3] = hmom_->SourceM00();
+			dy[NC_+4] = hmom_->SourceM10();
+			dy[NC_+5] = hmom_->SourceM01();
 		}
 		else
 		{
