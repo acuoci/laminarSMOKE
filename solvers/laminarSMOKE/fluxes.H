@@ -42,11 +42,21 @@
 	// Mass diffusion
 	forAll (Y,i)
 	{
-		volScalarField& Xi = X[i];
-		volScalarField& Dmixi = Dmix[i];
-		dimensionedScalar MWi("MWi", dimensionSet(1,0,0,0,-1,0,0),scalar(thermodynamicsMapXML->MW()[i+1]) ); 
+		if (mwCorrectionInDiffusionFluxes == true)
+		{
+			volScalarField& Xi = X[i];
+			volScalarField& Dmixi = Dmix[i];
+			dimensionedScalar MWi("MWi", dimensionSet(1,0,0,0,-1,0,0),scalar(thermodynamicsMapXML->MW()[i+1]) ); 
 
-		J[i] = ( fvc::interpolate ( -rho*Dmixi*MWi/MWmix ) ) * ( fvc::interpolate ( fvc::grad(Xi) ) & mesh.Sf() );
+			J[i] = ( fvc::interpolate ( -rho*Dmixi*MWi/MWmix ) ) * ( fvc::interpolate ( fvc::grad(Xi) ) & mesh.Sf() );
+		}
+		else
+		{
+			volScalarField& Yi = Y[i];
+			volScalarField& Dmixi = Dmix[i];
+
+			J[i] = ( fvc::interpolate (-rho*Dmixi) ) * ( fvc::interpolate ( fvc::grad(Yi) ) & mesh.Sf() );
+		}
 	}
 
 	// Soret effect

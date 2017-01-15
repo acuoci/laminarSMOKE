@@ -111,6 +111,7 @@ std::vector<int> indexSoret;
 scalar thermodynamicPressure = 101325.;
 label zMixDmixIndex = inertIndex;
 scalar direct_integration_minimum_temperature_for_chemistry = 200.;
+Switch mwCorrectionInDiffusionFluxes = false;
 
 const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel");
 {
@@ -123,6 +124,10 @@ const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel
 	includeDpDt = Switch(physicalModelDictionary.lookup(word("includeDpDt")));
 	iMassDiffusionInEnergyEquation = Switch(physicalModelDictionary.lookup(word("massDiffusionInEnergyEquation")));
 	direct_integration_minimum_temperature_for_chemistry  = readScalar(physicalModelDictionary.lookup("minTemperature4Chemistry"));
+	mwCorrectionInDiffusionFluxes = Switch(physicalModelDictionary.lookupOrDefault(word("mwCorrectionInDiffusionFluxes"), word("on")));
+
+	// Info
+	Info << "Molecular weight correction in diffusion fluxes: " << mwCorrectionInDiffusionFluxes << endl;
 	
 	// Thermophoretic effect
 	thermophoreticEffect = Switch(physicalModelDictionary.lookup(word("thermophoreticEffect")));

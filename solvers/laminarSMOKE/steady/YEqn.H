@@ -64,56 +64,96 @@ if(speciesEquations == true)
         {
            	volScalarField& Yi = Y[i];
 	    	volScalarField& Dmixi = Dmix[i];
-		dimensionedScalar Mi( "Mi", dimensionSet(1,0,0,0,-1,0,0),thermodynamicsMapXML->MW()[i+1] ); 
 
 		// Corrections
+		if (mwCorrectionInDiffusionFluxes == true)
 		{
-			sumDiffusionCorrections *= 0.;
-			for (label k=0; k<Y.size(); k++)
+			dimensionedScalar Mi( "Mi", dimensionSet(1,0,0,0,-1,0,0),thermodynamicsMapXML->MW()[i+1] ); 
+
 			{
-				volScalarField& Yk = Y[k];	
-				dimensionedScalar Mk( "Mk", dimensionSet(1,0,0,0,-1,0,0), thermodynamicsMapXML->MW()[k+1] );
+				sumDiffusionCorrections *= 0.;
+				for (label k=0; k<Y.size(); k++)
+				{
+					volScalarField& Yk = Y[k];	
+					dimensionedScalar Mk( "Mk", dimensionSet(1,0,0,0,-1,0,0), thermodynamicsMapXML->MW()[k+1] );
 
-				if (i!=k)
-				sumDiffusionCorrections += fvc::laplacian(rho*MWmix/Mk*Dmixi*Yi, Yk);
+					if (i!=k)
+					sumDiffusionCorrections += fvc::laplacian(rho*MWmix/Mk*Dmixi*Yi, Yk);
+				}
 			}
-		}
 
-		fvScalarMatrix YiEqn
-		(
-		    	mvConvection->fvmDiv(phi, Yi)
-		      - fvm::laplacian(rho*Dmixi, Yi) 
-                        == 
-	              - fvm::laplacian(rho*Dmixi*MWmix*Yi/Mi, Yi)
-		      - sumDiffusionCorrections + 
-                      - fvm::div(Jc,Yi, "div(Jc,Yi)") + 
-		        sourceExplicit[i] + fvm::Sp(sourceImplicit[i],Yi) +						
-		     	fvOptions(rho, Yi)
-		);
+			fvScalarMatrix YiEqn
+			(
+			    	mvConvection->fvmDiv(phi, Yi)
+			      - fvm::laplacian(rho*Dmixi, Yi) 
+		                == 
+			      - fvm::laplacian(rho*Dmixi*MWmix*Yi/Mi, Yi)
+			      - sumDiffusionCorrections + 
+		              - fvm::div(Jc,Yi, "div(Jc,Yi)") + 
+				sourceExplicit[i] + fvm::Sp(sourceImplicit[i],Yi) +						
+			     	fvOptions(rho, Yi)
+			);
 
-		// Add Soret effect
-		if (soretEffect == true)
-		{ 
-			if (soretEffectList[i] == true)
-				YiEqn -= fvc::laplacian(rho*Dsoret[indexSoret[i]]/T, T, "laplacian(teta,Yi)");
-		}
+			// Add Soret effect
+			if (soretEffect == true)
+			{ 
+				if (soretEffectList[i] == true)
+					YiEqn -= fvc::laplacian(rho*Dsoret[indexSoret[i]]/T, T, "laplacian(teta,Yi)");
+			}
 
-		// Add thermophoretic effect
-		if (thermophoreticEffect == true)
-		{
-			if (thermophoreticEffectList[i] == true)
-				YiEqn -= fvc::laplacian(0.55*mu/T*Yi, T, "laplacian(teta,Yi)");
-		}
+			// Add thermophoretic effect
+			if (thermophoreticEffect == true)
+			{
+				if (thermophoreticEffectList[i] == true)
+					YiEqn -= fvc::laplacian(0.55*mu/T*Yi, T, "laplacian(teta,Yi)");
+			}
 
-		// Solve
-		YiEqn.relax();
-		fvOptions.constrain(YiEqn);
-		YiEqn.solve(mesh.solver(exceptional_species[i]));
-		fvOptions.correct(Yi);	
+			// Solve
+			YiEqn.relax();
+			fvOptions.constrain(YiEqn);
+			YiEqn.solve(mesh.solver(exceptional_species[i]));
+			fvOptions.correct(Yi);	
 			
-		// Sum of mass fractions
-            	Yi.max(0.0);
-           	Yt += Yi;
+			// Sum of mass fractions
+		    	Yi.max(0.0);
+		   	Yt += Yi;
+		}
+		else
+		{
+			fvScalarMatrix YiEqn
+			(
+			    	mvConvection->fvmDiv(phi, Yi)
+			      - fvm::laplacian(rho*Dmixi, Yi) 
+		                == 
+		              - fvm::div(Jc,Yi, "div(Jc,Yi)") 
+			      + sourceExplicit[i] + fvm::Sp(sourceImplicit[i],Yi)						
+			      +	fvOptions(rho, Yi)
+			);
+
+			// Add Soret effect
+			if (soretEffect == true)
+			{ 
+				if (soretEffectList[i] == true)
+					YiEqn -= fvc::laplacian(rho*Dsoret[indexSoret[i]]/T, T, "laplacian(teta,Yi)");
+			}
+
+			// Add thermophoretic effect
+			if (thermophoreticEffect == true)
+			{
+				if (thermophoreticEffectList[i] == true)
+					YiEqn -= fvc::laplacian(0.55*mu/T*Yi, T, "laplacian(teta,Yi)");
+			}
+
+			// Solve
+			YiEqn.relax();
+			fvOptions.constrain(YiEqn);
+			YiEqn.solve(mesh.solver(exceptional_species[i]));
+			fvOptions.correct(Yi);	
+			
+			// Sum of mass fractions
+		    	Yi.max(0.0);
+		   	Yt += Yi;
+		}
         }
     }
 

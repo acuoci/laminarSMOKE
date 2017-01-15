@@ -146,6 +146,9 @@ private:
 	//- Soot radiation: Planck coefficient
 	SootPlanckCoefficient soot_planck_coefficient_;
 
+	//- Soot correction coefficient
+	scalar soot_correction_coefficient_;
+
 
 public:
 
