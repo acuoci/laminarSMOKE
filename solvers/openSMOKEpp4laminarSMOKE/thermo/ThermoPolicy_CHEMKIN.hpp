@@ -1031,7 +1031,7 @@ namespace OpenSMOKE
 			Y = XT*y;
 
 			Eigen::MatrixXd fittedParameters;
-			fittedParameters = XTX.fullPivLu().solve(Y);
+			fittedParameters = XTX.partialPivLu().solve(Y);
 
 			const double Tknot2 = Tknot*Tknot;
 			const double Tknot3 = Tknot2*Tknot;
@@ -1192,6 +1192,213 @@ namespace OpenSMOKE
 			if (list_of_nonstandard_atomic_composition.size() != 0)
 			{
 				for(unsigned int j=0;j<list_of_nonstandard_atomic_composition.size();j++)
+				{
+					unsigned int i = list_of_standard_atomic_composition[j];
+					fout << atomic_composition_.element_names()[i] << " " << atomic_composition_.element_coefficients()[i] << " ";
+				}
+				fout << std::endl;
+			}
+		}
+	}
+
+	void ThermoPolicy_CHEMKIN::ReformulationOfThermodynamicsFixedIntermediateTemperature(std::ostream& fout, const unsigned int policy_intermediate_temperature, const double intermediate_temperature, const double max_temperature)
+	{
+		const double Tknot = 1000.;
+
+		unsigned int n = 15;
+		OpenSMOKEVectorDouble temperatures(2 * n);
+		temperatures[1] = thermodynamics_parameters_[1];
+		for (unsigned int i = 2; i <= n; i++)
+			temperatures[i] = temperatures[i - 1] + (thermodynamics_parameters_[2] - thermodynamics_parameters_[1]) / double(n - 1);
+		for (unsigned int i = n + 1; i <= 2 * n; i++)
+			temperatures[i] = temperatures[i - 1] + (max_temperature - thermodynamics_parameters_[2]) / double(n);
+
+		// Evaluating the profile to fit
+		Eigen::MatrixXd y(temperatures.Size(), 1);
+		for (int i = 1; i <= temperatures.Size(); i++)
+		{
+			const double T = temperatures[i];
+			const double RGAS_over_MW_ = PhysicalConstants::R_J_mol / (MolecularWeight()*1.e-3);
+
+			y(i - 1, 0) = cp(temperatures[i]) / RGAS_over_MW_;
+		}
+
+		int N = 1;
+		Eigen::MatrixXd XTX(5 + N, 5 + N);
+		Eigen::MatrixXd XT(5 + N, temperatures.Size());
+		Eigen::MatrixXd X(temperatures.Size(), 5 + N);
+		Eigen::MatrixXd Y(5 + N, 1);
+
+		// Assembling X and XT Matrices (Fixed part)
+		for (int i = 0; i<temperatures.Size(); i++)
+		{
+			const double T = temperatures[i + 1];
+			X(i, 0) = 1.;
+			X(i, 1) = T;
+			X(i, 2) = T*T;
+			X(i, 3) = T*T*T;
+			X(i, 4) = T*T*T*T;
+		}
+
+		double ALT, BLT, CLT, DLT, ELT;
+		double AHT, BHT, CHT, DHT, EHT;
+
+		{
+			for (int i = 0; i<temperatures.Size(); i++)
+			{
+				const double T = temperatures[i + 1];
+
+				if (T <= Tknot)
+				{
+					X(i, 5) = 0.;
+					if (N>1)	X(i, 6) = 0.;
+					if (N>2)	X(i, 7) = 0.;
+				}
+				else
+				{
+					double difference = T - Tknot;
+					X(i, 5) = difference*difference*difference*difference;
+					if (N>1)	X(i, 6) = difference*difference*difference;
+					if (N>2)	X(i, 7) = difference*difference;
+				}
+			}
+
+			// Calculating the LS matrix
+			XT = X.transpose();
+			XTX = XT*X;
+			Y = XT*y;
+
+			Eigen::MatrixXd fittedParameters;
+			fittedParameters = XTX.partialPivLu().solve(Y);
+
+			const double Tknot2 = Tknot*Tknot;
+			const double Tknot3 = Tknot2*Tknot;
+			const double Tknot4 = Tknot2*Tknot2;
+
+			ALT = fittedParameters(0, 0);
+			BLT = fittedParameters(1, 0);
+			CLT = fittedParameters(2, 0);
+			DLT = fittedParameters(3, 0);
+			ELT = fittedParameters(4, 0);
+
+			AHT = ALT + fittedParameters(5, 0)*Tknot4;
+			BHT = BLT - 4.*fittedParameters(5, 0)*Tknot3;
+			CHT = CLT + 6.*fittedParameters(5, 0)*Tknot2;
+			DHT = DLT - 4.*fittedParameters(5, 0)*Tknot;
+			EHT = ELT + fittedParameters(5, 0);
+
+			if (N>1)
+			{
+				AHT += -fittedParameters(6, 0)*Tknot3;
+				BHT += 3.*fittedParameters(6, 0)*Tknot2;
+				CHT += -3.*fittedParameters(6, 0)*Tknot;
+				DHT += fittedParameters(6, 0);
+			}
+			if (N>2)
+			{
+				AHT += fittedParameters(7, 0)*Tknot2;
+				BHT += -2.*fittedParameters(7, 0)*Tknot;
+				CHT += fittedParameters(7, 0);
+			}
+
+			double relative_error = 0.;
+			for (int i = 1; i <= temperatures.Size(); i++)
+			{
+				const double T = temperatures[i];
+				double cp_new;
+
+				if (T <= Tknot)
+					cp_new = (ALT + T*(BLT + T*(CLT + T*(DLT + T*ELT))));
+				else
+					cp_new = (AHT + T*(BHT + T*(CHT + T*(DHT + T*EHT))));
+			}
+		}
+
+		{
+			const double RGAS_over_MW_ = PhysicalConstants::R_J_mol / (MolecularWeight()*1.e-3);
+
+			const double Tknot2 = Tknot*Tknot;
+			const double Tknot3 = Tknot*Tknot2;
+			const double Tknot4 = Tknot2*Tknot2;
+			const double FLT = (enthalpy(Tknot) / RGAS_over_MW_ / Tknot - (ALT + BLT / 2.*Tknot + CLT / 3.*Tknot2 + DLT / 4.*Tknot3 + ELT / 5.*Tknot4)) *Tknot;
+			const double FHT = (enthalpy(Tknot) / RGAS_over_MW_ / Tknot - (AHT + BHT / 2.*Tknot + CHT / 3.*Tknot2 + DHT / 4.*Tknot3 + EHT / 5.*Tknot4)) *Tknot;
+
+			double GLT = (entropy(Tknot) / RGAS_over_MW_ - (ALT*std::log(Tknot) + BLT*Tknot + CLT / 2.*Tknot2 + DLT / 3.*Tknot3 + ELT / 4.*Tknot4));
+			double GHT = (entropy(Tknot) / RGAS_over_MW_ - (AHT*std::log(Tknot) + BHT*Tknot + CHT / 2.*Tknot2 + DHT / 3.*Tknot3 + EHT / 4.*Tknot4));
+
+			// Write on a file
+			fout << std::setw(16) << std::left << name_thermo_;
+			fout << std::setw(8) << std::left << " ";
+
+			std::vector<unsigned int> list_of_nonstandard_atomic_composition;
+			std::vector<unsigned int> list_of_standard_atomic_composition;
+
+			for (unsigned int i = 0; i<atomic_composition_.element_coefficients().size(); i++)
+			{
+				if (atomic_composition_.element_coefficients()[i] != 0.)
+				{
+					if (IsInteger(atomic_composition_.element_coefficients()[i]) == false || int(atomic_composition_.element_coefficients()[i]) > 99)
+						list_of_nonstandard_atomic_composition.push_back(i);
+					else
+						list_of_standard_atomic_composition.push_back(i);
+				}
+			}
+
+			if (list_of_standard_atomic_composition.size() <= 4 && list_of_nonstandard_atomic_composition.size() == 0)
+			{
+				for (unsigned int j = 0; j<list_of_standard_atomic_composition.size(); j++)
+				{
+					unsigned int i = list_of_standard_atomic_composition[j];
+					fout << std::setw(2) << std::left << atomic_composition_.element_names()[i];
+					fout << std::setw(3) << std::right << int(atomic_composition_.element_coefficients()[i]);
+				}
+				for (std::size_t j = list_of_standard_atomic_composition.size(); j<4; j++)
+				{
+					fout << std::setw(2) << " ";
+					fout << std::setw(3) << " ";
+				}
+			}
+			else
+			{
+				list_of_nonstandard_atomic_composition.insert(list_of_nonstandard_atomic_composition.end(), list_of_standard_atomic_composition.begin(), list_of_standard_atomic_composition.end());
+				for (unsigned int j = 0; j<4; j++)
+				{
+					fout << std::setw(2) << " ";
+					fout << std::setw(3) << " ";
+				}
+			}
+
+			fout << phase_;
+			fout << std::setw(10) << std::right << std::fixed << std::setprecision(2) << thermodynamics_parameters_[1];
+			fout << std::setw(10) << std::right << std::fixed << std::setprecision(2) << max_temperature;
+			fout << std::setw(8) << std::right << std::fixed << std::setprecision(2) << Tknot;
+			fout << "      1";
+			if (list_of_nonstandard_atomic_composition.size() != 0)
+				fout << "&";
+			fout << std::endl;
+
+			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(AHT, 2);
+			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(BHT, 2);
+			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(CHT, 2);
+			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(DHT, 2);
+			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(EHT, 2);
+			fout << "    2" << std::endl;
+			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(FHT, 2);
+			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(GHT, 2);
+			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(ALT, 2);
+			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(BLT, 2);
+			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(CLT, 2);
+			fout << "    3" << std::endl;
+			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(DLT, 2);
+			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(ELT, 2);
+			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(FLT, 2);
+			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(GLT, 2);
+			fout << std::setw(15) << " ";
+			fout << "    4" << std::endl;
+
+			if (list_of_nonstandard_atomic_composition.size() != 0)
+			{
+				for (unsigned int j = 0; j<list_of_nonstandard_atomic_composition.size(); j++)
 				{
 					unsigned int i = list_of_standard_atomic_composition[j];
 					fout << atomic_composition_.element_names()[i] << " " << atomic_composition_.element_coefficients()[i] << " ";

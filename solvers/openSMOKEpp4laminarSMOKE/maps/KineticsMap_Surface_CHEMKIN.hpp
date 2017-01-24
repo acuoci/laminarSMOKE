@@ -668,8 +668,10 @@ namespace OpenSMOKE
 	}
 
 	template<typename map> 
-	void KineticsMap_Surface_CHEMKIN<map>::ArrheniusKineticConstants()
+	void KineticsMap_Surface_CHEMKIN<map>::KineticConstants()
 	{
+		ReactionEnthalpiesAndEntropies();
+
 		if (arrhenius_kinetic_constants_must_be_recalculated_ == true)
 		{
 			// Forward kinetic constants (Arrhenius' Law)
@@ -770,7 +772,7 @@ namespace OpenSMOKE
 		if (type_of_kinetics_ == TYPE_OF_KINETICS_CHEMKIN_CONVENTIONAL)
 		{
 			// 1. Kinetic constants
-			ArrheniusKineticConstants();
+			KineticConstants();
 		
 			// 2. Correct the effective kinetic constants by stick reactions
 			if (number_of_stick_reactions_>0)
@@ -912,7 +914,7 @@ namespace OpenSMOKE
 		const double cTot = c.SumElements();
 
 		// 1. Kinetic constants
-		ArrheniusKineticConstants();
+		KineticConstants();
 			
 		// 2. Calculates the three-body corrections
 		ThirdBodyReactions(cTot, c);
@@ -1083,6 +1085,32 @@ namespace OpenSMOKE
 		ElementByElementProduct(netReactionRates_, kArrheniusModified_, &netReactionRates_);
 	}
 	*/
+
+	template<typename map>
+	void KineticsMap_Surface_CHEMKIN<map>::RateOfProductionAnalysis(ROPA_Data& ropa) const
+	{
+		stoichiometry_->RateOfProductionAnalysis(netReactionRates_, false);
+		stoichiometry_->WriteRateOfProductionAnalysis(ropa);
+	}
+
+	template<typename map>
+	void KineticsMap_Surface_CHEMKIN<map>::RateOfProductionAnalysis(ROPA_Data& ropa, const OpenSMOKE::OpenSMOKEVectorDouble& rf, const OpenSMOKE::OpenSMOKEVectorDouble& rb) const
+	{
+		stoichiometry_->RateOfProductionAnalysis(rf, rb);
+		stoichiometry_->WriteRateOfProductionAnalysis(ropa);
+	}
+
+	template<typename map>
+	void KineticsMap_Surface_CHEMKIN<map>::ProductionAndDestructionRates(OpenSMOKEVectorDouble* P, OpenSMOKEVectorDouble* D)
+	{
+		stoichiometry_->ProductionAndDestructionRatesFromReactionRates(P, D, netReactionRates_);
+	}
+
+	template<typename map>
+	void KineticsMap_Surface_CHEMKIN<map>::FormationRates(OpenSMOKEVectorDouble* R)
+	{
+		stoichiometry_->FormationRatesFromReactionRates(R, netReactionRates_);
+	}
 
 	template<typename map> 
 	void KineticsMap_Surface_CHEMKIN<map>::FormationRates(OpenSMOKEVectorDouble* Rgas, OpenSMOKEVectorDouble* Rsite, OpenSMOKEVectorDouble* Rbulk, OpenSMOKEVectorDouble* RsitePhases)
@@ -1288,8 +1316,7 @@ namespace OpenSMOKE
 			SetTemperature(temperatures[i]);
 			thermodynamics_.SetTemperature(temperatures[i]);
 
-			ReactionEnthalpiesAndEntropies();
-			ArrheniusKineticConstants();
+			KineticConstants();
 			ReactionRates(c_bath);
 
 			// Temperature
@@ -1396,8 +1423,8 @@ namespace OpenSMOKE
 
 			SetTemperature(temperatures[i]);
 			thermodynamics_.SetTemperature(temperatures[i]);
-			ReactionEnthalpiesAndEntropies();
-			ArrheniusKineticConstants();
+			
+			KineticConstants();
 			ReactionRates(c);
 
 			for (unsigned int k=1;k<=this->number_of_reactions_;k++)
@@ -1591,7 +1618,7 @@ namespace OpenSMOKE
 		thermodynamics_.SetTemperature(this->T_);
 		thermodynamics_.SetPressure(this->P_);
 		ReactionEnthalpiesAndEntropies();
-		ArrheniusKineticConstants();
+		KineticConstants();
 
 		// Calculates centered values
 		ReactionRates(c);
@@ -1661,7 +1688,7 @@ namespace OpenSMOKE
 			thermodynamics_.SetTemperature(T_plus);
 			thermodynamics_.SetPressure(this->P_);
 			ReactionEnthalpiesAndEntropies();
-			ArrheniusKineticConstants();
+			KineticConstants();
 
 			ReactionRates(c);
 			FormationRates(&R_plus);

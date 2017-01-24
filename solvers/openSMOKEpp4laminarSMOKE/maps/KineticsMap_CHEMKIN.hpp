@@ -148,6 +148,8 @@ namespace OpenSMOKE
             this->lnA_ = rhs.lnA_ ;
             this->Beta_ = rhs.Beta_ ;
             this->E_over_R_ = rhs.E_over_R_ ;
+			this->negative_lnA_ = rhs.negative_lnA_;
+			this->sign_lnA_ = rhs.sign_lnA_;
 
             this->lnA_reversible_ = rhs.lnA_reversible_ ;
             this->Beta_reversible_ = rhs.Beta_reversible_ ;
@@ -271,7 +273,7 @@ namespace OpenSMOKE
 		log_Patm_over_RT_ = std::log(Patm_over_RT_);
 
 		const double epsilon = 0.;
-	//	if (std::fabs(this->T_-this->T_old_)/this->T_>epsilon)
+		if (std::fabs(this->T_-this->T_old_)/this->T_>epsilon)
 		{
 			arrhenius_kinetic_constants_must_be_recalculated_ = true;
 			nonconventional_kinetic_constants_must_be_recalculated_ = true;
@@ -513,6 +515,24 @@ namespace OpenSMOKE
 					std::stringstream fInput;
 					fInput << current_node->value();
 					lnA_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
+				}
+
+				// negative-lnA
+				{
+					// List of reactions with negative frequency factors
+					rapidxml::xml_node<>* current_node = direct_node->first_node("negative-lnA");
+					if (current_node != 0)
+					{
+						std::stringstream fInput;
+						fInput << current_node->value();
+						negative_lnA_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
+					}
+
+					// Sign of frequency factors
+					ChangeDimensions(lnA_.Size(), &sign_lnA_, true);
+					sign_lnA_ = 1;
+					for (int i = 1; i <= negative_lnA_.Size(); i++)
+						sign_lnA_[negative_lnA_[i]] = -1;
 				}
 
 				// Beta
@@ -994,6 +1014,7 @@ namespace OpenSMOKE
 				std::cout << "   Fit1 reactions:               " << number_of_fit1_reactions_ << " (" << number_of_fit1_reactions_ / std::max(1., double(this->number_of_reactions_))*100. << "%)" << std::endl;
 				std::cout << "   Janev-Langer reactions:       " << number_of_janevlanger_reactions_ << " (" << number_of_janevlanger_reactions_ / std::max(1., double(this->number_of_reactions_))*100. << "%)" << std::endl;
 				std::cout << "   Landau-Teller reactions:      " << number_of_landauteller_reactions_ << " (" << number_of_landauteller_reactions_ / std::max(1., double(this->number_of_reactions_))*100. << "%)" << std::endl;
+				std::cout << " Negative frequency factors:     " << negative_lnA_.Size() << " (" << negative_lnA_.Size() / std::max(1., double(this->number_of_reactions_))*100. << "%)" << std::endl;
 				std::cout << std::endl;
 
 				stoichiometry_->Summary(std::cout);
@@ -1033,7 +1054,7 @@ namespace OpenSMOKE
 	template<typename map> 
 	void KineticsMap_CHEMKIN<map>::KineticConstants()
 	{
-                ReactionEnthalpiesAndEntropies();
+        ReactionEnthalpiesAndEntropies();
                 
 		if (arrhenius_kinetic_constants_must_be_recalculated_ == true)
 		{
@@ -1048,6 +1069,10 @@ namespace OpenSMOKE
 					*pt_kArrheniusT++ = (*pt_lnA++) + (*pt_Beta++)*this->logT_ - (*pt_E_over_R++)*this->uT_;
 			
 				Exp(kArrhenius_, &kArrhenius_);
+
+				// Negative frequency factors: reactions must be reversed
+				for (int j = 1; j <= negative_lnA_.Size(); j++)
+					kArrhenius_[negative_lnA_[j]] *= -1.;
 			}
 
 			// Equilibrium constants (inverse value)
@@ -1347,7 +1372,10 @@ namespace OpenSMOKE
 						M += c[ falloff_indices_of_thirdbody_species_[k-1][s] ] * falloff_indices_of_thirdbody_efficiencies_[k-1][s];
 				}
 				else
-					M = c[ falloff_index_of_single_thirdbody_species_[k] ];
+				{
+					const double epsilon = 1.e-16;
+					M = c[falloff_index_of_single_thirdbody_species_[k]] + epsilon;
+				}
 			
 				const unsigned int j=indices_of_falloff_reactions_[k];
 				const double Pr = kArrhenius_[j] * M / kArrhenius_falloff_inf_[k];
@@ -1357,21 +1385,23 @@ namespace OpenSMOKE
 				{
 					case PhysicalConstants::REACTION_TROE_FALLOFF:
 
-                                                if (Pr > 1.e-32)
-                                                {
-                                                    const double nTroe = 0.75-1.27*logFcent_falloff_[k];
-                                                    const double cTroe = -0.4-0.67*logFcent_falloff_[k];
-                                                    const double sTroe = std::log10(Pr) + cTroe;
-                                                    wF = std::pow(10., logFcent_falloff_[k]/(1. + boost::math::pow<2>(sTroe/(nTroe-0.14*sTroe)))); 
-                                                }
-                                                else
-                                                {
-                                                    // Asymptotic value for wF when sTroe --> -Inf
-                                                    wF = std::pow(10., logFcent_falloff_[k]/(1. + boost::math::pow<2>(1./0.14)));
-                                                }
+                        if (Pr > 1.e-32)
+                        {
+                            const double nTroe = 0.75-1.27*logFcent_falloff_[k];
+                            const double cTroe = -0.4-0.67*logFcent_falloff_[k];
+                            const double sTroe = std::log10(Pr) + cTroe;
+                            wF = std::pow(10., logFcent_falloff_[k]/(1. + boost::math::pow<2>(sTroe/(nTroe-0.14*sTroe)))); 
+                        }
+                        else
+                        {
+                            // Asymptotic value for wF when sTroe --> -Inf
+                            wF = std::pow(10., logFcent_falloff_[k]/(1. + boost::math::pow<2>(1./0.14)));
+                        }
                                                 
 						break;
+
 					case PhysicalConstants::REACTION_SRI_FALLOFF:
+
 						const double xSRI = 1. / (1. + boost::math::pow<2>(std::log10(Pr)));
 						wF = std::pow(logFcent_falloff_[k], xSRI) * d_falloff_[k];
 						if(e_falloff_[k] != 0.)
@@ -1395,7 +1425,10 @@ namespace OpenSMOKE
 				M += c[falloff_indices_of_thirdbody_species_[local_k - 1][s]] * falloff_indices_of_thirdbody_efficiencies_[local_k - 1][s];
 		}
 		else
-			M = c[falloff_index_of_single_thirdbody_species_[local_k]];
+		{
+			const double epsilon = 1.e-16;
+			M = c[falloff_index_of_single_thirdbody_species_[local_k]] + epsilon;
+		}
 
 		const unsigned int j = indices_of_falloff_reactions_[local_k];
 		const double Pr = kArrhenius_[j] * M / kArrhenius_falloff_inf_[local_k];
@@ -1419,15 +1452,28 @@ namespace OpenSMOKE
 				}
 
 				break;
+
 			case PhysicalConstants::REACTION_SRI_FALLOFF:
-				const double xSRI = 1. / (1. + boost::math::pow<2>(std::log10(Pr)));
-				wF = std::pow(logFcent_falloff_[local_k], xSRI) * d_falloff_[local_k];
-				if (e_falloff_[local_k] != 0.)
-					wF *= std::pow(this->T_, e_falloff_[local_k]);
+
+				if (Pr > 1.e-32)
+				{
+					const double xSRI = 1. / (1. + boost::math::pow<2>(std::log10(Pr)));
+					wF = std::pow(logFcent_falloff_[local_k], xSRI) * d_falloff_[local_k];
+					if (e_falloff_[local_k] != 0.)
+						wF *= std::pow(this->T_, e_falloff_[local_k]);
+				}
+				else
+				{
+					const double xSRI = 0.;
+					wF = std::pow(logFcent_falloff_[local_k], xSRI) * d_falloff_[local_k];
+					if (e_falloff_[local_k] != 0.)
+						wF *= std::pow(this->T_, e_falloff_[local_k]);
+				}
+
 				break;
 		}
 
-		return kArrhenius_falloff_inf_[local_k] * (Pr / (1. + Pr)) * wF / kArrhenius_[j];
+		return ( kArrhenius_falloff_inf_[local_k] * (Pr / (1. + Pr)) * wF / kArrhenius_[j] );
 	}
 
 	template<typename map> 
@@ -1445,7 +1491,10 @@ namespace OpenSMOKE
 						M += c[ cabr_indices_of_thirdbody_species_[k-1][s] ] * cabr_indices_of_thirdbody_efficiencies_[k-1][s];
 				}
 				else
-					M = c[ cabr_index_of_single_thirdbody_species_[k] ];
+				{
+					const double epsilon = 1.e-16;
+					M = c[cabr_index_of_single_thirdbody_species_[k]] + epsilon;
+				}
 			
 				const unsigned int j=indices_of_cabr_reactions_[k];
 				const double Pr = kArrhenius_[j] * M / kArrhenius_cabr_inf_[k];
@@ -1455,11 +1504,14 @@ namespace OpenSMOKE
 				switch(cabr_reaction_type_[k])
 				{
 					case PhysicalConstants::REACTION_TROE_CABR:
+
 						nTroe = 0.75-1.27*logFcent_cabr_[k];
 						cTroe = -0.4-0.67*logFcent_cabr_[k];
 						sTroe = std::log10(Pr) + cTroe;
 						wF = std::pow(10., logFcent_cabr_[k]/(1. + boost::math::pow<2>(sTroe/(nTroe-0.14*sTroe))));
+						
 						break;
+					
 					case PhysicalConstants::REACTION_SRI_CABR:
 						xSRI = 1. / (1. + boost::math::pow<2>(std::log10(Pr)));
 						wF = std::pow(logFcent_cabr_[k], xSRI) * d_cabr_[k];
@@ -1599,7 +1651,7 @@ namespace OpenSMOKE
 				const double tmp = kArrheniusModified_[jReaction];
 				kArrheniusModified_ = 0.;
 				kArrheniusModified_[jReaction] = tmp;
-				parameter =  std::exp(lnA_[jReaction]);
+				parameter =  sign_lnA_[jReaction]*std::exp(lnA_[jReaction]);
 
 				if (type_of_reaction_[jReaction] == PhysicalConstants::REACTION_LINDEMANN_FALLOFF || 
 					type_of_reaction_[jReaction] == PhysicalConstants::REACTION_TROE_FALLOFF ||
@@ -1607,8 +1659,8 @@ namespace OpenSMOKE
 				{
 					unsigned int jFallOff = local_family_index_[jReaction];
 					double	kInf = std::exp(lnA_falloff_inf_[jFallOff] + Beta_falloff_inf_[jFallOff]*this->logT_ - E_over_R_falloff_inf_[jFallOff]*this->uT_);
-					double F, dF_over_dA0, dF_over_dAInf;this->
-					FallOffReactions(jFallOff, cTot, c, F, dF_over_dA0, dF_over_dAInf);
+					double F, dF_over_dA0, dF_over_dAInf;
+					this->FallOffReactions(jFallOff, cTot, c, F, dF_over_dA0, dF_over_dAInf);
 
 					kArrheniusModified_[jReaction] = kArrheniusModified_[jReaction] / std::exp(lnA_[jReaction]) * (1.-kArrheniusModified_[jReaction]/kInf/F) +
 											 kArrheniusModified_[jReaction]/F*dF_over_dA0;			
@@ -1632,7 +1684,7 @@ namespace OpenSMOKE
 				}
 				else
 				{
-					kArrheniusModified_[jReaction] = kArrheniusModified_[jReaction] / std::exp(lnA_[jReaction]);
+					kArrheniusModified_[jReaction] = kArrheniusModified_[jReaction] / (sign_lnA_[jReaction]*std::exp(lnA_[jReaction]));
 				}
 			}
 
@@ -1649,11 +1701,20 @@ namespace OpenSMOKE
 					parameter =  std::exp(lnA_falloff_inf_[jFallOff]);
 
 					double	kInf = std::exp(lnA_falloff_inf_[jFallOff] + Beta_falloff_inf_[jFallOff]*this->logT_ - E_over_R_falloff_inf_[jFallOff]*this->uT_);
-					double F, dF_over_dA0, dF_over_dAInf;
+					
+					double F = 0.;
+					double dF_over_dA0 = 0.; 
+					double dF_over_dAInf = 0.;
 					FallOffReactions(jFallOff, cTot, c, F, dF_over_dA0, dF_over_dAInf);
 
 					kArrheniusModified_[index_global] = kArrheniusModified_[index_global] / F * 
-											    ( kArrheniusModified_[index_global]/std::exp(lnA_falloff_inf_[jFallOff])/kInf + dF_over_dAInf);		
+														( kArrheniusModified_[index_global]/std::exp(lnA_falloff_inf_[jFallOff])/kInf + dF_over_dAInf);	
+
+					if (parameter == 0.) std::cout << "parameter " << jReaction - this->number_of_reactions_ << std::endl;
+					if (F == 0.) std::cout << "Falloff inv F " << jReaction - this->number_of_reactions_ << std::endl;
+					if (kInf == 0.) std::cout << "Falloff inv kInf " << jReaction - this->number_of_reactions_ << std::endl;
+					if (std::exp(lnA_falloff_inf_[jFallOff]) == 0.) std::cout << "Falloff inv exp " << jReaction - this->number_of_reactions_ << std::endl;
+
 				}
 				// CABR reactions
 				else if (jReaction <= this->number_of_reactions_ + number_of_falloff_reactions_ +  number_of_cabr_reactions_)
@@ -1667,8 +1728,11 @@ namespace OpenSMOKE
 
 					double	k0   = std::exp(lnA_[index_global] + Beta_[index_global]*this->logT_ - E_over_R_[index_global]*this->uT_);
 
-					double F, dF_over_dA0, dF_over_dAInf;
+					double F = 0.;
+					double dF_over_dA0 = 0.;
+					double dF_over_dAInf = 0.;
 					ChemicallyActivatedBimolecularReactions(jCABR, cTot, c, F, dF_over_dA0, dF_over_dAInf);
+					
 					kArrheniusModified_[index_global] = kArrheniusModified_[index_global] / F * 
 											    ( kArrheniusModified_[index_global]/std::exp(lnA_cabr_inf_[jCABR])/k0 + dF_over_dAInf);	
 				}
@@ -1720,7 +1784,6 @@ namespace OpenSMOKE
 		{
 			unsigned int j = indices_of_reversible_reactions_[k];
 			netReactionRates_[j] -= reverseReactionRates_[j];
-
 		}
 
 		// Multiplies the net reaction rate by the effective kinetic constant (accounting for 
@@ -2025,7 +2088,10 @@ namespace OpenSMOKE
 		{
 			unsigned int jFallOff = local_family_index_[k];
 			double	kInf = std::exp(lnA_falloff_inf_[jFallOff] + Beta_falloff_inf_[jFallOff] * this->logT_ - E_over_R_falloff_inf_[jFallOff] * this->uT_);
-			double F, dF_over_dA0, dF_over_dAInf; 
+			
+			double F = 0.;
+			double dF_over_dA0 = 0.;
+			double dF_over_dAInf = 0.;
 			this->FallOffReactions(jFallOff, c.SumElements(), c, F, dF_over_dA0, dF_over_dAInf);
 
 			fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << kInf;
@@ -2412,13 +2478,14 @@ namespace OpenSMOKE
 		switch(falloff_reaction_type_[k])
 		{
 			case PhysicalConstants::REACTION_TROE_FALLOFF:
+
 				nTroe = 0.75-1.27*logFcent_falloff_[k];
 				cTroe = -0.4-0.67*logFcent_falloff_[k];
 				sTroe = std::log10(Pr) + cTroe;
 				F = std::pow(10., logFcent_falloff_[k]/(1. + boost::math::pow<2>(sTroe/(nTroe-0.14*sTroe))));
 
 				// Calculates the derivative 
-				if (Pr>1e-100)
+				if (Pr > 1.e-32)
 				{
 					const double a = logFcent_falloff_[k];
 					const double LOG10 = std::log(10.);
@@ -2432,35 +2499,37 @@ namespace OpenSMOKE
 				}
 
 				break;
+
 			case PhysicalConstants::REACTION_SRI_FALLOFF:
-				xSRI = 1. / (1. + boost::math::pow<2>(std::log10(Pr)));
-				F = std::pow(logFcent_falloff_[k], xSRI) * d_falloff_[k];
-				if(e_falloff_[k] != 0.)
-					F *= std::pow(this->T_, e_falloff_[k]);
 
 				// Calculates the derivative 
-				if (Pr>1e-100)
+				if (Pr > 1.e-32)
 				{
-					double PrPlus = 1.001*Pr;
-					double xSRIPlus = 1. / (1. + boost::math::pow<2>(std::log10(PrPlus)));
-					double FPlus = std::pow(logFcent_falloff_[k], xSRIPlus) * d_falloff_[k];
-					if(e_falloff_[k] != 0.)
-						FPlus *= std::pow(this->T_, e_falloff_[k]);
-					dF_over_dPr = (FPlus-F)/(PrPlus-Pr);
-				}
+					xSRI = 1. / (1. + boost::math::pow<2>(std::log10(Pr)));
+					F = std::pow(logFcent_falloff_[k], xSRI) * d_falloff_[k];
+					if (e_falloff_[k] != 0.)
+						F *= std::pow(this->T_, e_falloff_[k]);
 
-				if (Pr>1e-100)
-				{
-					double PrPlus = 1.001*Pr;
-					double xSRIPlus = 1. / (1. + boost::math::pow<2>(std::log10(PrPlus)));
+					const double eps = 0.01;
+					const double PrPlus = (1.+eps)*Pr;
+					const double xSRIPlus = 1. / (1. + boost::math::pow<2>(std::log10(PrPlus)));
 					double FPlus = std::pow(logFcent_falloff_[k], xSRIPlus) * d_falloff_[k];
 					if(e_falloff_[k] != 0.)
 						FPlus *= std::pow(this->T_, e_falloff_[k]);
-					dF_over_dPr = (FPlus-F)/(PrPlus-Pr);
+					dF_over_dPr = (FPlus-F)/(eps*Pr);
+				}
+				else
+				{
+					xSRI = 0.;
+					F = std::pow(logFcent_falloff_[k], xSRI) * d_falloff_[k];
+					if (e_falloff_[k] != 0.)
+						F *= std::pow(this->T_, e_falloff_[k]);
+					dF_over_dPr = 0.;
 				}
 
 				break;
 		}
+
 		dF_over_dA0   =  Pr/std::exp(lnA_[j]) * dF_over_dPr;
 		dF_over_dAInf = -Pr/std::exp(lnA_falloff_inf_[k]) * dF_over_dPr;
 	}
@@ -2492,42 +2561,48 @@ namespace OpenSMOKE
 		switch(cabr_reaction_type_[k])
 		{
 			case PhysicalConstants::REACTION_TROE_CABR:
+
 				nTroe = 0.75-1.27*logFcent_cabr_[k];
 				cTroe = -0.4-0.67*logFcent_cabr_[k];
 				sTroe = std::log10(Pr) + cTroe;
 				F = std::pow(10., logFcent_cabr_[k]/(1. + boost::math::pow<2>(sTroe/(nTroe-0.14*sTroe))));
 
 				// Calculates the derivative 
-				if (Pr>1e-100)
+				if (Pr > 1.e-32)
 				{
-					double PrPlus = 1.001*Pr;
-					double nTroePlus = 0.75-1.27*logFcent_cabr_[k];
-					double cTroePlus = -0.4-0.67*logFcent_cabr_[k];
-					double sTroePlus = std::log10(PrPlus) + cTroePlus;
-					double FPlus = std::pow(10., logFcent_cabr_[k]/(1. + boost::math::pow<2>(sTroePlus/(nTroePlus-0.14*sTroePlus))));
-					dF_over_dPr = (FPlus-F)/(PrPlus-Pr);
+					const double eps = 0.01;
+					const double PrPlus = (1.+eps)*Pr;
+					const double nTroePlus = 0.75-1.27*logFcent_cabr_[k];
+					const double cTroePlus = -0.4-0.67*logFcent_cabr_[k];
+					const double sTroePlus = std::log10(PrPlus) + cTroePlus;
+					const double FPlus = std::pow(10., logFcent_cabr_[k]/(1. + boost::math::pow<2>(sTroePlus/(nTroePlus-0.14*sTroePlus))));
+					dF_over_dPr = (FPlus-F)/(eps*Pr);
 				}
 
 				break;
+
 			case PhysicalConstants::REACTION_SRI_CABR:
+
 				xSRI = 1. / (1. + boost::math::pow<2>(std::log10(Pr)));
 				F = std::pow(logFcent_cabr_[k], xSRI) * d_cabr_[k];
 				if(e_cabr_[k] != 0.)
 					F *= std::pow(this->T_, e_cabr_[k]);
 
 				// Calculates the derivative
-				if (Pr>1e-100)
+				if (Pr > 1.e-32)
 				{
-					double PrPlus = 1.001*Pr;
-					double xSRIPlus = 1. / (1. + boost::math::pow<2>(std::log10(PrPlus)));
+					const double eps = 0.01;
+					const double PrPlus = (1.+eps)*Pr;
+					const double xSRIPlus = 1. / (1. + boost::math::pow<2>(std::log10(PrPlus)));
 					double FPlus = std::pow(logFcent_cabr_[k], xSRIPlus) * d_cabr_[k];
 					if(e_cabr_[k] != 0.)
 						FPlus *= std::pow(this->T_, e_cabr_[k]);
-					dF_over_dPr = (FPlus-F)/(PrPlus-Pr);
+					dF_over_dPr = (FPlus-F)/(eps*Pr);
 				}
 
 				break;
 		}
+
 		dF_over_dA0 = Pr/std::exp(lnA_[j]) * dF_over_dPr;
 		dF_over_dAInf = -Pr/std::exp(lnA_falloff_inf_[k]) * dF_over_dPr;
 	}

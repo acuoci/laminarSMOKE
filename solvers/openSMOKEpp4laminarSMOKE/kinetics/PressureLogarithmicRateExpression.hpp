@@ -85,6 +85,9 @@ namespace OpenSMOKE
 		unsigned count = 0;
 		for(unsigned int i=0;i<N;i++)
 		{
+			if (coefficients_[count] < 0.)
+				ErrorMessage("The PLOG option can be used only with non-negative frequency factors!");
+
 			p_[i] = coefficients_[count++]*101325.;
 			lnp_[i] = std::log(p_[i]);
 			lnA_[i] = std::log(std::max(coefficients_[count++]*conversion_A_, threshold)) ;
@@ -100,7 +103,7 @@ namespace OpenSMOKE
 
 	double PressureLogarithmicRateExpression::KineticConstant(const double T, const double P)
 	{
-		if		(P<=p_[0])		return std::exp(lnA_[0]+Beta_[0]*std::log(T)-E_over_R_[0]/T);
+		if	(P<=p_[0])	return std::exp(lnA_[0]+Beta_[0]*std::log(T)-E_over_R_[0]/T);
 		else if (P>=p_[N-1])	return std::exp(lnA_[N-1]+Beta_[N-1]*std::log(T)-E_over_R_[N-1]/T);
 		else
 		{

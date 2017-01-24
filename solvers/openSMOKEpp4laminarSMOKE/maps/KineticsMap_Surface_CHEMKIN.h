@@ -192,6 +192,7 @@ namespace OpenSMOKE
 		*@brief Calculates the formation rates for all the species in the kinetic mechanism
 		*/
 		void FormationRates(OpenSMOKEVectorDouble* Rgas, OpenSMOKEVectorDouble* Rsite, OpenSMOKEVectorDouble* Rbulk, OpenSMOKEVectorDouble* RsitePhases);
+		void FormationRates(OpenSMOKEVectorDouble* R);
 
 		/**
 		*@brief Calculates the heat release
@@ -201,8 +202,11 @@ namespace OpenSMOKE
 		/**
 		*@brief Calculates the production and the destruction rates for all the species in the kinetic mechanism
 		*/
-//		void ProductionAndDestructionRates(OpenSMOKEVectorDouble* P, OpenSMOKEVectorDouble* D);
+		void ProductionAndDestructionRates(OpenSMOKEVectorDouble* P, OpenSMOKEVectorDouble* D);
 //      void ProductionAndDestructionRatesGross(OpenSMOKEVectorDouble* P, OpenSMOKEVectorDouble* D);
+
+		void RateOfProductionAnalysis(ROPA_Data& ropa) const;
+		void RateOfProductionAnalysis(ROPA_Data& ropa, const OpenSMOKE::OpenSMOKEVectorDouble& rf, const OpenSMOKE::OpenSMOKEVectorDouble& rb) const;
 
 
 		/**
@@ -242,7 +246,7 @@ namespace OpenSMOKE
 		/**
 		*@brief Calculates the kinetic constants
 		*/
-		void ArrheniusKineticConstants();
+		void KineticConstants();
 
 		/**
 		*@brief Return the net reaction rates in [kmol/m2/s]

@@ -292,7 +292,7 @@ namespace OpenSMOKE
 		*@brief Return the frequency factor of a single reaction [kmol, m, s]
 		*@param j index of reaction (starting from zero)
 		*/
-		double A(const unsigned int j) { return std::exp(lnA_[j + 1]); }
+		double A(const unsigned int j) { return sign_lnA_[j+1]*std::exp(lnA_[j+1]); }
 
 		/**
 		*@brief Return the temperature exponent a single reaction 
@@ -388,6 +388,8 @@ namespace OpenSMOKE
 		OpenSMOKEVectorDouble lnA_;								//!< frequency factors (log)
 		OpenSMOKEVectorDouble Beta_;							//!< temperature exponents
 		OpenSMOKEVectorDouble E_over_R_;						//!< activation temperatures
+		OpenSMOKEVectorInt    negative_lnA_;					//!< list of reactions with negative frequency factor (1-index based)
+		OpenSMOKEVectorInt    sign_lnA_;						//!< sign of frequency factors of reactions (+1 or -1)
 
 		OpenSMOKEVectorDouble lnA_reversible_;					//!< frequency factors (log) for explicitly reversible reactions
 		OpenSMOKEVectorDouble Beta_reversible_;					//!< temperature exponents for explicitly reversible reactions

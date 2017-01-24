@@ -198,7 +198,7 @@ namespace OpenSMOKE
 			if (m <= n)
 			{
 				Eigen::VectorXd	beta(m);
-				for (int k = 0; k < m; k++)
+				for (unsigned int k = 0; k < m; k++)
 				{
 					unsigned int j = indices_available_elements[k];
 					beta(k) = reactant_side(j) - product_side(j);
@@ -206,7 +206,7 @@ namespace OpenSMOKE
 
 				Eigen::MatrixXd nu(m, n);
 				for (unsigned int i = 0; i<reaction.product_nu_indices().size(); i++)
-				for (int k = 0; k < m; k++)
+				for (unsigned int k = 0; k < m; k++)
 				{
 					unsigned int j = indices_available_elements[k];
 					nu(k, i) = element_coefficients_list_(reaction.product_nu_indices()[i], j);

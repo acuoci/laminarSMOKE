@@ -189,6 +189,12 @@ namespace OpenSMOKE
 		void ReformulationOfThermodynamics(std::ostream& fout, const unsigned int policy_intermediate_temperature, const double intermediate_temperature, const double max_temperature);
 
 		/**
+		*@brief Reformultes the thermodynamic properties in order to ensure their consistency at the
+		intermediate temperature
+		*/
+		void ReformulationOfThermodynamicsFixedIntermediateTemperature(std::ostream& fout, const unsigned int policy_intermediate_temperature, const double intermediate_temperature, const double max_temperature);
+
+		/**
 		*@brief Reports information about the consistency of the specific heat at the intermediate temperature
 		*/
 		int ReportStatusSpecificHeatCoefficient(std::ostream& fout);

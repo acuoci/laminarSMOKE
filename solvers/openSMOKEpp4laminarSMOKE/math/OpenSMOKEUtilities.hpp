@@ -37,7 +37,8 @@
 #ifndef OpenSMOKE_OpenSMOKEUtilities_Cpp
 #define OpenSMOKE_OpenSMOKEUtilities_Cpp
 
-//#include "OpenSMOKEStdInclude.h"
+#include "OpenSMOKEStdInclude.h"
+#include <numeric>
 #include "OpenSMOKEFunctions.h"
 #include <boost/math/constants/constants.hpp> 
 #include <boost/date_time.hpp>
@@ -525,8 +526,6 @@ namespace OpenSMOKE
 
                 #else
 
-			OpenSMOKE::FatalErrorMessage("sort_and_track_indices_decreasing not yet available for Linux");
-		/*
 		struct IdxCompare
 		{
 			const std::vector<T>& target;
@@ -538,7 +537,6 @@ namespace OpenSMOKE
 			indices[i] = i;
 
 		std::sort(indices.begin(), indices.end(), IdxCompare(values));
-		*/
 
 		#endif
 
@@ -561,8 +559,6 @@ namespace OpenSMOKE
 	
 		#else
 
-			OpenSMOKE::FatalErrorMessage("sort_and_track_indices_decreasing not yet available for Linux");
-		/*
 		struct IdxCompare
 		{
 			const std::vector<T>& target;
@@ -574,7 +570,7 @@ namespace OpenSMOKE
 			indices[i] = i;
 
 		std::sort(indices.begin(), indices.end(), IdxCompare(values));
-		*/
+
 		#endif
 
 		return indices;
@@ -694,6 +690,7 @@ namespace OpenSMOKE
 			return current_date;
 	}
 
+	//#include "Crypto-SHA256.h"
 	#include<boost/tokenizer.hpp>
 
 	void OpenSMOKE_logo(const std::string application_name, const std::string author_name)
@@ -1121,7 +1118,7 @@ namespace OpenSMOKE
 
 		std::ifstream file(path.c_str());
 
-		return std::count(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>(), '\n');
+		return static_cast<unsigned int>(std::count(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>(), '\n'));
 	}
 
 	int countwords (std::stringstream& str)
@@ -1136,7 +1133,6 @@ namespace OpenSMOKE
 	  return n_elements;
 	}
 
-	#include  <cmath>
 	std::vector<double>
 	cubicrootsreal (const double a, const double b, const double c, const double d)
 	{
@@ -1186,11 +1182,11 @@ namespace OpenSMOKE
 	{
 		double x_sum = 0;
 
-		for (int i = 0; i < x.size (); i++)
+		for (unsigned int i = 0; i < x.size (); i++)
 			x_sum += x[i];
 
 		std::vector<double> x_tmp (x.size ());
-		for (int i = 0; i < x.size (); i++)
+		for (unsigned int i = 0; i < x.size (); i++)
 		x_tmp[i] = x[i] / x_sum;
 		return x_tmp;
 	}
@@ -1246,7 +1242,7 @@ namespace OpenSMOKE
 
 		std::vector<double> deviations(vec.size());
 
-		for (int i = 0; i < vec.size(); i++)
+		for (unsigned int i = 0; i < vec.size(); i++)
 			deviations[i] = OpenSMOKE::Abs(vec[i] - med);
 
 		mad_value = median(deviations);
@@ -1291,7 +1287,7 @@ namespace OpenSMOKE
 	void CheckSumOfFractions(std::vector<double>& x)
 	{
 		double boundary_eps = 1.e-8;
-		for (int i = 0; i < x.size(); i++)
+		for (unsigned int i = 0; i < x.size(); i++)
 		{
 			if (x[i] < - boundary_eps)
 			{
@@ -1315,8 +1311,8 @@ namespace OpenSMOKE
 		else
 		{
 			std::vector<double> x_tmp(x.size());
-			for (int i = 0; i < x.size(); i++)
-			x_tmp[i] = x[i] / sum;
+			for (unsigned int i = 0; i < x.size(); i++)
+				x_tmp[i] = x[i] / sum;
 			x = x_tmp;
 		}
 	}

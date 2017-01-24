@@ -566,6 +566,12 @@ namespace OpenSMOKE
 								AInf_ = coefficients[0];
 								betaInf_ = coefficients[1];
 								EInf_ = coefficients[2];
+
+								if (AInf_ < 0.)
+								{
+									std::cout << "Negative frequency factors are not allowed for HIGH type reactions!" << std::endl;
+									CheckForFatalError(false);
+								}
 							}
 						}
 						else if (boost::iequals(keyword, "JAN"))
@@ -616,6 +622,12 @@ namespace OpenSMOKE
 								A_ = coefficients[0];
 								beta_ = coefficients[1];
 								E_ = coefficients[2];
+
+								if (AInf_ < 0.)
+								{
+									std::cout << "Negative frequency factors are not allowed for LOW type reactions!" << std::endl;
+									CheckForFatalError(false);
+								}
 							}
 						}
 						else if (boost::iequals(keyword, "LT"))
@@ -884,8 +896,7 @@ namespace OpenSMOKE
 							std::cout << "Sorry! The " << keyword << " option is not currently available." << std::endl;
 							return false;
 						}
-					}
-				
+					}			
 				}
 			}
 
@@ -963,6 +974,15 @@ namespace OpenSMOKE
 					chebyshev_temperature_limits_.resize(2);
 					chebyshev_temperature_limits_[0] = 300.;
 					chebyshev_temperature_limits_[1] = 2500.;
+				}
+			}
+
+			// Negative frequency factors are allowed only for simple reactions
+			{
+				if (A_ < 0. && tag_reaction_ != PhysicalConstants::REACTION_SIMPLE)
+				{
+					std::cout << "Negative frequency factors are allowed only for conventional (SIMPLE) reactions!" << std::endl;
+					CheckForFatalError(false);
 				}
 			}
 

@@ -143,7 +143,7 @@ namespace OpenSMOKE
 		int width = mu + ml + 1;
 		int ngroups = std::min(width, N);
 
-		for (unsigned int group = 1; group <= ngroups; group++)
+		for (int group = 1; group <= ngroups; group++)
 		{
 			for (int j = group - 1; j < N; j += width)
 			{
