@@ -348,6 +348,35 @@ if (postProcessingPolimiSoot == true)
 		dimensionSet(1, -3, -1, 0, 0)
 	);
 
+	// --------------------------------------------------------------------------
+	// Creating soot class fields
+	// --------------------------------------------------------------------------
+	PtrList<volScalarField> sootClasses;
+	if (calculateSootClasses == true)
+	{
+		sootClasses.resize(soot_classes_reader.number_of_classes());
+		for (int i=0;i<soot_classes_reader.number_of_classes();i++)
+		{
+			sootClasses.set
+			(
+				i,
+				new volScalarField
+				(
+					IOobject
+					(
+						"soot::" + soot_classes_reader.class_name(i),
+						mesh.time().timeName(),
+						mesh,
+						IOobject::NO_READ,
+						IOobject::AUTO_WRITE
+					),
+					mesh,
+					dimensionSet(0, -3, -1, 0, 1)
+				)
+			);
+		}
+	}
+
 	Info << "Post processing soot..." << endl;
 
 	label ns = Y.size();
@@ -356,6 +385,7 @@ if (postProcessingPolimiSoot == true)
 	OpenSMOKE::OpenSMOKEVectorDouble x(ns);
 	OpenSMOKE::OpenSMOKEVectorDouble c(thermodynamicsMapXML->NumberOfSpecies());
 	OpenSMOKE::OpenSMOKEVectorDouble R(thermodynamicsMapXML->NumberOfSpecies());
+	OpenSMOKE::OpenSMOKEVectorDouble r(kineticsMapXML->NumberOfReactions());
 	Eigen::VectorXd y_eigen(ns);
 	Eigen::VectorXd x_eigen(ns);
 
@@ -451,6 +481,7 @@ if (postProcessingPolimiSoot == true)
 		kineticsMapXML->KineticConstants();
 		kineticsMapXML->ReactionRates(c);
 		kineticsMapXML->FormationRates(&R);
+		kineticsMapXML->GetReactionRates(&r);
 		for(unsigned int i=1;i<=ns;i++)
 			R[i] *= thermodynamicsMapXML->MW()[i];
 
@@ -458,7 +489,21 @@ if (postProcessingPolimiSoot == true)
 		soot_R_smallCells[celli] = smallBinMassFormationRates(sootAnalyzer, R);
 		pah_R_1_2Cells[celli]    = pah12RingsFormationRates(sootAnalyzer, R);
 		pah_R_3_4Cells[celli]    = pah34RingsFormationRates(sootAnalyzer, R);
-		pah_R_more_4Cells[celli] = pahMoreThan4RingsFormationRates(sootAnalyzer, R);			
+		pah_R_more_4Cells[celli] = pahMoreThan4RingsFormationRates(sootAnalyzer, R);	
+
+		if (calculateSootClasses == true)
+		{
+			for (int i=0;i<soot_classes_reader.number_of_classes();i++)
+			{
+				double sum = 0.;
+				for (int j=0;j<soot_classes_reader.number_reactions_per_class(i);j++)
+				{
+					sum += r[soot_classes_reader.reaction_indices(i)[j]];
+				}
+			
+				sootClasses[i].internalField()[celli] = sum;		
+			}
+		}
 	}
 
 	Info << " * boundaries..." << endl;
@@ -556,6 +601,7 @@ if (postProcessingPolimiSoot == true)
 			kineticsMapXML->KineticConstants();
 			kineticsMapXML->ReactionRates(c);
 			kineticsMapXML->FormationRates(&R);
+			kineticsMapXML->GetReactionRates(&r);
 			for(unsigned int i=1;i<=ns;i++)
 				R[i] *= thermodynamicsMapXML->MW()[i];
 
@@ -564,6 +610,20 @@ if (postProcessingPolimiSoot == true)
 			ppah_R_1_2[facei]    = pah12RingsFormationRates(sootAnalyzer, R);
 			ppah_R_3_4[facei]    = pah34RingsFormationRates(sootAnalyzer, R);
 			ppah_R_more_4[facei] = pahMoreThan4RingsFormationRates(sootAnalyzer, R);
+
+			if (calculateSootClasses == true)
+			{
+				for (int i=0;i<soot_classes_reader.number_of_classes();i++)
+				{
+					double sum = 0.;
+					for (int j=0;j<soot_classes_reader.number_reactions_per_class(i);j++)
+					{
+						sum += r[soot_classes_reader.reaction_indices(i)[j]];
+					}
+
+					sootClasses[i].boundaryField()[patchi][facei] = sum;		
+				}
+			}
 		}
 	}
 
@@ -593,6 +653,9 @@ if (postProcessingPolimiSoot == true)
 		pah_R_1_2.write();
 		pah_R_3_4.write();
 		pah_R_more_4.write();
+
+		for (int i=0;i<soot_classes_reader.number_of_classes();i++)
+			sootClasses[i].write();
 	}
 
 	// Distribution along a boundary

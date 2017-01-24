@@ -130,6 +130,7 @@
 // Soot
 #include "sootUtilities.H"
 #include "soot/OpenSMOKE_PolimiSoot_Analyzer.h"
+#include "SootClassesReader.h"
 
 using namespace Foam;
 
@@ -179,10 +180,12 @@ int main(int argc, char *argv[])
 	OpenSMOKE::KineticsMap_CHEMKIN<double>* kineticsMapXML;
 	OpenSMOKE::TransportPropertiesMap_CHEMKIN<double>* transportMapXML;
 	OpenSMOKE::PolimiSoot_Analyzer* sootAnalyzer;
+	
+	Foam::string kinetics_folder;
 
 	{	
 		const dictionary& kineticsDictionary = solverOptionsDictionary.subDict("Kinetics");
-		Foam::string kinetics_folder = kineticsDictionary.lookup("folder");
+		kinetics_folder = kineticsDictionary.lookup("folder");
 		boost::filesystem::path path_kinetics = kinetics_folder;
 
 		rapidxml::xml_document<> doc;
@@ -216,6 +219,9 @@ int main(int argc, char *argv[])
 	bool postProcessingPolimiSoot = false;
 	List<word> polimiSootBoundaries;
 	std::vector<int> soot_precursors_indices;
+	SootClassesReader soot_classes_reader;
+	bool calculateSootClasses = false;
+
 	List<vector> pnts_soot_psdf;
 	{	
 		const dictionary& postProcessingDictionary = solverOptionsDictionary.subDict("PostProcessing");
@@ -250,6 +256,7 @@ int main(int argc, char *argv[])
 			scalar bin_density_zero  = readScalar(postProcessingPolimiSootDictionary.lookup("binDensityZero"));
 			scalar bin_density_final = readScalar(postProcessingPolimiSootDictionary.lookup("binDensityFinal"));
 			scalar fractal_diameter = readScalar(postProcessingPolimiSootDictionary.lookup("fractalDiameter"));
+			calculateSootClasses = Switch(postProcessingPolimiSootDictionary.lookup(word("sootClasses")));
 
 			sootAnalyzer = new OpenSMOKE::PolimiSoot_Analyzer(thermodynamicsMapXML);
 			sootAnalyzer->SetFractalDiameter(fractal_diameter);
@@ -260,6 +267,13 @@ int main(int argc, char *argv[])
 			// Particle size distribution function
 			List<vector> pnts_soot_psdf_dummy(postProcessingPolimiSootDictionary.lookup("PSDF"));
 			pnts_soot_psdf = pnts_soot_psdf_dummy;
+
+			// Soot classes reader
+			if (calculateSootClasses == true)
+			{
+				std::string path_to_classes_definition = kinetics_folder + "/process-reac.def";
+				soot_classes_reader.ReadFromFile(path_to_classes_definition);
+			}
 		}
 
 		if (reconstructMixtureFraction == true)
