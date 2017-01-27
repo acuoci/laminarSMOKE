@@ -222,6 +222,25 @@ int main(int argc, char *argv[])
 	SootClassesReader soot_classes_reader;
 	bool calculateSootClasses = false;
 
+	boost::filesystem::path soot_folder("sootpp");
+	boost::filesystem::create_directory(soot_folder);
+
+	OFstream fSootFvLarge( (soot_folder / "soot_fv_large").string() );
+	OFstream fSootFvSmall( (soot_folder / "soot_fv_small").string() );
+	OFstream fSootRhoLarge( (soot_folder / "soot_rho_large").string() );
+	OFstream fSootRhoSmall( (soot_folder / "soot_rho_small").string() );
+	OFstream fSootNLarge( (soot_folder / "soot_N_large").string() );
+	OFstream fSootNSmall( (soot_folder / "soot_N_small").string() );	
+	OFstream fSootOmegaLarge( (soot_folder / "soot_omega_large").string() );
+	OFstream fSootOmegaSmall( (soot_folder / "soot_omega_small").string() );
+	OFstream fSootRLarge( (soot_folder / "soot_R_large").string() );
+	OFstream fSootRSmall( (soot_folder / "soot_R_small").string() );	
+	OFstream fSootR12( (soot_folder / "soot_R_pah_1_2").string() );
+	OFstream fSootR34( (soot_folder / "soot_R_pah_3_4").string() );
+	OFstream fSootRmore4( (soot_folder / "soot_R_pah_more_4").string() );
+
+	PtrList<OFstream> fsootClassesIntegrals;
+
 	List<vector> pnts_soot_psdf;
 	{	
 		const dictionary& postProcessingDictionary = solverOptionsDictionary.subDict("PostProcessing");
@@ -257,6 +276,7 @@ int main(int argc, char *argv[])
 			scalar bin_density_final = readScalar(postProcessingPolimiSootDictionary.lookup("binDensityFinal"));
 			scalar fractal_diameter = readScalar(postProcessingPolimiSootDictionary.lookup("fractalDiameter"));
 			calculateSootClasses = Switch(postProcessingPolimiSootDictionary.lookup(word("sootClasses")));
+			
 
 			sootAnalyzer = new OpenSMOKE::PolimiSoot_Analyzer(thermodynamicsMapXML);
 			sootAnalyzer->SetFractalDiameter(fractal_diameter);
@@ -269,10 +289,15 @@ int main(int argc, char *argv[])
 			pnts_soot_psdf = pnts_soot_psdf_dummy;
 
 			// Soot classes reader
+			Info << "Calculate soot classes: " << calculateSootClasses << endl;
 			if (calculateSootClasses == true)
 			{
 				std::string path_to_classes_definition = kinetics_folder + "/process-reac.def";
 				soot_classes_reader.ReadFromFile(path_to_classes_definition);
+
+				fsootClassesIntegrals.setSize(soot_classes_reader.number_of_classes());
+				for (int i=0;i<soot_classes_reader.number_of_classes();i++)
+					fsootClassesIntegrals.set( i, new OFstream( (soot_folder / soot_classes_reader.class_name(i)).string()) ) ;
 			}
 		}
 

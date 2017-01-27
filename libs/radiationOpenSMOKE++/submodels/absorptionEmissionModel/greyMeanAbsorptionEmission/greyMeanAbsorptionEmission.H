@@ -143,6 +143,9 @@ private:
         //- Pointer list of species in the registry involved in the absorption
         UPtrList<volScalarField> Yj_;
 
+	//- Gas correction coefficient
+	scalar gas_correction_coefficient_;
+
 	//- Soot radiation: Planck coefficient
 	SootPlanckCoefficient soot_planck_coefficient_;
 
