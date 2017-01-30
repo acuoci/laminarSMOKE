@@ -1,0 +1,142 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.3;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      solverOptions;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+Kinetics
+{
+	folder	   		"../kinetics-POLIMI_C2H4_53_AR";
+	inertSpecies 		N2;
+}
+
+HMOM
+{
+	hmom			true;
+	test			false;
+	
+	pah_species 		     C10H8;
+        pah_gas_consumption	        on;
+	
+	pah_nc				16;
+	collision_diameter_model	2;
+	fractal_diameter_model		1;
+
+	nucleation			1;
+	surface_growth			1;
+	oxidation			1;
+	condensation			1;
+	coagulation			1;
+	coagulation_continous		1;
+}
+
+SteadyState
+{
+	sparseJacobian		false;
+	jacobianUpdate		1;
+	propertiesUpdate	1;
+	implicitSourceTerm 	true;
+	orderSpecies		"sweep";
+	exceptionalSpecies	(N2);
+}
+
+PhysicalModel
+{
+	strangAlgorithm 		"MomentumTransportReaction";
+	homogeneousReactions 		on;
+	momentumEquations		on;
+	energyEquation			on;
+	speciesEquations		on;
+	constPressureBatchReactor 	true;
+
+	massDiffusionInEnergyEquation	on;
+	diffusivityCorrection		"semi-implicit";
+	diffusivityModel		"multi-component";
+	soretEffect			on;
+	thermophoreticEffect		on;
+
+	includeDpDt			on;
+	thermodynamicPressure		101325.;
+
+	tauEquation			on;
+	zMixEquation			on;
+	zMixDmixSpecies			N2;
+
+	minTemperature4Chemistry	200.;
+}
+
+Output
+{
+	formationRates		off;
+	diffusivities		off;
+	gasProperties		off;
+	gasRadiation		off;
+}
+
+PolimiSoot
+{
+	physicalSootDiffusivity off;
+	physicalSootDiffusivityIndex 10;
+	thermophoreticEffectTag "BIN";
+}
+
+OdeHomogeneous
+{
+	odeSolver 	"OpenSMOKE";
+	relTolerance 	1e-7;
+	absTolerance 	1e-12;
+	maximumOrder 	5;
+	fullPivoting 	false;
+}
+
+PostProcessing
+{
+	moleFractions	off;
+	concentrations	off;
+	mixtureFraction	off;
+	soot		off;
+
+	PolimiSoot
+        {
+                onTheFlyFill    off;
+		planckCoefficient "Smooke";
+                integralUpdate  10;
+                boundaries      ();
+                
+                binMinimum      "BIN5";
+                binIndexZero    10;
+                binIndexFinal   20;
+                binDensityZero  1500.;
+                binDensityFinal 1500.;
+                fractalDiameter 3;
+        }
+}
+
+Spark
+{
+	spark 		off;
+	position    	(2e-3 0.0 3e-3);
+	time		0.;
+	temperature 	2000;
+	duration 	0.01;
+	diameter 	3.e-3;
+}
+
+#include "isatOptions"
+
+#include "lewisNumbers"
+
+#include "drgOptions"
+
+// ************************************************************************* //

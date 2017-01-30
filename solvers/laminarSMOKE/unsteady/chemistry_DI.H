@@ -109,7 +109,7 @@
 							batchReactorHomogeneousConstantPressure.SetHMOMAnalysis(hmom_analysis);
 							batchReactorHomogeneousConstantPressure.SetHMOM(&hmom);
 							batchReactorHomogeneousConstantPressure.SetHMOMOptions(hmom_index_H, hmom_index_OH, hmom_index_H2, hmom_index_H2O, hmom_index_C2H2, hmom_index_O2, hmom_index_PAH);
-
+							batchReactorHomogeneousConstantPressure.SetPAHGasConsumption(hmom_pah_gas_consumption);
 						
 							// Set initial conditions
 							odeSolverConstantPressure().SetInitialConditions(t0, y0);
@@ -143,6 +143,7 @@
 						//	batchReactorHomogeneousConstantVolume.SetHMOMAnalysis(hmom_analysis);
 						//	batchReactorHomogeneousConstantVolume.SetHMOM(&hmom);
 						//	batchReactorHomogeneousConstantVolume.SetHMOMOptions(hmom_index_H, hmom_index_OH, hmom_index_H2, hmom_index_H2O, hmom_index_C2H2, hmom_index_O2, hmom_index_PAH);
+						//	batchReactorHomogeneousConstantVolume.SetPAHGasConsumption(hmom_pah_gas_consumption);
 
 							// Set initial conditions
 							odeSolverConstantVolume().SetInitialConditions(t0, y0);

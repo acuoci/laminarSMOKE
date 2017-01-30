@@ -62,7 +62,7 @@ public:
 	void SetHMOMTest(const bool flag);
 	void SetHMOMAnalysis(const bool flag);
 	void SetHMOMOptions(const int index_H, const int index_OH, const int index_H2, const int index_H2O, const int index_C2H2, const int index_O2, const int index_PAH);
-
+	void SetPAHGasConsumption(const bool pah_gas_consumption);
 
 	const OpenSMOKE::OpenSMOKEVectorDouble& R() const { return R_; }
 	double QR() const { return QR_; }
@@ -124,6 +124,8 @@ private:
 	int hmom_index_O2_;
 	int hmom_index_PAH_;
 
+	bool pah_gas_consumption_;
+
 	OpenSMOKE::HMOM* hmom_;
 };
 
@@ -151,6 +153,11 @@ void BatchReactorHomogeneousConstantPressure::SetHMOMOptions(const int index_H, 
 	hmom_index_C2H2_ = index_C2H2;
 	hmom_index_O2_   = index_O2;
 	hmom_index_PAH_  = index_PAH;
+}
+
+void BatchReactorHomogeneousConstantPressure::SetPAHGasConsumption(const bool pah_gas_consumption)
+{
+	pah_gas_consumption_ = pah_gas_consumption;
 }
 
 unsigned int BatchReactorHomogeneousConstantPressure::NumberOfEquations() const
@@ -181,6 +188,7 @@ BatchReactorHomogeneousConstantPressure::BatchReactorHomogeneousConstantPressure
 		energyEquation_ = true;
 		isat_ = false;
 		drgAnalysis_ = false;
+		pah_gas_consumption_ = true;
 	}
 
 void BatchReactorHomogeneousConstantPressure::SetReactor( const double P0 )
@@ -297,6 +305,18 @@ int BatchReactorHomogeneousConstantPressure::Equations(const double t, const Ope
 			dy[NC_+3] = hmom_->SourceM00();
 			dy[NC_+4] = hmom_->SourceM10();
 			dy[NC_+5] = hmom_->SourceM01();
+
+			// PAH consumption
+			if (pah_gas_consumption_ == true)
+			{
+				double RPAH = hmom_->PAHConsumptionRate()*1e-3;	// [kmol/m3/s]
+
+				int pahIndex = hmom_index_PAH_+1;
+				int n2Index  = thermodynamicsMap_.IndexOfSpecies("N2");
+				
+				dy[pahIndex] -= thermodynamicsMap_.MW()[pahIndex]/rho_ * RPAH;
+				dy[n2Index]  += thermodynamicsMap_.MW()[n2Index]/rho_ * RPAH;
+			}
 		}
 		else
 		{

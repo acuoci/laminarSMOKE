@@ -192,6 +192,7 @@ const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel
 
 Switch hmom_analysis = false;
 Switch hmom_test = false;
+Switch hmom_pah_gas_consumption = true;
 int hmom_index_H = -1;
 int hmom_index_OH = -1;
 int hmom_index_H2O = -1;
@@ -217,6 +218,8 @@ const dictionary& hmomDictionary = solverOptions.subDict("HMOM");
 {
 	hmom_analysis = Switch(hmomDictionary.lookup(word("hmom")));
 	hmom_test = Switch(hmomDictionary.lookup(word("test")));
+
+
 	
 	if ( hmom_analysis == true)
 	{
@@ -240,6 +243,8 @@ const dictionary& hmomDictionary = solverOptions.subDict("HMOM");
 		hmom_condensation = readLabel(hmomDictionary.lookup("condensation"));
 		hmom_coagulation = readLabel(hmomDictionary.lookup("coagulation"));
 		hmom_coagulation_continous = readLabel(hmomDictionary.lookup("coagulation_continous"));
+
+		hmom_pah_gas_consumption = Switch(hmomDictionary.lookup(word("pah_gas_consumption")));
 	}
 }
 

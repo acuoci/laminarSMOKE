@@ -42,7 +42,6 @@ EXE_LIBS = \
     -lboost_date_time \
     -lboost_filesystem \
     -lboost_system \
-    -lboost_regex \
-    -lHMOM
+    -lboost_regex
 
     

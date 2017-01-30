@@ -1,0 +1,101 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.2                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      sampleDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+interpolationScheme cellPointFace;
+
+setFormat       raw;
+
+fields          (p T U H2 O2 H2O N2);
+
+sets
+(
+    axis
+    {
+        type    face;
+        axis    z;
+        start   (1e-10 0 0);
+        end     (1e-10 0 140e-3);
+    }
+
+    radial_3mm
+    {
+        type    face;
+        axis    x;
+        start   (1e-10  0 3e-3);
+        end     (20e-3  0 3e-3);
+    }
+
+    radial_10mm
+    {
+        type    face;
+        axis    x;
+        start   (1e-10  0 10e-3);
+        end     (20e-3  0 10e-3);
+    }
+
+    radial_20mm
+    {
+        type    face;
+        axis    x;
+        start   (1e-10  0 20e-3);
+        end     (20e-3  0 20e-3);
+    }
+
+    radial_30mm
+    {
+        type    face;
+        axis    x;
+        start   (1e-10  0 30e-3);
+        end     (20e-3  0 30e-3);
+    }
+
+    radial_40mm
+    {
+        type    face;
+        axis    x;
+        start   (1e-10  0 40e-3);
+        end     (20e-3  0 40e-3);
+    }
+
+    radial_50mm
+    {
+        type    face;
+        axis    x;
+        start   (1e-10  0 50e-3);
+        end     (20e-3  0 50e-3);
+    }
+
+    radial_60mm
+    {
+        type    face;
+        axis    x;
+        start   (1e-10  0 60e-3);
+        end     (20e-3  0 60e-3);
+    }
+
+    radial_70mm
+    {
+        type    face;
+        axis    x;
+        start   (1e-10  0 70e-3);
+        end     (20e-3  0 70e-3);
+    }
+);
+
+
+
+// ************************************************************************* //
