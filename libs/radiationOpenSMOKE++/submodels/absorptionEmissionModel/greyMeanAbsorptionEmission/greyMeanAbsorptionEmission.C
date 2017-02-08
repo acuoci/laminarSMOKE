@@ -176,6 +176,9 @@ Foam::radiation::greyMeanAbsorptionEmission::greyMeanAbsorptionEmission
         }
     }
 
+	gas_correction_coefficient_  = coeffsDict_.lookupOrDefault<scalar>(word("gasCorrectionCoefficient"),  scalar(1.));
+	Info << "Gas correction coefficient: " << gas_correction_coefficient_ << endl;
+
     	word soot_radiation(coeffsDict_.lookup("sootRadiation"));
 
 	if (soot_radiation == "none")
@@ -191,6 +194,11 @@ Foam::radiation::greyMeanAbsorptionEmission::greyMeanAbsorptionEmission
 		FatalErrorIn( "Foam::radiation::greyMeanAbsorptionEmission::greyMeanAbsorptionEmission")
 	    		<< "Wrong sootRadiation model. Available models: none | Smooke | Kent | Sazhin " << abort(FatalError);
 	}
+
+	soot_correction_coefficient_ = coeffsDict_.lookupOrDefault<scalar>(word("sootCorrectionCoefficient"), scalar(1.));
+	Info << "Soot radiation model: " << soot_radiation << endl;
+	Info << " - Correction coeff.: " << soot_correction_coefficient_ << endl;
+
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -275,6 +283,8 @@ Foam::radiation::greyMeanAbsorptionEmission::aCont(const label bandI) const
                   + b[0]
                 );
         }
+
+	a[cellI] *= gas_correction_coefficient_;
     }
 
     // Soot contribution
@@ -286,13 +296,17 @@ Foam::radiation::greyMeanAbsorptionEmission::aCont(const label bandI) const
     	{
 		const scalar fvi = fvsoot[cellI];
 		const scalar Ti = T[cellI];
+
+		double aSoot = 0.;
 															
 		if (soot_planck_coefficient_ == SOOT_RADIATION_PLANCK_COEFFICIENT_SMOOKE)
-			a[cellI] += 1307.*fvi*Ti;						// [1/m]	(Smooke et al. Combustion and Flame 2009)
+			aSoot = 1307.*fvi*Ti;						// [1/m]	(Smooke et al. Combustion and Flame 2009)
 		else if (soot_planck_coefficient_ == SOOT_RADIATION_PLANCK_COEFFICIENT_KENT)
-			a[cellI] += 2262.*fvi*Ti;						// [1/m]	(Kent al. Combustion and Flame 1990)
+			aSoot = 2262.*fvi*Ti;						// [1/m]	(Kent al. Combustion and Flame 1990)
 		else if (soot_planck_coefficient_ == SOOT_RADIATION_PLANCK_COEFFICIENT_SAZHIN)
-			a[cellI] += 1232.*fvi*(1. + 4.8e-4*(Ti - 2000.));			// [1/m]	(Sazhin, Fluent 1994)	
+			aSoot= 1232.*fvi*(1. + 4.8e-4*(Ti - 2000.));			// [1/m]	(Sazhin, Fluent 1994)	
+
+		a[cellI] += aSoot*soot_correction_coefficient_;
         }
     }
 

@@ -36,9 +36,9 @@ HMOM
 	nucleation			1;
 	surface_growth			1;
 	oxidation			1;
-	condensation			1;
-	coagulation			1;
-	coagulation_continous		1;
+	condensation			0;
+	coagulation			0;
+	coagulation_continous		0;
 }
 
 SteadyState

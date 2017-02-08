@@ -182,3 +182,19 @@ volScalarField HMOM_np
     dimensionedScalar("HMOM_np", dimensionSet(0., 0., 0., 0., 0.), 0.)
 );
 
+Info<< "soot_fv_large [-]\n" << endl;
+volScalarField soot_fv_large
+(
+    IOobject
+    (
+        "soot_fv_large",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("soot_fv_large", dimensionSet(0., 0., 0., 0., 0.), 0.)
+);
+
+soot_fv_large = HMOM_fv;

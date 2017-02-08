@@ -109,6 +109,11 @@ namespace OpenSMOKE
 				OpenSMOKE::SINGLE_STRING,
 				"Species to be assumed as PAH (example: @PAH C10H8;)",
 				false));
+				
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@PAHConsumption",
+				OpenSMOKE::SINGLE_BOOL,
+				"Consumption of PAH is accounted for (default: true)",
+				false));
 		}
 	};
 }

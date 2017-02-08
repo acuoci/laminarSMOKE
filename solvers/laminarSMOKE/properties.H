@@ -293,6 +293,9 @@
 			}
 		}
 	}
+
+	// This is needed by the radiation model
+	soot_fv_large = HMOM_fv;
 	
 	double tEnd = OpenSMOKE::OpenSMOKEGetCpuTime();
 

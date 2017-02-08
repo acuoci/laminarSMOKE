@@ -22,7 +22,6 @@ EXE_INC = \
 EXE_LIBS = \
     -L$(FOAM_USER_LIBBIN) \
     -L$(BOOST_LIBRARY_PATH)/lib \
-    -L$(HMOM_LIBRARY_PATH) \
     $(MKL_LIBS) \
     -lradiationOpenSMOKE++ \
     -lfiniteVolume \

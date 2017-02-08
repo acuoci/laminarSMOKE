@@ -91,7 +91,7 @@ if (jacobianUpdate != 1)
 {
 	Jstore.resize(mesh.nCells());
 	for(int i=0;i<mesh.nCells();i++)
-		Jstore[i].resize(thermodynamicsMapXML->NumberOfSpecies()+1);
+		Jstore[i].resize(thermodynamicsMapXML->NumberOfSpecies()+1+hmom_number_moments);
 }
 
 std::vector<int> species_order(thermodynamicsMapXML->NumberOfSpecies());

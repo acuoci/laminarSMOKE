@@ -44,30 +44,32 @@ if (homogeneousReactions == true && (speciesEquations == true || energyEquation 
 	if (implicitSourceTerm == true && jacobianUpdate == 1)
 	{
 		Info<< "Jacobian evaluation (continous)... " << endl;
-		
-	//	std::ofstream* fOut[thermodynamicsMapXML->NumberOfSpecies()];
-	//	for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
-	//	{
-	//		fOut[i] = new std::ofstream(thermodynamicsMapXML->NamesOfSpecies()[i].c_str(), std::ios::out);
-	//		fOut[i]->setf(std::ios::scientific);
-	//	}
 
 		double tStart = OpenSMOKE::OpenSMOKEGetCpuTime();	
 		{
 			const unsigned int NC = thermodynamicsMapXML->NumberOfSpecies();
+			const unsigned int NE = NC+1+hmom_number_moments;
 
 			const scalarField& TCells = T.internalField();
-			const scalarField& pCells = p.internalField(); 
+			const scalarField& pCells = p.internalField();
+			const scalarField& HMOM_Norm_N0Cells  = HMOM_Norm_N0.internalField();
+			const scalarField& HMOM_Norm_M00Cells = HMOM_Norm_M00.internalField();
+			const scalarField& HMOM_Norm_M10Cells = HMOM_Norm_M10.internalField();
+			const scalarField& HMOM_Norm_M01Cells = HMOM_Norm_M01.internalField();
 	
-			Eigen::VectorXd J(NC+1);
-			OpenSMOKE::OpenSMOKEVectorDouble Source(thermodynamicsMapXML->NumberOfSpecies()+1);	
-			OpenSMOKE::OpenSMOKEVectorDouble y(thermodynamicsMapXML->NumberOfSpecies()+1);
+			Eigen::VectorXd J(NE);
+			OpenSMOKE::OpenSMOKEVectorDouble Source(NE);	
+			OpenSMOKE::OpenSMOKEVectorDouble y(NE);
 
 			forAll(TCells, celli)
 			{
 				for(int i=0;i<NC;i++)
 					y[i+1] = Y[i].internalField()[celli];
 				y[NC+1] = TCells[celli];
+				y[NC+2] = HMOM_Norm_M00Cells[celli];
+				y[NC+3] = HMOM_Norm_M10Cells[celli];
+				y[NC+4] = HMOM_Norm_M01Cells[celli];
+				y[NC+5] = HMOM_Norm_N0Cells[celli];
 
 				linear_model.reactionSourceTerms(	*thermodynamicsMapXML, *kineticsMapXML, y, pCells[celli], Source);
 
@@ -77,28 +79,17 @@ if (homogeneousReactions == true && (speciesEquations == true || energyEquation 
 				else
 					linear_model.reactionJacobianSparse( *thermodynamicsMapXML, *kineticsMapXML, y, pCells[celli], J, energyEquation, speciesEquations);
 
-				for(int i=0;i<NC+1;i++)
+				for(int i=0;i<NE;i++)
 					sourceImplicit[i].internalField()[celli] = J(i);
 			
-				for(int i=0;i<NC+1;i++)
+				for(int i=0;i<NE;i++)
 					sourceExplicit[i].internalField()[celli] = Source[i+1] - J(i)*y[i+1];
-
-		//		if (TCells[celli] > 2200. && TCells[celli] < 2220.)
-		//		{
-		//			for(int i=0;i<NC;i++)
-		//				*fOut[i] << Source[i+1] << " " << J(i) << " " << y[i+1] << " " << J(i)*y[i+1] << " " << Source[i+1] - J(i)*y[i+1] << std::endl;
-		//		}
 			}
 		}
 		double tEnd = OpenSMOKE::OpenSMOKEGetCpuTime();
 
 		Info << "done in " << tEnd - tStart << " s  (" << (tEnd-tStart)/double(mesh.nCells())*1000. << " ms per cell)" << endl;
 
-	//	for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
-	//		fOut[i]->close();
-	//
-	//	delete[] fOut;
-		
 	}
 	else if (implicitSourceTerm == true && jacobianUpdate != 1)
 	{
@@ -107,19 +98,28 @@ if (homogeneousReactions == true && (speciesEquations == true || energyEquation 
 		double tStart = OpenSMOKE::OpenSMOKEGetCpuTime();	
 		{
 			const unsigned int NC = thermodynamicsMapXML->NumberOfSpecies();
+			const unsigned int NE = NC+1+hmom_number_moments;
 
 			const scalarField& TCells = T.internalField();
 			const scalarField& pCells = p.internalField(); 
+			const scalarField& HMOM_Norm_N0Cells  = HMOM_Norm_N0.internalField();
+			const scalarField& HMOM_Norm_M00Cells = HMOM_Norm_M00.internalField();
+			const scalarField& HMOM_Norm_M10Cells = HMOM_Norm_M10.internalField();
+			const scalarField& HMOM_Norm_M01Cells = HMOM_Norm_M01.internalField();
 	
-			Eigen::VectorXd J(NC+1);
-			OpenSMOKE::OpenSMOKEVectorDouble Source(thermodynamicsMapXML->NumberOfSpecies()+1);	
-			OpenSMOKE::OpenSMOKEVectorDouble y(thermodynamicsMapXML->NumberOfSpecies()+1);
+			Eigen::VectorXd J(NE);
+			OpenSMOKE::OpenSMOKEVectorDouble Source(NE);	
+			OpenSMOKE::OpenSMOKEVectorDouble y(NE);
 
 			forAll(TCells, celli)
 			{
 				for(int i=0;i<NC;i++)
 					y[i+1] = Y[i].internalField()[celli];
 				y[NC+1] = TCells[celli];
+				y[NC+2] = HMOM_Norm_M00Cells[celli];
+				y[NC+3] = HMOM_Norm_M10Cells[celli];
+				y[NC+4] = HMOM_Norm_M01Cells[celli];
+				y[NC+5] = HMOM_Norm_N0Cells[celli];
 
 				linear_model.reactionSourceTerms(	*thermodynamicsMapXML, *kineticsMapXML, y, pCells[celli], Source);
 
@@ -133,10 +133,10 @@ if (homogeneousReactions == true && (speciesEquations == true || energyEquation 
 					Jstore[celli] = J;
 				}
 
-				for(int i=0;i<NC+1;i++)
+				for(int i=0;i<NE;i++)
 					sourceImplicit[i].internalField()[celli] = Jstore[celli](i);
 			
-				for(int i=0;i<NC+1;i++)
+				for(int i=0;i<NE;i++)
 					sourceExplicit[i].internalField()[celli] = Source[i+1] - Jstore[celli](i)*y[i+1];
 			}
 		}
@@ -156,25 +156,34 @@ if (homogeneousReactions == true && (speciesEquations == true || energyEquation 
 		double tStart = OpenSMOKE::OpenSMOKEGetCpuTime();	
 		{
 			const unsigned int NC = thermodynamicsMapXML->NumberOfSpecies();
+			const unsigned int NE = NC+1+hmom_number_moments;
 
 			const scalarField& TCells = T.internalField();
 			const scalarField& pCells = p.internalField(); 
+			const scalarField& HMOM_Norm_N0Cells  = HMOM_Norm_N0.internalField();
+			const scalarField& HMOM_Norm_M00Cells = HMOM_Norm_M00.internalField();
+			const scalarField& HMOM_Norm_M10Cells = HMOM_Norm_M10.internalField();
+			const scalarField& HMOM_Norm_M01Cells = HMOM_Norm_M01.internalField();
 	
-			OpenSMOKE::OpenSMOKEVectorDouble Source(thermodynamicsMapXML->NumberOfSpecies()+1);	
-			OpenSMOKE::OpenSMOKEVectorDouble y(thermodynamicsMapXML->NumberOfSpecies()+1);
+			OpenSMOKE::OpenSMOKEVectorDouble Source(NE);	
+			OpenSMOKE::OpenSMOKEVectorDouble y(NE);
 
 			forAll(TCells, celli)
 			{
 				for(int i=0;i<NC;i++)
 					y[i+1] = Y[i].internalField()[celli];
 				y[NC+1] = TCells[celli];
+				y[NC+2] = HMOM_Norm_M00Cells[celli];
+				y[NC+3] = HMOM_Norm_M10Cells[celli];
+				y[NC+4] = HMOM_Norm_M01Cells[celli];
+				y[NC+5] = HMOM_Norm_N0Cells[celli];
 
 				linear_model.reactionSourceTerms( *thermodynamicsMapXML, *kineticsMapXML, y, pCells[celli], Source );
 
-				for(int i=0;i<NC+1;i++)
+				for(int i=0;i<NE;i++)
 					sourceImplicit[i].internalField()[celli] = 0.;
 			
-				for(int i=0;i<NC+1;i++)
+				for(int i=0;i<NE;i++)
 					sourceExplicit[i].internalField()[celli] = Source[i+1];
 			}
 		}

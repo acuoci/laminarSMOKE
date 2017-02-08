@@ -122,7 +122,7 @@ const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel
 	homogeneousReactions = Switch(physicalModelDictionary.lookup(word("homogeneousReactions")));
 	includeDpDt = Switch(physicalModelDictionary.lookup(word("includeDpDt")));
 	iMassDiffusionInEnergyEquation = Switch(physicalModelDictionary.lookup(word("massDiffusionInEnergyEquation")));
-	//direct_integration_minimum_temperature_for_chemistry  = readScalar(physicalModelDictionary.lookup("minTemperature4Chemistry"));
+	direct_integration_minimum_temperature_for_chemistry  = physicalModelDictionary.lookupOrDefault<scalar>(word("minTemperature4Chemistry"),  scalar(200.));
 	
 	// Thermophoretic effect
 	thermophoreticEffect = Switch(physicalModelDictionary.lookup(word("thermophoreticEffect")));
@@ -213,6 +213,8 @@ int hmom_condensation = 1;
 int hmom_coagulation = 1;
 int hmom_coagulation_continous = 1;
 
+scalar hmom_minimum_normalized_value = 1.e-16;
+
 
 const dictionary& hmomDictionary = solverOptions.subDict("HMOM");
 {
@@ -245,6 +247,8 @@ const dictionary& hmomDictionary = solverOptions.subDict("HMOM");
 		hmom_coagulation_continous = readLabel(hmomDictionary.lookup("coagulation_continous"));
 
 		hmom_pah_gas_consumption = Switch(hmomDictionary.lookup(word("pah_gas_consumption")));
+
+		hmom_minimum_normalized_value  = hmomDictionary.lookupOrDefault<scalar>(word("mininum_normalized_value"),  scalar(1.e-16));
 	}
 }
 

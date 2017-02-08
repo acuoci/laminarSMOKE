@@ -15,12 +15,11 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-radiation               off;
-radiationModel          none;
+radiation               on;
+radiationModel          opticallyThin;
 solverFreq 	        10;
 absorptionEmissionModel greyMeanAbsorptionEmission;
 scatterModel    	none;
-sootModel 		none;
 
 fvDOMCoeffs
 {
@@ -49,7 +48,7 @@ greyMeanAbsorptionEmissionCoeffs
 
     EhrrCoeff                0.0;
 
-    sootRadiation	    none;
+    sootRadiation	    Smooke;
 
     H2O
     {

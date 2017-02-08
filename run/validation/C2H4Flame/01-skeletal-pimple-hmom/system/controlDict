@@ -21,9 +21,9 @@ startFrom       latestTime;
 
 startTime       0;
 
-stopAt          endTime;
+stopAt          noWriteNow;
 
-endTime         3.0;
+endTime         10;
 
 deltaT          1e-5;
 
@@ -47,7 +47,7 @@ runTimeModifiable yes;
 
 adjustTimeStep  yes;
 
-maxCo           0.1;
+maxCo           0.05;
 
 // ************************************************************************* //
 

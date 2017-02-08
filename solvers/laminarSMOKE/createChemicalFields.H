@@ -48,8 +48,8 @@ PtrList<volScalarField> CpSpecies(thermodynamicsMapXML->NumberOfSpecies());
 PtrList<volScalarField> FormationRates(outputFormationRatesIndices.size());
 
 #if STEADYSTATE == 1
-PtrList<volScalarField> sourceImplicit(thermodynamicsMapXML->NumberOfSpecies()+1);
-PtrList<volScalarField> sourceExplicit(thermodynamicsMapXML->NumberOfSpecies()+1);
+PtrList<volScalarField> sourceImplicit(thermodynamicsMapXML->NumberOfSpecies()+1+hmom_number_moments);
+PtrList<volScalarField> sourceExplicit(thermodynamicsMapXML->NumberOfSpecies()+1+hmom_number_moments);
 #endif
 
 PtrList<volScalarField> Dsoret(transportMapXML->iThermalDiffusionRatios().size());
@@ -287,6 +287,51 @@ sourceExplicit.set
 		dimensionedScalar("SET", dimensionSet(1, -1, -3, 0, 0), 0.0)
 	)
 );
+
+std::vector<std::string> hmom_names(4);
+hmom_names[0] = "M00";
+hmom_names[1] = "M10";
+hmom_names[2] = "M01";
+hmom_names[3] = "N0";
+
+for (int i=0;i<hmom_number_moments;i++)
+{
+	sourceImplicit.set
+	(
+		thermodynamicsMapXML->NumberOfSpecies()+i+1,
+		new volScalarField
+		(
+			IOobject
+			(
+				"SI_HMOM" + hmom_names[i],
+				mesh.time().timeName(),
+				mesh,
+				IOobject::NO_READ,
+				IOobject::NO_WRITE
+			),
+			mesh,
+			dimensionedScalar("SIHMOM", dimensionSet(0, 0, -1, 0, 0), 0.0)
+		)
+	);
+
+	sourceExplicit.set
+	(
+		thermodynamicsMapXML->NumberOfSpecies()+i+1,
+		new volScalarField
+		(
+			IOobject
+			(
+				"SE_HMOM" + hmom_names[i],
+				mesh.time().timeName(),
+				mesh,
+				IOobject::NO_READ,
+				IOobject::NO_WRITE
+			),
+			mesh,
+			dimensionedScalar("SET", dimensionSet(0, -3, -1, 0, 1), 0.0)
+		)
+	);
+}
 
 #endif
 

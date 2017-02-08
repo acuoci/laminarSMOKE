@@ -64,7 +64,7 @@
 		Eigen::VectorXd yMax(NEQ); 
 		for(unsigned int i=0;i<NEQ;i++)   yMax(i) = 1.;  
 						  yMax(NC) = 6000.;
-		for(unsigned int i=0;i<NHMOM;i++) yMax(NC+1+i) = 1e16;  
+		for(unsigned int i=0;i<NHMOM;i++) yMax(NC+1+i) = 1.e16;  
 
 		Eigen::VectorXd y0(NEQ);
 		Eigen::VectorXd yf(NEQ);
@@ -83,10 +83,12 @@
 						for(unsigned int i=0;i<NC;i++)
 							y0(i) = Y[i].internalField()[celli];
 						y0(NC) = TCells[celli];
-						y0(NC+1) = HMOM_Norm_N0Cells[celli];
-						y0(NC+2) = HMOM_Norm_M00Cells[celli];
-						y0(NC+3) = HMOM_Norm_M10Cells[celli];
-						y0(NC+4) = HMOM_Norm_M01Cells[celli];
+						y0(NC+1) = HMOM_Norm_M00Cells[celli];
+						y0(NC+2) = HMOM_Norm_M10Cells[celli];
+						y0(NC+3) = HMOM_Norm_M01Cells[celli];
+						y0(NC+4) = HMOM_Norm_N0Cells[celli];
+
+						//Info <<  TCells[celli] << " " << HMOM_Norm_M00Cells[celli] << " " << HMOM_Norm_M10Cells[celli] << " " << HMOM_Norm_M01Cells[celli] << " " << HMOM_Norm_N0Cells[celli] << endl;
 
 						// Check and normalize the composition
 						{
@@ -175,10 +177,10 @@
 					for(unsigned int i=0;i<NC;i++)
 						yf(i) = Y[i].internalField()[celli];
 					yf(NC) = TCells[celli];
-					yf(NC+1) = HMOM_Norm_N0Cells[celli];
-					yf(NC+2) = HMOM_Norm_M00Cells[celli];
-					yf(NC+3) = HMOM_Norm_M10Cells[celli];
-					yf(NC+4) = HMOM_Norm_M01Cells[celli];
+					yf(NC+1) = HMOM_Norm_M00Cells[celli];
+					yf(NC+2) = HMOM_Norm_M10Cells[celli];
+					yf(NC+3) = HMOM_Norm_M01Cells[celli];
+					yf(NC+4) = HMOM_Norm_N0Cells[celli];
 				}
 
 				// Check mass fractions
@@ -193,10 +195,10 @@
 					TCells[celli] = yf(NC);
 
 				// Moments
-				HMOM_Norm_N0Cells[celli]  = yf(NC+1);
-				HMOM_Norm_M00Cells[celli] = yf(NC+2);
-				HMOM_Norm_M10Cells[celli] = yf(NC+3);
-				HMOM_Norm_M01Cells[celli] = yf(NC+4);
+				HMOM_Norm_M00Cells[celli] = yf(NC+1);
+				HMOM_Norm_M10Cells[celli] = yf(NC+2);
+				HMOM_Norm_M01Cells[celli] = yf(NC+3);
+				HMOM_Norm_N0Cells[celli]  = yf(NC+4);
 
 				if (counter%(int(0.20*mesh.nCells())+1) == 0)
 					Info <<"   Accomplished: " << counter << "/" << mesh.nCells() << endl;

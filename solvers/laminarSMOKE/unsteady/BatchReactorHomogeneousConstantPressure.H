@@ -244,10 +244,10 @@ int BatchReactorHomogeneousConstantPressure::Equations(const double t, const Ope
 		T_ = y[NC_+1];
 
 		// Recover normalized moments	
-		const double HMOM_Norm_N0_  = y[NC_+2];
-		const double HMOM_Norm_M00_ = y[NC_+3];
-		const double HMOM_Norm_M10_ = y[NC_+4];
-		const double HMOM_Norm_M01_ = y[NC_+5];
+		const double HMOM_Norm_M00_ = y[NC_+2];
+		const double HMOM_Norm_M10_ = y[NC_+3];
+		const double HMOM_Norm_M01_ = y[NC_+4];
+		const double HMOM_Norm_N0_  = y[NC_+5];
 		
 		// Test HMOM library
 		#include "testHMOM.H"
@@ -301,21 +301,22 @@ int BatchReactorHomogeneousConstantPressure::Equations(const double t, const Ope
 			hmom_->CalculateSourceMoments();
 
 			// Moments equations [mol/m3/s]
-			dy[NC_+2] = hmom_->SourceN0();
-			dy[NC_+3] = hmom_->SourceM00();
-			dy[NC_+4] = hmom_->SourceM10();
-			dy[NC_+5] = hmom_->SourceM01();
+			dy[NC_+2] = hmom_->SourceM00();
+			dy[NC_+3] = hmom_->SourceM10();
+			dy[NC_+4] = hmom_->SourceM01();
+			dy[NC_+5] = hmom_->SourceN0();
 
 			// PAH consumption
 			if (pah_gas_consumption_ == true)
 			{
-				double RPAH = hmom_->PAHConsumptionRate()*1e-3;	// [kmol/m3/s]
-
 				int pahIndex = hmom_index_PAH_+1;
 				int n2Index  = thermodynamicsMap_.IndexOfSpecies("N2");
+
+				const double RPAH = hmom_->PAHConsumptionRate()*1e-3;		// [kmol/m3/s]
+				const double OmegaPAH = thermodynamicsMap_.MW()[pahIndex]*RPAH;	// [kg/m3/s]
 				
-				dy[pahIndex] -= thermodynamicsMap_.MW()[pahIndex]/rho_ * RPAH;
-				dy[n2Index]  += thermodynamicsMap_.MW()[n2Index]/rho_ * RPAH;
+				dy[pahIndex] -= OmegaPAH/rho_;
+				dy[n2Index]  += OmegaPAH/rho_;
 			}
 		}
 		else

@@ -54,13 +54,15 @@
 	);
 
 	{
+		unsigned int index = Y.size()+4;
+
 		fvScalarMatrix HMOM_Norm_N0Eqn
 		(
-			fvm::ddt(rho,HMOM_Norm_N0)
-		      + fvm::div(phi, HMOM_Norm_N0) 
+		        fvm::div(phi, HMOM_Norm_N0) 
 		      - fvm::laplacian(rho*Dhmom, HMOM_Norm_N0) 
 		        == 
 		        // source terms
+			rho*sourceExplicit[index] + fvm::Sp(rho*sourceImplicit[index],HMOM_Norm_N0) + 
 		     	fvOptions(rho, HMOM_Norm_N0)
 		);
 
@@ -78,13 +80,15 @@
 	}
 
 	{
+		unsigned int index = Y.size()+1;
+
 		fvScalarMatrix HMOM_Norm_M00Eqn
 		(
-			fvm::ddt(rho,HMOM_Norm_M00)
-		      + fvm::div(phi, HMOM_Norm_M00) 
+			fvm::div(phi, HMOM_Norm_M00) 
 		      - fvm::laplacian(rho*Dhmom, HMOM_Norm_M00) 
 		        == 
 		        // source terms
+			rho*sourceExplicit[index] + fvm::Sp(rho*sourceImplicit[index],HMOM_Norm_M00) + 
 		     	fvOptions(rho, HMOM_Norm_M00)
 		);
 
@@ -102,13 +106,15 @@
 	}
 
 	{
+		unsigned int index = Y.size()+2;
+
 		fvScalarMatrix HMOM_Norm_M10Eqn
 		(
-			fvm::ddt(rho,HMOM_Norm_M10)
-		      + fvm::div(phi, HMOM_Norm_M10) 
+			fvm::div(phi, HMOM_Norm_M10) 
 		      - fvm::laplacian(rho*Dhmom, HMOM_Norm_M10) 
 		        == 
 		        // source terms
+			rho*sourceExplicit[index] + fvm::Sp(rho*sourceImplicit[index],HMOM_Norm_M10) + 
 		     	fvOptions(rho, HMOM_Norm_M10)
 		);
 
@@ -126,13 +132,15 @@
 	}
 
 	{
+		unsigned int index = Y.size()+3;
+
 		fvScalarMatrix HMOM_Norm_M01Eqn
 		(
-			fvm::ddt(rho,HMOM_Norm_M01)
-		      + fvm::div(phi, HMOM_Norm_M01) 
+			fvm::div(phi, HMOM_Norm_M01) 
 		      - fvm::laplacian(rho*Dhmom, HMOM_Norm_M01) 
 		        == 
 		        // source terms
+			rho*sourceExplicit[index] + fvm::Sp(rho*sourceImplicit[index],HMOM_Norm_M01) + 
 		     	fvOptions(rho, HMOM_Norm_M01)
 		);
 
@@ -148,4 +156,5 @@
 		HMOM_Norm_M01.max(hmom_minimum_normalized_value);
 		HMOM_Norm_M01.min(1e0);
 	}
+
 }

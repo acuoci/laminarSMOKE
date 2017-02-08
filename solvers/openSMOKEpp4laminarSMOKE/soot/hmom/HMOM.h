@@ -133,6 +133,12 @@ namespace OpenSMOKE
 		*@param volume_to_surface the collision diametr model (1 or 2, default equal to 2)
 		*/
 		void SetCollisionDiameterModel(const int dc_model);
+		
+		/**
+		*@brief Sets if the PAH consumption rate is turned on or off
+		*@param flag if true, consumption of PAH is turned on
+		*/
+		void SetPAHConsumption(const bool flag);
 
 		/**
 		*@brief Sets the normalized moments
@@ -366,6 +372,11 @@ namespace OpenSMOKE
 		const Eigen::VectorXd& sources_coagulation_continous_ll() const { return source_coagulation_continous_ll_; }
 
 		/**
+		*@brief Returns if PAH consumption is turned on or off
+		*/
+		bool PAHConsumption() const { return pah_consumption_; }
+		
+		/**
 		*@brief Returns the PAH consumption rate [mol/m3/s]
 		*/
 		double PAHConsumptionRate() const;
@@ -553,6 +564,7 @@ namespace OpenSMOKE
 		double K_collisional_;					//!< [???]
 
 		std::string	pah_species_;				//!< name of PAH species
+		bool pah_consumption_;					//!< PAH consumption
 
 	private:
 

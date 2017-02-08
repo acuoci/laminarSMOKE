@@ -106,6 +106,9 @@ namespace OpenSMOKE
 		// Collision diameter model
 		const int dc_model = 2;
 		SetCollisionDiameterModel(dc_model);
+		
+		// PAH consumption
+		SetPAHConsumption(true);
 
 		// Memory allocation
 		MemoryAllocation();
@@ -138,6 +141,13 @@ namespace OpenSMOKE
 			int flag;
 			dictionary.ReadInt("@CollisionDiameterModel", flag);
 			SetCollisionDiameterModel(flag);
+		}
+		
+		if (dictionary.CheckOption("@PAHConsumption") == true)
+		{
+			bool flag;
+			dictionary.ReadBool("@CollisionDiameterModel", flag);
+			SetPAHConsumption(flag);
 		}
 
 		if (dictionary.CheckOption("@PAH") == true)
@@ -307,7 +317,12 @@ namespace OpenSMOKE
 		As_fractal_ = 3.0*chi_fractal;
 		K_fractal_ = 2.0 / 3.0 * std::pow(1.0 / 36.0 / pi, chi_fractal);
 	}
-
+	
+	void HMOM::SetPAHConsumption(const bool flag)
+	{
+		pah_consumption_ = flag;
+	}
+	
 	void HMOM::SetNormalizedMoments(	const double M00_normalized, const double M10_normalized,
 										const double M01_normalized, const double N0_normalized)
 	{
@@ -334,27 +349,27 @@ namespace OpenSMOKE
 	}
 
 	void HMOM::SetConcentrations(	const std::string units, const double conc_OH, const double conc_H, const double conc_H2O,
-									const double conc_H2, const double conc_C2H2, const double conc_O2,
-									const double conc_PAH)
+								 const double conc_H2, const double conc_C2H2, const double conc_O2,
+								 const double conc_PAH)
 	{
 		if (units == "mol/cm3")
 		{
-			conc_OH_ = conc_OH;			// [mol/cm3]
-			conc_H_ = conc_H;			// [mol/cm3]
+			conc_OH_ = conc_OH;		// [mol/cm3]
+			conc_H_ = conc_H;		// [mol/cm3]
 			conc_H2O_ = conc_H2O;		// [mol/cm3]
-			conc_H2_ = conc_H2;			// [mol/cm3]
+			conc_H2_ = conc_H2;		// [mol/cm3]
 			conc_C2H2_ = conc_C2H2;		// [mol/cm3]
-			conc_O2_ = conc_O2;			// [mol/cm3]
+			conc_O2_ = conc_O2;		// [mol/cm3]
 			conc_PAH_ = conc_PAH;		// [mol/cm3]
 		}
 		else if (units == "kmol/m3")
 		{
-			conc_OH_ = conc_OH / 1.e3;			// [mol/cm3]
-			conc_H_ = conc_H / 1.e3;			// [mol/cm3]
+			conc_OH_ = conc_OH / 1.e3;		// [mol/cm3]
+			conc_H_ = conc_H / 1.e3;		// [mol/cm3]
 			conc_H2O_ = conc_H2O / 1.e3;		// [mol/cm3]
-			conc_H2_ = conc_H2 / 1.e3;			// [mol/cm3]
+			conc_H2_ = conc_H2 / 1.e3;		// [mol/cm3]
 			conc_C2H2_ = conc_C2H2 / 1.e3;		// [mol/cm3]
-			conc_O2_ = conc_O2 / 1.e3;			// [mol/cm3]
+			conc_O2_ = conc_O2 / 1.e3;		// [mol/cm3]
 			conc_PAH_ = conc_PAH / 1.e3;		// [mol/cm3]
 		}
 	}
@@ -511,12 +526,14 @@ namespace OpenSMOKE
 
 	void HMOM::SootOxidationM4()
 	{
-		source_oxidation_(0) = -kox_ * surface_density * VC2_ * N0_ * S0_ / V0_ / AvogadroNumber;
-		source_oxidation_(1) = -kox_ * surface_density * VC2_ / V0_ / AvogadroNumber *
-			(S0_*N0_ - GetMissingMoment(0., 1.));
-		source_oxidation_(2) = -kox_ * surface_density * VC2_ / S0_ / AvogadroNumber *
-			(std::pow(S0_, 2.)*N0_ / V0_ - 2.0 / 3.0 * GetMissingMoment(-1., 2.));
-		source_oxidation_(3) = -kox_ * surface_density * VC2_ * N0_ * S0_ / V0_ / AvogadroNumber;
+		const double coefficient = kox_ * surface_density * VC2_;
+		const double M01 = GetMissingMoment(0., 1.);
+		const double M_12 = GetMissingMoment(-1., 2.);
+
+		source_oxidation_(0) = -coefficient * N0_ * S0_ / V0_ / AvogadroNumber;								// M00
+		source_oxidation_(1) = -coefficient / V0_ / AvogadroNumber * M01;								// M10
+		source_oxidation_(2) = -coefficient / S0_ / AvogadroNumber * (std::pow(S0_, 2.)*N0_ / V0_ + 2./3.*( M_12 - S0_*N0_));		// M01
+		source_oxidation_(3) = -coefficient * N0_ * S0_ / V0_ / AvogadroNumber;								// N0
 	}
 
 	void HMOM::SootCondensationM4()
@@ -745,7 +762,7 @@ namespace OpenSMOKE
 			// M(x,y) = N0*V0^x*S0^y + NL*VL^x*SL^y
 
 			moment =	N0_*std::pow(V0_, i)*std::pow(S0_, j) +
-						NL_*std::pow(NLVL_ / NL_, i)*std::pow(NLSL_ / NL_, j);
+					NL_*std::pow(NLVL_ / NL_, i)*std::pow(NLSL_ / NL_, j);
 		}
 
 		return moment;

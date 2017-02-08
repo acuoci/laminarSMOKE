@@ -93,13 +93,19 @@ int main(int argc, char *argv[])
 	#include "createBasicFields.H"
 	#include "readOptions.H"
 	#include "readOptionsSteadyState.H"
+	#include "createHMOMFields.H"
 
 	linearModel linear_model(*thermodynamicsMapXML, *kineticsMapXML);
+	linear_model.SetHMOMTest(hmom_test);
+	linear_model.SetHMOMAnalysis(hmom_analysis);
+	linear_model.SetHMOM(&hmom);
+	linear_model.SetHMOMOptions(hmom_index_H, hmom_index_OH, hmom_index_H2, hmom_index_H2O, hmom_index_C2H2, hmom_index_O2, hmom_index_PAH);
+	linear_model.SetPAHGasConsumption(hmom_pah_gas_consumption);
 	
 	#include "createGasFields.H"
 	#include "createChemicalFields.H"
 	#include "createLaminarSMOKEThermoClass.H"
-	#include "createHMOMFields.H"
+	
         #if OPENFOAM_VERSION == 30
         #include "createMRF.H"
         #endif
@@ -158,6 +164,7 @@ int main(int argc, char *argv[])
 
 		    #include "fluxes.H"
 		    #include "YEqn.H"
+		    #include "HMOMEqn.H"
 		    #include "TEqn.H" 
 		}
 	    

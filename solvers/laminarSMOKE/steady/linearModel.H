@@ -38,6 +38,8 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
+#include "soot/hmom/HMOM.h"
+
 class linearModel
 {
 
@@ -45,8 +47,9 @@ public:
 
 	linearModel(OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermodynamicsMap_, OpenSMOKE::KineticsMap_CHEMKIN<double>& kineticsMap_)
 	{
+		NHMOM_ = 4;
 		NC_ = thermodynamicsMap_.NumberOfSpecies();
-		NE_ = NC_+1;
+		NE_ = NC_+1+NHMOM_;
 		ChangeDimensions(NC_, &omega_, true);
 		ChangeDimensions(NC_, &x_, true);
 		ChangeDimensions(NC_, &R_, true);
@@ -57,6 +60,10 @@ public:
 		ChangeDimensions(NE_, &dy_plus_, true);
 		ChangeDimensions(NE_, &dy_original_, true);
 		Jdiagonal_.resize(NE_);
+
+		pah_gas_consumption_ = true;
+		hmom_analysis_ = false;
+		hmom_test_ = false;
 	}
 
 	void reactionSourceTerms(	OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermodynamicsMap_, OpenSMOKE::KineticsMap_CHEMKIN<double>& kineticsMap_,
@@ -70,10 +77,22 @@ public:
 		       			const OpenSMOKE::OpenSMOKEVectorDouble& y, const double P0,
 		       			Eigen::VectorXd &J, const bool energyEquation, const bool speciesEquations);
 
+	
+	void SetHMOMAnalysis(const bool flag);
+
+	void SetHMOMTest(const bool flag);
+
+	void SetHMOM(OpenSMOKE::HMOM* hmom);
+
+	void SetHMOMOptions(const int index_H, const int index_OH, const int index_H2, const int index_H2O, const int index_C2H2, const int index_O2, const int index_PAH);
+
+	void SetPAHGasConsumption(const bool pah_gas_consumption);
+
 private:
 
 	unsigned int NC_;
-	unsigned int NE_; 
+	unsigned int NE_;
+	unsigned int NHMOM_; 
 	OpenSMOKE::OpenSMOKEVectorDouble omega_;
 	OpenSMOKE::OpenSMOKEVectorDouble x_;
 	OpenSMOKE::OpenSMOKEVectorDouble R_;
@@ -86,7 +105,52 @@ private:
      	OpenSMOKE::OpenSMOKEVectorDouble dy_original_;
 
 	Eigen::VectorXd Jdiagonal_;
+
+	bool hmom_analysis_;
+	bool hmom_test_;
+	int hmom_index_H_;
+	int hmom_index_OH_;
+	int hmom_index_H2_;
+	int hmom_index_H2O_;
+	int hmom_index_C2H2_;
+	int hmom_index_O2_;
+	int hmom_index_PAH_;
+
+	bool pah_gas_consumption_;
+
+	OpenSMOKE::HMOM* hmom_;
 };
+
+void linearModel::SetHMOMAnalysis(const bool flag)
+{
+	hmom_analysis_ = flag;
+}
+
+void linearModel::SetHMOMTest(const bool flag)
+{
+	hmom_test_ = flag;
+}
+
+void linearModel::SetHMOM(OpenSMOKE::HMOM* hmom)
+{
+	hmom_ = hmom;
+}
+
+void linearModel::SetHMOMOptions(const int index_H, const int index_OH, const int index_H2, const int index_H2O, const int index_C2H2, const int index_O2, const int index_PAH)
+{
+	hmom_index_H_    = index_H;
+	hmom_index_OH_   = index_OH;
+	hmom_index_H2_   = index_H2;
+	hmom_index_H2O_  = index_H2O;
+	hmom_index_C2H2_ = index_C2H2;
+	hmom_index_O2_   = index_O2;
+	hmom_index_PAH_  = index_PAH;
+}
+
+void linearModel::SetPAHGasConsumption(const bool pah_gas_consumption)
+{
+	pah_gas_consumption_ = pah_gas_consumption;
+}
 
 // 
 void linearModel::reactionSourceTerms(	OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermodynamicsMap_, OpenSMOKE::KineticsMap_CHEMKIN<double>& kineticsMap_,
@@ -97,6 +161,12 @@ void linearModel::reactionSourceTerms(	OpenSMOKE::ThermodynamicsMap_CHEMKIN<doub
 	for(unsigned int i=1;i<=NC_;++i)
 		omega_[i] = max(y[i], 0.);
 	const double T = y[NC_+1];
+
+	// Recover normalized moments	
+	const double HMOM_Norm_M00_ = y[NC_+2];
+	const double HMOM_Norm_M10_ = y[NC_+3];
+	const double HMOM_Norm_M01_ = y[NC_+4];
+	const double HMOM_Norm_N0_  = y[NC_+5];
 
 	// Calculates the pressure and the concentrations of species
 	double MW_ = 0.;
@@ -119,7 +189,7 @@ void linearModel::reactionSourceTerms(	OpenSMOKE::ThermodynamicsMap_CHEMKIN<doub
 	for (unsigned int i=1;i<=NC_;++i)	
 		S[i] = R_[i]*thermodynamicsMap_.MW()[i];
 
-	
+	// Temperature
     	{
 		double CpMixMolar; 
 		thermodynamicsMap_.cpMolar_Mixture_From_MoleFractions(CpMixMolar,x_);
@@ -127,6 +197,49 @@ void linearModel::reactionSourceTerms(	OpenSMOKE::ThermodynamicsMap_CHEMKIN<doub
 		const double QR_ = kineticsMap_.HeatRelease(R_);
 		
 		S[NC_+1]  = QR_;
+	}
+
+	// HMOM Equations
+	if (hmom_analysis_ == true)
+	{
+		const double viscosity = 1.716e-5*Foam::pow(T/273.15,1.5)*(273.15+110.4)/(T+110.4);		// [kg/m/s]
+
+		// Setup
+		hmom_->SetNormalizedMoments(HMOM_Norm_M00_, HMOM_Norm_M10_, HMOM_Norm_M01_, HMOM_Norm_N0_);
+		hmom_->SetTemperatureAndPressure(T, P0);
+		hmom_->SetMassFractions(omega_[hmom_index_OH_+1], omega_[hmom_index_H_+1]);
+		hmom_->SetConcentrations("kmol/m3", c_[hmom_index_OH_+1], c_[hmom_index_H_+1], c_[hmom_index_H2O_+1], c_[hmom_index_H2_+1], c_[hmom_index_C2H2_+1], c_[hmom_index_O2_+1], c_[hmom_index_PAH_+1]);
+		hmom_->SetViscosity(viscosity);
+	
+		// Calculates
+		hmom_->CalculateSourceMoments();
+
+		// Moments equations [mol/m3/s]
+		S[NC_+2] = hmom_->SourceM00();
+		S[NC_+3] = hmom_->SourceM10();
+		S[NC_+4] = hmom_->SourceM01();
+		S[NC_+5] = hmom_->SourceN0();
+
+		// PAH consumption
+		if (pah_gas_consumption_ == true)
+		{
+			int pahIndex = hmom_index_PAH_+1;
+			int n2Index  = thermodynamicsMap_.IndexOfSpecies("N2");
+
+			const double RPAH = hmom_->PAHConsumptionRate()*1e-3;		// [kmol/m3/s]
+			const double OmegaPAH = thermodynamicsMap_.MW()[pahIndex]*RPAH;	// [kg/m3/s]
+		
+			S[pahIndex] -= OmegaPAH;
+			S[n2Index]  += OmegaPAH;
+		}
+	}
+	else
+	{
+		// Moments equations
+		S[NC_+2] = 0.;
+		S[NC_+3] = 0.;
+		S[NC_+4] = 0.;
+		S[NC_+5] = 0.;
 	}
 }
 
