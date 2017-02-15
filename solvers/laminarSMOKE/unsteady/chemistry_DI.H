@@ -44,10 +44,12 @@
 	scalarField& QCells = Q.internalField();
 	const scalarField& rhoCells = rho.internalField();
 	const scalarField& vCells = mesh.V();
-	scalarField& HMOM_Norm_N0Cells  = HMOM_Norm_N0.internalField();
+
 	scalarField& HMOM_Norm_M00Cells = HMOM_Norm_M00.internalField();
 	scalarField& HMOM_Norm_M10Cells = HMOM_Norm_M10.internalField();
 	scalarField& HMOM_Norm_M01Cells = HMOM_Norm_M01.internalField();
+	scalarField& HMOM_Norm_N0Cells  = HMOM_Norm_N0.internalField();
+	scalarField& HMOM_fvCells = HMOM_fv.internalField(); 
 
 	if (homogeneousReactions == true && odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_OPENSMOKE)
 	{
@@ -87,8 +89,17 @@
 						y0(NC+2) = HMOM_Norm_M10Cells[celli];
 						y0(NC+3) = HMOM_Norm_M01Cells[celli];
 						y0(NC+4) = HMOM_Norm_N0Cells[celli];
-
-						//Info <<  TCells[celli] << " " << HMOM_Norm_M00Cells[celli] << " " << HMOM_Norm_M10Cells[celli] << " " << HMOM_Norm_M01Cells[celli] << " " << HMOM_Norm_N0Cells[celli] << endl;
+/*
+						Info 	<< "T=" << TCells[celli] 
+							<< " fv=" << HMOM_fvCells[celli] 
+							<< " M00=" << HMOM_Norm_M00Cells[celli] 
+							<< " M10=" << HMOM_Norm_M10Cells[celli] 
+							<< " M01" << HMOM_Norm_M01Cells[celli] 
+							<< " N0=" << HMOM_Norm_N0Cells[celli]
+							<< endl;
+*/
+						if (HMOM_fvCells[celli] < hmom_minimum_fv_for_integration)
+							hmom_analysis = false;
 
 						// Check and normalize the composition
 						{
@@ -199,6 +210,8 @@
 				HMOM_Norm_M10Cells[celli] = yf(NC+2);
 				HMOM_Norm_M01Cells[celli] = yf(NC+3);
 				HMOM_Norm_N0Cells[celli]  = yf(NC+4);
+
+				hmom_analysis = true;
 
 				if (counter%(int(0.20*mesh.nCells())+1) == 0)
 					Info <<"   Accomplished: " << counter << "/" << mesh.nCells() << endl;

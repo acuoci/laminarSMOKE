@@ -303,14 +303,14 @@ for (int i=0;i<hmom_number_moments;i++)
 		(
 			IOobject
 			(
-				"SI_HMOM" + hmom_names[i],
+				"SI_HMOM_" + hmom_names[i],
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
 				IOobject::NO_WRITE
 			),
 			mesh,
-			dimensionedScalar("SIHMOM", dimensionSet(0, 0, -1, 0, 0), 0.0)
+			dimensionedScalar("SIHMOM", dimensionSet(1, -3, -1, 0, 0), 0.0)
 		)
 	);
 
@@ -321,14 +321,14 @@ for (int i=0;i<hmom_number_moments;i++)
 		(
 			IOobject
 			(
-				"SE_HMOM" + hmom_names[i],
+				"SE_HMOM_" + hmom_names[i],
 				mesh.time().timeName(),
 				mesh,
 				IOobject::NO_READ,
 				IOobject::NO_WRITE
 			),
 			mesh,
-			dimensionedScalar("SET", dimensionSet(0, -3, -1, 0, 1), 0.0)
+			dimensionedScalar("SET", dimensionSet(1, -6, -1, 0, 1), 0.0)
 		)
 	);
 }

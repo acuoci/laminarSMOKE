@@ -60,6 +60,7 @@
 // OpenFOAM
 #include "fvCFD.H"
 #include "multivariateScheme.H"
+#include "boundedConvectionScheme.H"
 #include "simpleControl.H"
 #include "fvIOoptionList.H"
 #include "interpolation.H"

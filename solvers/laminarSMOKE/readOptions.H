@@ -214,6 +214,7 @@ int hmom_coagulation = 1;
 int hmom_coagulation_continous = 1;
 
 scalar hmom_minimum_normalized_value = 1.e-16;
+scalar hmom_minimum_fv_for_integration = 1.e-16;
 
 
 const dictionary& hmomDictionary = solverOptions.subDict("HMOM");
@@ -248,7 +249,11 @@ const dictionary& hmomDictionary = solverOptions.subDict("HMOM");
 
 		hmom_pah_gas_consumption = Switch(hmomDictionary.lookup(word("pah_gas_consumption")));
 
-		hmom_minimum_normalized_value  = hmomDictionary.lookupOrDefault<scalar>(word("mininum_normalized_value"),  scalar(1.e-16));
+		hmom_minimum_normalized_value   = hmomDictionary.lookupOrDefault<scalar>(word("mininum_normalized_value"),  scalar(1.e-16));
+		hmom_minimum_fv_for_integration = hmomDictionary.lookupOrDefault<scalar>(word("mininum_fv_for_integration"),  scalar(1.e-16));
+
+		Info << "HMOM: minimum normalized moments: " << hmom_minimum_normalized_value << endl;
+		Info << "HMOM: minimum fv for integration: " << hmom_minimum_fv_for_integration << endl;
 	}
 }
 

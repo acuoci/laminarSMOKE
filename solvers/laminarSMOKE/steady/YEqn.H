@@ -38,17 +38,6 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-// Discretization schemes
-tmp<fv::convectionScheme<scalar> > mvConvection
-(
-    fv::convectionScheme<scalar>::New
-    (
-        mesh,
-        fields,
-        phi,
-        mesh.divScheme("div(phi,Yi)")
-    )
-);
 
 if(speciesEquations == true)
 {
@@ -81,7 +70,7 @@ if(speciesEquations == true)
 
 		fvScalarMatrix YiEqn
 		(
-		    	mvConvection->fvmDiv(phi, Yi)
+		    	fvm::div(phi, Yi, "div(phi,Yi)")
 		      - fvm::laplacian(rho*Dmixi, Yi) 
                         == 
 	              - fvm::laplacian(rho*Dmixi*MWmix*Yi/Mi, Yi)

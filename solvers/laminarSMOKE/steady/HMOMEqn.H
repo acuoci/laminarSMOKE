@@ -62,7 +62,7 @@
 		      - fvm::laplacian(rho*Dhmom, HMOM_Norm_N0) 
 		        == 
 		        // source terms
-			rho*sourceExplicit[index] + fvm::Sp(rho*sourceImplicit[index],HMOM_Norm_N0) + 
+			sourceExplicit[index] + fvm::Sp(sourceImplicit[index],HMOM_Norm_N0) + 
 		     	fvOptions(rho, HMOM_Norm_N0)
 		);
 
@@ -88,7 +88,7 @@
 		      - fvm::laplacian(rho*Dhmom, HMOM_Norm_M00) 
 		        == 
 		        // source terms
-			rho*sourceExplicit[index] + fvm::Sp(rho*sourceImplicit[index],HMOM_Norm_M00) + 
+			sourceExplicit[index] + fvm::Sp(sourceImplicit[index],HMOM_Norm_M00) + 
 		     	fvOptions(rho, HMOM_Norm_M00)
 		);
 
@@ -114,7 +114,7 @@
 		      - fvm::laplacian(rho*Dhmom, HMOM_Norm_M10) 
 		        == 
 		        // source terms
-			rho*sourceExplicit[index] + fvm::Sp(rho*sourceImplicit[index],HMOM_Norm_M10) + 
+			sourceExplicit[index] + fvm::Sp(sourceImplicit[index],HMOM_Norm_M10) + 
 		     	fvOptions(rho, HMOM_Norm_M10)
 		);
 
@@ -140,7 +140,7 @@
 		      - fvm::laplacian(rho*Dhmom, HMOM_Norm_M01) 
 		        == 
 		        // source terms
-			rho*sourceExplicit[index] + fvm::Sp(rho*sourceImplicit[index],HMOM_Norm_M01) + 
+			sourceExplicit[index] + fvm::Sp(sourceImplicit[index],HMOM_Norm_M01) + 
 		     	fvOptions(rho, HMOM_Norm_M01)
 		);
 

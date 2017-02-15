@@ -214,17 +214,17 @@ void linearModel::reactionSourceTerms(	OpenSMOKE::ThermodynamicsMap_CHEMKIN<doub
 		// Calculates
 		hmom_->CalculateSourceMoments();
 
-		// Moments equations [mol/m3/s]
-		S[NC_+2] = hmom_->SourceM00();
-		S[NC_+3] = hmom_->SourceM10();
-		S[NC_+4] = hmom_->SourceM01();
-		S[NC_+5] = hmom_->SourceN0();
+		// Moments equations [mol/m3/s * kg/m3]
+		S[NC_+2] = rho_*hmom_->SourceM00();
+		S[NC_+3] = rho_*hmom_->SourceM10();
+		S[NC_+4] = rho_*hmom_->SourceM01();
+		S[NC_+5] = rho_*hmom_->SourceN0();
 
 		// PAH consumption
 		if (pah_gas_consumption_ == true)
 		{
-			int pahIndex = hmom_index_PAH_+1;
-			int n2Index  = thermodynamicsMap_.IndexOfSpecies("N2");
+			const int pahIndex = hmom_index_PAH_+1;
+			const int n2Index  = thermodynamicsMap_.IndexOfSpecies("N2");
 
 			const double RPAH = hmom_->PAHConsumptionRate()*1e-3;		// [kmol/m3/s]
 			const double OmegaPAH = thermodynamicsMap_.MW()[pahIndex]*RPAH;	// [kg/m3/s]
