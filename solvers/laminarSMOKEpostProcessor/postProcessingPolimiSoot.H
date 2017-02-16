@@ -348,6 +348,42 @@ if (postProcessingPolimiSoot == true)
 		dimensionSet(1, -3, -1, 0, 0)
 	);
 
+	// --------------------------------------------------------------------------
+	// Creating soot class fields
+	// --------------------------------------------------------------------------
+	PtrList<volScalarField> sootClasses;
+	std::vector<double> sootClassesIntegrals;
+	if (calculateSootClasses == true)
+	{
+		Info << "Post processing soot classes..." << endl;
+
+		sootClasses.resize(soot_classes_reader.number_of_classes());
+		for (int i=0;i<soot_classes_reader.number_of_classes();i++)
+		{
+			sootClasses.set
+			(
+				i,
+				new volScalarField
+				(
+					IOobject
+					(
+						"soot__" + soot_classes_reader.class_name(i),
+						mesh.time().timeName(),
+						mesh,
+						IOobject::NO_READ,
+						IOobject::AUTO_WRITE
+					),
+					mesh,
+					dimensionSet(0, -3, -1, 0, 1)
+				)
+			);
+		}
+
+		sootClassesIntegrals.resize(soot_classes_reader.number_of_classes());
+		for (int i=0;i<soot_classes_reader.number_of_classes();i++)
+			sootClassesIntegrals[i] = 0.;
+	}
+
 	Info << "Post processing soot..." << endl;
 
 	label ns = Y.size();
@@ -356,6 +392,7 @@ if (postProcessingPolimiSoot == true)
 	OpenSMOKE::OpenSMOKEVectorDouble x(ns);
 	OpenSMOKE::OpenSMOKEVectorDouble c(thermodynamicsMapXML->NumberOfSpecies());
 	OpenSMOKE::OpenSMOKEVectorDouble R(thermodynamicsMapXML->NumberOfSpecies());
+	OpenSMOKE::OpenSMOKEVectorDouble r(kineticsMapXML->NumberOfReactions());
 	Eigen::VectorXd y_eigen(ns);
 	Eigen::VectorXd x_eigen(ns);
 
@@ -386,6 +423,26 @@ if (postProcessingPolimiSoot == true)
 	scalarField& pah_R_1_2Cells = pah_R_1_2.internalField();
 	scalarField& pah_R_3_4Cells = pah_R_3_4.internalField();
 	scalarField& pah_R_more_4Cells = pah_R_more_4.internalField();
+
+	// Total volume
+	double Vtot = 0.;
+	forAll(TCells, celli)
+		Vtot += mesh.V()[celli];
+
+	// Integral quantities
+	double sootFvLargeIntegral 	= 0;
+	double sootFvSmallIntegral 	= 0;
+	double sootRhoLargeIntegral 	= 0;
+	double sootRhoSmallIntegral 	= 0;
+	double sootNLargeIntegral 	= 0;
+	double sootNSmallIntegral 	= 0;
+	double 	sootOmegaLargeIntegral 	= 0;
+	double sootOmegaSmallIntegral 	= 0;
+	double sootRLargeIntegral  	= 0;
+	double sootRSmallIntegral  	= 0;
+	double sootR12Integral  	= 0;
+	double sootR34Integral 	 	= 0;
+	double sootRmore4Integral  	= 0;
 
 	Info << " * internal fields..." << endl;
 	forAll(TCells, celli)
@@ -451,6 +508,7 @@ if (postProcessingPolimiSoot == true)
 		kineticsMapXML->KineticConstants();
 		kineticsMapXML->ReactionRates(c);
 		kineticsMapXML->FormationRates(&R);
+		kineticsMapXML->GetReactionRates(&r);
 		for(unsigned int i=1;i<=ns;i++)
 			R[i] *= thermodynamicsMapXML->MW()[i];
 
@@ -458,7 +516,37 @@ if (postProcessingPolimiSoot == true)
 		soot_R_smallCells[celli] = smallBinMassFormationRates(sootAnalyzer, R);
 		pah_R_1_2Cells[celli]    = pah12RingsFormationRates(sootAnalyzer, R);
 		pah_R_3_4Cells[celli]    = pah34RingsFormationRates(sootAnalyzer, R);
-		pah_R_more_4Cells[celli] = pahMoreThan4RingsFormationRates(sootAnalyzer, R);			
+		pah_R_more_4Cells[celli] = pahMoreThan4RingsFormationRates(sootAnalyzer, R);	
+
+
+		sootFvLargeIntegral 	+= soot_fv_largeCells[celli]*mesh.V()[celli];
+		sootFvSmallIntegral 	+= soot_fv_smallCells[celli]*mesh.V()[celli];
+		sootRhoLargeIntegral 	+= soot_rho_largeCells[celli]*mesh.V()[celli];
+		sootRhoSmallIntegral 	+= soot_rho_smallCells[celli]*mesh.V()[celli];
+		sootNLargeIntegral 	+= soot_N_largeCells[celli]*mesh.V()[celli];
+		sootNSmallIntegral 	+= soot_N_largeCells[celli]*mesh.V()[celli];
+		sootOmegaLargeIntegral  += soot_omega_largeCells[celli]*mesh.V()[celli];
+		sootOmegaSmallIntegral  += soot_omega_largeCells[celli]*mesh.V()[celli];
+		sootRLargeIntegral 	+= soot_R_largeCells[celli]*mesh.V()[celli];
+		sootRSmallIntegral 	+= soot_R_smallCells[celli]*mesh.V()[celli];
+		sootR12Integral 	+= pah_R_1_2Cells[celli]*mesh.V()[celli];
+		sootR34Integral 	+= pah_R_3_4Cells[celli]*mesh.V()[celli];
+		sootRmore4Integral 	+= pah_R_more_4Cells[celli]*mesh.V()[celli];
+
+		if (calculateSootClasses == true)
+		{
+			for (int i=0;i<soot_classes_reader.number_of_classes();i++)
+			{
+				double sum = 0.;
+				for (int j=0;j<soot_classes_reader.number_reactions_per_class(i);j++)
+				{
+					sum += r[soot_classes_reader.reaction_indices(i)[j]];
+				}
+			
+				sootClasses[i].internalField()[celli] = sum;	
+				sootClassesIntegrals[i] += sum*mesh.V()[celli];	
+			}
+		}
 	}
 
 	Info << " * boundaries..." << endl;
@@ -556,6 +644,7 @@ if (postProcessingPolimiSoot == true)
 			kineticsMapXML->KineticConstants();
 			kineticsMapXML->ReactionRates(c);
 			kineticsMapXML->FormationRates(&R);
+			kineticsMapXML->GetReactionRates(&r);
 			for(unsigned int i=1;i<=ns;i++)
 				R[i] *= thermodynamicsMapXML->MW()[i];
 
@@ -564,6 +653,20 @@ if (postProcessingPolimiSoot == true)
 			ppah_R_1_2[facei]    = pah12RingsFormationRates(sootAnalyzer, R);
 			ppah_R_3_4[facei]    = pah34RingsFormationRates(sootAnalyzer, R);
 			ppah_R_more_4[facei] = pahMoreThan4RingsFormationRates(sootAnalyzer, R);
+
+			if (calculateSootClasses == true)
+			{
+				for (int i=0;i<soot_classes_reader.number_of_classes();i++)
+				{
+					double sum = 0.;
+					for (int j=0;j<soot_classes_reader.number_reactions_per_class(i);j++)
+					{
+						sum += r[soot_classes_reader.reaction_indices(i)[j]];
+					}
+
+					sootClasses[i].boundaryField()[patchi][facei] = sum;		
+				}
+			}
 		}
 	}
 
@@ -593,6 +696,31 @@ if (postProcessingPolimiSoot == true)
 		pah_R_1_2.write();
 		pah_R_3_4.write();
 		pah_R_more_4.write();
+
+		fSootFvLarge << runTime.timeName() 	<< " " << sootFvLargeIntegral 	<< " " << sootFvLargeIntegral/Vtot << endl;
+		fSootFvSmall << runTime.timeName() 	<< " " << sootFvSmallIntegral 	<< " " << sootFvSmallIntegral/Vtot << endl;
+		fSootRhoLarge << runTime.timeName() 	<< " " << sootRhoLargeIntegral << " " << sootRhoLargeIntegral/Vtot << endl;
+		fSootRhoSmall << runTime.timeName() 	<< " " << sootRhoSmallIntegral << " " << sootRhoSmallIntegral/Vtot << endl;
+		fSootNLarge << runTime.timeName() 	<< " " << sootNLargeIntegral 	<< " " << sootNLargeIntegral/Vtot << endl;
+		fSootNSmall << runTime.timeName() 	<< " " << sootNSmallIntegral 	<< " " << sootNSmallIntegral/Vtot << endl;
+		fSootOmegaLarge << runTime.timeName() 	<< " " << sootOmegaLargeIntegral << " " << sootOmegaLargeIntegral/Vtot << endl;
+		fSootOmegaSmall << runTime.timeName() 	<< " " << sootOmegaSmallIntegral << " " << sootOmegaSmallIntegral/Vtot << endl;
+		fSootRLarge << runTime.timeName() 	<< " " << sootRLargeIntegral 	<< " " << sootRLargeIntegral/Vtot << endl;
+		fSootRSmall << runTime.timeName() 	<< " " << sootRSmallIntegral 	<< " " << sootRSmallIntegral/Vtot << endl;
+		fSootR12 << runTime.timeName() 		<< " " << sootR12Integral 	<< " " << sootR12Integral/Vtot << endl;
+		fSootR34 << runTime.timeName() 		<< " " << sootR34Integral 	<< " " << sootR34Integral/Vtot << endl;
+		fSootRmore4 << runTime.timeName()	<< " " << sootRmore4Integral 	<< " " << sootRmore4Integral/Vtot << endl;
+
+		if (calculateSootClasses == true)
+		{
+			Info << "* writing on files (soot classes)..." << endl;
+
+			for (int i=0;i<soot_classes_reader.number_of_classes();i++)
+				sootClasses[i].write();
+
+			for (int i=0;i<soot_classes_reader.number_of_classes();i++)
+				fsootClassesIntegrals[i] << runTime.timeName() << " " << sootClassesIntegrals[i] << " " << sootClassesIntegrals[i]/Vtot << endl;
+		}
 	}
 
 	// Distribution along a boundary

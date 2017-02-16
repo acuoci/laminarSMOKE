@@ -111,6 +111,7 @@ std::vector<int> indexSoret;
 scalar thermodynamicPressure = 101325.;
 label zMixDmixIndex = inertIndex;
 scalar direct_integration_minimum_temperature_for_chemistry = 200.;
+autoPtr<std::ofstream> fSootIntegrals;
 
 const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel");
 {
@@ -191,6 +192,7 @@ const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel
 }
 
 Switch hmom_analysis = false;
+Switch hmom_analysis_onthefly = true;
 Switch hmom_test = false;
 Switch hmom_pah_gas_consumption = true;
 int hmom_index_H = -1;
@@ -222,8 +224,6 @@ const dictionary& hmomDictionary = solverOptions.subDict("HMOM");
 	hmom_analysis = Switch(hmomDictionary.lookup(word("hmom")));
 	hmom_test = Switch(hmomDictionary.lookup(word("test")));
 
-
-	
 	if ( hmom_analysis == true)
 	{
 		hmom_index_H = thermodynamicsMapXML->IndexOfSpecies("H")-1;
@@ -254,6 +254,25 @@ const dictionary& hmomDictionary = solverOptions.subDict("HMOM");
 
 		Info << "HMOM: minimum normalized moments: " << hmom_minimum_normalized_value << endl;
 		Info << "HMOM: minimum fv for integration: " << hmom_minimum_fv_for_integration << endl;
+
+		// Soot integrals
+		if ( !boost::filesystem::exists("soot.integrals") )
+		{
+			fSootIntegrals.reset(new std::ofstream("soot.integrals", std::ios::out));
+			fSootIntegrals().setf(std::ios::scientific);
+
+			fSootIntegrals() << std::setw(20) << "time";
+			fSootIntegrals() << std::setw(20) << "soot_mass[kg]";
+			fSootIntegrals() << std::setw(20) << "soot_volume[m3]";
+			fSootIntegrals() << std::setw(20) << "soot_particles[#]";		
+			fSootIntegrals() << std::setw(20) << "pah_mass[kg]";
+			fSootIntegrals() << std::endl;
+		}
+		else
+		{
+			fSootIntegrals.reset(new std::ofstream("soot.integrals", std::ios::app));
+			fSootIntegrals().setf(std::ios::scientific);
+		}
 	}
 }
 
@@ -429,7 +448,7 @@ Switch iPolimiSoot = false;
 label sootIntegralUpdate  = 1;
 label sootIntegralCounter = sootIntegralUpdate;
 Switch sootOnTheFlyFill = false;
-autoPtr<std::ofstream> fSootIntegrals;
+
 
 //List<vector> pnts_soot_psdf;
 {	

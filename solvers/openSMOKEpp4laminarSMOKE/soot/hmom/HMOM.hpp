@@ -497,7 +497,10 @@ namespace OpenSMOKE
 		const double k4 = A4  * std::pow(T_, n4)  * std::exp(-E4 / T_);
 
 		const double ratio = k1b*conc_H2O_ + k2b*conc_H2_ + k3b*conc_H_ + k4*conc_C2H2_;
-		double conc_sootStar = (k1f*conc_OH_ + k2f*conc_H_ + k3f) / ratio;
+		double conc_sootStar = 0.;
+
+		if (ratio > 0.)
+			conc_sootStar = (k1f*conc_OH_ + k2f*conc_H_ + k3f) / ratio;
 
 		if (mass_fraction_H_ < 2.e-9)
 		{

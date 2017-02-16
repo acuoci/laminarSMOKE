@@ -440,3 +440,34 @@ if (iPolimiSoot == true)
 		}
 	}
 }
+
+if (hmom_analysis == true)
+{
+	if (sootIntegralCounter == sootIntegralUpdate)
+	{
+		const double soot_mass = 1800.*fvc::domainIntegrate(HMOM_fv).value();
+		const double soot_volume = fvc::domainIntegrate(HMOM_fv).value();
+		const double soot_particles = fvc::domainIntegrate(HMOM_N).value();
+		const double pah_mass = fvc::domainIntegrate(rho*Y[hmom_index_PAH]).value();
+		
+		// Only if the processor is the master, write to the file
+		if (Pstream::master())
+		{
+	    		fSootIntegrals() << std::setw(20) << runTime.value();
+			fSootIntegrals() << std::setw(20) << soot_mass;
+			fSootIntegrals() << std::setw(20) << soot_volume;
+			fSootIntegrals() << std::setw(20) << soot_particles;
+			fSootIntegrals() << std::setw(20) << pah_mass;
+			fSootIntegrals() << std::endl;
+		}
+		
+		Info << "Soot mass [kg]:     " << soot_mass << endl;
+		Info << "Soot volume [m3]:   " << soot_volume << endl;
+		Info << "Soot particles [#]: " << soot_particles << endl;		
+		Info << "PAH mass [kg]:      " << pah_mass << endl;
+
+		sootIntegralCounter = 0;
+	}
+
+	sootIntegralCounter++;
+}
