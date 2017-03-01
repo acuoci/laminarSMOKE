@@ -289,11 +289,16 @@ int main(int argc, char *argv[])
 			pnts_soot_psdf = pnts_soot_psdf_dummy;
 
 			// Soot classes reader
-			Info << "Calculate soot classes: " << calculateSootClasses << endl;
+			Info << "Calculate soot classes (new): " << calculateSootClasses << endl;
 			if (calculateSootClasses == true)
 			{
-				std::string path_to_classes_definition = kinetics_folder + "/process-reac.def";
-				soot_classes_reader.ReadFromFile(path_to_classes_definition);
+				boost::filesystem::path path_to_classes_definition = kinetics_folder + "ReacOfProcessCorrected.xml";
+
+				rapidxml::xml_document<> doc;
+				std::vector<char> xml_string;
+				OpenSMOKE::OpenInputFileXML(doc, xml_string, path_to_classes_definition);
+
+				soot_classes_reader.ReadFromFile(doc);
 
 				fsootClassesIntegrals.setSize(soot_classes_reader.number_of_classes());
 				for (int i=0;i<soot_classes_reader.number_of_classes();i++)
