@@ -178,15 +178,7 @@ namespace OpenSMOKE
 			{
 				std::string flag;
 				dictionary.ReadString("@PlanckCoefficient", flag);
-
-				if (flag == "Smooke")
-					soot_planck_coefficient_ = SOOT_PLANCK_COEFFICIENT_SMOOKE;
-				else if (flag == "Kent")
-					soot_planck_coefficient_ = SOOT_PLANCK_COEFFICIENT_KENT;
-				else if (flag == "Sazhin")
-					soot_planck_coefficient_ = SOOT_PLANCK_COEFFICIENT_SAZHIN;
-				else
-					OpenSMOKE::FatalErrorMessage("@PlanckCoefficient: available options: Smooke (default) | Kent | Sazhin");
+				SetPlanckAbsorptionCoefficient(flag);
 			}
 
 			if (dictionary.CheckOption("@WritePSDF") == true)
@@ -649,14 +641,14 @@ namespace OpenSMOKE
 
 	double PolimiSoot_Analyzer::planck_coefficient(const double rhoGas, const double T, const Eigen::VectorXd &omegaGas) const
 	{
-		if (soot_planck_coefficient_ == SOOT_PLANCK_COEFFICIENT_NONE)
-			return 0.;																
-		else if (soot_planck_coefficient_ == SOOT_PLANCK_COEFFICIENT_SMOOKE)
+		if (soot_planck_coefficient_ == SOOT_PLANCK_COEFFICIENT_SMOOKE)
 			return (1307.*fv_large(rhoGas, omegaGas)*T);							// [1/m]	(Smooke et al. Combustion and Flame 2009)
 		else if (soot_planck_coefficient_ == SOOT_PLANCK_COEFFICIENT_KENT)
 			return (2262.*fv_large(rhoGas, omegaGas)*T);							// [1/m]	(Kent al. Combustion and Flame 1990)
 		else if (soot_planck_coefficient_ == SOOT_PLANCK_COEFFICIENT_SAZHIN)
-			return (1232.*rho_large(rhoGas, omegaGas)*(1. + 4.8e-4*(T - 2000.)));	// [1/m]	(Sazhin, Fluent 1994)
+			return (1232.*fv_large(rhoGas, omegaGas)*(1. + 4.8e-4*(T - 2000.)));	// [1/m]	(Sazhin, Fluent 1994)
+		else
+			return 0.;
 	}
 
 	void PolimiSoot_Analyzer::Analysis(const double T, const double P_Pa, const double rhoGas, const Eigen::VectorXd &omegaGas, const Eigen::VectorXd &xGas)

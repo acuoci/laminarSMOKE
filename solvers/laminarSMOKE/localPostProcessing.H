@@ -448,7 +448,9 @@ if (hmom_analysis == true)
 		const double soot_mass = 1800.*fvc::domainIntegrate(HMOM_fv).value();
 		const double soot_volume = fvc::domainIntegrate(HMOM_fv).value();
 		const double soot_particles = fvc::domainIntegrate(HMOM_N).value();
-		const double pah_mass = fvc::domainIntegrate(rho*Y[hmom_index_PAH]).value();
+		double pah_mass = 0.;
+		for (unsigned int j = 0; j < hmom.pah_species().size(); j++)
+			pah_mass += fvc::domainIntegrate(rho*Y[hmom_pah_species_indices[j]]).value();
 		
 		// Only if the processor is the master, write to the file
 		if (Pstream::master())

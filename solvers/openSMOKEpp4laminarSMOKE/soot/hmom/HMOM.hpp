@@ -84,7 +84,8 @@ namespace OpenSMOKE
 		n_moments_ = 4;
 		
 		// PAH species
-		pah_species_ = "C10H8";
+		pah_species_.resize(1);
+		pah_species_[0] = "C10H8";
 
 		// Physical/Chemical phenomena
 		nucleation_model_ = 1;
@@ -94,6 +95,9 @@ namespace OpenSMOKE
 		coagulation_model_ = 1;
 		coagulation_continous_model_ = 1;
 		thermophoretic_model_ = 1;
+		schmidt_number_ = 50.;
+		radiative_heat_transfer_ = true;
+		soot_planck_coefficient_ = SOOT_PLANCK_COEFFICIENT_SMOOKE;
 
 		// Nuclei particles
 		const int n_carbon_pah = 16;
@@ -146,13 +150,13 @@ namespace OpenSMOKE
 		if (dictionary.CheckOption("@PAHConsumption") == true)
 		{
 			bool flag;
-			dictionary.ReadBool("@CollisionDiameterModel", flag);
+			dictionary.ReadBool("@PAHConsumption", flag);
 			SetPAHConsumption(flag);
 		}
 
 		if (dictionary.CheckOption("@PAH") == true)
 		{
-			dictionary.ReadString("@PAH", pah_species_);
+			dictionary.ReadOption("@PAH", pah_species_);
 			SetPAH(pah_species_);
 		}
 
@@ -204,6 +208,23 @@ namespace OpenSMOKE
 			dictionary.ReadInt("@ThermophoreticModel", flag);
 			SetThermophoreticModel(flag);
 		}
+
+		if (dictionary.CheckOption("@RadiativeHeatTransfer") == true)
+			dictionary.ReadBool("@RadiativeHeatTransfer", radiative_heat_transfer_);
+
+		if (dictionary.CheckOption("@PlanckCoefficient") == true)
+		{
+			std::string flag;
+			dictionary.ReadString("@PlanckCoefficient", flag);
+			SetPlanckAbsorptionCoefficient(flag);
+		}
+
+		if (dictionary.CheckOption("@SchmidtNumber") == true)
+		{
+			double value;
+			dictionary.ReadDouble("@SchmidtNumber", value);
+			SetSchmidtNumber(value);
+		}
 	}
 
 	void HMOM::MemoryAllocation()
@@ -238,7 +259,7 @@ namespace OpenSMOKE
 		NLSL_ = 0.;		// [#/m]
 	}
 
-	void HMOM::SetPAH(const std::string pah_species)
+	void HMOM::SetPAH(const std::vector<std::string> pah_species)
 	{
 		pah_species_ = pah_species;
 	}
@@ -321,6 +342,35 @@ namespace OpenSMOKE
 	void HMOM::SetPAHConsumption(const bool flag)
 	{
 		pah_consumption_ = flag;
+	}
+
+	void HMOM::SetPlanckAbsorptionCoefficient(const SootPlanckCoefficient soot_planck_coefficient)
+	{
+		soot_planck_coefficient_ = soot_planck_coefficient;
+	}
+
+	void HMOM::SetPlanckAbsorptionCoefficient(const std::string label)
+	{
+		if (label == "Smooke")
+			soot_planck_coefficient_ = SOOT_PLANCK_COEFFICIENT_SMOOKE;
+		else if (label == "Kent")
+			soot_planck_coefficient_ = SOOT_PLANCK_COEFFICIENT_KENT;
+		else if (label == "Sazhin")
+			soot_planck_coefficient_ = SOOT_PLANCK_COEFFICIENT_SAZHIN;
+		else if (label == "none")
+			soot_planck_coefficient_ = SOOT_PLANCK_COEFFICIENT_NONE;
+		else
+			OpenSMOKE::FatalErrorMessage("@PlanckCoefficient: available options: none | Smooke (default) | Kent | Sazhin");
+	}
+
+	void HMOM::SetRadiativeHeatTransfer(const bool flag)
+	{
+		radiative_heat_transfer_ = flag;
+	}
+
+	void HMOM::SetSchmidtNumber(const double value)
+	{
+		schmidt_number_ = value;
 	}
 	
 	void HMOM::SetNormalizedMoments(	const double M00_normalized, const double M10_normalized,
@@ -498,7 +548,7 @@ namespace OpenSMOKE
 
 		const double ratio = k1b*conc_H2O_ + k2b*conc_H2_ + k3b*conc_H_ + k4*conc_C2H2_;
 		double conc_sootStar = 0.;
-
+		
 		if (ratio > 0.)
 			conc_sootStar = (k1f*conc_OH_ + k2f*conc_H_ + k3f) / ratio;
 
@@ -812,6 +862,18 @@ namespace OpenSMOKE
 		// np = 1/(36pi)*V^(-2)*S(3)
 
 		return std::pow(K_spher, -3.)*GetMoment(-2., 3.) / (GetMoment(0., 0.)+1e-32);
+	}
+
+	double HMOM::planck_coefficient(const double T, const double fv) const
+	{
+		if (soot_planck_coefficient_ == SOOT_PLANCK_COEFFICIENT_SMOOKE)
+			return (1307.*fv*T);							// [1/m]	(Smooke et al. Combustion and Flame 2009)
+		else if (soot_planck_coefficient_ == SOOT_PLANCK_COEFFICIENT_KENT)
+			return (2262.*fv*T);							// [1/m]	(Kent al. Combustion and Flame 1990)
+		else if (soot_planck_coefficient_ == SOOT_PLANCK_COEFFICIENT_SAZHIN)
+			return (1232.*(1. + 4.8e-4*(T - 2000.)));		// [1/m]	(Sazhin, Fluent 1994)
+		else
+			return 0.;
 	}
 
 	HMOM::~HMOM()

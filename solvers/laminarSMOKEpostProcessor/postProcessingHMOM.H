@@ -49,7 +49,8 @@ if (postProcessingHMOM == true)
 	int hmom_index_H2 = -1;
 	int hmom_index_O2 = -1;
 	int hmom_index_C2H2 = -1;
-	int hmom_index_PAH = -1;
+	std::vector<int> hmom_pah_species_indices;
+	std::vector<std::string> hmom_pah_species_names;
 
 	int hmom_pah_nc = 16;
 	int hmom_number_moments = 4;
@@ -80,8 +81,14 @@ if (postProcessingHMOM == true)
 			hmom_index_O2 = thermodynamicsMapXML->IndexOfSpecies("O2")-1;
 			hmom_index_C2H2 = thermodynamicsMapXML->IndexOfSpecies("C2H2")-1;
 		
-			word pah_name(hmomDictionary.lookup("pah_species"));
-			hmom_index_PAH = thermodynamicsMapXML->IndexOfSpecies(pah_name)-1;
+			List<word>  listSpecies(hmomDictionary.lookup("pah_species"));
+			hmom_pah_species_indices.resize(listSpecies.size());
+			hmom_pah_species_names.resize(listSpecies.size());
+			for (int i=0;i<listSpecies.size();i++)
+			{
+				hmom_pah_species_indices[i] = thermodynamicsMapXML->IndexOfSpecies(listSpecies[i])-1;
+				hmom_pah_species_names[i] = listSpecies[i];
+			}
 
 			hmom_pah_nc = readLabel(hmomDictionary.lookup("pah_nc"));
 			hmom_collision_diameter_model = readLabel(hmomDictionary.lookup("collision_diameter_model"));
@@ -106,6 +113,7 @@ if (postProcessingHMOM == true)
 	hmom.SetCondensation(hmom_condensation);
 	hmom.SetCoagulation(hmom_coagulation);
 	hmom.SetCoagulationContinous(hmom_coagulation_continous);
+	hmom.SetPAH(hmom_pah_species_names);
 
 	hmom.SetNumberCarbonPAH(hmom_pah_nc);
 	hmom.SetFractalDiameterModel(hmom_fractal_diameter_model);
@@ -689,12 +697,19 @@ if (postProcessingHMOM == true)
 		// HMOM
 		if (hmom_analysis == true)
 		{
-			// Setup
+			// Viscosity
 			const double viscosity = 1.716e-5*Foam::pow(TCells[celli]/273.15,1.5)*(273.15+110.4)/(TCells[celli]+110.4);		// [kg/m/s]
+
+			// PAH concentration
+			double conc_PAH = 0.;
+			for (unsigned int j = 0; j<hmom.pah_species().size(); j++)
+				conc_PAH += cTot*x[hmom_pah_species_indices[j] + 1];
+
+			// Setup
 			hmom.SetNormalizedMoments(HMOM_Norm_M00Cells[celli], HMOM_Norm_M10Cells[celli], HMOM_Norm_M01Cells[celli], HMOM_Norm_N0Cells[celli]);
 			hmom.SetTemperatureAndPressure(TCells[celli], pCells[celli]);
 			hmom.SetMassFractions(y[hmom_index_OH+1], y[hmom_index_H+1]);
-			hmom.SetConcentrations("kmol/m3", c[hmom_index_OH+1], c[hmom_index_H+1], c[hmom_index_H2O+1], c[hmom_index_H2+1], c[hmom_index_C2H2+1], c[hmom_index_O2+1], c[hmom_index_PAH+1]);
+			hmom.SetConcentrations("kmol/m3", c[hmom_index_OH+1], c[hmom_index_H+1], c[hmom_index_H2O+1], c[hmom_index_H2+1], c[hmom_index_C2H2+1], c[hmom_index_O2+1], conc_PAH);
 			hmom.SetViscosity(viscosity);
 
 			// Calculates
@@ -831,12 +846,19 @@ if (postProcessingHMOM == true)
 			// HMOM
 			if (hmom_analysis == true)
 			{
-				// Setup
+				// Viscosity
 				const double viscosity = 1.716e-5*Foam::pow(pT[facei]/273.15,1.5)*(273.15+110.4)/(pT[facei]+110.4);		// [kg/m/s]
+
+				// PAH concentration
+				double conc_PAH = 0.;
+				for (unsigned int j = 0; j<hmom.pah_species().size(); j++)
+					conc_PAH += cTot*x[hmom_pah_species_indices[j] + 1];
+
+				// Setup
 				hmom.SetNormalizedMoments(pHMOM_Norm_M00[facei], pHMOM_Norm_M10[facei], pHMOM_Norm_M01[facei], pHMOM_Norm_N0[facei]);
 				hmom.SetTemperatureAndPressure(pT[facei], pp[facei]);
 				hmom.SetMassFractions(y[hmom_index_OH+1], y[hmom_index_H+1]);
-				hmom.SetConcentrations("kmol/m3", c[hmom_index_OH+1], c[hmom_index_H+1], c[hmom_index_H2O+1], c[hmom_index_H2+1], c[hmom_index_C2H2+1], c[hmom_index_O2+1], c[hmom_index_PAH+1]);
+				hmom.SetConcentrations("kmol/m3", c[hmom_index_OH+1], c[hmom_index_H+1], c[hmom_index_H2O+1], c[hmom_index_H2+1], c[hmom_index_C2H2+1], c[hmom_index_O2+1], conc_PAH);
 				hmom.SetViscosity(viscosity);
 
 				// Calculates

@@ -49,6 +49,8 @@ namespace OpenSMOKE
 	*/
 	class HMOM
 	{
+
+		enum SootPlanckCoefficient { SOOT_PLANCK_COEFFICIENT_NONE, SOOT_PLANCK_COEFFICIENT_SMOOKE, SOOT_PLANCK_COEFFICIENT_KENT, SOOT_PLANCK_COEFFICIENT_SAZHIN };
 	
 	public:
 
@@ -72,7 +74,7 @@ namespace OpenSMOKE
 		*@brief Sets the species to be assumed as PAHs
 		*@param pah_species PAH species
 		*/
-		void SetPAH(const std::string pah_species);
+		void SetPAH(const std::vector<std::string> pah_species);
 
 		/**
 		*@brief Enables soot nucleation
@@ -187,6 +189,31 @@ namespace OpenSMOKE
 		void SetViscosity(const double viscosity);
 
 		/**
+		*@brief Sets the radiative heat transfer from soot
+		*@param flag true if the radiative heat transfer from soot is turned on
+		*/
+		void SetRadiativeHeatTransfer(const bool flag);
+
+		/**
+		*@brief Sets the law for calculating the soot Planck mean absorption coefficient
+		*@param soot_planck_coefficient the law for calculating the soot Planck mean absorption coefficient
+		*/
+		void SetPlanckAbsorptionCoefficient(const SootPlanckCoefficient soot_planck_coefficient);
+
+		/**
+		*@brief Sets the law for calculating the soot Planck mean absorption coefficient
+		*@param soot_planck_coefficient the law for calculating the soot Planck
+		mean absorption coefficient: Smooke (default) | Kent | Sazhin
+		*/
+		void SetPlanckAbsorptionCoefficient(const std::string soot_planck_coefficient);
+
+		/**
+		*@brief Sets the Schmidt number for moments
+		*@param value Schmidt number for moments
+		*/
+		void SetSchmidtNumber(const double value);
+
+		/**
 		*@brief Calculates the source terms for moment equations
 		*/
 		void CalculateSourceMoments();
@@ -254,7 +281,7 @@ namespace OpenSMOKE
 		/**
 		*@brief Returns the species to be considered as PAH
 		*/
-		const std::string pah_species() const { return pah_species_; }
+		const std::vector<std::string>& pah_species() const { return pah_species_; }
 
 		/**
 		*@brief Returns the number of moments
@@ -380,6 +407,23 @@ namespace OpenSMOKE
 		*@brief Returns the PAH consumption rate [mol/m3/s]
 		*/
 		double PAHConsumptionRate() const;
+
+		/**
+		*@brief Returns the soot Planck mean absorption coefficient
+		*@param T temperature of gaseous mixture [K]
+		*@param fv soot volume fraction
+		*/
+		double planck_coefficient(const double T, const double fv) const;
+
+		/**
+		*@brief Returns true is soot has to be accounted for in radiative heat transfer
+		*/
+		bool radiative_heat_transfer() const { return radiative_heat_transfer_; }
+
+		/**
+		*@brief Returns the Schmidt number for moments
+		*/
+		double schmidt_number() const { return schmidt_number_; }
 
 	private:
 
@@ -563,8 +607,13 @@ namespace OpenSMOKE
 		double As_collisional_;					//!< [???]
 		double K_collisional_;					//!< [???]
 
-		std::string	pah_species_;				//!< name of PAH species
+		std::vector<std::string> pah_species_;	//!< names of PAH species
 		bool pah_consumption_;					//!< PAH consumption
+
+		SootPlanckCoefficient soot_planck_coefficient_;
+		bool radiative_heat_transfer_;
+
+		double schmidt_number_;
 
 	private:
 

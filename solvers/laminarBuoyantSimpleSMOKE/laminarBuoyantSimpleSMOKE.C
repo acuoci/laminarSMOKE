@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 	linear_model.SetHMOMTest(hmom_test);
 	linear_model.SetHMOMAnalysis(hmom_analysis);
 	linear_model.SetHMOM(&hmom);
-	linear_model.SetHMOMOptions(hmom_index_H, hmom_index_OH, hmom_index_H2, hmom_index_H2O, hmom_index_C2H2, hmom_index_O2, hmom_index_PAH);
+	linear_model.SetHMOMOptions(hmom_index_H, hmom_index_OH, hmom_index_H2, hmom_index_H2O, hmom_index_C2H2, hmom_index_O2, hmom_pah_species_indices);
 	linear_model.SetPAHGasConsumption(hmom_pah_gas_consumption);
 	
 	#include "createGasFields.H"

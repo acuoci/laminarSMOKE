@@ -39,26 +39,28 @@
 \*-----------------------------------------------------------------------*/
 
 {
-	volScalarField Dhmom
+	volScalarField GammaMoments
 	(
 	    IOobject
 	    (
-		"Dhmom",
+		"GammaMoments",
 		runTime.timeName(),
 		mesh,
 		IOobject::NO_READ,
 		IOobject::NO_WRITE
 	    ),
 	    mesh,
-	    dimensionedScalar("Dhmom", dimensionSet(0., 2., -1., 0., 0.), 1.e-8)
+	    dimensionedScalar("GammaMoments", dimensionSet(0., 2., -1., 0., 0.), 1.e-16)
 	);
+
+	GammaMoments = mu/rho/hmom.schmidt_number();
 
 	{
 		fvScalarMatrix HMOM_Norm_N0Eqn
 		(
 			fvm::ddt(rho,HMOM_Norm_N0)
 		      + fvm::div(phi, HMOM_Norm_N0) 
-		      - fvm::laplacian(rho*Dhmom, HMOM_Norm_N0) 
+		      - fvm::laplacian(rho*GammaMoments, HMOM_Norm_N0) 
 		        == 
 		        // source terms
 		     	fvOptions(rho, HMOM_Norm_N0)
@@ -82,7 +84,7 @@
 		(
 			fvm::ddt(rho,HMOM_Norm_M00)
 		      + fvm::div(phi, HMOM_Norm_M00) 
-		      - fvm::laplacian(rho*Dhmom, HMOM_Norm_M00) 
+		      - fvm::laplacian(rho*GammaMoments, HMOM_Norm_M00) 
 		        == 
 		        // source terms
 		     	fvOptions(rho, HMOM_Norm_M00)
@@ -106,7 +108,7 @@
 		(
 			fvm::ddt(rho,HMOM_Norm_M10)
 		      + fvm::div(phi, HMOM_Norm_M10) 
-		      - fvm::laplacian(rho*Dhmom, HMOM_Norm_M10) 
+		      - fvm::laplacian(rho*GammaMoments, HMOM_Norm_M10) 
 		        == 
 		        // source terms
 		     	fvOptions(rho, HMOM_Norm_M10)
@@ -130,7 +132,7 @@
 		(
 			fvm::ddt(rho,HMOM_Norm_M01)
 		      + fvm::div(phi, HMOM_Norm_M01) 
-		      - fvm::laplacian(rho*Dhmom, HMOM_Norm_M01) 
+		      - fvm::laplacian(rho*GammaMoments, HMOM_Norm_M01) 
 		        == 
 		        // source terms
 		     	fvOptions(rho, HMOM_Norm_M01)

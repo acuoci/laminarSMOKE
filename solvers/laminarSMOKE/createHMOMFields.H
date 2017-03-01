@@ -46,10 +46,12 @@ hmom.SetOxidation(hmom_oxidation);
 hmom.SetCondensation(hmom_condensation);
 hmom.SetCoagulation(hmom_coagulation);
 hmom.SetCoagulationContinous(hmom_coagulation_continous);
+hmom.SetPAH(hmom_pah_species_names);
 
 hmom.SetNumberCarbonPAH(hmom_pah_nc);
 hmom.SetFractalDiameterModel(hmom_fractal_diameter_model);
 hmom.SetCollisionDiameterModel(hmom_collision_diameter_model);
+hmom.SetSchmidtNumber(hmom_schmidt_number);
 
 Info<< "HMOM_Norm_N0 [mol/m3]\n" << endl;
 volScalarField HMOM_Norm_N0

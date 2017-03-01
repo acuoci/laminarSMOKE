@@ -201,7 +201,8 @@ int hmom_index_H2O = -1;
 int hmom_index_H2 = -1;
 int hmom_index_O2 = -1;
 int hmom_index_C2H2 = -1;
-int hmom_index_PAH = -1;
+std::vector<int> hmom_pah_species_indices;
+std::vector<std::string> hmom_pah_species_names;
 
 int hmom_pah_nc = 16;
 int hmom_number_moments = 4;
@@ -214,6 +215,7 @@ int hmom_oxidation = 1;
 int hmom_condensation = 1;
 int hmom_coagulation = 1;
 int hmom_coagulation_continous = 1;
+double hmom_schmidt_number = 50.;
 
 scalar hmom_minimum_normalized_value = 1.e-16;
 scalar hmom_minimum_fv_for_integration = 1.e-16;
@@ -233,8 +235,14 @@ const dictionary& hmomDictionary = solverOptions.subDict("HMOM");
 		hmom_index_O2 = thermodynamicsMapXML->IndexOfSpecies("O2")-1;
 		hmom_index_C2H2 = thermodynamicsMapXML->IndexOfSpecies("C2H2")-1;
 		
-		word pah_name(hmomDictionary.lookup("pah_species"));
-		hmom_index_PAH = thermodynamicsMapXML->IndexOfSpecies(pah_name)-1;
+		List<word>  listSpecies(hmomDictionary.lookup("pah_species"));
+		hmom_pah_species_indices.resize(listSpecies.size());
+		hmom_pah_species_names.resize(listSpecies.size());
+		for (int i=0;i<listSpecies.size();i++)
+		{
+			hmom_pah_species_indices[i] = thermodynamicsMapXML->IndexOfSpecies(listSpecies[i])-1;
+			hmom_pah_species_names[i] = listSpecies[i];
+		}
 
 		hmom_pah_nc = readLabel(hmomDictionary.lookup("pah_nc"));
 		hmom_collision_diameter_model = readLabel(hmomDictionary.lookup("collision_diameter_model"));
@@ -248,6 +256,8 @@ const dictionary& hmomDictionary = solverOptions.subDict("HMOM");
 		hmom_coagulation_continous = readLabel(hmomDictionary.lookup("coagulation_continous"));
 
 		hmom_pah_gas_consumption = Switch(hmomDictionary.lookup(word("pah_gas_consumption")));
+
+		hmom_schmidt_number = hmomDictionary.lookupOrDefault<scalar>(word("schmidt_number"),  scalar(50.));
 
 		hmom_minimum_normalized_value   = hmomDictionary.lookupOrDefault<scalar>(word("mininum_normalized_value"),  scalar(1.e-16));
 		hmom_minimum_fv_for_integration = hmomDictionary.lookupOrDefault<scalar>(word("mininum_fv_for_integration"),  scalar(1.e-16));
