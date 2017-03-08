@@ -292,7 +292,13 @@ int main(int argc, char *argv[])
 			Info << "Calculate soot classes (new): " << calculateSootClasses << endl;
 			if (calculateSootClasses == true)
 			{
-				boost::filesystem::path path_to_classes_definition = kinetics_folder + "ReacOfProcessCorrected.xml";
+				boost::filesystem::path path_to_classes_definition = kinetics_folder + "ReacOfProcess.xml";
+
+				if (boost::filesystem::exists(path_to_classes_definition) == false)
+				{
+					Info << "XML File " << path_to_classes_definition.string() << " does not exist!" << endl;
+					abort();
+				}
 
 				rapidxml::xml_document<> doc;
 				std::vector<char> xml_string;
