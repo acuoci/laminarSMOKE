@@ -38,8 +38,7 @@
 
 namespace OpenSMOKE
 {
-	template<typename map> 
-	SensitivityMap<map>::SensitivityMap(KineticsMap_CHEMKIN<map>& kinetics, const unsigned int number_of_equations) :
+	SensitivityMap::SensitivityMap(KineticsMap_CHEMKIN& kinetics, const unsigned int number_of_equations) :
 	kinetics_(kinetics), 
 	number_of_equations_(number_of_equations)
 	{
@@ -100,8 +99,7 @@ namespace OpenSMOKE
 		cpuTimeSolution_			= 0.;
 	}
 
-	template<typename map> 
-	void SensitivityMap<map>::SetSensitivityType(const PhysicalConstants::sensitivity_type type)
+	void SensitivityMap::SetSensitivityType(const PhysicalConstants::sensitivity_type type)
 	{
 		sensitivity_type_ = type;
 		if (sensitivity_type_ == PhysicalConstants::SENSITIVITY_KINETIC_CONSTANT)
@@ -114,68 +112,57 @@ namespace OpenSMOKE
 		sensitivity_coeffs_.setConstant(0.);
 	}
 
-	template<typename map> 
-	void SensitivityMap<map>::SetIndexOfTemperature(const unsigned int index)
+	void SensitivityMap::SetIndexOfTemperature(const unsigned int index)
 	{
 		index_of_temperature_ = index;
 	}
 
-	template<typename map> 
-	void SensitivityMap<map>::SetIndexOfDensity(const unsigned int index)
+	void SensitivityMap::SetIndexOfDensity(const unsigned int index)
 	{
 		index_of_density_ = index;
 	}
 
-	template<typename map> 
-	void SensitivityMap<map>::SetDenseSolverType(const DenseSolverType type)
+	void SensitivityMap::SetDenseSolverType(const DenseSolverType type)
 	{
 		dense_solver_type_ = type;
 	}
 
-	template<typename map>
-	void SensitivityMap<map>::SetSparseSolverType(const SparseSolverType type)
+	void SensitivityMap::SetSparseSolverType(const SparseSolverType type)
 	{
 		sparse_solver_type_ = type;
 	}
 
-	template<typename map> 
-	void SensitivityMap<map>::SetDenseDecompositionType(const DenseDecompositionType type)
+	void SensitivityMap::SetDenseDecompositionType(const DenseDecompositionType type)
 	{
 		dense_decomposition_type_ = type;
 	}
 
-	template<typename map>
-	void SensitivityMap<map>::SetSparsePreconditionerType(const SparsePreconditionerType type)
+	void SensitivityMap::SetSparsePreconditionerType(const SparsePreconditionerType type)
 	{
 		sparsePreconditionerType_ = type;
 	}
 
-	template<typename map>
-	void SensitivityMap<map>::SetSparsePreconditionerDropTolerance(const double droptol)
+	void SensitivityMap::SetSparsePreconditionerDropTolerance(const double droptol)
 	{
 		sparse_preconditioner_droptol_ = droptol;
 	}
 
-	template<typename map>
-	void SensitivityMap<map>::SetSparsePreconditionerFillFactor(const int fillfactor)
+	void SensitivityMap::SetSparsePreconditionerFillFactor(const int fillfactor)
 	{
 		sparse_preconditioner_fillfactor_ = fillfactor;
 	}
 
-	template<typename map> 
-	void SensitivityMap<map>::SetEnergyEquationType(const EnergyEquationType type)
+	void SensitivityMap::SetEnergyEquationType(const EnergyEquationType type)
 	{
 		energy_type_ = type;
 	}
 
-	template<typename map> 
-	void SensitivityMap<map>::SetNumberOfSubSteps(const unsigned int number_of_substeps)
+	void SensitivityMap::SetNumberOfSubSteps(const unsigned int number_of_substeps)
 	{
 		number_of_substeps_ = number_of_substeps;
 	}
 
-	template<typename map>
-	void SensitivityMap<map>::SetSparsityPattern(const std::vector<unsigned int>& row, const std::vector<unsigned int>& col)
+	void SensitivityMap::SetSparsityPattern(const std::vector<unsigned int>& row, const std::vector<unsigned int>& col)
 	{
 		// Set size of sparse matrix
 		A_eigen_sparse_->resize(number_of_equations_, number_of_equations_);
@@ -271,8 +258,7 @@ namespace OpenSMOKE
 		#endif
 	}
 
-	template<typename map> 
-	void SensitivityMap<map>::Calculate(const double t, const double T, const double P_Pa, const OpenSMOKE::OpenSMOKEVectorDouble& c, const OpenSMOKE::OpenSMOKEMatrixDouble& J, const OpenSMOKE::OpenSMOKEVectorDouble& scaling_Jp)
+	void SensitivityMap::Calculate(const double t, const double T, const double P_Pa, const OpenSMOKE::OpenSMOKEVectorDouble& c, const OpenSMOKE::OpenSMOKEMatrixDouble& J, const OpenSMOKE::OpenSMOKEVectorDouble& scaling_Jp)
 	{
 		t_ = t;
 
@@ -373,8 +359,7 @@ namespace OpenSMOKE
 		tOld_ = t_;
 	}
 
-	template<typename map>
-	void SensitivityMap<map>::Calculate(const double t, const double T, const double P_Pa, const OpenSMOKE::OpenSMOKEVectorDouble& c, const Eigen::SparseMatrix<double>& J, const OpenSMOKE::OpenSMOKEVectorDouble& scaling_Jp)
+	void SensitivityMap::Calculate(const double t, const double T, const double P_Pa, const OpenSMOKE::OpenSMOKEVectorDouble& c, const Eigen::SparseMatrix<double>& J, const OpenSMOKE::OpenSMOKEVectorDouble& scaling_Jp)
 	{
 		t_ = t;
 
@@ -551,8 +536,7 @@ namespace OpenSMOKE
 		tOld_ = t_;
 	}
 
-	template<typename map> 
-	void SensitivityMap<map>::Calculate(const double T, const double P_Pa, const OpenSMOKE::OpenSMOKEVectorDouble& c, const OpenSMOKE::OpenSMOKEMatrixDouble& J, const OpenSMOKE::OpenSMOKEVectorDouble& scaling_Jp)
+	void SensitivityMap::Calculate(const double T, const double P_Pa, const OpenSMOKE::OpenSMOKEVectorDouble& c, const OpenSMOKE::OpenSMOKEMatrixDouble& J, const OpenSMOKE::OpenSMOKEVectorDouble& scaling_Jp)
 	{
 		OpenSMOKE::OpenSMOKEVectorDouble mole_fractions(number_of_species_);
 		const double cTot = P_Pa / T / PhysicalConstants::R_J_kmol;
@@ -664,8 +648,7 @@ namespace OpenSMOKE
 		}
 	}
 
-	template<typename map>
-	void SensitivityMap<map>::Calculate(const double T, const double P_Pa, const OpenSMOKE::OpenSMOKEVectorDouble& c, const Eigen::SparseMatrix<double>& J, const OpenSMOKE::OpenSMOKEVectorDouble& scaling_Jp)
+	void SensitivityMap::Calculate(const double T, const double P_Pa, const OpenSMOKE::OpenSMOKEVectorDouble& c, const Eigen::SparseMatrix<double>& J, const OpenSMOKE::OpenSMOKEVectorDouble& scaling_Jp)
 	{
 		OpenSMOKE::OpenSMOKEVectorDouble mole_fractions(number_of_species_);
 		const double cTot = P_Pa / T / PhysicalConstants::R_J_kmol;

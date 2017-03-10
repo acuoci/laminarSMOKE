@@ -65,7 +65,6 @@ namespace OpenSMOKE
 			A class to perform sensitivity analysis
 	*/
 
-	template<typename map> 
 	class SensitivityMap
 	{
 	
@@ -76,7 +75,7 @@ namespace OpenSMOKE
 		*@param kineticsMap map containing the kinetic mechanism
 		*@param number_of_equations total number of equations of the ODE (or NLS) associated to the sensitivity analysis
 		*/
-		SensitivityMap(KineticsMap_CHEMKIN<map>& kineticMap, const unsigned int number_of_equations);
+		SensitivityMap(KineticsMap_CHEMKIN& kineticMap, const unsigned int number_of_equations);
 
 		/**
 		*@brief Returns the dense solver type
@@ -244,10 +243,10 @@ namespace OpenSMOKE
 
 	protected:
 
-		KineticsMap_CHEMKIN<map>& kinetics_;	//!< reference to the kinetic map
+		KineticsMap_CHEMKIN& kinetics_;			//!< reference to the kinetic map
 
 		unsigned int index_of_temperature_;		//!< index of temperature equation (if available)
-		unsigned int index_of_density_;		//!< index of temperature equation (if available)
+		unsigned int index_of_density_;			//!< index of temperature equation (if available)
 		unsigned int index_of_species_;			//!< index of first species equation
 		unsigned int number_of_species_;		//!< total number of species
 		unsigned int number_of_reactions_;		//!< total number of reactions

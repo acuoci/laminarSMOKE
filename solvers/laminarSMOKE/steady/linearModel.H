@@ -43,7 +43,7 @@ class linearModel
 
 public:
 
-	linearModel(OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermodynamicsMap_, OpenSMOKE::KineticsMap_CHEMKIN<double>& kineticsMap_)
+	linearModel(OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMap_, OpenSMOKE::KineticsMap_CHEMKIN& kineticsMap_)
 	{
 		NC_ = thermodynamicsMap_.NumberOfSpecies();
 		NE_ = NC_+1;
@@ -59,14 +59,14 @@ public:
 		Jdiagonal_.resize(NE_);
 	}
 
-	void reactionSourceTerms(	OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermodynamicsMap_, OpenSMOKE::KineticsMap_CHEMKIN<double>& kineticsMap_,
+	void reactionSourceTerms(	OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMap_, OpenSMOKE::KineticsMap_CHEMKIN& kineticsMap_,
 					const OpenSMOKE::OpenSMOKEVectorDouble& y, const double P0, OpenSMOKE::OpenSMOKEVectorDouble& S);
 
-	void reactionJacobian( 	OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermodynamicsMap_, OpenSMOKE::KineticsMap_CHEMKIN<double>& kineticsMap_,
+	void reactionJacobian( 	OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMap_, OpenSMOKE::KineticsMap_CHEMKIN& kineticsMap_,
 		       		const OpenSMOKE::OpenSMOKEVectorDouble& y, const double P0,
 		       		Eigen::VectorXd &J);
 
-	void reactionJacobianSparse( 	OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermodynamicsMap_, OpenSMOKE::KineticsMap_CHEMKIN<double>& kineticsMap_,
+	void reactionJacobianSparse( 	OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMap_, OpenSMOKE::KineticsMap_CHEMKIN& kineticsMap_,
 		       			const OpenSMOKE::OpenSMOKEVectorDouble& y, const double P0,
 		       			Eigen::VectorXd &J, const bool energyEquation, const bool speciesEquations);
 
@@ -89,7 +89,7 @@ private:
 };
 
 // 
-void linearModel::reactionSourceTerms(	OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermodynamicsMap_, OpenSMOKE::KineticsMap_CHEMKIN<double>& kineticsMap_,
+void linearModel::reactionSourceTerms(	OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMap_, OpenSMOKE::KineticsMap_CHEMKIN& kineticsMap_,
 				const OpenSMOKE::OpenSMOKEVectorDouble& y, const double P0, OpenSMOKE::OpenSMOKEVectorDouble& S)
 {
 	
@@ -130,7 +130,7 @@ void linearModel::reactionSourceTerms(	OpenSMOKE::ThermodynamicsMap_CHEMKIN<doub
 	}
 }
 
-void linearModel::reactionJacobian( OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermodynamicsMap_, OpenSMOKE::KineticsMap_CHEMKIN<double>& kineticsMap_,
+void linearModel::reactionJacobian( OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMap_, OpenSMOKE::KineticsMap_CHEMKIN& kineticsMap_,
 		       const OpenSMOKE::OpenSMOKEVectorDouble& y, const double P0,
 		       Eigen::VectorXd &J) 
 {
@@ -170,7 +170,7 @@ void linearModel::reactionJacobian( OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>
      }
  }
 
-void linearModel::reactionJacobianSparse( OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermodynamicsMap_, OpenSMOKE::KineticsMap_CHEMKIN<double>& kineticsMap_,
+void linearModel::reactionJacobianSparse( OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMap_, OpenSMOKE::KineticsMap_CHEMKIN& kineticsMap_,
 		       const OpenSMOKE::OpenSMOKEVectorDouble& y, const double P0,
 		       Eigen::VectorXd &J, const bool energyEquation, const bool speciesEquations) 
 {

@@ -163,11 +163,11 @@ namespace OdeSMOKE
 		y_plus_ = y;
 
 		// Loop
-		for (unsigned int group = 1; group <= ngroups; group++)
+		for (int group = 1; group <= ngroups; group++)
 		{
 			if (max_constraints == false)
 			{
-				for (unsigned int j = group - 1; j < this->ne_; j += width)
+				for (int j = group - 1; j < static_cast<int>(this->ne_); j += width)
 				{
 					const double yh = y(j);
 					const double hJf = hf / e(j);
@@ -182,7 +182,7 @@ namespace OdeSMOKE
 			}
 			else
 			{
-				for (unsigned int j = group - 1; j < this->ne_; j += width)
+				for (int j = group - 1; j < static_cast<int>(this->ne_); j += width)
 				{
 					const double yh = y(j);
 					const double hJf = hf / e(j);
@@ -202,13 +202,13 @@ namespace OdeSMOKE
 			this->Equations(y_plus_, t, f_plus_);
 			numberOfFunctionCallsForJacobian_++;
 
-			for (int j = group - 1; j < this->ne_; j += width)
+			for (int j = group - 1; j < static_cast<int>(this->ne_); j += width)
 			{
 				y_plus_(j) = y(j);
 
 				double* col_j = BAND_COL(J_, j);
 				int i1 = std::max(0, j - J_->nUpper());
-				int i2 = std::min(j + J_->nLower(), int(this->ne_ - 1));
+				int i2 = std::min(j + J_->nLower(), static_cast<int>(this->ne_ - 1));
 				for (int i = i1; i <= i2; i++)
 					BAND_COL_ELEM(col_j, i, j) = (f_plus_[i] - f[i]) / hJ_(j);
 			}

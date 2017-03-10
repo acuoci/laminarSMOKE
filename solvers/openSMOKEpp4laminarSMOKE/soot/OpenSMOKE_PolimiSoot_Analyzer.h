@@ -66,14 +66,14 @@ namespace OpenSMOKE
 		*@brief Constructor based on the thermodynamic map
 		*@param thermodynamicsMap map containing the thermodynamic data
 		*/
-		PolimiSoot_Analyzer(OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>* thermodynamicsMapXML);
+		PolimiSoot_Analyzer(OpenSMOKE::ThermodynamicsMap_CHEMKIN* thermodynamicsMapXML);
 
 		/**
 		*@brief Constructor based on the thermodynamic map and input from a user-defined dictionary
 		*@param thermodynamicsMap map containing the thermodynamic data
 		*@param dictionary the dictionary defined by the user
 		*/
-		PolimiSoot_Analyzer(OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>* thermodynamicsMapXML, OpenSMOKE::OpenSMOKE_Dictionary& dictionary);
+		PolimiSoot_Analyzer(OpenSMOKE::ThermodynamicsMap_CHEMKIN* thermodynamicsMapXML, OpenSMOKE::OpenSMOKE_Dictionary& dictionary);
 
 		/**
 		*@brief Prepares the object according to what defined in the external dictionary
@@ -489,6 +489,7 @@ namespace OpenSMOKE
 	public:		// indices
 
 		const std::vector<unsigned int>& bin_indices() const { return bin_indices_; }
+		const std::vector<std::string>& bin_names() const { return bin_names_; }
 		const std::vector<unsigned int>& bin_indices_large() const { return bin_indices_large_; }
 		const std::vector<unsigned int>& bin_indices_small() const { return bin_indices_small_; }
 		const std::vector<unsigned int>& bin_indices_large_spherical() const { return bin_indices_large_spherical_; }
@@ -514,7 +515,7 @@ namespace OpenSMOKE
 
 	private:
 
-		OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermo_;
+		OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermo_;
 
 		std::string bin_label_;
 		std::string bin_minimum_;

@@ -138,13 +138,13 @@ namespace OpenSMOKE
 			{
 				if (this->mUpper_ == 0 && this->mLower_ == 0)
 				{
-					std::cout << "CVODE Solver: Dense Jacobian (without Lapack)..." << std::endl;
+//					std::cout << "CVODE Solver: Dense Jacobian (without Lapack)..." << std::endl;
 					flag = CVDense(cvode_mem_, this->n_);
 					if (check_flag(&flag, std::string("CVDense"), 1)) exit(-1);
 				}
 				else
 				{
-					std::cout << "CVODE Solver: Band Jacobian (without Lapack)..." << std::endl;
+//					std::cout << "CVODE Solver: Band Jacobian (without Lapack)..." << std::endl;
 					flag = CVBand(cvode_mem_, this->n_, this->mUpper_, this->mLower_);
 					if (check_flag(&flag, std::string("CVBand"), 1)) exit(-1);
 				}
@@ -153,13 +153,13 @@ namespace OpenSMOKE
 			{
 				if (this->mUpper_ == 0 && this->mLower_ == 0)
 				{
-					std::cout << "CVODE Solver: Dense Jacobian (with Lapack)..." << std::endl;
+//					std::cout << "CVODE Solver: Dense Jacobian (with Lapack)..." << std::endl;
 					flag = CVLapackDense(cvode_mem_, this->n_);
 					if (check_flag(&flag, std::string("CVLapackDense"), 1)) exit(-1);
 				}
 				else
 				{
-					std::cout << "CVODE Solver: Band Jacobian (with Lapack)..." << std::endl;
+//					std::cout << "CVODE Solver: Band Jacobian (with Lapack)..." << std::endl;
 					flag = CVLapackBand(cvode_mem_, this->n_, this->mUpper_, this->mLower_);
 					if (check_flag(&flag, std::string("CVLapackBand"), 1)) exit(-1);
 				}

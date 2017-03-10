@@ -57,8 +57,7 @@ namespace OpenSMOKE
 		 if the temperature changes
 	*/
 
-	template<typename map> 
-	class KineticsMap_Solid_CHEMKIN : public KineticsMap<map>
+	class KineticsMap_Solid_CHEMKIN : public KineticsMap
 	{
 
 	public:
@@ -68,30 +67,28 @@ namespace OpenSMOKE
 		*@param thermo the thermodynamic map
 		*@param doc xml file  
 		*@param target solid material index (from 1 to the number of materials)
-		*@param nPoints number op points in the map (for a scalar map the number of oints is 1)
 		*/
-		KineticsMap_Solid_CHEMKIN(ThermodynamicsMap_Solid_CHEMKIN<map>& thermo, rapidxml::xml_document<>& doc, const unsigned int target, const unsigned int nPoints = 1);
+		KineticsMap_Solid_CHEMKIN(ThermodynamicsMap_Solid_CHEMKIN& thermo, rapidxml::xml_document<>& doc, const unsigned int target);
 
 		/**
 		*@brief Creates a thermodynamic map for the evaluation of thermodynamic properties
 		*@param thermo the thermodynamic map
 		*@param doc xml file  
 		*@param target solid material name
-		*@param nPoints number op points in the map (for a scalar map the number of oints is 1)
 		*/
-		KineticsMap_Solid_CHEMKIN(ThermodynamicsMap_Solid_CHEMKIN<map>& thermo, rapidxml::xml_document<>& doc, const std::string target, const unsigned int nPoints = 1);
+		KineticsMap_Solid_CHEMKIN(ThermodynamicsMap_Solid_CHEMKIN& thermo, rapidxml::xml_document<>& doc, const std::string target);
 
 		/**
 		*@brief Set the temperature at which the properties have to be evaluated
 		*@param T the temperature value in K
 		*/
-		virtual void SetTemperature(const map& T);
+		virtual void SetTemperature(const double& T);
 
 		/**
 		*@brief Set the pressure at which the properties have to be evaluated
 		*@param P the pressure value in Pa
 		*/
-		virtual void SetPressure(const map& P);		
+		virtual void SetPressure(const double& P);		
 
 		/**
 		*@brief Returns the names of the species
@@ -202,7 +199,7 @@ namespace OpenSMOKE
 		*/
 		StoichiometricMap& stoichiometry() { return *stoichiometry_; }
                 
-                /**
+        /**
 		*@brief Calculates the reaction enthalpies and entropies (to be used for the kinetic constants)
 		*/
 		void ReactionEnthalpiesAndEntropies();
@@ -227,7 +224,7 @@ namespace OpenSMOKE
 
 	private:
 
-		ThermodynamicsMap_Solid_CHEMKIN<map>& thermodynamics_;		//!< reference to the thermodynamics
+		ThermodynamicsMap_Solid_CHEMKIN& thermodynamics_;		//!< reference to the thermodynamics
 		OpenSMOKEVectorDouble c_;
 		OpenSMOKEVectorDouble aux_vector_;
 

@@ -313,7 +313,7 @@ namespace OdeSMOKE
 	}
 	
 	template <typename ODESystemObject>
-	void KernelSparse<ODESystemObject>::SetPreconditionerFillFactor(const double fillfactor)
+	void KernelSparse<ODESystemObject>::SetPreconditionerFillFactor(const int fillfactor)
 	{
 		preconditioner_fillfactor_ = fillfactor;
 	}

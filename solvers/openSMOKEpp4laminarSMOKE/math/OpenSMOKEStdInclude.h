@@ -32,7 +32,7 @@
 	#include <map>
     #include <stdlib.h>
 
-	#define __OPENSMOKE_VERSION__ "0.5.0"
+	#define __OPENSMOKE_VERSION__ "0.7.0"
 
 	#define OPENSMOKE_LONG_DOUBLE 8
 	#define OPENSMOKE_DOUBLE 8

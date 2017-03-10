@@ -38,7 +38,7 @@ namespace OpenSMOKE
 {
 	#include <sstream>
 
-	PolimiSoot_Analyzer::PolimiSoot_Analyzer(OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>* thermodynamicsMapXML) :
+	PolimiSoot_Analyzer::PolimiSoot_Analyzer(OpenSMOKE::ThermodynamicsMap_CHEMKIN* thermodynamicsMapXML) :
 		thermo_(*thermodynamicsMapXML)
 	{
 		//	Default values
@@ -65,7 +65,7 @@ namespace OpenSMOKE
 		threshold_for_psdf_ = 1e-11;
 	}
 
-	PolimiSoot_Analyzer::PolimiSoot_Analyzer(OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>* thermodynamicsMapXML, OpenSMOKE::OpenSMOKE_Dictionary& dictionary) :
+	PolimiSoot_Analyzer::PolimiSoot_Analyzer(OpenSMOKE::ThermodynamicsMap_CHEMKIN* thermodynamicsMapXML, OpenSMOKE::OpenSMOKE_Dictionary& dictionary) :
 		thermo_(*thermodynamicsMapXML)
 	{
 		SetupFromDictionary(dictionary);
@@ -131,8 +131,7 @@ namespace OpenSMOKE
 				dictionary.ReadBool("@ThermophoreticEffect", thermophoretic_effect_);
 
 			if (dictionary.CheckOption("@ThermophoreticEffectAmplificationFactor") == true)
-				dictionary.ReadDouble("@ThermophoreticEffectAmplificationFactor", thermophoretic_effect_amplification_factor_);
-			
+				dictionary.ReadDouble("@ThermophoreticEffectAmplificationFactor", thermophoretic_effect_amplification_factor_);			
 
 			if (dictionary.CheckOption("@ThermophoreticEffectInCorrectionVelocity") == true)
 				dictionary.ReadBool("@ThermophoreticEffectInCorrectionVelocity", thermophoretic_effect_included_in_correction_);
@@ -178,15 +177,7 @@ namespace OpenSMOKE
 			{
 				std::string flag;
 				dictionary.ReadString("@PlanckCoefficient", flag);
-
-				if (flag == "Smooke")
-					soot_planck_coefficient_ = SOOT_PLANCK_COEFFICIENT_SMOOKE;
-				else if (flag == "Kent")
-					soot_planck_coefficient_ = SOOT_PLANCK_COEFFICIENT_KENT;
-				else if (flag == "Sazhin")
-					soot_planck_coefficient_ = SOOT_PLANCK_COEFFICIENT_SAZHIN;
-				else
-					OpenSMOKE::FatalErrorMessage("@PlanckCoefficient: available options: Smooke (default) | Kent | Sazhin");
+				SetPlanckAbsorptionCoefficient(flag);
 			}
 
 			if (dictionary.CheckOption("@WritePSDF") == true)
@@ -258,7 +249,7 @@ namespace OpenSMOKE
 		// Check is soot sections are really available in the kinetic mechanism
 		{
 			unsigned int count = 0;
-			for (int i = 0; i < nspecies_; i++)
+			for (unsigned int i = 0; i < nspecies_; i++)
 			if (thermo_.NamesOfSpecies()[i].compare(0, bin_label_.size(), bin_label_) == 0)
 				count++;
 
@@ -270,7 +261,7 @@ namespace OpenSMOKE
 		double min_mw_soot = 1.e32;
 		{
 			bool iFound = false;
-			for (int i = 0; i < nspecies_; i++)
+			for (unsigned int i = 0; i < nspecies_; i++)
 				if (thermo_.NamesOfSpecies()[i].compare(0, bin_minimum_.size(), bin_minimum_) == 0)
 				{
 					iFound = true;
@@ -282,7 +273,7 @@ namespace OpenSMOKE
 		}
 
 		unsigned int bin_minimum_fractal_dimension_index = 0;
-		for (int i = 0; i < nspecies_; i++)
+		for (unsigned int i = 0; i < nspecies_; i++)
 		if (thermo_.NamesOfSpecies()[i].compare(0, bin_label_.size(), bin_label_) == 0)
 		{
 			const double nc = thermo_.atomic_composition()(i, iC_);
@@ -328,7 +319,7 @@ namespace OpenSMOKE
 
 			if ( thermo_.MW()[i+1] >=  min_mw_soot)	
 			{
-				unsigned int index = bin_indices_.size()-1;
+				int index = bin_indices_.size()-1;
 				bin_indices_large_.push_back(index);
 				bin_indices_large_global_.push_back(i);
 				bin_density_large_.push_back(bin_density_[index]);
@@ -336,7 +327,7 @@ namespace OpenSMOKE
 			}
 			else
 			{
-				unsigned int index = bin_indices_.size()-1;
+				int index = bin_indices_.size()-1;
 				bin_indices_small_.push_back(index);
 				bin_indices_small_global_.push_back(i);
 				bin_density_small_.push_back(bin_density_[index]);
@@ -345,7 +336,7 @@ namespace OpenSMOKE
 
 			// Collisional diameter and diameter
 			{
-				int iCollisional = false;
+				bool iCollisional = false;
 				const double index = std::log(nc / 24.) / std::log(2.) + 1;
 
 				if (index > 12)
@@ -381,7 +372,7 @@ namespace OpenSMOKE
 		// Physical diffusivities (correction factors)
 		{
 			const double bin_to_cut = 10.;
-			const unsigned int binReference = std::min_element(bin_mw_.begin(), bin_mw_.end()) - bin_mw_.begin();
+			const int binReference = std::min_element(bin_mw_.begin(), bin_mw_.end()) - bin_mw_.begin();
 			const double MWReference = bin_mw_[binReference];
 
 			if (binReference >= 0)
@@ -411,10 +402,10 @@ namespace OpenSMOKE
 
 			//if (iBin_ == true)
 			{
-				for (int i = 0; i < bin_indices_.size(); i++)
+				for (unsigned int i = 0; i < bin_indices_.size(); i++)
 				{
 					bool iNew = true;
-					for (int k = 0; k < bin_baskets_.size(); k++)
+					for (unsigned int k = 0; k < bin_baskets_.size(); k++)
 					if (bin_c_[i] == bin_baskets_[k])
 					{
 						iNew = false;
@@ -428,8 +419,8 @@ namespace OpenSMOKE
 				bin_baskets_indices_.resize(bin_baskets_.size());
 
 
-				for (int i = 0; i < bin_indices_.size(); i++)
-				for (int k = 0; k < bin_baskets_.size(); k++)
+				for (unsigned int i = 0; i < bin_indices_.size(); i++)
+				for (unsigned int k = 0; k < bin_baskets_.size(); k++)
 				{
 					if (bin_c_[i] == bin_baskets_[k])
 						bin_baskets_indices_[k].push_back(i);
@@ -458,14 +449,14 @@ namespace OpenSMOKE
 				bin_baskets_omega_.resize(bin_baskets_.size());
 			}
 
-			for (int k = 0; k < bin_baskets_.size(); k++)
+			for (unsigned int k = 0; k < bin_baskets_.size(); k++)
 			{
 				bin_baskets_mw_[k] = 0.;
 				bin_baskets_d_[k] = 0.;
 				bin_baskets_m_[k] = 0.;
 				bin_baskets_V_[k] = 0.;
 
-				for (int i = 0; i < bin_baskets_indices_[k].size(); i++)
+				for (unsigned int i = 0; i < bin_baskets_indices_[k].size(); i++)
 				{
 					int j = bin_baskets_indices_[k][i];
 					bin_baskets_d_[k] += bin_d_[j];
@@ -489,7 +480,7 @@ namespace OpenSMOKE
 			bin_baskets_dlog10V_[0] = ((bin_baskets_log10V_[1] + bin_baskets_log10V_[0]) / 2. - bin_baskets_log10V_[0])*2.;
 			bin_baskets_dlog10m_[0] = ((bin_baskets_log10m_[1] + bin_baskets_log10m_[0]) / 2. - bin_baskets_log10m_[0])*2.;
 
-			for (int k = 1; k < bin_baskets_.size() - 1; k++)
+			for (unsigned int k = 1; k < bin_baskets_.size() - 1; k++)
 			{
 				bin_baskets_dlog10d_[k] = (bin_baskets_log10d_[k + 1] + bin_baskets_log10d_[k]) / 2. - (bin_baskets_log10d_[k] + bin_baskets_log10d_[k - 1]) / 2.;
 				bin_baskets_dlog10V_[k] = (bin_baskets_log10V_[k + 1] + bin_baskets_log10V_[k]) / 2. - (bin_baskets_log10V_[k] + bin_baskets_log10V_[k - 1]) / 2.;
@@ -503,7 +494,7 @@ namespace OpenSMOKE
 		}
 
 		// Soot dimer
-		for(int i=0;i<nspecies_;i++)
+		for(unsigned int i=0;i<nspecies_;i++)
 			if (thermo_.NamesOfSpecies()[i].compare(0, bin_minimum_.size(), bin_minimum_) == 0)
 				soot_dimer_indices_global_.push_back(i);
 
@@ -579,7 +570,7 @@ namespace OpenSMOKE
 	double PolimiSoot_Analyzer::fv_large(const double rhoGas, const Eigen::VectorXd &omegaGas) const
 	{
 		double sum = 0.;
-		for (int i = 0; i < bin_indices_large_global_.size(); i++)
+		for (unsigned int i = 0; i < bin_indices_large_global_.size(); i++)
 		{
 			int j = bin_indices_large_global_[i];
 			sum += rhoGas*omegaGas(j) / bin_density_large_[i];
@@ -590,7 +581,7 @@ namespace OpenSMOKE
 	double PolimiSoot_Analyzer::rho_large(const double rhoGas, const Eigen::VectorXd &omegaGas) const
 	{
 		double sum = 0.;
-		for (int i = 0; i < bin_indices_large_global_.size(); i++)
+		for (unsigned int i = 0; i < bin_indices_large_global_.size(); i++)
 		{
 			int j = bin_indices_large_global_[i];
 			sum += rhoGas*omegaGas(j);
@@ -601,7 +592,7 @@ namespace OpenSMOKE
 	double PolimiSoot_Analyzer::fv_small(const double rhoGas, const Eigen::VectorXd &omegaGas) const
 	{
 		double sum = 0.;
-		for (int i = 0; i < bin_indices_small_global_.size(); i++)
+		for (unsigned int i = 0; i < bin_indices_small_global_.size(); i++)
 		{
 			int j = bin_indices_small_global_[i];
 			sum += rhoGas*omegaGas(j) / bin_density_small_[i];
@@ -617,7 +608,7 @@ namespace OpenSMOKE
 	double PolimiSoot_Analyzer::omega_pah_1_2_rings(const Eigen::VectorXd &omegaGas) const
 	{
 		double sum = 0.;
-		for (int i = 0; i < pah_1_2_rings_indices_global_.size(); i++)
+		for (unsigned int i = 0; i < pah_1_2_rings_indices_global_.size(); i++)
 		{
 			const unsigned int j = pah_1_2_rings_indices_global_[i];
 			sum += omegaGas(j);
@@ -628,7 +619,7 @@ namespace OpenSMOKE
 	double PolimiSoot_Analyzer::omega_pah_3_4_rings(const Eigen::VectorXd &omegaGas) const
 	{
 		double sum = 0.;
-		for (int i = 0; i < pah_3_4_rings_indices_global_.size(); i++)
+		for (unsigned int i = 0; i < pah_3_4_rings_indices_global_.size(); i++)
 		{
 			const unsigned int j = pah_3_4_rings_indices_global_[i];
 			sum += omegaGas(j);
@@ -639,7 +630,7 @@ namespace OpenSMOKE
 	double PolimiSoot_Analyzer::omega_pah_more_than_4_rings(const Eigen::VectorXd &omegaGas) const
 	{
 		double sum = 0.;
-		for (int i = 0; i < pah_more_than_4_rings_indices_global_.size(); i++)
+		for (unsigned int i = 0; i < pah_more_than_4_rings_indices_global_.size(); i++)
 		{
 			const unsigned int j = pah_more_than_4_rings_indices_global_[i];
 			sum += omegaGas(j);
@@ -649,14 +640,14 @@ namespace OpenSMOKE
 
 	double PolimiSoot_Analyzer::planck_coefficient(const double rhoGas, const double T, const Eigen::VectorXd &omegaGas) const
 	{
-		if (soot_planck_coefficient_ == SOOT_PLANCK_COEFFICIENT_NONE)
-			return 0.;																
-		else if (soot_planck_coefficient_ == SOOT_PLANCK_COEFFICIENT_SMOOKE)
+		if (soot_planck_coefficient_ == SOOT_PLANCK_COEFFICIENT_SMOOKE)
 			return (1307.*fv_large(rhoGas, omegaGas)*T);							// [1/m]	(Smooke et al. Combustion and Flame 2009)
 		else if (soot_planck_coefficient_ == SOOT_PLANCK_COEFFICIENT_KENT)
 			return (2262.*fv_large(rhoGas, omegaGas)*T);							// [1/m]	(Kent al. Combustion and Flame 1990)
 		else if (soot_planck_coefficient_ == SOOT_PLANCK_COEFFICIENT_SAZHIN)
-			return (1232.*rho_large(rhoGas, omegaGas)*(1. + 4.8e-4*(T - 2000.)));	// [1/m]	(Sazhin, Fluent 1994)
+			return (1232.*fv_large(rhoGas, omegaGas)*(1. + 4.8e-4*(T - 2000.)));	// [1/m]	(Sazhin, Fluent 1994)
+		else
+			return 0.;
 	}
 
 	void PolimiSoot_Analyzer::Analysis(const double T, const double P_Pa, const double rhoGas, const Eigen::VectorXd &omegaGas, const Eigen::VectorXd &xGas)
@@ -665,7 +656,7 @@ namespace OpenSMOKE
 		{
 			double small_eps = 1e-20;
 
-			for (int i = 0; i < bin_indices_.size(); i++)
+			for (unsigned int i = 0; i < bin_indices_.size(); i++)
 			{
 				int j = bin_indices_[i];
 				bin_omega_[i] = omegaGas(j);				// mass fraction
@@ -684,7 +675,7 @@ namespace OpenSMOKE
 			o_over_c_small_ = 0.;
 			o_over_h_small_ = 0.;
 
-			for (int i = 0; i < bin_indices_small_.size(); i++)
+			for (unsigned int i = 0; i < bin_indices_small_.size(); i++)
 			{
 				int j = bin_indices_small_[i];
 				fv_small_ += bin_fv_[j];
@@ -714,7 +705,7 @@ namespace OpenSMOKE
 				o_over_c_large_ = 0.;
 				o_over_h_large_ = 0.;
 
-				for (int i = 0; i < bin_indices_large_.size(); i++)
+				for (unsigned int i = 0; i < bin_indices_large_.size(); i++)
 				{
 					int j = bin_indices_large_[i];
 					fv_large_ += bin_fv_[j];
@@ -739,7 +730,7 @@ namespace OpenSMOKE
 				N_large_spherical_ = 0.;
 				omega_large_spherical_ = 0.;
 				x_large_spherical_ = 0.;
-				for (int i = 0; i < bin_indices_large_spherical_.size(); i++)
+				for (unsigned int i = 0; i < bin_indices_large_spherical_.size(); i++)
 				{
 					int j = bin_indices_large_spherical_[i];
 					fv_large_spherical_ += bin_fv_[j];
@@ -755,7 +746,7 @@ namespace OpenSMOKE
 				N_large_aggregates_ = 0.;
 				omega_large_aggregates_ = 0.;
 				x_large_aggregates_ = 0.;
-				for (int i = 0; i < bin_indices_large_aggregates_.size(); i++)
+				for (unsigned int i = 0; i < bin_indices_large_aggregates_.size(); i++)
 				{
 					int j = bin_indices_large_aggregates_[i];
 					fv_large_aggregates_ += bin_fv_[j];
@@ -770,21 +761,21 @@ namespace OpenSMOKE
 			// Analysis of PAHs
 			{
 				omega_pah_1_2_rings_ = 0.;
-				for (int i = 0; i < pah_1_2_rings_indices_global_.size(); i++)
+				for (unsigned int i = 0; i < pah_1_2_rings_indices_global_.size(); i++)
 				{
 					const unsigned int j = pah_1_2_rings_indices_global_[i];
 					omega_pah_1_2_rings_ += omegaGas(j);
 				}
 
 				omega_pah_3_4_rings_ = 0.;
-				for (int i = 0; i < pah_3_4_rings_indices_global_.size(); i++)
+				for (unsigned int i = 0; i < pah_3_4_rings_indices_global_.size(); i++)
 				{
 					const unsigned int j = pah_3_4_rings_indices_global_[i];
 					omega_pah_3_4_rings_ += omegaGas(j);
 				}
 
 				omega_pah_more_than_4_rings_ = 0.;
-				for (int i = 0; i < pah_more_than_4_rings_indices_global_.size(); i++)
+				for (unsigned int i = 0; i < pah_more_than_4_rings_indices_global_.size(); i++)
 				{
 					const unsigned int j = pah_more_than_4_rings_indices_global_[i];
 					omega_pah_more_than_4_rings_ += omegaGas(j);
@@ -798,7 +789,7 @@ namespace OpenSMOKE
 	{
 		//if (iBin_ == true)
 		{
-			for (int k = 0; k < bin_baskets_.size(); k++)
+			for (unsigned int k = 0; k < bin_baskets_.size(); k++)
 			{
 				bin_baskets_N_[k] = 0.;
 				bin_baskets_fv_[k] = 0.;
@@ -806,7 +797,7 @@ namespace OpenSMOKE
 				bin_baskets_omega_[k] = 0.;
 				bin_baskets_x_[k] = 0.;
 
-				for (int i = 0; i < bin_baskets_indices_[k].size(); i++)
+				for (unsigned int i = 0; i < bin_baskets_indices_[k].size(); i++)
 				{
 					int j = bin_baskets_indices_[k][i];
 					bin_baskets_N_[k] += bin_N_[j];
@@ -830,7 +821,7 @@ namespace OpenSMOKE
 			double m1 = 0.;
 			double m2 = 0.;
 			double m3 = 0.;
-			for (int k = 0; k < bin_baskets_.size(); k++)
+			for (unsigned int k = 0; k < bin_baskets_.size(); k++)
 			{
 				m0 += bin_baskets_N_[k];
 				m1 += bin_baskets_N_[k] * bin_baskets_d_[k];
@@ -847,7 +838,7 @@ namespace OpenSMOKE
 
 			// Variance [m2]
 			dvariance_N_ = 0.;
-			for (int k = 0; k < bin_baskets_.size(); k++)
+			for (unsigned int k = 0; k < bin_baskets_.size(); k++)
 				dvariance_N_ += bin_baskets_N_[k] * std::pow(bin_baskets_d_[k] - dmean_N_large_, 2.);
 			dvariance_N_ /= m0;
 
@@ -858,7 +849,7 @@ namespace OpenSMOKE
 
 	void PolimiSoot_Analyzer::WriteDistribution(std::ofstream& fSootDistribution, const double t, const double x, const double y, const double z, const double T)
 	{
-		for (int k = 0; k < bin_baskets_.size(); k++)
+		for (unsigned int k = 0; k < bin_baskets_.size(); k++)
 		{
 			fSootDistribution << std::scientific << std::setw(20) << std::left << t;
 			fSootDistribution << std::scientific << std::setw(20) << std::left << x;
@@ -954,7 +945,7 @@ namespace OpenSMOKE
 		fOutput << std::setw(18) << std::scientific << std::left << "Teta(corr.fact.)";					// [-]
 		fOutput << std::endl;
 
-		for (int i = 0; i < bin_indices_small_.size(); i++)
+		for (unsigned int i = 0; i < bin_indices_small_.size(); i++)
 		{
 			int j = bin_indices_small_[i];
 			fOutput << std::setw(5) << std::left << j + 1;
@@ -978,7 +969,7 @@ namespace OpenSMOKE
 		}
 		fOutput << std::endl;
 
-		for (int i = 0; i < bin_indices_large_.size(); i++)
+		for (unsigned int i = 0; i < bin_indices_large_.size(); i++)
 		{
 			int j = bin_indices_large_[i];
 			fOutput << std::setw(5) << std::left << j + 1;

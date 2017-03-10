@@ -38,29 +38,24 @@
 #include "ThermodynamicsMap.h"
 
 namespace OpenSMOKE
-{
-	template<typename map> 
-	KineticsMap_Solid_CHEMKIN<map>::KineticsMap_Solid_CHEMKIN(ThermodynamicsMap_Solid_CHEMKIN<map>& thermo, rapidxml::xml_document<>& doc, const unsigned int target, const unsigned int nPoints) :
+{ 
+	KineticsMap_Solid_CHEMKIN::KineticsMap_Solid_CHEMKIN(ThermodynamicsMap_Solid_CHEMKIN& thermo, rapidxml::xml_document<>& doc, const unsigned int target) :
 	thermodynamics_(thermo)
 	{
-		this->number_of_points_ = nPoints;
 		ImportSpeciesFromXMLFile(doc);
 		ImportCoefficientsFromXMLFile(doc, target);
 		this->T_ = this->P_ = 0.;
 	}
 
-	template<typename map> 
-	KineticsMap_Solid_CHEMKIN<map>::KineticsMap_Solid_CHEMKIN(ThermodynamicsMap_Solid_CHEMKIN<map>& thermo, rapidxml::xml_document<>& doc, const std::string target, const unsigned int nPoints) :
+	KineticsMap_Solid_CHEMKIN::KineticsMap_Solid_CHEMKIN(ThermodynamicsMap_Solid_CHEMKIN& thermo, rapidxml::xml_document<>& doc, const std::string target) :
 	thermodynamics_(thermo)
 	{
-		this->number_of_points_ = nPoints;
 		ImportSpeciesFromXMLFile(doc);
 		ImportCoefficientsFromXMLFile(doc, target);
 		this->T_ = this->P_ = 0.;
 	}
 
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::SetTemperature(const map& T)
+	void KineticsMap_Solid_CHEMKIN::SetTemperature(const double& T)
 	{
 		this->T_old_ = this->T_;
 		this->T_ = T;
@@ -77,8 +72,7 @@ namespace OpenSMOKE
 		}
 	}
 
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::SetPressure(const map& P)
+	void KineticsMap_Solid_CHEMKIN::SetPressure(const double& P)
 	{
 		this->P_old_ = this->P_;
 		this->P_ = P;
@@ -87,27 +81,13 @@ namespace OpenSMOKE
 			nonconventional_kinetic_constants_must_be_recalculated_ = true;
 		}
 	}
-/*
-	void CheckKeyWord(const std::string read_value, const std::string expected_value)
+
+	void KineticsMap_Solid_CHEMKIN::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)
 	{
-		if (read_value != expected_value)
-		{
-			std::cout << "Error in reading the kinetic mechanism: Expected " << expected_value << " - Found: " << read_value << std::endl;
-			std::cout << "Please check your kinetic mechanism!" << std::endl;
-			std::cout << "Press enter to continue..." << std::endl;
-			getchar();
-			exit(OPENSMOKE_FATAL_ERROR_EXIT);
-		}
-	}
-*/
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)
-	{
-		ErrorMessage("void KineticsMap_Solid_CHEMKIN<map>::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)", "The solid kinetic map require the user specifies tha material name.");
+		ErrorMessage("void KineticsMap_Solid_CHEMKIN::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)", "The solid kinetic map require the user specifies tha material name.");
 	}
 
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc, const std::string target_material_name)
+	void KineticsMap_Solid_CHEMKIN::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc, const std::string target_material_name)
 	{
 		rapidxml::xml_node<>* opensmoke_node = doc.first_node("opensmoke");
 		rapidxml::xml_node<>* parent_kinetics_node = opensmoke_node->first_node("Kinetics");
@@ -116,7 +96,7 @@ namespace OpenSMOKE
 		std::string kinetics_version = parent_kinetics_node->first_attribute("version")->value();
 				
 		if (kinetics_type != "OpenSMOKE" || kinetics_version != "01-02-2014")
-			ErrorMessage("void KineticsMap_Solid_CHEMKIN<map>::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)", "The current kinetic scheme is not supported.");
+			ErrorMessage("void KineticsMap_Solid_CHEMKIN::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)", "The current kinetic scheme is not supported.");
 
 		unsigned int target_material_index = 0;
 		for (rapidxml::xml_node<> *kinetics_node = parent_kinetics_node->first_node("MaterialKinetics"); kinetics_node; kinetics_node = kinetics_node->next_sibling("MaterialKinetics"))
@@ -129,16 +109,15 @@ namespace OpenSMOKE
 		}
 
 		if (target_material_index == 0)
-			ErrorMessage("void KineticsMap_Solid_CHEMKIN<map>::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)", "The requested solid material is not available. Please check the name.");
+			ErrorMessage("void KineticsMap_Solid_CHEMKIN::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)", "The requested solid material is not available. Please check the name.");
 		else
 			ImportCoefficientsFromXMLFile(doc, target_material_index);
 	}
-
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc, const unsigned int target_material_index)
+ 
+	void KineticsMap_Solid_CHEMKIN::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc, const unsigned int target_material_index)
 	{
 		if (target_material_index <=0 || target_material_index > thermodynamics_.number_of_materials())
-			ErrorMessage("void KineticsMap_Solid_CHEMKIN<map>::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)", "The requested solid material is not available. Please check the name.");
+			ErrorMessage("void KineticsMap_Solid_CHEMKIN::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)", "The requested solid material is not available. Please check the name.");
 
 		rapidxml::xml_node<>* opensmoke_node = doc.first_node("opensmoke");
 		rapidxml::xml_node<>* parent_kinetics_node = opensmoke_node->first_node("Kinetics");
@@ -147,14 +126,14 @@ namespace OpenSMOKE
 		std::string kinetics_version = parent_kinetics_node->first_attribute("version")->value();
 				
 		if (kinetics_type != "OpenSMOKE" || kinetics_version != "01-02-2014")
-			ErrorMessage("void KineticsMap_Solid_CHEMKIN<map>::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)", "The current kinetic scheme is not supported.");
+			ErrorMessage("void KineticsMap_Solid_CHEMKIN::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)", "The current kinetic scheme is not supported.");
 
 		for (rapidxml::xml_node<> *kinetics_node = parent_kinetics_node->first_node("MaterialKinetics"); kinetics_node; kinetics_node = kinetics_node->next_sibling("MaterialKinetics"))
 		{
 			if (target_material_index == boost::lexical_cast<unsigned int>(kinetics_node->first_attribute("index")->value()) )
 			{
 				if (kinetics_node == 0)
-					ErrorMessage("void KineticsMap_Solid_CHEMKIN<map>::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)", "Kinetics tag was not found!");
+					ErrorMessage("void KineticsMap_Solid_CHEMKIN::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)", "Kinetics tag was not found!");
 				
 				// Reading the number of species
 				{
@@ -354,7 +333,7 @@ namespace OpenSMOKE
 					std::string stoichiometry_version = stoichiometry_node->first_attribute("version")->value();
 
 					if (stoichiometry_type != "OpenSMOKE" || stoichiometry_version != "01-02-2014")
-						ErrorMessage("void KineticsMap_Solid_CHEMKIN<map>::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)", "The current stoichiometric data are not supported.");
+						ErrorMessage("void KineticsMap_Solid_CHEMKIN::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)", "The current stoichiometric data are not supported.");
 
 					std::stringstream fInput;
 					fInput << stoichiometry_node->value();
@@ -422,8 +401,7 @@ namespace OpenSMOKE
 		}
 	}
 
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::ImportSpeciesFromXMLFile(rapidxml::xml_document<>& doc)
+	void KineticsMap_Solid_CHEMKIN::ImportSpeciesFromXMLFile(rapidxml::xml_document<>& doc)
 	{
 		rapidxml::xml_node<>* opensmoke_node = doc.first_node("opensmoke");
 		rapidxml::xml_node<>* number_of_species_node = opensmoke_node->first_node("NumberOfSpecies");
@@ -433,12 +411,11 @@ namespace OpenSMOKE
 		}
 		catch(...)
 		{
-			ErrorMessage("KineticsMap_Solid_CHEMKIN<map>::ImportSpeciesFromXMLFile", "Error in reading the number of species.");
+			ErrorMessage("KineticsMap_Solid_CHEMKIN::ImportSpeciesFromXMLFile", "Error in reading the number of species.");
 		}
 	}
 
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::ReactionEnthalpiesAndEntropies()
+	void KineticsMap_Solid_CHEMKIN::ReactionEnthalpiesAndEntropies()
 	{
 		if (reaction_h_and_s_must_be_recalculated_ == true)
 		{
@@ -449,8 +426,7 @@ namespace OpenSMOKE
 		}
 	}
 
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::KineticConstants()
+	void KineticsMap_Solid_CHEMKIN::KineticConstants()
 	{
                 ReactionEnthalpiesAndEntropies();
                         
@@ -515,8 +491,7 @@ namespace OpenSMOKE
 		kArrheniusModified_ = kArrhenius_;
 	}
 
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::ReactionRates(const OpenSMOKEVectorDouble& cGas, const OpenSMOKEVectorDouble& cSolid)
+	void KineticsMap_Solid_CHEMKIN::ReactionRates(const OpenSMOKEVectorDouble& cGas, const OpenSMOKEVectorDouble& cSolid)
 	{
 		const double cTot = cGas.SumElements();
 		
@@ -572,188 +547,8 @@ namespace OpenSMOKE
 		// vector contains the net reaction rates of all the reactions in [kmol/m3/s]
 		ElementByElementProduct(netReactionRates_, kArrheniusModified_, &netReactionRates_);
 	}
-
-	/*
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::DerivativesOfReactionRatesWithRespectToKineticParameters(const PhysicalConstants::sensitivity_type type, unsigned int jReaction, const OpenSMOKEVectorDouble& c, double& parameter)
-	{
-		const double cTot = c.SumElements();
-
-		// 1. Kinetic constants
-		KineticConstants();
-			
-		// 2. Calculates the three-body corrections
-		ThirdBodyReactions(cTot, c);
-
-		// 3. Correct the effective kinetic constants by three-body coefficients
-		for(unsigned int s=1;s<=number_of_thirdbody_reactions_;s++)
-		{
-			const unsigned int j=indices_of_thirdbody_reactions_[s];
-			kArrheniusModified_[j] *= Meff_[s];
-		}
-
-		// 4. Correct the effective kinetic constants: Fall-off reactions
-		FallOffReactions(cTot, c);
-		for(unsigned int s=1;s<=number_of_falloff_reactions_;s++)
-		{
-			const unsigned int j=indices_of_falloff_reactions_[s];
-			kArrheniusModified_[j] *= correction_falloff_[s];
-		}
-
-		// 5. Correct the effective kinetic constants: CABR reactions
-		ChemicallyActivatedBimolecularReactions(cTot, c);
-		for(unsigned int s=1;s<=number_of_cabr_reactions_;s++)
-		{
-			const unsigned int j=indices_of_cabr_reactions_[s];
-			kArrheniusModified_[j] *= correction_cabr_[s];
-		}
-
-		if (type == PhysicalConstants::SENSITIVITY_KINETIC_CONSTANT)
-		{
-			parameter = kArrheniusModified_[jReaction];
-			kArrheniusModified_ = 0.;
-			kArrheniusModified_[jReaction] = 1.;
-		}
-		else if (type == PhysicalConstants::SENSITIVITY_FREQUENCY_FACTOR)
-		{
-			if (jReaction <= this->number_of_reactions_)
-			{
-				const double tmp = kArrheniusModified_[jReaction];
-				kArrheniusModified_ = 0.;
-				kArrheniusModified_[jReaction] = tmp;
-				parameter =  std::exp(lnA_[jReaction]);
-
-				if (type_of_reaction_[jReaction] == PhysicalConstants::REACTION_LINDEMANN_FALLOFF || 
-					type_of_reaction_[jReaction] == PhysicalConstants::REACTION_TROE_FALLOFF ||
-					type_of_reaction_[jReaction] == PhysicalConstants::REACTION_SRI_FALLOFF)
-				{
-					unsigned int jFallOff = local_family_index_[jReaction];
-					double	kInf = std::exp(lnA_falloff_inf_[jFallOff] + Beta_falloff_inf_[jFallOff]*this->logT_ - E_over_R_falloff_inf_[jFallOff]*this->uT_);
-					double F, dF_over_dA0, dF_over_dAInf;this->
-					FallOffReactions(jFallOff, cTot, c, F, dF_over_dA0, dF_over_dAInf);
-
-					kArrheniusModified_[jReaction] = kArrheniusModified_[jReaction] / std::exp(lnA_[jReaction]) * (1.-kArrheniusModified_[jReaction]/kInf/F) +
-											 kArrheniusModified_[jReaction]/F*dF_over_dA0;			
-				}
-				else if (type_of_reaction_[jReaction] == PhysicalConstants::REACTION_LINDEMANN_CABR || 
-						 type_of_reaction_[jReaction] == PhysicalConstants::REACTION_TROE_CABR ||
-						 type_of_reaction_[jReaction] == PhysicalConstants::REACTION_SRI_CABR)
-				{
-					unsigned int jCABR = local_family_index_[jReaction];
-					double	k0   = std::exp(lnA_[jReaction] + Beta_[jReaction]*this->logT_ - E_over_R_[jReaction]*this->uT_);
-
-					double F, dF_over_dA0, dF_over_dAInf;
-					ChemicallyActivatedBimolecularReactions(jCABR, cTot, c, F, dF_over_dA0, dF_over_dAInf);
-					kArrheniusModified_[jReaction] = kArrheniusModified_[jReaction]*kArrheniusModified_[jReaction] / std::exp(lnA_[jReaction])/k0/F +
-											 kArrheniusModified_[jReaction]/F*dF_over_dA0;
-				}
-				else if (type_of_reaction_[jReaction] == PhysicalConstants::REACTION_CHEBYSHEV)
-				{
-					parameter = kArrheniusModified_[jReaction];
-					kArrheniusModified_[jReaction] = 1.;
-				}
-				else
-				{
-					kArrheniusModified_[jReaction] = kArrheniusModified_[jReaction] / std::exp(lnA_[jReaction]);
-				}
-			}
-
-			else 
-			{
-				// Fall-off reaction
-				if (jReaction <= this->number_of_reactions_ + number_of_falloff_reactions_)
-				{
-					unsigned int jFallOff = jReaction - this->number_of_reactions_;
-					unsigned int index_global = indices_of_falloff_reactions_[jFallOff];
-					const double tmp = kArrheniusModified_[index_global];
-					kArrheniusModified_ = 0.;
-					kArrheniusModified_[index_global] = tmp;
-					parameter =  std::exp(lnA_falloff_inf_[jFallOff]);
-
-					double	kInf = std::exp(lnA_falloff_inf_[jFallOff] + Beta_falloff_inf_[jFallOff]*this->logT_ - E_over_R_falloff_inf_[jFallOff]*this->uT_);
-					double F, dF_over_dA0, dF_over_dAInf;
-					FallOffReactions(jFallOff, cTot, c, F, dF_over_dA0, dF_over_dAInf);
-
-					kArrheniusModified_[index_global] = kArrheniusModified_[index_global] / F * 
-											    ( kArrheniusModified_[index_global]/std::exp(lnA_falloff_inf_[jFallOff])/kInf + dF_over_dAInf);		
-				}
-				// CABR reactions
-				else if (jReaction <= this->number_of_reactions_ + number_of_falloff_reactions_ +  number_of_cabr_reactions_)
-				{
-					unsigned int jCABR = jReaction - this->number_of_reactions_ - number_of_falloff_reactions_;
-					unsigned int index_global = indices_of_cabr_reactions_[jCABR];
-					const double tmp = kArrheniusModified_[index_global];
-					kArrheniusModified_ = 0.;
-					kArrheniusModified_[index_global] = tmp;
-					parameter =  std::exp(lnA_falloff_inf_[jCABR]);
-
-					double	k0   = std::exp(lnA_[index_global] + Beta_[index_global]*this->logT_ - E_over_R_[index_global]*this->uT_);
-
-					double F, dF_over_dA0, dF_over_dAInf;
-					ChemicallyActivatedBimolecularReactions(jCABR, cTot, c, F, dF_over_dA0, dF_over_dAInf);
-					kArrheniusModified_[index_global] = kArrheniusModified_[index_global] / F * 
-											    ( kArrheniusModified_[index_global]/std::exp(lnA_cabr_inf_[jCABR])/k0 + dF_over_dAInf);	
-				}
-			}
-		}
-
-
-		// Calculates the product of conenctrations (for forward and reverse reactions)
-		// Be careful: the reverseReactionRates_ vector is defined for all the reactions
-		// in the kinetic scheme, not only for the reversible reactions. After calling the
-		// function reported below the value of reverseReactionRates_ vector for non reversible
-		// reactions is put equal to 1.
-		stoichiometry_->ProductOfConcentrations(forwardReactionRates_, reverseReactionRates_, c);
-		
-		// Corrects the product of concentrations for reverse reaction by the 
-		// thermodynamic equilibrium constant
-		for(unsigned int k=1;k<=number_of_thermodynamic_reversible_reactions_;k++)
-		{
-			unsigned int j = indices_of_thermodynamic_reversible_reactions_[k];
-			reverseReactionRates_[j] *= uKeq_[k];
-		}
-
-		// Corrects the product of concentrations for reverse reaction by the 
-		// explicit Arrhenius kinetic parameters (if provided)
-//		for(unsigned int k=1;k<=number_of_explicitly_reversible_reactions_;k++)
-//		{
-//			unsigned int j = indices_of_explicitly_reversible_reactions_[k];
-		//	reverseReactionRates_[j] *= kArrhenius_reversible_[k]/kArrheniusModified_[j];
-//			if (j==jReaction)
-//				reverseReactionRates_[j] *= kArrhenius_reversible_[k]/parameter;
-//			else
-//				reverseReactionRates_[j] = 0.;
-//		}
-
-		for(unsigned int k=1;k<=number_of_explicitly_reversible_reactions_;k++)
-		{
-			unsigned int j = indices_of_explicitly_reversible_reactions_[k];
-			if (j==jReaction)
-				reverseReactionRates_[j] *= kArrhenius_reversible_[k]/kArrhenius_[j];
-			else
-				reverseReactionRates_[j] = 0.;
-		}
-
-		// Calculates the net reaction rate
-		// Be careful: the netReactionRates_ vector must be multiplied by the effective 
-		// forward kinetic constant, to obtain the real reaction rates in [kmol/m3/s]
-		netReactionRates_ = forwardReactionRates_;
-		for(unsigned int k=1;k<=number_of_reversible_reactions_;k++)
-		{
-			unsigned int j = indices_of_reversible_reactions_[k];
-			netReactionRates_[j] -= reverseReactionRates_[j];
-
-		}
-
-		// Multiplies the net reaction rate by the effective kinetic constant (accounting for 
-		// third-body effects, fall-off, etc.). At the end of this function the netReactionRates_
-		// vector contains the net reaction rates of all the reactions in [kmol/m3/s]
-		ElementByElementProduct(netReactionRates_, kArrheniusModified_, &netReactionRates_);
-	}
-	*/
-
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::FormationRates(OpenSMOKEVectorDouble* Rgas, OpenSMOKEVectorDouble* Rsolid)
+ 
+	void KineticsMap_Solid_CHEMKIN::FormationRates(OpenSMOKEVectorDouble* Rgas, OpenSMOKEVectorDouble* Rsolid)
 	{
 		OpenSMOKE::OpenSMOKEVectorDouble R(thermodynamics_.NumberOfSpecies());
 		stoichiometry_->FormationRatesFromReactionRates(&R, netReactionRates_);
@@ -765,9 +560,8 @@ namespace OpenSMOKE
 		for(unsigned int j=1;j<=thermodynamics_.number_of_solid_species();j++)
 			(*Rsolid)[j] = R[count++];
 	}
-
-	template<typename map> 
-	double KineticsMap_Solid_CHEMKIN<map>::HeatRelease(const OpenSMOKEVectorDouble& Rgas, const OpenSMOKEVectorDouble& RSolid)
+ 
+	double KineticsMap_Solid_CHEMKIN::HeatRelease(const OpenSMOKEVectorDouble& Rgas, const OpenSMOKEVectorDouble& RSolid)
 	{
 		unsigned int k = 1;
 		for(int j=1;j<=Rgas.Size();j++)
@@ -775,131 +569,30 @@ namespace OpenSMOKE
 		for(int j=1;j<=RSolid.Size();j++)
 			aux_vector_[k++] = RSolid[j];
 
-	//	std::cout << "Gas " << std::endl;
-	//	for(int j=1;j<=Rgas.Size();j++)
-	//	std::cout << j << " " << Rgas[j] << std::endl;
-	//	std::cout << "Solid " << std::endl;
-	//	for(int j=1;j<=RSolid.Size();j++)
-	//	std::cout << j << " " << RSolid[j] << std::endl;
-	//	getchar();
 		return -Dot(aux_vector_, thermodynamics_.species_h_over_RT()) * PhysicalConstants::R_J_kmol * this->T_;
 	}
 
-	/*
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::SensitivityWithRespectKineticParameter(const PhysicalConstants::sensitivity_type type, const unsigned int k, const OpenSMOKEVectorDouble& c, OpenSMOKEVectorDouble* Jalfa, double& parameter)
-	{
-		DerivativesOfReactionRatesWithRespectToKineticParameters(type, k, c, parameter);
-		stoichiometry_->FormationRatesFromReactionRates(Jalfa, netReactionRates_);
-	}
-	*/
-
-	/*
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::SensitivityWithRespectKineticParameter(const PhysicalConstants::sensitivity_type type, const EnergyEquationType energy_type, const unsigned int k, const OpenSMOKEVectorDouble& c, const OpenSMOKEVectorDouble& mole_fractions, OpenSMOKEVectorDouble* Jalfa, double& JT, double& parameter)
-	{
-		DerivativesOfReactionRatesWithRespectToKineticParameters(type, k, c, parameter);
-		stoichiometry_->FormationRatesFromReactionRates(Jalfa, netReactionRates_);
-		
-		JT  = HeatRelease(*Jalfa);
-		if (energy_type == CONSTANT_VOLUME_SYSTEM)
-		{
-			double sumMoleFormationRates = (*Jalfa).SumElements();
-			JT  += PhysicalConstants::R_J_kmol*this->T_*sumMoleFormationRates;
-		}	
-		if (energy_type == PLUGFLOW_SYSTEM)
-		{
-			// TODO
-			//double sumMoleFormationRates = (*Jalfa).SumElements();
-		}	
-	}
-	*/
-
-	/*
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::SensitivityWithRespectKineticParameter(const PhysicalConstants::sensitivity_type type, const EnergyEquationType energy_type, const unsigned int k, const OpenSMOKEVectorDouble& c, const OpenSMOKEVectorDouble& mole_fractions, OpenSMOKEVectorDouble* Jalfa, double& JT, double& Jrho, double& parameter)
-	{
-		DerivativesOfReactionRatesWithRespectToKineticParameters(type, k, c, parameter);
-		stoichiometry_->FormationRatesFromReactionRates(Jalfa, netReactionRates_);
-		
-		double CpMixMolar;
-		thermodynamics_.cpMolar_Mixture_From_MoleFractions(CpMixMolar, mole_fractions);
-		
-		const double dQR_over_parameter = HeatRelease(*Jalfa);
-		double sumMoleFormationRates = (*Jalfa).SumElements();
-		JT    =  dQR_over_parameter;
-		Jrho  = - (dQR_over_parameter/CpMixMolar + this->T_*sumMoleFormationRates);
-	}
-	*/
-
-	/*
-	// This version seems to be wrong
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::ProductionAndDestructionRatesGross(OpenSMOKEVectorDouble* P, OpenSMOKEVectorDouble* D)
-	{
-		OpenSMOKEVectorDouble forward_(this->number_of_reactions_);
-		OpenSMOKEVectorDouble backward_(this->number_of_reactions_);
-
-		GetForwardReactionRates(&forward_);
-		GetBackwardReactionRates(&backward_);
-
-		stoichiometry_->ProductionAndDestructionRatesFromReactionRatesGross(P, D, forward_, backward_);
-	}
-	*/
-
-	
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::ProductionAndDestructionRates(OpenSMOKEVectorDouble* P, OpenSMOKEVectorDouble* D)
+	void KineticsMap_Solid_CHEMKIN::ProductionAndDestructionRates(OpenSMOKEVectorDouble* P, OpenSMOKEVectorDouble* D)
 	{
 		stoichiometry_->ProductionAndDestructionRatesFromReactionRates(P, D, netReactionRates_);
 	}
 	
-
-	/*
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::RateOfProductionAnalysis(const bool iNormalize) const
-	{
-		stoichiometry_->RateOfProductionAnalysis(netReactionRates_, iNormalize);
-	}
-	*/
-	/*
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::RateOfProductionAnalysis(std::ostream& fout) const
-	{
-		stoichiometry_->RateOfProductionAnalysis(netReactionRates_, false);
-		stoichiometry_->WriteRateOfProductionAnalysis(fout);
-	}
-	*/
-
-	/*
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::RateOfProductionAnalysis(ROPA_Data& ropa) const
-	{
-		stoichiometry_->RateOfProductionAnalysis(netReactionRates_, false);
-		stoichiometry_->WriteRateOfProductionAnalysis(ropa);
-	}
-	*/
-
-	template<typename map> 
-	const OpenSMOKEVectorDouble& KineticsMap_Solid_CHEMKIN<map>::GetReactionRates()
+	const OpenSMOKEVectorDouble& KineticsMap_Solid_CHEMKIN::GetReactionRates()
 	{
 		return netReactionRates_;
 	}
 
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::GetReactionRates(OpenSMOKEVectorDouble* r)
+	void KineticsMap_Solid_CHEMKIN::GetReactionRates(OpenSMOKEVectorDouble* r)
 	{
 		*r = netReactionRates_;
 	}
 
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::GetForwardReactionRates(OpenSMOKEVectorDouble* r)
+	void KineticsMap_Solid_CHEMKIN::GetForwardReactionRates(OpenSMOKEVectorDouble* r)
 	{
 		ElementByElementProduct(forwardReactionRates_, kArrheniusModified_, r);
 	}
-
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::GetBackwardReactionRates(OpenSMOKEVectorDouble* r)
+ 
+	void KineticsMap_Solid_CHEMKIN::GetBackwardReactionRates(OpenSMOKEVectorDouble* r)
 	{
 		*r = 0.;
 		for(unsigned int k=1;k<=number_of_reversible_reactions_;k++)
@@ -914,8 +607,7 @@ namespace OpenSMOKE
 		}                
 	}
 
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::WriteKineticData(std::ostream& fOut, const unsigned int k)
+	void KineticsMap_Solid_CHEMKIN::WriteKineticData(std::ostream& fOut, const unsigned int k)
 	{			
 		thermodynamics_.SetPressure(101325.);
 		thermodynamics_.SetTemperature(298.15);
@@ -927,161 +619,18 @@ namespace OpenSMOKE
 		fOut    << std::setw(14) << std::left << std::setprecision(3) << std::fixed << reaction_h_over_RT_[k] *PhysicalConstants::R_kcal_mol*this->T_;;						// [kcal/mol]
 		fOut    << std::setw(14) << std::left << std::setprecision(3) << std::fixed << reaction_s_over_R_[k] *PhysicalConstants::R_cal_mol;;							// [cal/mol/K]
 	}
-
-
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::WriteKineticData(std::ostream& fOut, const unsigned int k, OpenSMOKEVectorDouble& c_bath, const double conversion_forward, const double conversion_backward)
+ 
+	void KineticsMap_Solid_CHEMKIN::WriteKineticData(std::ostream& fOut, const unsigned int k, OpenSMOKEVectorDouble& c_bath, const double conversion_forward, const double conversion_backward)
 	{			
-		const double patm = 101325.;
-		SetPressure(patm);
-		thermodynamics_.SetPressure(patm);
-	
-		OpenSMOKEVectorDouble temperatures(5); 
-		temperatures[1] = 300.;
-		temperatures[2] = 1000.;
-		temperatures[3] = 1500.;
-		temperatures[4] = 2000.;
-		temperatures[5] = 2500.;
-
-		fOut << " -------------------------------------------------------------------------------------------------------------------------------" << std::endl;
-		fOut << "    Temperature   kF            Keq           kR            DG            DH            DS            kF            kR" << std::endl;          
-		fOut << "    [K]           [kmol,m3,s]   [-]           [kmol,m3,s]   [kcal/mol]    [kcal/mol]    [cal/mol/K]   [mol,cm3,s]   [mol,cm3,s]" << std::endl;        
-		fOut << " -------------------------------------------------------------------------------------------------------------------------------" << std::endl;
-
-		for(int i=1;i<=temperatures.Size();i++)
-		{
-			SetTemperature(temperatures[i]);
-			thermodynamics_.SetTemperature(temperatures[i]);
-
-			KineticConstants();
-			ReactionRates(c_bath);
-
-			// Temperature
-			fOut << "    " << std::setw(14) << std::left << std::setprecision(0) << std::fixed << temperatures[i];
-			
-			// Forward kinetic constant [kmol, m3, s]
-			fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << kArrheniusModified_[k];
-
-			// Equilibrium and Backward kinetic constant [kmol, m3, s]
-			if (isThermodynamicallyReversible_[k] != 0)
-			{
-				const unsigned int j = isThermodynamicallyReversible_[k];
-				fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << 1./uKeq_[j];
-				fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << kArrheniusModified_[k]*uKeq_[j];
-			}
-			else if (isExplicitlyReversible_[k] != 0)
-			{
-				const unsigned int j = isExplicitlyReversible_[k];
-				fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << kArrheniusModified_[k]/kArrhenius_reversible_[j];
-				fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << kArrhenius_reversible_[j];
-			}
-			else
-			{
-				fOut << std::setw(14) << std::left << std::setprecision(0) << std::fixed << 0.;
-				fOut << std::setw(14) << std::left << std::setprecision(0) << std::fixed << 0.;
-			}
-
-			// Thermodynamic data
-			fOut    << std::setw(14) << std::left << std::setprecision(3) << std::fixed << (reaction_h_over_RT_[k]-reaction_s_over_R_[k])*PhysicalConstants::R_kcal_mol*this->T_;	// [kcal/mol]
-			fOut    << std::setw(14) << std::left << std::setprecision(3) << std::fixed << reaction_h_over_RT_[k] *PhysicalConstants::R_kcal_mol*this->T_;;						// [kcal/mol]
-			fOut    << std::setw(14) << std::left << std::setprecision(3) << std::fixed << reaction_s_over_R_[k] *PhysicalConstants::R_cal_mol;;							// [cal/mol/K]
-
-			// Forward kinetic constant [mol, cm3, s]
-			fOut    << std::setw(14) << std::left << std::setprecision(4) << std::scientific << kArrheniusModified_[k]*conversion_forward;
-
-			// Equilibrium and Backward kinetic constant [mol, cm3, s]
-			if (isThermodynamicallyReversible_[k] != 0)
-			{
-				const unsigned int j = isThermodynamicallyReversible_[k];
-				fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << kArrheniusModified_[k]*uKeq_[j]*conversion_backward;
-			}
-			else if (isExplicitlyReversible_[k] != 0)
-			{
-				const unsigned int j = isExplicitlyReversible_[k];
-				fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << kArrhenius_reversible_[j]*conversion_backward;
-			}
-			else
-			{
-				fOut << std::setw(14) << std::left << std::setprecision(0) << std::fixed << 0.;
-			}
-
-			fOut    << std::endl;
-		}
-		fOut << " -------------------------------------------------------------------------------------------------------------------------------" << std::endl;
-		fOut << std::endl;
+		// TODO
 	}
 
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::FittedReverseKineticConstants(OpenSMOKEVectorDouble& x_bath, const unsigned int nparameters, Eigen::MatrixXd& fittedKineticParameters)
+	void KineticsMap_Solid_CHEMKIN::FittedReverseKineticConstants(OpenSMOKEVectorDouble& x_bath, const unsigned int nparameters, Eigen::MatrixXd& fittedKineticParameters)
 	{			
-		unsigned int npoints = 11;
-		OpenSMOKEVectorDouble temperatures(npoints); 
-		
-		temperatures[1] = 300.;		temperatures[2] = 600.;		temperatures[3] = 900.;		temperatures[4] = 1100.;
-		temperatures[5] = 1300.;	temperatures[6] = 1500.;	temperatures[7] = 1700.;	temperatures[8] = 1900.;
-		temperatures[9] = 2100.;    temperatures[10] = 2300.;   temperatures[11] = 2500.;
-		OpenSMOKEVectorDouble c(x_bath.Size()); 
-
-		Eigen::MatrixXd XTX(nparameters, nparameters);
-		Eigen::MatrixXd XT(nparameters, npoints);
-
-		std::cout << "   assembling X and XT matrices..." << std::endl;
-		{
-			// Assembling X and XT Matrices
-			Eigen::MatrixXd X(npoints, nparameters);
-		
-			for(int i=0;i<temperatures.Size();i++)
-			{
-				const double T = temperatures[i+1];
-
-				X(i,0) = 1.;
-				X(i,1) = -1. / PhysicalConstants::R_J_kmol / T;
-
-				if (nparameters == 3)
-					X(i,2) = log(T);
-			}
-
-			XT = X.transpose();
-			XTX=XT*X;
-		}
-
-		const double patm = 101325.;
-		SetPressure(patm);
-		thermodynamics_.SetPressure(patm);
-
-		Eigen::MatrixXd y(npoints, number_of_thermodynamic_reversible_reactions_);
-		Eigen::MatrixXd Y(nparameters, number_of_thermodynamic_reversible_reactions_);
-
-		std::cout << "   evaluating the reaction rates..." << std::endl;
-		for(int i=1;i<=temperatures.Size();i++)
-		{
-			const double ctot = patm/PhysicalConstants::R_J_kmol/temperatures[i];
-			Product(ctot, x_bath, &c);
-
-			SetTemperature(temperatures[i]);
-			thermodynamics_.SetTemperature(temperatures[i]);
-
-			KineticConstants();
-			ReactionRates(c);
-
-			for (unsigned int k=1;k<=this->number_of_reactions_;k++)
-			{
-				if (isThermodynamicallyReversible_[k] != 0)
-				{
-					const unsigned int j = isThermodynamicallyReversible_[k];
-					y(i-1,j-1) = log(kArrheniusModified_[k]*uKeq_[j]);
-				}
-			}
-		}
-
-		Y=XT*y;
-
-		std::cout << "   solving the linear regressions..." << std::endl;
-		fittedKineticParameters = XTX.partialPivLu().solve(Y);
+		// TODO
 	}
 
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::FittedReverseKineticConstants(const unsigned int k, std::ostream& fOut, Eigen::MatrixXd& fittedKineticParameters)
+	void KineticsMap_Solid_CHEMKIN::FittedReverseKineticConstants(const unsigned int k, std::ostream& fOut, Eigen::MatrixXd& fittedKineticParameters)
 	{
 		if (isThermodynamicallyReversible_[k] != 0)
 		{
@@ -1105,255 +654,5 @@ namespace OpenSMOKE
 			fOut << std::setw(5)  << "";
 		}
 	}
-
-	/*
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::DerivativesOfFormationRates(const OpenSMOKEVectorDouble& c, const OpenSMOKEVectorDouble& omega, OpenSMOKEMatrixDouble* dR_over_domega)
-	{
-		OpenSMOKE::OpenSMOKEMatrixDouble dc_over_domega(this->number_of_species_, this->number_of_species_);
-		OpenSMOKE::OpenSMOKEMatrixDouble dR_over_dc(this->number_of_species_, this->number_of_species_);
-
-		double MW;
-		thermodynamics_.MolecularWeight_From_MassFractions(MW, omega);
-		double cTot = c.SumElements();
-
-		thermodynamics_.DerivativesOfConcentrationsWithRespectToMassFractions(cTot, MW, omega, &dc_over_domega);
-		DerivativesOfFormationRates(c, &dR_over_dc);
-
-		for(unsigned int k=1;k<=this->number_of_species_;k++)
-		{
-			for(unsigned int i=1;i<=this->number_of_species_;i++)
-			{
-				double sum = 0.;
-				for(unsigned int j=1;j<=this->number_of_species_;j++)
-					sum += dR_over_dc[k][j] * dc_over_domega[j][i];
-				(*dR_over_domega)[k][i] = sum;
-			}
-		}
-	}
-	*/
-	/*
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::Derivatives(const OpenSMOKEVectorDouble& c, const OpenSMOKEVectorDouble& omega, OpenSMOKEMatrixDouble* derivatives)
-	{
-		OpenSMOKE::OpenSMOKEMatrixDouble dc_over_domega(this->number_of_species_, this->number_of_species_);
-		OpenSMOKE::OpenSMOKEMatrixDouble derivatives_over_dc(this->number_of_species_+1, this->number_of_species_+1);
-
-		double MW;
-		thermodynamics_.MolecularWeight_From_MassFractions(MW, omega);
-		double cTot = c.SumElements();
-
-		thermodynamics_.DerivativesOfConcentrationsWithRespectToMassFractions(cTot, MW, omega, &dc_over_domega);
-		Derivatives(c, &derivatives_over_dc);
-
-		for(unsigned int k=1;k<=this->number_of_species_;k++)
-		{
-			for(unsigned int i=1;i<=this->number_of_species_;i++)
-			{
-				double sum = 0.;
-				for(unsigned int j=1;j<=this->number_of_species_;j++)
-					sum += derivatives_over_dc[k][j] * dc_over_domega[j][i];
-				(*derivatives)[k][i] = sum;
-			}
-		}
-
-		for(unsigned int i=1;i<=this->number_of_species_;i++)
-		{
-			double sum = 0.;
-			for(unsigned int j=1;j<=this->number_of_species_;j++)
-				sum += derivatives_over_dc[this->number_of_species_+1][j] * dc_over_domega[j][i];
-			(*derivatives)[this->number_of_species_+1][i] = sum;
-		}
-
-		for(unsigned int i=1;i<=this->number_of_species_+1;i++)
-			(*derivatives)[i][this->number_of_species_+1] = derivatives_over_dc[i][this->number_of_species_+1];
-	}
-	*/
-	/*
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::DerivativesOfFormationRates(const OpenSMOKEVectorDouble& c, OpenSMOKEMatrixDouble* dR_over_dC)
-	{
-		const double ZERO_DER = sqrt(OPENSMOKE_TINY_FLOAT);
-		const double ETA2 = sqrt(OPENSMOKE_MACH_EPS_DOUBLE);			
-		const double TOLR = 100. * OPENSMOKE_MACH_EPS_FLOAT;
-		const double TOLA = 1.e-10;
-		
-		OpenSMOKEVectorDouble c_plus = c;
-		OpenSMOKEVectorDouble R_original(this->number_of_species_);
-		OpenSMOKEVectorDouble R_plus(this->number_of_species_);
-
-		// Calculates centered values
-		ReactionRates(c);
-		FormationRates(&R_original);
-
-		// derivata rispetto a ckd
-		for(unsigned int kd=1;kd<=this->number_of_species_;kd++)
-		{
-			if(c[kd] <= 1.e-100)
-			{
-				double dc = 1.e-10 + 1.e-12 * c_plus[kd];
-				double udc = 3.e-8 * Max(c_plus[kd],1./dc);
-				udc = std::max(udc,1./dc);
-				udc = std::max(udc,1.e-19);
-				dc = std::min(udc, 0.001 + 0.001*c_plus[kd]);
-				c_plus[kd] += dc;
-				udc = 1./dc;
-
-				ReactionRates(c_plus);
-				FormationRates(&R_plus);
-
-				for(unsigned int j=1;j<=this->number_of_species_;j++)
-					(*dR_over_dC)[j][kd] = (R_plus[j]-R_original[j]) * udc;
-
-				c_plus[kd] = c[kd];
-			}
-			else
-			{
-				double hf = 1.e0;
-				double error_weight = 1./(TOLA+TOLR*std::fabs(c[kd]));
-				double hJ = ETA2 * std::fabs(std::max(c[kd], 1./error_weight));
-				double hJf = hf/error_weight;
-				hJ = std::max(hJ, hJf);
-				hJ = std::max(hJ, ZERO_DER);
-
-				// This is what is done by BzzMath
-				double dc = std::min(hJ, 1.e-3 + 1e-3*std::fabs(c[kd]));
-
-				// Thisis what is done in the KPP
-				//double dc = TOLR*c[kd];
-
-				double udc = 1. / dc;
-				c_plus[kd] += dc;
-
-				ReactionRates(c_plus);
-				FormationRates(&R_plus);
-
-				for(unsigned int j=1;j<=this->number_of_species_;j++)
-					(*dR_over_dC)[j][kd] = (R_plus[j]-R_original[j]) * udc;
-
-				c_plus[kd] = c[kd];
-			}
-		}
-	}
-	*/
-	/*
-	template<typename map> 
-	void KineticsMap_Solid_CHEMKIN<map>::Derivatives(const OpenSMOKEVectorDouble& c, OpenSMOKEMatrixDouble* derivatives, const bool constant_density)
-	{
-		const double ZERO_DER = sqrt(OPENSMOKE_TINY_FLOAT);
-		const double ETA2 = sqrt(OPENSMOKE_MACH_EPS_DOUBLE);			
-		const double TOLR = 100. * OPENSMOKE_MACH_EPS_FLOAT;
-		const double TOLA = 1.e-10;
-	
-		OpenSMOKEVectorDouble c_plus = c;
-		OpenSMOKEVectorDouble R_original(this->number_of_species_);
-		OpenSMOKEVectorDouble R_plus(this->number_of_species_);
-		double Q_original;
-
-		SetTemperature(this->T_);
-		SetPressure(this->P_);
-		thermodynamics_.SetTemperature(this->T_);
-		thermodynamics_.SetPressure(this->P_);
-
-		KineticConstants();
-
-		// Calculates centered values
-		ReactionRates(c);
-		FormationRates(&R_original);
-		Q_original = HeatRelease(R_original);
-
-		// derivata rispetto a ckd
-		for(unsigned int kd=1;kd<=this->number_of_species_;kd++)
-		{
-			if(c[kd] <= 1.e-100)
-			{
-				double dc = 1.e-10 + 1.e-12 * c_plus[kd];
-				double udc = 3.e-8 * std::max(c_plus[kd],1./dc);
-				udc = std::max(udc,1./dc);
-				udc = std::max(udc,1.e-19);
-				dc = std::min(udc, 0.001 + 0.001*c_plus[kd]);
-				c_plus[kd] += dc;
-				udc = 1./dc;
-
-				ReactionRates(c_plus);
-				FormationRates(&R_plus);
-				double Q_plus = HeatRelease(R_plus);
-
-				for(unsigned int j=1;j<=this->number_of_species_;j++)
-					(*derivatives)[j][kd] = (R_plus[j]-R_original[j]) * udc;
-				(*derivatives)[this->number_of_species_+1][kd] = (Q_plus-Q_original) * udc;
-
-				c_plus[kd] = c[kd];
-			}
-			else
-			{
-				double hf = 1.e0;
-				double error_weight = 1./(TOLA+TOLR*std::fabs(c[kd]));
-				double hJ = ETA2 * std::fabs(std::max(c[kd], 1./error_weight));
-				double hJf = hf/error_weight;
-				hJ = std::max(hJ, hJf);
-				hJ = std::max(hJ, ZERO_DER);
-
-				// This is what is done by BzzMath
-				double dc = std::min(hJ, 1.e-3 + 1e-3*std::fabs(c[kd]));
-
-				// Thisis what is done in the KPP
-				//double dc = TOLR*c[kd];
-				
-				double udc = 1. / dc;
-				c_plus[kd] += dc;
-				ReactionRates(c_plus);
-				FormationRates(&R_plus);
-				double Q_plus = HeatRelease(R_plus);
-
-				for(unsigned int j=1;j<=this->number_of_species_;j++)
-					(*derivatives)[j][kd] = (R_plus[j]-R_original[j]) * udc;
-				(*derivatives)[this->number_of_species_+1][kd] = (Q_plus-Q_original) * udc;
-
-				c_plus[kd] = c[kd];
-			}
-		}
-
-		// Derivatives with respect to the temperature
-		{
-			double dT = TOLR*this->T_;
-			double T_plus = this->T_+dT;
-			double udT = 1. / dT;
-
-			SetTemperature(T_plus);
-			SetPressure(this->P_);
-			thermodynamics_.SetTemperature(T_plus);
-			thermodynamics_.SetPressure(this->P_);
-
-			KineticConstants();
-
-			ReactionRates(c);
-			FormationRates(&R_plus);
-			double Q_plus = HeatRelease(R_plus);
-
-			for(unsigned int j=1;j<=this->number_of_species_;j++)
-				(*derivatives)[j][this->number_of_species_+1] = (R_plus[j]-R_original[j]) * udT;
-			(*derivatives)[this->number_of_species_+1][this->number_of_species_+1] = (Q_plus-Q_original) * udT;
-		}
-
-		// If density is constant, this correction has to be skipped
-		if (constant_density == false)
-		{
-			SetTemperature(this->T_);
-			SetPressure(this->P_);
-			thermodynamics_.SetTemperature(this->T_);
-			thermodynamics_.SetPressure(this->P_);
-
-			unsigned int index_T = this->number_of_species_+1;
-			for(unsigned int k=1;k<=this->number_of_species_+1;k++)
-			{
-				double sum = 0.;
-				for(unsigned int j=1;j<=this->number_of_species_;j++)
-					sum += c[j]/this->T_ * (*derivatives)[k][j];
-				(*derivatives)[k][index_T] -= sum;
-			}
-		}
-	}
-	*/
 }
 

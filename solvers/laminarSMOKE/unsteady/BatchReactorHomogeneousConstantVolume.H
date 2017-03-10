@@ -45,8 +45,8 @@ class BatchReactorHomogeneousConstantVolume
 {
 public:
 
-	BatchReactorHomogeneousConstantVolume(	OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermodynamicsMap, 
-					OpenSMOKE::KineticsMap_CHEMKIN<double>& kineticsMap);
+	BatchReactorHomogeneousConstantVolume(	OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMap, 
+					OpenSMOKE::KineticsMap_CHEMKIN& kineticsMap);
 
 	void SetReactor( const double V0, const double P0, const double rho0);
 	void SetTemperature( const double T, double* y);
@@ -82,8 +82,8 @@ private:
 	unsigned int NC_;
 	unsigned int NE_;
 
-	OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>&	thermodynamicsMap_;		//!< thermodynamic map
-	OpenSMOKE::KineticsMap_CHEMKIN<double>&		kineticsMap_;			//!< kinetic map
+	OpenSMOKE::ThermodynamicsMap_CHEMKIN&	thermodynamicsMap_;		//!< thermodynamic map
+	OpenSMOKE::KineticsMap_CHEMKIN&		kineticsMap_;			//!< kinetic map
 
 	OpenSMOKE::OpenSMOKEVectorDouble omega_;
 	OpenSMOKE::OpenSMOKEVectorDouble x_;
@@ -96,8 +96,8 @@ private:
 	double enthalpy_;
 };
 
-BatchReactorHomogeneousConstantVolume::BatchReactorHomogeneousConstantVolume(	OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermodynamicsMap, 
-								OpenSMOKE::KineticsMap_CHEMKIN<double>& kineticsMap):
+BatchReactorHomogeneousConstantVolume::BatchReactorHomogeneousConstantVolume(	OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMap, 
+								OpenSMOKE::KineticsMap_CHEMKIN& kineticsMap):
 	thermodynamicsMap_(thermodynamicsMap), 
 	kineticsMap_(kineticsMap)
 	{

@@ -128,7 +128,7 @@ namespace OpenSMOKE
 		for(unsigned int i=0;i<number_of_keywords_;i++)
 			for(unsigned int j=i+1;j<number_of_keywords_;j++)
 				if ( keywords_[i].name() == keywords_[j].name() )
-					ErrorMessage("The following keyword is defined more than once: " + keywords_[i].name() );
+					FatalErrorMessage("The following keyword is defined more than once: " + keywords_[i].name() );
 
 		// Check the existence of additional keywords
 		CheckExistence();

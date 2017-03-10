@@ -520,11 +520,11 @@ namespace OpenSMOKE
 		std::iota(begin(indices), end(indices), static_cast<size_t>(0));
 		std::sort(begin(indices), end(indices), [&](size_t a, size_t b) { return values[a] > values[b]; });
 
-                #elif __APPLE__
+        #elif __APPLE__
 
-                        ErrorMessage("sort_and_track_indices_decreasing not yet available for MacOSX");
+			ErrorMessage("sort_and_track_indices_decreasing", "sort_and_track_indices_decreasing not yet available for MacOSX");
 
-                #else
+        #else
 
 		struct IdxCompare
 		{
@@ -555,7 +555,7 @@ namespace OpenSMOKE
 
 		#elif __APPLE__
 		
-			ErrorMessage("sort_and_track_indices_increasing not yet available for MacOSX");
+			ErrorMessage("sort_and_track_indices_increasing", "sort_and_track_indices_increasing not yet available for MacOSX");
 	
 		#else
 
@@ -576,13 +576,6 @@ namespace OpenSMOKE
 		return indices;
 	}
 
-	void EM(const std::string msg)
-	{
-		std::cout << msg << std::endl;
-		getchar();
-		exit(OPENSMOKE_FATAL_ERROR_EXIT);
-	}
-
 	template <typename T>
 	void Save(T value, std::ofstream& fOutput, const OpenSMOKE_File_Format fileFormat)
 	{
@@ -593,7 +586,7 @@ namespace OpenSMOKE
 		else if (fileFormat == OPENSMOKE_BINARY_FILE)
 		{
 			if(!fOutput.write( reinterpret_cast < char * > (&value), sizeof(T)))
-				EM("I was unable to write on binary file");
+				ErrorMessage("Save(T value, std::ofstream& fOutput, const OpenSMOKE_File_Format fileFormat)", "I was unable to write on binary file");
 		}
 	}
 
@@ -607,12 +600,9 @@ namespace OpenSMOKE
 		else if (fileFormat == OPENSMOKE_BINARY_FILE)
 		{
 			if(!fInput.read(reinterpret_cast<char *>(value), sizeof(T)))
-				EM("I was unable to read from binary file");
+				ErrorMessage("Load(T* value, std::ifstream& fInput, const OpenSMOKE_File_Format fileFormat)", "I was unable to read from binary file");
 		}
 	}
-
-				// Reading vector size
-			
 
 	template<typename T>
 	void Save(const std::vector<T>& vector, std::ofstream& fOutput, const OpenSMOKE_File_Format fileFormat)
@@ -690,7 +680,7 @@ namespace OpenSMOKE
 			return current_date;
 	}
 
-	//#include "Crypto-SHA256.h"
+	
 	#include<boost/tokenizer.hpp>
 
 	void OpenSMOKE_logo(const std::string application_name, const std::string author_name)
@@ -1196,7 +1186,7 @@ namespace OpenSMOKE
 	{
 		bool isPresent = false;
 
-		for (int i = 0; i < x.size (); i++)
+		for (unsigned int i = 0; i < x.size(); i++)
 		if (x[i] == value)
 		{
 			isPresent = true;
@@ -1257,7 +1247,7 @@ namespace OpenSMOKE
 	{
 		int index = -1;
 		bool iFound = false;
-		for (int i = 0; i < value_list.size (); i++)
+		for (unsigned int i = 0; i < value_list.size (); i++)
 		if (value == value_list[i])
 		{
 			index = i;

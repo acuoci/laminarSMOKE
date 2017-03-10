@@ -47,13 +47,12 @@ namespace OpenSMOKE
 			A class to perform flux analysis
 	*/
 
-	template<typename map> 
 	class FluxAnalysisMap
 	{
 	public:
 
-		FluxAnalysisMap(OpenSMOKE::ThermodynamicsMap_CHEMKIN<map>& thermodynamicsMapXML, 
-					 OpenSMOKE::KineticsMap_CHEMKIN<map>& kineticsMapXML) :
+		FluxAnalysisMap(OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMapXML, 
+					 OpenSMOKE::KineticsMap_CHEMKIN& kineticsMapXML) :
 		thermodynamicsMapXML_(thermodynamicsMapXML), kineticsMapXML_(kineticsMapXML)
 		{
 			NC = thermodynamicsMapXML_.NumberOfSpecies();
@@ -105,8 +104,8 @@ namespace OpenSMOKE
 
 	private:
 
-		OpenSMOKE::ThermodynamicsMap_CHEMKIN<map>&  thermodynamicsMapXML_;
-		OpenSMOKE::KineticsMap_CHEMKIN<map>& kineticsMapXML_;
+		OpenSMOKE::ThermodynamicsMap_CHEMKIN&  thermodynamicsMapXML_;
+		OpenSMOKE::KineticsMap_CHEMKIN& kineticsMapXML_;
 
 		unsigned int NC;
 		unsigned int NR;

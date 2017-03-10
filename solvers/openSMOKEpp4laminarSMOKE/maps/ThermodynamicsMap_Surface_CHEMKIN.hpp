@@ -38,27 +38,21 @@
 
 namespace OpenSMOKE
 {
-	template<typename map> 
-	ThermodynamicsMap_Surface_CHEMKIN<map>::ThermodynamicsMap_Surface_CHEMKIN(const unsigned int nSpecies, const unsigned int nPoints)
+	ThermodynamicsMap_Surface_CHEMKIN::ThermodynamicsMap_Surface_CHEMKIN(const unsigned int nSpecies)
 	{
 		this->nspecies_ = nSpecies;
-		this->npoints_ = nPoints;
 		MemoryAllocation();
 	}
 
-	template<typename map> 
-	ThermodynamicsMap_Surface_CHEMKIN<map>::ThermodynamicsMap_Surface_CHEMKIN(rapidxml::xml_document<>& doc, const unsigned int nPoints)
+	ThermodynamicsMap_Surface_CHEMKIN::ThermodynamicsMap_Surface_CHEMKIN(rapidxml::xml_document<>& doc)
 	{
-		this->npoints_ = nPoints;
-	
 		ImportSpeciesFromXMLFile(doc);
 		this->ImportElementsFromXMLFile(doc);
 		MemoryAllocation();
 		ImportCoefficientsFromXMLFile(doc);
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::MemoryAllocation()
+	void ThermodynamicsMap_Surface_CHEMKIN::MemoryAllocation()
 	{
 		Cp_LT = new double[5*this->nspecies_];	
 		Cp_HT = new double[5*this->nspecies_];
@@ -73,18 +67,17 @@ namespace OpenSMOKE
 		ChangeDimensions(this->nspecies_, &this->MW_, true);
 		ChangeDimensions(this->nspecies_, &this->uMW_, true);
 
-		ChangeDimensions(this->nspecies_*this->npoints_, &species_cp_over_R_, true);
-		ChangeDimensions(this->nspecies_*this->npoints_, &species_h_over_RT_, true);
-		ChangeDimensions(this->nspecies_*this->npoints_, &species_g_over_RT_, true);
-		ChangeDimensions(this->nspecies_*this->npoints_, &species_s_over_R_, true);
+		ChangeDimensions(this->nspecies_, &species_cp_over_R_, true);
+		ChangeDimensions(this->nspecies_, &species_h_over_RT_, true);
+		ChangeDimensions(this->nspecies_, &species_g_over_RT_, true);
+		ChangeDimensions(this->nspecies_, &species_s_over_R_, true);
 
 		cp_must_be_recalculated_ = true;
 		h_must_be_recalculated_ = true;
 		s_must_be_recalculated_ = true;
 	}
-
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::SetTemperature(const map& T)
+ 
+	void ThermodynamicsMap_Surface_CHEMKIN::SetTemperature(const double& T)
 	{
 		this->T_ = T;
 		cp_must_be_recalculated_ = true;
@@ -92,15 +85,12 @@ namespace OpenSMOKE
 		s_must_be_recalculated_ = true;
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::SetPressure(const map& P)
+	void ThermodynamicsMap_Surface_CHEMKIN::SetPressure(const double& P)
 	{
 		this->P_ = P;
 	}
 
-	
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::SetCoefficients(const unsigned k, const double* coefficients)
+	void ThermodynamicsMap_Surface_CHEMKIN::SetCoefficients(const unsigned k, const double* coefficients)
 	{
 		const double one_third = 1./3.;
 
@@ -182,9 +172,8 @@ namespace OpenSMOKE
 		this->MW_[k+1] = coefficients[17];
 		this->uMW_[k+1] = 1./coefficients[17];
 	}
-
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::ImportCoefficientsFromASCIIFile(std::ifstream& fInput)
+ 
+	void ThermodynamicsMap_Surface_CHEMKIN::ImportCoefficientsFromASCIIFile(std::ifstream& fInput)
 	{
 		std::cout << " * Reading thermodynamic coefficients of species..." << std::endl;
 		double coefficients[18];
@@ -195,9 +184,8 @@ namespace OpenSMOKE
 			SetCoefficients(i, coefficients);
 		}
 	}
-
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::ImportSpeciesFromXMLFile(rapidxml::xml_document<>& doc)
+ 
+	void ThermodynamicsMap_Surface_CHEMKIN::ImportSpeciesFromXMLFile(rapidxml::xml_document<>& doc)
 	{
 		// Names of species
 		{
@@ -248,7 +236,7 @@ namespace OpenSMOKE
 			}
 			catch(...)
 			{
-				ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN<map>::ImportSpeciesFromXMLFile", "Error in reading the list of species.");
+				ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN::ImportSpeciesFromXMLFile", "Error in reading the list of species.");
 			}
 		}
 
@@ -390,24 +378,12 @@ namespace OpenSMOKE
 					}
 				}
 
-				/*
-				for(unsigned int j=0;j<matrix_name_site_species_[k].size();j++)
-					for(unsigned int i=0;i<matrix_name_site_species_[k][j].size();i++)
-						std::cout << matrix_name_site_species_[k][j][i] << " " << matrix_occupancy_site_species_[k][j][i] << " " << matrix_index_site_species_[k][j][i] << std::endl;
-
-
-				for(unsigned int j=0;j<matrix_name_bulk_species_[k].size();j++)
-					for(unsigned int i=0;i<matrix_name_bulk_species_[k][j].size();i++)
-						std::cout << matrix_name_bulk_species_[k][j][i] << " " << matrix_density_bulk_species_[k][j][i] << " " << matrix_index_bulk_species_[k][j][i] << std::endl;
-						*/
-
 				k++;
 			}
 		}
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)
+	void ThermodynamicsMap_Surface_CHEMKIN::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)
 	{
 		std::cout << " * Reading thermodynamic coefficients of species from XML file..." << std::endl;
 
@@ -433,38 +409,33 @@ namespace OpenSMOKE
 				}
 			}
 			else
-				ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN<map>::ImportCoefficientsFromXMLFile", "Thermodynamics type not supported!"); 
+				ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN::ImportCoefficientsFromXMLFile", "Thermodynamics type not supported!"); 
 		}
 		else
-			ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN<map>::ImportCoefficientsFromXMLFile", "Thermodynamics tag was not found!");
+			ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN::ImportCoefficientsFromXMLFile", "Thermodynamics tag was not found!");
+	}
+ 
+	inline void ThermodynamicsMap_Surface_CHEMKIN::MolecularWeight_From_MoleFractions(double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+	{
+		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN::MolecularWeight_From_MoleFractions", "Function not available for surface thermodynamics!");
+	}
+ 
+	inline void ThermodynamicsMap_Surface_CHEMKIN::MolecularWeight_From_MassFractions(double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y)
+	{
+		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN::MolecularWeight_From_MassFractions", "Function not available for surface thermodynamics!");
 	}
 
-	template<typename map> 
-	inline void ThermodynamicsMap_Surface_CHEMKIN<map>::MolecularWeight_From_MoleFractions(map& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+	inline void ThermodynamicsMap_Surface_CHEMKIN::MassFractions_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& y, double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
-		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN<map>::MolecularWeight_From_MoleFractions", "Function not available for surface thermodynamics!");
+		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN::MassFractions_From_MoleFractions", "Function not available for surface thermodynamics!");
+	}
+	 
+	inline void ThermodynamicsMap_Surface_CHEMKIN::MoleFractions_From_MassFractions(OpenSMOKE::OpenSMOKEVectorDouble& x, double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y)
+	{
+		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN::MoleFractions_From_MassFractions", "Function not available for surface thermodynamics!");
 	}
 
-	template<typename map> 
-	inline void ThermodynamicsMap_Surface_CHEMKIN<map>::MolecularWeight_From_MassFractions(map& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y)
-	{
-		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN<map>::MolecularWeight_From_MassFractions", "Function not available for surface thermodynamics!");
-	}
-
-	template<typename map> 
-	inline void ThermodynamicsMap_Surface_CHEMKIN<map>::MassFractions_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& y, map& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x)
-	{
-		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN<map>::MassFractions_From_MoleFractions", "Function not available for surface thermodynamics!");
-	}
-	
-	template<typename map> 
-	inline void ThermodynamicsMap_Surface_CHEMKIN<map>::MoleFractions_From_MassFractions(OpenSMOKE::OpenSMOKEVectorDouble& x, map& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y)
-	{
-		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN<map>::MoleFractions_From_MassFractions", "Function not available for surface thermodynamics!");
-	}
-
-	template<> 
-	inline void ThermodynamicsMap_Surface_CHEMKIN<double>::cp_over_R()
+	inline void ThermodynamicsMap_Surface_CHEMKIN::cp_over_R()
 	{
 		if (cp_must_be_recalculated_ == true)
 		{
@@ -484,34 +455,7 @@ namespace OpenSMOKE
 		}
 	}
 
-	template<typename map> 
-	inline void ThermodynamicsMap_Surface_CHEMKIN<map>::cp_over_R()
-	{
-		if (cp_must_be_recalculated_ == true)
-		{
-			int unsigned count = 1;
-			for (unsigned int i=1;i<=this->npoints_;i++)
-			{
-				const double T1 = this->T_[i];
-				const double T2 = T1*T1;
-				const double T3 = T2*T1;
-				const double T4 = T3*T1;
-
-				unsigned int j = 0;
-				for (unsigned int k=1;k<=this->nspecies_;k++)
-				{
-					species_cp_over_R_[count++] = (T1>TM[k-1]) ?	Cp_HT[j] + T1*Cp_HT[j+1] + T2*Cp_HT[j+2] + T3*Cp_HT[j+3] + T4*Cp_HT[j+4] :
-																	Cp_LT[j] + T1*Cp_LT[j+1] + T2*Cp_LT[j+2] + T3*Cp_LT[j+3] + T4*Cp_LT[j+4] ;
-					j += 5;
-				}
-			}
-			
-			cp_must_be_recalculated_ = false;
-		}
-	}
-
-	template<> 
-	inline void ThermodynamicsMap_Surface_CHEMKIN<double>::h_over_RT()
+	inline void ThermodynamicsMap_Surface_CHEMKIN::h_over_RT()
 	{
 		if (h_must_be_recalculated_ == true)
 		{
@@ -532,35 +476,7 @@ namespace OpenSMOKE
 		}
 	}
 	
-	template<typename map>
-	inline void ThermodynamicsMap_Surface_CHEMKIN<map>::h_over_RT()
-	{
-		if (h_must_be_recalculated_ == true)
-		{
-			unsigned int count = 1;
-			for (unsigned int i=1;i<=this->npoints_;i++)
-			{
-				const double T1 = this->T_[i];
-				const double T2 = T1*T1;
-				const double T3 = T2*T1;
-				const double T4 = T3*T1;
-				const double uT1 = 1./T1;
-
-				unsigned int j = 0;
-				for (unsigned int k=1;k<=this->nspecies_;k++)
-				{
-					species_h_over_RT_[count++] = (T1>TM[k-1]) ?	DH_HT[j] + T1*DH_HT[j+1] + T2*DH_HT[j+2] + T3*DH_HT[j+3] + T4*DH_HT[j+4] + uT1*DH_HT[j+5]:
-																	DH_LT[j] + T1*DH_LT[j+1] + T2*DH_LT[j+2] + T3*DH_LT[j+3] + T4*DH_LT[j+4] + uT1*DH_LT[j+5];
-					j += 6;
-				}
-			}
-
-			h_must_be_recalculated_ = false;
-		}
-	}
-	
-	template<> 
-	inline void ThermodynamicsMap_Surface_CHEMKIN<double>::s_over_R()
+	inline void ThermodynamicsMap_Surface_CHEMKIN::s_over_R()
 	{
 		if (s_must_be_recalculated_ == true)
 		{
@@ -581,8 +497,7 @@ namespace OpenSMOKE
 		}
 	}
 
-	template<> 
-	inline void ThermodynamicsMap_Surface_CHEMKIN<double>::g_over_RT()
+	inline void ThermodynamicsMap_Surface_CHEMKIN::g_over_RT()
 	{
 		h_over_RT();
 		s_over_R();
@@ -590,106 +505,67 @@ namespace OpenSMOKE
 		Sub(species_h_over_RT_, species_s_over_R_, &species_g_over_RT_);
 	}
 	
-	template<typename map> 
-	inline void ThermodynamicsMap_Surface_CHEMKIN<map>::s_over_R()
+	void ThermodynamicsMap_Surface_CHEMKIN::cpMolar_Mixture_From_MoleFractions(double& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
-		if (s_must_be_recalculated_ == true)
-		{
-			unsigned int count = 1;
-			for (unsigned int i=1;i<=this->npoints_;i++)
-			{
-				const double T1 = this->T_[i];
-				const double T2 = T1*T1;
-				const double T3 = T2*T1;
-				const double T4 = T3*T1;
-				const double logT1 = log(T1);
-
-				unsigned int j = 0;
-				for (unsigned int k=1;k<=this->nspecies_;k++)
-				{
-					species_s_over_R_[count++] = (T1>TM[k-1]) ?	DS_HT[j]*logT1 + T1*DS_HT[j+1] + T2*DS_HT[j+2] + T3*DS_HT[j+3] + T4*DS_HT[j+4] + DS_HT[j+5] :
-																DS_LT[j]*logT1 + T1*DS_LT[j+1] + T2*DS_LT[j+2] + T3*DS_LT[j+3] + T4*DS_LT[j+4] + DS_LT[j+5] ;
-					j += 6;
-				}
-			}
-		
-			s_must_be_recalculated_ = false;
-		}
+		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN::cpMolar_Mixture_From_MoleFractions", "Function not available for surface thermodynamics!");
+	}
+	 
+	void ThermodynamicsMap_Surface_CHEMKIN::hMolar_Mixture_From_MoleFractions(double& hmix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+	{
+		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN::hMolar_Mixture_From_MoleFractions", "Function not available for surface thermodynamics!");
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::cpMolar_Mixture_From_MoleFractions(map& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+	void ThermodynamicsMap_Surface_CHEMKIN::sMolar_Mixture_From_MoleFractions(double& smix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
-		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN<map>::cpMolar_Mixture_From_MoleFractions", "Function not available for surface thermodynamics!");
-	}
-	
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::hMolar_Mixture_From_MoleFractions(map& hmix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
-	{
-		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN<map>::hMolar_Mixture_From_MoleFractions", "Function not available for surface thermodynamics!");
+		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN::sMolar_Mixture_From_MoleFractions", "Function not available for surface thermodynamics!");
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::sMolar_Mixture_From_MoleFractions(map& smix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+	void ThermodynamicsMap_Surface_CHEMKIN::uMolar_Mixture_From_MoleFractions(double& umix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
-		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN<map>::sMolar_Mixture_From_MoleFractions", "Function not available for surface thermodynamics!");
+		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN::uMolar_Mixture_From_MoleFractions", "Function not available for surface thermodynamics!");
 	}
-
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::uMolar_Mixture_From_MoleFractions(map& umix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+ 
+	void ThermodynamicsMap_Surface_CHEMKIN::gMolar_Mixture_From_MoleFractions(double& gmix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
-		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN<map>::uMolar_Mixture_From_MoleFractions", "Function not available for surface thermodynamics!");
+		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN::gMolar_Mixture_From_MoleFractions", "Function not available for surface thermodynamics!");
 	}
-
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::gMolar_Mixture_From_MoleFractions(map& gmix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+ 
+	void ThermodynamicsMap_Surface_CHEMKIN::aMolar_Mixture_From_MoleFractions(double& amix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
-		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN<map>::gMolar_Mixture_From_MoleFractions", "Function not available for surface thermodynamics!");
+		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN::aMolar_Mixture_From_MoleFractions", "Function not available for surface thermodynamics!");
 	}
-
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::aMolar_Mixture_From_MoleFractions(map& amix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
-	{
-		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN<map>::aMolar_Mixture_From_MoleFractions", "Function not available for surface thermodynamics!");
-	}
-
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::cpMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& cp_species)
+ 
+	void ThermodynamicsMap_Surface_CHEMKIN::cpMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& cp_species)
 	{
 		cp_over_R();
 		Product(PhysicalConstants::R_J_kmol, species_cp_over_R_, &cp_species);
 	}
-
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::hMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& h_species)
+ 
+	void ThermodynamicsMap_Surface_CHEMKIN::hMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& h_species)
 	{
 		h_over_RT();
 		Product(PhysicalConstants::R_J_kmol*this->T_, species_h_over_RT_, &h_species);
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::sMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& s_species)
+	void ThermodynamicsMap_Surface_CHEMKIN::sMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& s_species)
 	{
 		s_over_R();
 		Product(PhysicalConstants::R_J_kmol, species_s_over_R_, &s_species);
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::sMolar_Species_MixtureAveraged_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& s_species, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+	void ThermodynamicsMap_Surface_CHEMKIN::sMolar_Species_MixtureAveraged_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& s_species, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
-		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN<map>::sMolar_Species_MixtureAveraged_From_MoleFractions", "Function not available for surface thermodynamics!");
+		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN::sMolar_Species_MixtureAveraged_From_MoleFractions", "Function not available for surface thermodynamics!");
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::uMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& u_species)
+	void ThermodynamicsMap_Surface_CHEMKIN::uMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& u_species)
 	{
 		h_over_RT();
 		Add(species_h_over_RT_, -1., &u_species);
 		Product(PhysicalConstants::R_J_kmol*this->T_, &u_species);
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::gMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& g_species)
+	void ThermodynamicsMap_Surface_CHEMKIN::gMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& g_species)
 	{
 		h_over_RT();
 		s_over_R();
@@ -697,14 +573,12 @@ namespace OpenSMOKE
 		Product(PhysicalConstants::R_J_kmol*this->T_, &g_species);
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::gMolar_Species_MixtureAveraged_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& g_species, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+	void ThermodynamicsMap_Surface_CHEMKIN::gMolar_Species_MixtureAveraged_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& g_species, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
-		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN<map>::gMolar_Species_MixtureAveraged_From_MoleFractions", "Function not available for surface thermodynamics!");
+		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN::gMolar_Species_MixtureAveraged_From_MoleFractions", "Function not available for surface thermodynamics!");
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::aMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& a_species)
+	void ThermodynamicsMap_Surface_CHEMKIN::aMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& a_species)
 	{
 		h_over_RT();
 		s_over_R();
@@ -713,23 +587,20 @@ namespace OpenSMOKE
 		Product(PhysicalConstants::R_J_kmol*this->T_, &a_species);
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::aMolar_Species_MixtureAveraged_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& a_species, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+	void ThermodynamicsMap_Surface_CHEMKIN::aMolar_Species_MixtureAveraged_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& a_species, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
 		gMolar_Species_MixtureAveraged_From_MoleFractions(a_species, x);
 		a_species -= PhysicalConstants::R_J_kmol*this->T_;
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::DerivativesOfConcentrationsWithRespectToMassFractions(const double cTot, const double MW, const OpenSMOKE::OpenSMOKEVectorDouble& omega, OpenSMOKE::OpenSMOKEMatrixDouble* dc_over_omega)
+	void ThermodynamicsMap_Surface_CHEMKIN::DerivativesOfConcentrationsWithRespectToMassFractions(const double cTot, const double MW, const OpenSMOKE::OpenSMOKEVectorDouble& omega, OpenSMOKE::OpenSMOKEMatrixDouble* dc_over_omega)
 	{
-		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN<map>::DerivativesOfConcentrationsWithRespectToMassFractions", "Function not available for surface thermodynamics!");
+		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN::DerivativesOfConcentrationsWithRespectToMassFractions", "Function not available for surface thermodynamics!");
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_Surface_CHEMKIN<map>::Test(const int nLoops, const map& T, int* index)
+	void ThermodynamicsMap_Surface_CHEMKIN::Test(const int nLoops, const double& T, int* index)
 	{
-		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN<map>::Test", "Function not available for surface thermodynamics!");
+		ErrorMessage("ThermodynamicsMap_Surface_CHEMKIN::Test", "Function not available for surface thermodynamics!");
 	}
 
 }

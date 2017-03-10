@@ -117,7 +117,7 @@ namespace OpenSMOKE
 
 			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@PlanckCoefficient",
 				OpenSMOKE::SINGLE_STRING,
-				"Calculation of Planck Coefficient: Smooke (default) | Kent | Sazhin",
+				"Calculation of Planck Coefficient: Smooke (default) | Kent | Sazhin | none",
 				false));
 
 			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@WritePSDF",

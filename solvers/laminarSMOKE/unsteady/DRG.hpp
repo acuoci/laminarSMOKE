@@ -2,8 +2,8 @@
 
 namespace OpenSMOKE
 {
-	DRG::DRG(OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>* thermodynamicsMapXML,
-			 OpenSMOKE::KineticsMap_CHEMKIN<double>* kineticsMapXML) :
+	DRG::DRG(OpenSMOKE::ThermodynamicsMap_CHEMKIN* thermodynamicsMapXML,
+			 OpenSMOKE::KineticsMap_CHEMKIN* kineticsMapXML) :
 
 			 thermodynamicsMapXML_(*thermodynamicsMapXML),
 			 kineticsMapXML_(*kineticsMapXML)

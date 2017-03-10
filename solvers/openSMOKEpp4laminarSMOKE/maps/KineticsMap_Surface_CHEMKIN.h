@@ -119,8 +119,7 @@ namespace OpenSMOKE
 		 if the temperature changes
 	*/
 
-	template<typename map> 
-	class KineticsMap_Surface_CHEMKIN : public KineticsMap<map>
+	class KineticsMap_Surface_CHEMKIN : public KineticsMap
 	{
 
 	public:
@@ -129,29 +128,27 @@ namespace OpenSMOKE
 		*@brief Creates a thermodynamic map for the evaluation of thermodynamic properties (obsolete, TOREMOVE)
 		*@param thermo the thermodynamic map
 		*@param nSpecies number of species 
-		*@param nPoints number op points in the map (for a scalar map the number of oints is 1)
 		*/
-		KineticsMap_Surface_CHEMKIN(ThermodynamicsMap_Surface_CHEMKIN<map>& thermo, const unsigned int nSpecies, const unsigned int nPoints = 1);
+		KineticsMap_Surface_CHEMKIN(ThermodynamicsMap_Surface_CHEMKIN& thermo, const unsigned int nSpecies);
 
 		/**
 		*@brief Creates a thermodynamic map for the evaluation of thermodynamic properties
 		*@param thermo the thermodynamic map
 		*@param doc xml file  
-		*@param nPoints number op points in the map (for a scalar map the number of oints is 1)
 		*/
-		KineticsMap_Surface_CHEMKIN(ThermodynamicsMap_Surface_CHEMKIN<map>& thermo, rapidxml::xml_document<>& doc, const unsigned int nPoints = 1);
+		KineticsMap_Surface_CHEMKIN(ThermodynamicsMap_Surface_CHEMKIN& thermo, rapidxml::xml_document<>& doc);
 
 		/**
 		*@brief Set the temperature at which the properties have to be evaluated
 		*@param T the temperature value in K
 		*/
-		virtual void SetTemperature(const map& T);
+		virtual void SetTemperature(const double& T);
 
 		/**
 		*@brief Set the pressure at which the properties have to be evaluated
 		*@param P the pressure value in Pa
 		*/
-		virtual void SetPressure(const map& P);		
+		virtual void SetPressure(const double& P);		
 
 		/**
 		*@brief Returns the names of the species
@@ -282,7 +279,7 @@ namespace OpenSMOKE
 
 	protected:
 
-		ThermodynamicsMap_Surface_CHEMKIN<map>& thermodynamics_;		//!< reference to the thermodynamics
+		ThermodynamicsMap_Surface_CHEMKIN& thermodynamics_;		//!< reference to the thermodynamics
 
 		OpenSMOKEVectorDouble cSites_;
 		OpenSMOKEVectorDouble c_;

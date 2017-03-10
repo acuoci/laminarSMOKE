@@ -39,21 +39,19 @@
 
 namespace OpenSMOKE
 {
-	template<typename map> 
-	unsigned int ThermodynamicsMap<map>::IndexOfSpecies(const std::string name) const
+	unsigned int ThermodynamicsMap::IndexOfSpecies(const std::string name) const
 	{
 		for(unsigned int i=0;i<nspecies_;++i)
 			if (name == names_[i])
 				return i+1;
 
-		ErrorMessage(	"const unsigned int ThermodynamicsMap<map>::IndexOfSpecies(const std::string name) const", 
+		ErrorMessage(	"const unsigned int ThermodynamicsMap::IndexOfSpecies(const std::string name) const", 
 						"The requested species " + name + " is not available in the kinetic mechanism");
 		
 		return 0;
 	}
-
-	template<typename map> 
-	unsigned int ThermodynamicsMap<map>::IndexOfSpeciesWithoutError(const std::string name) const
+ 
+	unsigned int ThermodynamicsMap::IndexOfSpeciesWithoutError(const std::string name) const
 	{
 		for(unsigned int i=0;i<nspecies_;++i)
 			if (name == names_[i])
@@ -62,21 +60,19 @@ namespace OpenSMOKE
 		return 0;
 	}
 
-	template<typename map> 
-	unsigned int ThermodynamicsMap<map>::IndexOfElement(const std::string name) const
+	unsigned int ThermodynamicsMap::IndexOfElement(const std::string name) const
 	{
 		for(unsigned int i=0;i<elements_.size();++i)
 			if (name == elements_[i])
 				return i+1;
 
-		ErrorMessage(	"const unsigned int ThermodynamicsMap<map>::IndexOfElement(const std::string name) const", 
+		ErrorMessage(	"const unsigned int ThermodynamicsMap::IndexOfElement(const std::string name) const", 
 						"The requested element " + name + "is not available in the kinetic mechanism");
 		
 		return 0;
 	}
 
-	template<typename map> 
-	unsigned int ThermodynamicsMap<map>::IndexOfElementWithoutError(const std::string name) const
+	unsigned int ThermodynamicsMap::IndexOfElementWithoutError(const std::string name) const
 	{
 		for(unsigned int i=0;i<elements_.size();++i)
 			if (name == elements_[i])
@@ -85,8 +81,7 @@ namespace OpenSMOKE
 		return 0;
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap<map>::ImportElementsFromXMLFile(rapidxml::xml_document<>& doc)
+	void ThermodynamicsMap::ImportElementsFromXMLFile(rapidxml::xml_document<>& doc)
 	{
 		rapidxml::xml_node<>* opensmoke_node = doc.first_node("opensmoke");
 
@@ -119,9 +114,8 @@ namespace OpenSMOKE
 					values_composition >> this->atomic_composition_(i,j);
 		}
 	}
-
-	template<typename map> 
-	std::vector<double> ThermodynamicsMap<map>::GetMoleFractionsFromEquivalenceRatio(
+ 
+	std::vector<double> ThermodynamicsMap::GetMoleFractionsFromEquivalenceRatio(
 		const double equivalence_ratio,
 		const std::vector<std::string>& fuel_names, const std::vector<double>& moles_fuel,
 		const std::vector<std::string>& oxidizer_names,	const std::vector<double>& moles_oxidizer)
@@ -178,8 +172,7 @@ namespace OpenSMOKE
 		return mole;
 	}
 
-	template<typename map> 
-	double ThermodynamicsMap<map>::GetLocalEquivalenceRatio( 	const std::vector<double>& moles, const std::vector<double>& moles_st,
+	double ThermodynamicsMap::GetLocalEquivalenceRatio( 	const std::vector<double>& moles, const std::vector<double>& moles_st,
 									const std::vector<std::string>& fuel_names)
 	{
 		double nFuelStoichiometric = 0.;
@@ -198,8 +191,7 @@ namespace OpenSMOKE
 		return phi;
 	}
 
-	template<typename map> 
-	double 	ThermodynamicsMap<map>::GetMixtureFractionFromMassFractions(
+	double 	ThermodynamicsMap::GetMixtureFractionFromMassFractions(
 		const std::vector<double>& mass,
 		const std::vector<std::string>& fuel_names, 	const std::vector<double>& mass_fuel,
 		const std::vector<std::string>& oxidizer_names,	const std::vector<double>& mass_oxidizer)
@@ -260,113 +252,4 @@ namespace OpenSMOKE
 
 		return z;
 	}
-
-	/*
-	void ThermodynamicsMapBaseClass::MemoryAllocation()
-	{
-
-	}
-
-	template<typename map> 
-	void ThermodynamicsMap<map>::cpMix(map& cpmix, const map& T, OpenSMOKEVectorDouble& omega)
-	{
-		cp(T);
-		cpMix(cpmix, omega);
-	}
-
-	template<typename map> 
-	void ThermodynamicsMap<map>::cpMix(map& cpmix, OpenSMOKEVectorDouble& omega)
-	{
-		double* ptOmega = omega.GetHandle();
-		double* ptCpSpecies = cpSpecies_.GetHandle();
-		double* ptCpmix = cpmix.GetHandle();
-
-		for (int k=1;k<=npoints_;k++)
-		{
-			*ptCpmix = 0.;
-			for (int j=1;j<=nspecies_;j++)
-				*ptCpmix += (*ptCpSpecies++) * (*ptOmega++);
-			ptCpmix++;
-		}
-	}
-
-	template<> 
-	void ThermodynamicsMap<double>::cpMix(double& cpmix, OpenSMOKEVectorDouble& omega)
-	{
-		double* ptOmega = omega.GetHandle();
-		double* ptCpSpecies = cpSpecies_.GetHandle();
-		
-		cpmix = 0.;
-		for (int j=1;j<=nspecies_;j++)
-			cpmix += (*ptCpSpecies++) * (*ptOmega++);
-	}
-
-	template<typename map> 
-	void ThermodynamicsMap<map>::hMix(map& hmix, const map& T, OpenSMOKEVectorDouble& omega)
-	{
-		h(T);
-		hMix(hmix, omega);
-	}
-
-	template<typename map> 
-	void ThermodynamicsMap<map>::hMix(map& hmix, OpenSMOKEVectorDouble& omega)
-	{
-		double* ptOmega = omega.GetHandle();
-		double* ptHSpecies = hSpecies_.GetHandle();
-		double* ptHmix = hmix.GetHandle();
-
-		for (int k=1;k<=npoints_;k++)
-		{
-			*ptHmi = 0.;
-			for (int j=1;j<=nspecies_;j++)
-				*ptHmix += (*ptHSpecies++) * (*ptOmega++);
-			ptHmix++;
-		}
-	}
-
-	template<>
-	void ThermodynamicsMap<double>::hMix(double& hmix, OpenSMOKEVectorDouble& omega)
-	{
-		double* ptOmega = omega.GetHandle();
-		double* ptHSpecies = hSpecies_.GetHandle();
-		
-		hmix = 0.;
-		for (int j=1;j<=nspecies_;j++)
-			hmix += (*ptHSpecies++) * (*ptOmega++);
-	}
-
-	template<typename map> 
-	void ThermodynamicsMap<map>::sMix(map& smix, const map& T, OpenSMOKEVectorDouble& omega)
-	{
-		s(T);
-		sMix(smix, omega);
-	}
-
-	template<typename map> 
-	void ThermodynamicsMap<map>::sMix(map& smix, OpenSMOKEVectorDouble& omega)
-	{
-		double* ptOmega		= omega.GetHandle();
-		double* ptSSpecies	= sSpecies_.GetHandle();
-		double* ptSmix		= smix.GetHandle();
-
-		for (int k=1;k<=npoints_;k++)
-		{
-			*ptSmix = 0.;
-			for (int j=1;j<=nspecies_;j++)
-				*ptSmix += (*ptSSpecies++) * (*ptOmega++); 
-			ptSmix++;
-		}
-	}
-
-	template<>
-	void ThermodynamicsMap<double>::sMix(double& smix, OpenSMOKEVectorDouble& omega)
-	{
-		double* ptOmega = omega.GetHandle();
-		double* ptSSpecies = sSpecies_.GetHandle();
-		
-		smix = 0.;
-		for (int j=1;j<=nspecies_;j++)
-			smix += (*ptSSpecies++) * (*ptOmega++);
-	}
-	*/
 }

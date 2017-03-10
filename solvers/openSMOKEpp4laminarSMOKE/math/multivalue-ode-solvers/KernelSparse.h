@@ -99,7 +99,7 @@ namespace OdeSMOKE
 		*@brief Function to set the preconditioner fill factor (ILUT)
 		*@param fillfactor the fille factor (default 10)
 		*/
-		void SetPreconditionerFillFactor(const double fillfactor);
+		void SetPreconditionerFillFactor(const int fillfactor);
 
 		/**
 		*@brief Returns the number of calls to the system of equations for assembling the Jacobian matrix

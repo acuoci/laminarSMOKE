@@ -48,7 +48,6 @@ namespace OpenSMOKE
 			This virtual class provides a common interface to thermodynamic maps
 	*/
 
-	template<typename map> 
 	class ThermodynamicsMap
 	{
 	
@@ -72,62 +71,62 @@ namespace OpenSMOKE
 		/**
 		* @brief Sets the temperature (in K)
 		*/
-		virtual void SetTemperature(const map& T) = 0;
+		virtual void SetTemperature(const double& T) = 0;
 	
 		/**
 		* @brief Sets the pressure (in Pa)
 		*/
-		virtual void SetPressure(const map& P) = 0;
+		virtual void SetPressure(const double& P) = 0;
 
 		/**
 		* @brief Calculates the molecular weight of a mixture from the mole fractions
 		*/
-		virtual void MolecularWeight_From_MoleFractions(map& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual void MolecularWeight_From_MoleFractions(double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
 
 		/**
 		* @brief Calculates the molecular weight of a mixture from the mass fractions
 		*/
-		virtual void MolecularWeight_From_MassFractions(map& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y) = 0;
+		virtual void MolecularWeight_From_MassFractions(double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y) = 0;
 
 		/**
 		* @brief Calculates the mass fractions from the mole fractions
 		*/
-		virtual void MassFractions_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& y, map& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual void MassFractions_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& y, double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
 
 		/**
 		* @brief Calculates the mole fractions from the mass fractions
 		*/
-		virtual void MoleFractions_From_MassFractions(OpenSMOKE::OpenSMOKEVectorDouble& x, map& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y) = 0;
+		virtual void MoleFractions_From_MassFractions(OpenSMOKE::OpenSMOKEVectorDouble& x, double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y) = 0;
 
 		/**
 		* @brief Calculates the molar specific heat of the mixture from the mole fractions
 		*/
-		virtual void cpMolar_Mixture_From_MoleFractions(map& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual void cpMolar_Mixture_From_MoleFractions(double& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
 
 		/**
 		* @brief Calculates the molar enthalpy of the mixture from the mole fractions
 		*/
-		virtual void hMolar_Mixture_From_MoleFractions(map& hmix, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual void hMolar_Mixture_From_MoleFractions(double& hmix, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
 
 		/**
 		* @brief Calculates the molar entropy of the mixture from the mole fractions
 		*/
-		virtual void sMolar_Mixture_From_MoleFractions(map& hmix, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual void sMolar_Mixture_From_MoleFractions(double& hmix, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
 
 		/**
 		* @brief Calculates the molar internal energy of the mixture from the mole fractions
 		*/
-		virtual void uMolar_Mixture_From_MoleFractions(map& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual void uMolar_Mixture_From_MoleFractions(double& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
 
 		/**
 		* @brief Calculates the molar free Gibbs' energy of the mixture from the mole fractions
 		*/
-		virtual void gMolar_Mixture_From_MoleFractions(map& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual void gMolar_Mixture_From_MoleFractions(double& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
 
 		/**
 		* @brief Calculates the molar free Helmoltz' energy of the mixture from the mole fractions
 		*/
-		virtual void aMolar_Mixture_From_MoleFractions(map& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual void aMolar_Mixture_From_MoleFractions(double& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
 
 		/**
 		* @brief Calculates the molar specific heats of the species from the mole fractions
@@ -232,17 +231,16 @@ namespace OpenSMOKE
 							const std::vector<std::string>& fuel_names);
 
 		// Provisional
-		//virtual void Test(const int nLoops, const map& T, int* index) = 0;
+		//virtual void Test(const int nLoops, const double& T, int* index) = 0;
 
 	protected:
 
 		unsigned int nspecies_;					//!< number of species
-		unsigned int npoints_;					//!< number of points to be mapped (currently only 1)
 
 		std::vector<std::string> names_;		//!< names of the species
 
-		map T_;									//!< map of temperatures
-		map P_;									//!< map of pressures
+		double T_;									//!< temperature [K]
+		double P_;									//!< pressure [Pa]
 
 		OpenSMOKE::OpenSMOKEVectorDouble MW_;	//!< molecular weights of the species
 		OpenSMOKE::OpenSMOKEVectorDouble uMW_;	//!< reciprocal of molecular weights of the species

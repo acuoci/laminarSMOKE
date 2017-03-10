@@ -49,6 +49,8 @@ namespace OpenSMOKE
 	*/
 	class HMOM
 	{
+
+		enum SootPlanckCoefficient { SOOT_PLANCK_COEFFICIENT_NONE, SOOT_PLANCK_COEFFICIENT_SMOOKE, SOOT_PLANCK_COEFFICIENT_KENT, SOOT_PLANCK_COEFFICIENT_SAZHIN };
 	
 	public:
 
@@ -72,7 +74,7 @@ namespace OpenSMOKE
 		*@brief Sets the species to be assumed as PAHs
 		*@param pah_species PAH species
 		*/
-		void SetPAH(const std::string pah_species);
+		void SetPAH(const std::vector<std::string> pah_species);
 
 		/**
 		*@brief Enables soot nucleation
@@ -133,6 +135,12 @@ namespace OpenSMOKE
 		*@param volume_to_surface the collision diametr model (1 or 2, default equal to 2)
 		*/
 		void SetCollisionDiameterModel(const int dc_model);
+		
+		/**
+		*@brief Sets if the PAH consumption rate is turned on or off
+		*@param flag if true, consumption of PAH is turned on
+		*/
+		void SetPAHConsumption(const bool flag);
 
 		/**
 		*@brief Sets the normalized moments
@@ -179,6 +187,31 @@ namespace OpenSMOKE
 		*@param viscosity the laminar viscosity [kg/m/s]
 		*/
 		void SetViscosity(const double viscosity);
+
+		/**
+		*@brief Sets the radiative heat transfer from soot
+		*@param flag true if the radiative heat transfer from soot is turned on
+		*/
+		void SetRadiativeHeatTransfer(const bool flag);
+
+		/**
+		*@brief Sets the law for calculating the soot Planck mean absorption coefficient
+		*@param soot_planck_coefficient the law for calculating the soot Planck mean absorption coefficient
+		*/
+		void SetPlanckAbsorptionCoefficient(const SootPlanckCoefficient soot_planck_coefficient);
+
+		/**
+		*@brief Sets the law for calculating the soot Planck mean absorption coefficient
+		*@param soot_planck_coefficient the law for calculating the soot Planck
+		mean absorption coefficient: Smooke (default) | Kent | Sazhin
+		*/
+		void SetPlanckAbsorptionCoefficient(const std::string soot_planck_coefficient);
+
+		/**
+		*@brief Sets the Schmidt number for moments
+		*@param value Schmidt number for moments
+		*/
+		void SetSchmidtNumber(const double value);
 
 		/**
 		*@brief Calculates the source terms for moment equations
@@ -248,12 +281,12 @@ namespace OpenSMOKE
 		/**
 		*@brief Returns the species to be considered as PAH
 		*/
-		const std::string pah_species() const { return pah_species_; }
+		const std::vector<std::string>& pah_species() const { return pah_species_; }
 
 		/**
 		*@brief Returns the number of moments
 		*/
-		int n_moments() const { return n_moments_; }
+		unsigned int n_moments() const { return n_moments_; }
 
 		/**
 		*@brief Returns the dimerization rate [mol/m3/s]
@@ -328,7 +361,7 @@ namespace OpenSMOKE
 		/**
 		*@brief Returns the (normalized) coagulation (discrete) source terms for moment equations [mol/m3/s]
 		*/
-		const Eigen::VectorXd& sources_coagulation_discrete() const { return (source_coagulation_ss_+source_coagulation_sl_+source_coagulation_ll_); }
+		const Eigen::VectorXd& sources_coagulation_discrete() const { return source_coagulation_; }
 
 		/**
 		*@brief Returns the (normalized) coagulation (discrete, small-small) source terms for moment equations [mol/m3/s]
@@ -348,7 +381,7 @@ namespace OpenSMOKE
 		/**
 		*@brief Returns the (normalized) coagulation (continous) source terms for moment equations [mol/m3/s]
 		*/
-		const Eigen::VectorXd& sources_coagulation_continous() const { return (source_coagulation_continous_ss_ + source_coagulation_continous_sl_ + source_coagulation_continous_ll_); }
+		const Eigen::VectorXd& sources_coagulation_continous() const { return source_coagulation_continous_; }
 
 		/**
 		*@brief Returns the (normalized) coagulation (continous, small-small) source terms for moment equations [mol/m3/s]
@@ -364,6 +397,33 @@ namespace OpenSMOKE
 		*@brief Returns the (normalized) coagulation (continous, large-large) source terms for moment equations [mol/m3/s]
 		*/
 		const Eigen::VectorXd& sources_coagulation_continous_ll() const { return source_coagulation_continous_ll_; }
+
+		/**
+		*@brief Returns if PAH consumption is turned on or off
+		*/
+		bool PAHConsumption() const { return pah_consumption_; }
+		
+		/**
+		*@brief Returns the PAH consumption rate [mol/m3/s]
+		*/
+		double PAHConsumptionRate() const;
+
+		/**
+		*@brief Returns the soot Planck mean absorption coefficient
+		*@param T temperature of gaseous mixture [K]
+		*@param fv soot volume fraction
+		*/
+		double planck_coefficient(const double T, const double fv) const;
+
+		/**
+		*@brief Returns true is soot has to be accounted for in radiative heat transfer
+		*/
+		bool radiative_heat_transfer() const { return radiative_heat_transfer_; }
+
+		/**
+		*@brief Returns the Schmidt number for moments
+		*/
+		double schmidt_number() const { return schmidt_number_; }
 
 	private:
 
@@ -507,9 +567,11 @@ namespace OpenSMOKE
 		Eigen::VectorXd source_growth_;							//!< surface growth source terms [mol/m3/s]
 		Eigen::VectorXd source_oxidation_;						//!< oxidation source terms [mol/m3/s]
 		Eigen::VectorXd source_condensation_;					//!< condensation source terms [mol/m3/s]
+		Eigen::VectorXd source_coagulation_;					//!< coagulation source terms [mol/m3/s]
 		Eigen::VectorXd source_coagulation_ss_;					//!< coagulation (small/small) source terms [mol/m3/s]
 		Eigen::VectorXd source_coagulation_ll_;					//!< coagulation (small/large) source terms [mol/m3/s]
 		Eigen::VectorXd source_coagulation_sl_;					//!< coagulation (large/large) source terms [mol/m3/s]
+		Eigen::VectorXd source_coagulation_continous_;			//!< coagulation continous source terms [mol/m3/s]
 		Eigen::VectorXd source_coagulation_continous_ss_;		//!< coagulation continous (small/small) source terms [mol/m3/s]
 		Eigen::VectorXd source_coagulation_continous_ll_;		//!< coagulation continous (small/large) source terms [mol/m3/s]
 		Eigen::VectorXd source_coagulation_continous_sl_;		//!< coagulation continous (large/large) source terms [mol/m3/s]
@@ -521,7 +583,7 @@ namespace OpenSMOKE
 
 		bool is_active_;						//!< true if HMOM is turned on
 
-		int n_moments_;							//!< number of moments			
+		unsigned int n_moments_;				//!< number of moments			
 		int nucleation_model_;					//!< nucleation model
 		int condensation_model_;				//!< condensation model
 		int surface_growth_model_;				//!< surface growth model
@@ -547,7 +609,13 @@ namespace OpenSMOKE
 		double As_collisional_;					//!< [???]
 		double K_collisional_;					//!< [???]
 
-		std::string	pah_species_;				//!< name of PAH species
+		std::vector<std::string> pah_species_;	//!< names of PAH species
+		bool pah_consumption_;					//!< PAH consumption
+
+		SootPlanckCoefficient soot_planck_coefficient_;
+		bool radiative_heat_transfer_;
+
+		double schmidt_number_;
 
 	private:
 

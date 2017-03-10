@@ -264,6 +264,11 @@ namespace OpenSMOKE
 		bool IsPressureLog() const { return iPlog_; }
 
 		/**
+		*@brief Is the reaction an extended pressure logarithmic interpolated?
+		*/
+		bool IsExtendedPressureLog() const { return iExtPlog_; }
+
+		/**
 		*@brief Is the reaction a Janev-Langer reaction?
 		*/
 		bool IsJanevLanger() const { return iJan_; }
@@ -307,6 +312,11 @@ namespace OpenSMOKE
 		*@brief Reports the reaction data (short summary) on a file
 		*/
 		void WriteShortSummary(std::ostream& fOut, const std::vector<std::string>& list_species) const;
+
+		/**
+		*@brief Reports the reaction data (short summary) on a file
+		*/
+		void WriteShortSummary(std::ostream& fOut, const std::vector<std::string>& list_species, const Eigen::VectorXd& reverse_parameters) const;
 
 		/**
 		*@brief Writes the preprocessed reaction data on a file in a old-style format which can be read 
@@ -436,6 +446,14 @@ namespace OpenSMOKE
 		// Pressure Dependence Through Logarithmic Interp.
 		bool iPlog_;											//!< is a Pressure Dependence Through Logarithmic Interp. reaction (PLOG)?
 		std::vector<double> plog_coefficients_;					//!< coefficients
+
+		// Extended Pressure Dependence Through Logarithmic Interp.
+		bool iExtPlog_;											//!< is a Pressure Dependence Through Logarithmic Interp. reaction (PLOG)?
+		std::vector<std::string> extendedplog_coefficients_;	//!< coefficients
+
+		// Extended Falloff reaction
+		bool iExtLow_;															//!< is an extended falloff reaction
+		std::vector< std::vector<std::string> > extendedfalloff_coefficients_;	//!< coefficients
 
 	private:
 

@@ -106,8 +106,28 @@ namespace OpenSMOKE
 				false));
 
 			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@PAH",
+				OpenSMOKE::VECTOR_STRING,
+				"Species to be assumed as PAH (example: @PAH C10H8 BIN1A;)",
+				false));
+				
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@PAHConsumption",
+				OpenSMOKE::SINGLE_BOOL,
+				"Consumption of PAH is accounted for (default: true)",
+				false));
+
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@RadiativeHeatTransfer",
+				OpenSMOKE::SINGLE_BOOL,
+				"Radiative heat transfer (default: true)",
+				false));
+
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@PlanckCoefficient",
 				OpenSMOKE::SINGLE_STRING,
-				"Species to be assumed as PAH (example: @PAH C10H8;)",
+				"Calculation of Planck Coefficient: Smooke (default) | Kent | Sazhin | none",
+				false));
+
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@SchmidtNumber",
+				OpenSMOKE::SINGLE_DOUBLE,
+				"Schmidt number (default: 50)",
 				false));
 		}
 	};

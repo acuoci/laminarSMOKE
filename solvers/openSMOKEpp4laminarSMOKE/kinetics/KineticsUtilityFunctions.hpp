@@ -344,21 +344,6 @@ namespace OpenSMOKE_Utilities
 		}
 	}
 
-	bool ReadReactionKeyWordPlusCoefficients(const std::string tag, std::string& line, const int n, std::vector<double>& coefficients)
-	{
-		return ReadReactionKeyWordPlusCoefficients(tag, line, n, n, coefficients);
-	}
-
-	bool ReadReactionKeyWordPlusWords(const std::string tag, std::string& line, const int n, std::vector<std::string>& words)
-	{
-		return ReadReactionKeyWordPlusWords(tag, line, n, n, words);
-	}
-
-	bool ReadReactionKeyWordPlusCoefficients(const std::string tag, std::string& line, const int n, std::string& word, std::vector<double>& coefficients)
-	{
-		return ReadReactionKeyWordPlusCoefficients(tag, line, n, n, word, coefficients);
-	}
-
 	bool ReadReactionKeyWordPlusCoefficients(const std::string tag, std::string& line, const int n1, const int n2, std::vector<double>& coefficients)
 	{
 		boost::algorithm::trim(line);
@@ -399,6 +384,43 @@ namespace OpenSMOKE_Utilities
 			std::cout << tag << "The coefficients are not written properly (they are not numbers)" << std::endl;
 			return false;
 		}  
+
+		return true;
+	}
+
+	bool ReadReactionKeyWordPlusCoefficients(const std::string tag, std::string& line, const int n1, const int n2, std::vector<std::string>& coefficients)
+	{
+		boost::algorithm::trim(line);
+		typedef boost::tokenizer<boost::char_separator<char> >  tokenizer_slash;
+		boost::char_separator<char> sep_slash("/");
+		tokenizer_slash tokens_slash(line, sep_slash);
+
+		if (std::distance(tokens_slash.begin(), tokens_slash.end()) != 2)
+		{
+			std::cout << tag << "Syntax error: Wrong number of arguments (1)!" << std::endl;
+			return false;
+		}
+		tokenizer_slash::iterator tok_slash = tokens_slash.begin();
+		++tok_slash;
+		std::string numbers = *tok_slash;
+
+		typedef boost::tokenizer<boost::char_separator<char> >  tokenizer_blank;
+		boost::char_separator<char> sep_blank(" ");
+		tokenizer_blank tokens_blank(numbers, sep_blank);
+		const std::size_t n = std::distance(tokens_blank.begin(), tokens_blank.end());
+		if (n != n1 && n != n2)
+		{
+			std::cout << tag << "Syntax error: Wrong number of arguments (2)!" << std::endl;
+			return false;
+		}
+
+		coefficients.resize(n);
+		tokenizer_blank::iterator tok_blank = tokens_blank.begin();
+		for (std::size_t i = 0; i<n; i++)
+		{
+			coefficients[i] = *tok_blank;
+			++tok_blank;
+		}
 
 		return true;
 	}
@@ -447,6 +469,70 @@ namespace OpenSMOKE_Utilities
 		}  
 
 		return true;
+	}
+
+	bool ReadReactionKeyWordPlusCoefficients(const std::string tag, std::string& line, const int n1, const int n2, std::string& word, std::vector<std::string>& coefficients)
+	{
+		boost::algorithm::trim(line);
+		typedef boost::tokenizer<boost::char_separator<char> >  tokenizer_slash;
+		boost::char_separator<char> sep_slash("/");
+		tokenizer_slash tokens_slash(line, sep_slash);
+
+		if (std::distance(tokens_slash.begin(), tokens_slash.end()) != 2)
+		{
+			std::cout << tag << "Syntax error: Wrong number of arguments (1)!" << std::endl;
+			return false;
+		}
+		tokenizer_slash::iterator tok_slash = tokens_slash.begin();
+		++tok_slash;
+		std::string numbers = *tok_slash;
+
+		typedef boost::tokenizer<boost::char_separator<char> >  tokenizer_blank;
+		boost::char_separator<char> sep_blank(" ");
+		tokenizer_blank tokens_blank(numbers, sep_blank);
+		const std::size_t n = std::distance(tokens_blank.begin(), tokens_blank.end());
+		if (n != n1 && n != n2)
+		{
+			std::cout << tag << "Syntax error: Wrong number of arguments (2)!" << std::endl;
+			return false;
+		}
+
+		coefficients.resize(n - 1);
+		tokenizer_blank::iterator tok_blank = tokens_blank.begin();
+		word = *tok_blank;
+		++tok_blank;
+		for (std::size_t i = 0; i<n - 1; i++)
+		{
+			coefficients[i] = boost::lexical_cast<std::string>(*tok_blank);
+			++tok_blank;
+		}
+
+		return true;
+	}
+
+	bool ReadReactionKeyWordPlusCoefficients(const std::string tag, std::string& line, const int n, std::vector<double>& coefficients)
+	{
+		return ReadReactionKeyWordPlusCoefficients(tag, line, n, n, coefficients);
+	}
+
+	bool ReadReactionKeyWordPlusCoefficients(const std::string tag, std::string& line, const int n, std::vector<std::string>& coefficients)
+	{
+		return ReadReactionKeyWordPlusCoefficients(tag, line, n, n, coefficients);
+	}
+
+	bool ReadReactionKeyWordPlusWords(const std::string tag, std::string& line, const int n, std::vector<std::string>& words)
+	{
+		return ReadReactionKeyWordPlusWords(tag, line, n, n, words);
+	}
+
+	bool ReadReactionKeyWordPlusCoefficients(const std::string tag, std::string& line, const int n, std::string& word, std::vector<double>& coefficients)
+	{
+		return ReadReactionKeyWordPlusCoefficients(tag, line, n, n, word, coefficients);
+	}
+
+	bool ReadReactionKeyWordPlusCoefficients(const std::string tag, std::string& line, const int n, std::string& word, std::vector<std::string>& coefficients)
+	{
+		return ReadReactionKeyWordPlusCoefficients(tag, line, n, n, word, coefficients);
 	}
 
 	bool ReadCoefficients(const std::string tag, std::string& line, std::vector<double>& coefficients)

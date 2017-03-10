@@ -52,7 +52,6 @@ namespace OpenSMOKE
 		protected:
 
 			unsigned int nspecies_;
-			unsigned int npoints_;
 
 			OpenSMOKEVectorDouble lambdaSpecies_;
 			OpenSMOKEVectorDouble etaSpecies_;
@@ -66,31 +65,30 @@ namespace OpenSMOKE
 		 This virtual class provides a common interface to transport properties maps
 	*/
 
-	template<typename map> 
 	class TransportPropertiesMap : public TransportPropertiesMapBaseClass
 	{
 	
 	public:
             
-                /**
+        /**
 		* Sets the temperature (in K)
 		*/
-		virtual void SetTemperature(const map& T) = 0;
+		virtual void SetTemperature(const double& T) = 0;
 
 		/**
 		* Sets the pressure (in Pa)
 		*/
-		virtual void SetPressure(const map& P) = 0;
+		virtual void SetPressure(const double& P) = 0;
 
 		/**
 		*@brief Calculates the thermal conductivity of a mixture from the mole fractions
 		*/
-		void ThermalConductivity(map& lambdamix, OpenSMOKEVectorDouble& moleFractions);
+		void ThermalConductivity(double& lambdamix, OpenSMOKEVectorDouble& moleFractions);
 		
 		/**
 		*@brief Calculates the dynamic viscosity of a mixture from the mole fractions
 		*/		
-		void DynamicViscosity(map& etamix, OpenSMOKEVectorDouble& moleFractions);
+		void DynamicViscosity(double& etamix, OpenSMOKEVectorDouble& moleFractions);
 
 		/**
 		*@brief Calculates the mass diffusion coefficients (mixture averaged formulation) of a mixture from the mole fractions
@@ -120,19 +118,19 @@ namespace OpenSMOKE
 		/**
 		*@brief TODO
 		*/
-		virtual void Test(const int nLoops, const map& T, int* index) = 0;
+		virtual void Test(const int nLoops, const double& T, int* index) = 0;
 
 	protected:
 		
 		/**
 		*@brief Combines the species thermal conductivities to calculate the mixture thermal conductivity
 		*/
-		virtual void lambdaMix(map& lambdamix, OpenSMOKEVectorDouble& moleFractions) = 0;
+		virtual void lambdaMix(double& lambdamix, OpenSMOKEVectorDouble& moleFractions) = 0;
 
 		/**
 		*@brief Combines the species dynamic viscosities to calculate the mixture dynamic viscosity
 		*/
-		virtual void etaMix(map& etamix, OpenSMOKEVectorDouble& moleFractions) = 0;
+		virtual void etaMix(double& etamix, OpenSMOKEVectorDouble& moleFractions) = 0;
 
 		/**
 		*@brief Combines the species mass diffusion coefficients to calculate the mixture mass diffusion coefficients
@@ -181,11 +179,11 @@ namespace OpenSMOKE
                 
         protected:
             
-        map T_;								//!< map of temperatures
-		map P_;								//!< map of pressures
+        double T_;							//!< temperature [K]
+		double P_;							//!< pressure [Pa]
 
-		map T_old_;							//!< map of temperatures (previous values)
-		map P_old_;							//!< map of pressures (previous values)
+		double T_old_;						//!< temperature [K] (previous value)
+		double P_old_;						//!< pressure [Pa] (previous value)
 
 		bool species_bundling_;				//!< bundling of species for calculation of mass diffusion coefficients
 	};
