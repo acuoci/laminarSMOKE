@@ -108,8 +108,8 @@
 #include <Eigen/Dense>
 
 // Base classes
-#include "thermo/ThermoPolicy_CHEMKIN.h"
-#include "kinetics/ReactionPolicy_CHEMKIN.h"
+#include "kernel/thermo/ThermoPolicy_CHEMKIN.h"
+#include "kernel/kinetics/ReactionPolicy_CHEMKIN.h"
 #include "math/PhysicalConstants.h"
 #include "math/OpenSMOKEUtilities.h"
 
@@ -129,8 +129,8 @@
 
 // Soot
 #include "sootUtilities.H"
-#include "soot/hmom/HMOM.h"
-#include "soot/OpenSMOKE_PolimiSoot_Analyzer.h"
+#include "utilities/soot/hmom/HMOM.h"
+#include "utilities/soot/polimi/OpenSMOKE_PolimiSoot_Analyzer.h"
 #include "SootClassesReader.h"
 
 using namespace Foam;
@@ -177,9 +177,9 @@ int main(int argc, char *argv[])
 	);
 
 	// Read the kinetic scheme in XML format
-	OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>* thermodynamicsMapXML; 
-	OpenSMOKE::KineticsMap_CHEMKIN<double>* kineticsMapXML;
-	OpenSMOKE::TransportPropertiesMap_CHEMKIN<double>* transportMapXML;
+	OpenSMOKE::ThermodynamicsMap_CHEMKIN* thermodynamicsMapXML; 
+	OpenSMOKE::KineticsMap_CHEMKIN* kineticsMapXML;
+	OpenSMOKE::TransportPropertiesMap_CHEMKIN* transportMapXML;
 	OpenSMOKE::PolimiSoot_Analyzer* sootAnalyzer;
 	
 	Foam::string kinetics_folder;
@@ -194,9 +194,9 @@ int main(int argc, char *argv[])
 		OpenSMOKE::OpenInputFileXML(doc,xml_string,path_kinetics / "kinetics.xml");
 
 		double tStart = OpenSMOKE::OpenSMOKEGetCpuTime();
-		thermodynamicsMapXML = new OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>(doc); 
-		transportMapXML = new OpenSMOKE::TransportPropertiesMap_CHEMKIN<double>(doc); 
-		kineticsMapXML = new OpenSMOKE::KineticsMap_CHEMKIN<double>(*thermodynamicsMapXML, doc); 					
+		thermodynamicsMapXML = new OpenSMOKE::ThermodynamicsMap_CHEMKIN(doc); 
+		transportMapXML = new OpenSMOKE::TransportPropertiesMap_CHEMKIN(doc); 
+		kineticsMapXML = new OpenSMOKE::KineticsMap_CHEMKIN(*thermodynamicsMapXML, doc); 					
 		double tEnd = OpenSMOKE::OpenSMOKEGetCpuTime();
 		std::cout << " * Time to read XML file: " << tEnd-tStart << std::endl;
 	}

@@ -38,23 +38,17 @@
 
 namespace OpenSMOKE
 {
-	template<typename map> 
-	ThermodynamicsMap_CHEMKIN<map>::ThermodynamicsMap_CHEMKIN(const unsigned int nSpecies, const unsigned int nPoints)
+	ThermodynamicsMap_CHEMKIN::ThermodynamicsMap_CHEMKIN(const unsigned int nSpecies)
 	{
 		this->nspecies_ = nSpecies;
-		this->npoints_ = nPoints;
-                
-                this->verbose_output_ = true;
+        this->verbose_output_ = true;
                 
 		MemoryAllocation();
 	}
 
-	template<typename map> 
-	ThermodynamicsMap_CHEMKIN<map>::ThermodynamicsMap_CHEMKIN(rapidxml::xml_document<>& doc, const unsigned int nPoints)
+	ThermodynamicsMap_CHEMKIN::ThermodynamicsMap_CHEMKIN(rapidxml::xml_document<>& doc)
 	{
-		this->npoints_ = nPoints;
-                
-                this->verbose_output_ = true;
+		this->verbose_output_ = true;
 	
 		ImportSpeciesFromXMLFile(doc);
 		this->ImportElementsFromXMLFile(doc);
@@ -62,12 +56,9 @@ namespace OpenSMOKE
 		ImportCoefficientsFromXMLFile(doc);
 	}
         
-    template<typename map> 
-	ThermodynamicsMap_CHEMKIN<map>::ThermodynamicsMap_CHEMKIN(rapidxml::xml_document<>& doc, bool verbose, const unsigned int nPoints)
+	ThermodynamicsMap_CHEMKIN::ThermodynamicsMap_CHEMKIN(rapidxml::xml_document<>& doc, bool verbose)
 	{
-		this->npoints_ = nPoints;
-                
-                this->verbose_output_ = verbose;
+		this->verbose_output_ = verbose;
 	
 		ImportSpeciesFromXMLFile(doc);
 		this->ImportElementsFromXMLFile(doc);
@@ -75,59 +66,54 @@ namespace OpenSMOKE
 		ImportCoefficientsFromXMLFile(doc);
 	}
     
-        template<typename map> 
-	ThermodynamicsMap_CHEMKIN<map>::ThermodynamicsMap_CHEMKIN( const ThermodynamicsMap_CHEMKIN<map>& rhs )
-        {
-            CopyFromMap(rhs);
-        }
+	ThermodynamicsMap_CHEMKIN::ThermodynamicsMap_CHEMKIN( const ThermodynamicsMap_CHEMKIN& rhs )
+    {
+        CopyFromMap(rhs);
+    }
         
-    
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::CopyFromMap( const ThermodynamicsMap_CHEMKIN<map>& rhs )
-        {
-            this->nspecies_ = rhs.nspecies_;
-            this->npoints_  = rhs.npoints_;
+	void ThermodynamicsMap_CHEMKIN::CopyFromMap( const ThermodynamicsMap_CHEMKIN& rhs )
+    {
+        this->nspecies_ = rhs.nspecies_;
             
-            MemoryAllocation();
+        MemoryAllocation();
              
-	    this->names_ =  rhs.names_;
-            this->MW_    =  rhs.MW_;
-            this->uMW_   =  rhs.uMW_;
+		this->names_ =  rhs.names_;
+        this->MW_    =  rhs.MW_;
+        this->uMW_   =  rhs.uMW_;
 
-            this->atomic_composition_ =  rhs.atomic_composition_;
-	    this->elements_ = rhs.elements_; 
-	    this->verbose_output_          = rhs.verbose_output_;
+        this->atomic_composition_ = rhs.atomic_composition_;
+		this->elements_ = rhs.elements_; 
+		this->verbose_output_ = rhs.verbose_output_;
             
-            for (unsigned int i=0;i<5*this->nspecies_;i++)
-                this->Cp_LT[i] = rhs.Cp_LT[i];
+        for (unsigned int i=0;i<5*this->nspecies_;i++)
+            this->Cp_LT[i] = rhs.Cp_LT[i];
 
-            for (unsigned int i=0;i<5*this->nspecies_;i++)
-                this->Cp_HT[i] = rhs.Cp_HT[i];
+        for (unsigned int i=0;i<5*this->nspecies_;i++)
+            this->Cp_HT[i] = rhs.Cp_HT[i];
             
-            for (unsigned int i=0;i<6*this->nspecies_;i++)
-                this->DH_LT[i] = rhs.DH_LT[i];
+        for (unsigned int i=0;i<6*this->nspecies_;i++)
+            this->DH_LT[i] = rhs.DH_LT[i];
 
-            for (unsigned int i=0;i<6*this->nspecies_;i++)
-                this->DH_HT[i] = rhs.DH_HT[i];
+        for (unsigned int i=0;i<6*this->nspecies_;i++)
+            this->DH_HT[i] = rhs.DH_HT[i];
             
-            for (unsigned int i=0;i<6*this->nspecies_;i++)
-                this->DS_LT[i] = rhs.DS_LT[i];
+        for (unsigned int i=0;i<6*this->nspecies_;i++)
+            this->DS_LT[i] = rhs.DS_LT[i];
 
-            for (unsigned int i=0;i<6*this->nspecies_;i++)
-                this->DS_HT[i] = rhs.DS_HT[i];      
+        for (unsigned int i=0;i<6*this->nspecies_;i++)
+            this->DS_HT[i] = rhs.DS_HT[i];      
             
-            for (unsigned int i=0;i<this->nspecies_;i++)
-                this->TL[i] = rhs.TL[i];      
+        for (unsigned int i=0;i<this->nspecies_;i++)
+            this->TL[i] = rhs.TL[i];      
             
-            for (unsigned int i=0;i<this->nspecies_;i++)
-                this->TH[i] = rhs.TH[i];      
+        for (unsigned int i=0;i<this->nspecies_;i++)
+            this->TH[i] = rhs.TH[i];      
 
-            for (unsigned int i=0;i<this->nspecies_;i++)
-                this->TM[i] = rhs.TM[i]; 
-        }
-	 
-	template<typename map> 
-	ThermodynamicsMap_CHEMKIN<map>::~ThermodynamicsMap_CHEMKIN(void)
+        for (unsigned int i=0;i<this->nspecies_;i++)
+            this->TM[i] = rhs.TM[i]; 
+    }
+	  
+	ThermodynamicsMap_CHEMKIN::~ThermodynamicsMap_CHEMKIN(void)
 	{
 		this->names_.clear();		
 		this->elements_.clear();		
@@ -142,8 +128,7 @@ namespace OpenSMOKE
 		delete[] TM;
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::MemoryAllocation()
+	void ThermodynamicsMap_CHEMKIN::MemoryAllocation()
 	{
 		Cp_LT = new double[5*this->nspecies_];	
 		Cp_HT = new double[5*this->nspecies_];
@@ -158,34 +143,30 @@ namespace OpenSMOKE
 		ChangeDimensions(this->nspecies_, &this->MW_, true);
 		ChangeDimensions(this->nspecies_, &this->uMW_, true);
 
-		ChangeDimensions(this->nspecies_*this->npoints_, &species_cp_over_R_, true);
-		ChangeDimensions(this->nspecies_*this->npoints_, &species_h_over_RT_, true);
-		ChangeDimensions(this->nspecies_*this->npoints_, &species_g_over_RT_, true);
-		ChangeDimensions(this->nspecies_*this->npoints_, &species_s_over_R_, true);
+		ChangeDimensions(this->nspecies_, &species_cp_over_R_, true);
+		ChangeDimensions(this->nspecies_, &species_h_over_RT_, true);
+		ChangeDimensions(this->nspecies_, &species_g_over_RT_, true);
+		ChangeDimensions(this->nspecies_, &species_s_over_R_, true);
 
 		cp_must_be_recalculated_ = true;
 		h_must_be_recalculated_ = true;
 		s_must_be_recalculated_ = true;
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::SetTemperature(const map& T)
+	void ThermodynamicsMap_CHEMKIN::SetTemperature(const double& T)
 	{
 		this->T_ = T;
 		cp_must_be_recalculated_ = true;
 		h_must_be_recalculated_ = true;
 		s_must_be_recalculated_ = true;
 	}
-
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::SetPressure(const map& P)
+ 
+	void ThermodynamicsMap_CHEMKIN::SetPressure(const double& P)
 	{
 		this->P_ = P;
 	}
 
-	
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::SetCoefficients(const unsigned k, const double* coefficients)
+	void ThermodynamicsMap_CHEMKIN::SetCoefficients(const unsigned k, const double* coefficients)
 	{
 		const double one_third = 1./3.;
 
@@ -267,9 +248,8 @@ namespace OpenSMOKE
 		this->MW_[k+1] = coefficients[17];
 		this->uMW_[k+1] = 1./coefficients[17];
 	}
-
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::ImportCoefficientsFromASCIIFile(std::ifstream& fInput)
+ 
+	void ThermodynamicsMap_CHEMKIN::ImportCoefficientsFromASCIIFile(std::ifstream& fInput)
 	{
                 if(verbose_output_ == true)
 		    std::cout << " * Reading thermodynamic coefficients of species..." << std::endl;
@@ -282,9 +262,8 @@ namespace OpenSMOKE
 			SetCoefficients(i, coefficients);
 		}
 	}
-
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::ImportSpeciesFromXMLFile(rapidxml::xml_document<>& doc)
+ 
+	void ThermodynamicsMap_CHEMKIN::ImportSpeciesFromXMLFile(rapidxml::xml_document<>& doc)
 	{
 		rapidxml::xml_node<>* opensmoke_node = doc.first_node("opensmoke");
 		rapidxml::xml_node<>* number_of_species_node = opensmoke_node->first_node("NumberOfSpecies");
@@ -300,12 +279,11 @@ namespace OpenSMOKE
 		}
 		catch(...)
 		{
-			ErrorMessage("ThermodynamicsMap_CHEMKIN<map>::ImportSpeciesFromXMLFile", "Error in reading the list of species.");
+			ErrorMessage("ThermodynamicsMap_CHEMKIN::ImportSpeciesFromXMLFile", "Error in reading the list of species.");
 		}
 	}
-
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)
+ 
+	void ThermodynamicsMap_CHEMKIN::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)
 	{
                 if(verbose_output_ == true)
 		    std::cout << " * Reading thermodynamic coefficients of species from XML file..." << std::endl;
@@ -332,42 +310,37 @@ namespace OpenSMOKE
 				}
 			}
 			else
-				ErrorMessage("ThermodynamicsMap_CHEMKIN<map>::ImportCoefficientsFromXMLFile", "Thermodynamics type not supported!"); 
+				ErrorMessage("ThermodynamicsMap_CHEMKIN::ImportCoefficientsFromXMLFile", "Thermodynamics type not supported!"); 
 		}
 		else
-			ErrorMessage("ThermodynamicsMap_CHEMKIN<map>::ImportCoefficientsFromXMLFile", "Thermodynamics tag was not found!");
+			ErrorMessage("ThermodynamicsMap_CHEMKIN::ImportCoefficientsFromXMLFile", "Thermodynamics tag was not found!");
 	}
-
-	template<typename map> 
-	inline void ThermodynamicsMap_CHEMKIN<map>::MolecularWeight_From_MoleFractions(map& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+ 
+	inline void ThermodynamicsMap_CHEMKIN::MolecularWeight_From_MoleFractions(double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
 		MW = Dot(x,this->MW_);
 	}
 
-	template<typename map> 
-	inline void ThermodynamicsMap_CHEMKIN<map>::MolecularWeight_From_MassFractions(map& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y)
+	inline void ThermodynamicsMap_CHEMKIN::MolecularWeight_From_MassFractions(double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y)
 	{
 		MW = 1./Dot(y,this->uMW_);
 	}
 
-	template<typename map> 
-	inline void ThermodynamicsMap_CHEMKIN<map>::MassFractions_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& y, map& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+	inline void ThermodynamicsMap_CHEMKIN::MassFractions_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& y, double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
 		MW = Dot(x,this->MW_);
 		ElementByElementProduct(x, this->MW_, &y);
 		Product(1./MW, &y);
 	}
 	
-	template<typename map> 
-	inline void ThermodynamicsMap_CHEMKIN<map>::MoleFractions_From_MassFractions(OpenSMOKE::OpenSMOKEVectorDouble& x, map& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y)
+	inline void ThermodynamicsMap_CHEMKIN::MoleFractions_From_MassFractions(OpenSMOKE::OpenSMOKEVectorDouble& x, double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y)
 	{
 		MW = 1./Dot(y,this->uMW_);
 		Product(MW, y, &x);
 		ElementByElementProduct(x,this->uMW_,&x);
 	}
 
-	template<> 
-	inline void ThermodynamicsMap_CHEMKIN<double>::cp_over_R()
+	inline void ThermodynamicsMap_CHEMKIN::cp_over_R()
 	{
 		if (cp_must_be_recalculated_ == true)
 		{
@@ -387,34 +360,7 @@ namespace OpenSMOKE
 		}
 	}
 
-	template<typename map> 
-	inline void ThermodynamicsMap_CHEMKIN<map>::cp_over_R()
-	{
-		if (cp_must_be_recalculated_ == true)
-		{
-			int unsigned count = 1;
-			for (unsigned int i=1;i<=this->npoints_;i++)
-			{
-				const double T1 = this->T_[i];
-				const double T2 = T1*T1;
-				const double T3 = T2*T1;
-				const double T4 = T3*T1;
-
-				unsigned int j = 0;
-				for (unsigned int k=1;k<=this->nspecies_;k++)
-				{
-					species_cp_over_R_[count++] = (T1>TM[k-1]) ?	Cp_HT[j] + T1*Cp_HT[j+1] + T2*Cp_HT[j+2] + T3*Cp_HT[j+3] + T4*Cp_HT[j+4] :
-																	Cp_LT[j] + T1*Cp_LT[j+1] + T2*Cp_LT[j+2] + T3*Cp_LT[j+3] + T4*Cp_LT[j+4] ;
-					j += 5;
-				}
-			}
-			
-			cp_must_be_recalculated_ = false;
-		}
-	}
-
-	template<> 
-	inline void ThermodynamicsMap_CHEMKIN<double>::h_over_RT()
+	inline void ThermodynamicsMap_CHEMKIN::h_over_RT()
 	{
 		if (h_must_be_recalculated_ == true)
 		{
@@ -435,35 +381,7 @@ namespace OpenSMOKE
 		}
 	}
 	
-	template<typename map>
-	inline void ThermodynamicsMap_CHEMKIN<map>::h_over_RT()
-	{
-		if (h_must_be_recalculated_ == true)
-		{
-			unsigned int count = 1;
-			for (unsigned int i=1;i<=this->npoints_;i++)
-			{
-				const double T1 = this->T_[i];
-				const double T2 = T1*T1;
-				const double T3 = T2*T1;
-				const double T4 = T3*T1;
-				const double uT1 = 1./T1;
-
-				unsigned int j = 0;
-				for (unsigned int k=1;k<=this->nspecies_;k++)
-				{
-					species_h_over_RT_[count++] = (T1>TM[k-1]) ?	DH_HT[j] + T1*DH_HT[j+1] + T2*DH_HT[j+2] + T3*DH_HT[j+3] + T4*DH_HT[j+4] + uT1*DH_HT[j+5]:
-																	DH_LT[j] + T1*DH_LT[j+1] + T2*DH_LT[j+2] + T3*DH_LT[j+3] + T4*DH_LT[j+4] + uT1*DH_LT[j+5];
-					j += 6;
-				}
-			}
-
-			h_must_be_recalculated_ = false;
-		}
-	}
-	
-	template<> 
-	inline void ThermodynamicsMap_CHEMKIN<double>::s_over_R()
+	inline void ThermodynamicsMap_CHEMKIN::s_over_R()
 	{
 		if (s_must_be_recalculated_ == true)
 		{
@@ -484,8 +402,7 @@ namespace OpenSMOKE
 		}
 	}
 
-	template<> 
-	inline void ThermodynamicsMap_CHEMKIN<double>::g_over_RT()
+	inline void ThermodynamicsMap_CHEMKIN::g_over_RT()
 	{
 		h_over_RT();
 		s_over_R();
@@ -493,51 +410,21 @@ namespace OpenSMOKE
 		Sub(species_h_over_RT_, species_s_over_R_, &species_g_over_RT_);
 	}
 	
-	template<typename map> 
-	inline void ThermodynamicsMap_CHEMKIN<map>::s_over_R()
-	{
-		if (s_must_be_recalculated_ == true)
-		{
-			unsigned int count = 1;
-			for (unsigned int i=1;i<=this->npoints_;i++)
-			{
-				const double T1 = this->T_[i];
-				const double T2 = T1*T1;
-				const double T3 = T2*T1;
-				const double T4 = T3*T1;
-				const double logT1 = std::log(T1);
-
-				unsigned int j = 0;
-				for (unsigned int k=1;k<=this->nspecies_;k++)
-				{
-					species_s_over_R_[count++] = (T1>TM[k-1]) ?	DS_HT[j]*logT1 + T1*DS_HT[j+1] + T2*DS_HT[j+2] + T3*DS_HT[j+3] + T4*DS_HT[j+4] + DS_HT[j+5] :
-																DS_LT[j]*logT1 + T1*DS_LT[j+1] + T2*DS_LT[j+2] + T3*DS_LT[j+3] + T4*DS_LT[j+4] + DS_LT[j+5] ;
-					j += 6;
-				}
-			}
-		
-			s_must_be_recalculated_ = false;
-		}
-	}
-
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::cpMolar_Mixture_From_MoleFractions(map& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+	void ThermodynamicsMap_CHEMKIN::cpMolar_Mixture_From_MoleFractions(double& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
 		cp_over_R();
 		cpmix = Dot(species_cp_over_R_, x);
 		cpmix *= PhysicalConstants::R_J_kmol;
 	}
 	
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::hMolar_Mixture_From_MoleFractions(map& hmix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+	void ThermodynamicsMap_CHEMKIN::hMolar_Mixture_From_MoleFractions(double& hmix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
 		h_over_RT();
 		hmix = Dot(species_h_over_RT_, x);
 		hmix *= PhysicalConstants::R_J_kmol*this->T_;
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::sMolar_Mixture_From_MoleFractions(map& smix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+	void ThermodynamicsMap_CHEMKIN::sMolar_Mixture_From_MoleFractions(double& smix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
 		s_over_R();
 
@@ -549,17 +436,15 @@ namespace OpenSMOKE
 		smix = Dot(species_s_over_R_, x) - std::log(this->P_/101325.) - sum;
 		smix *= PhysicalConstants::R_J_kmol;
 	}
-
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::uMolar_Mixture_From_MoleFractions(map& umix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+ 
+	void ThermodynamicsMap_CHEMKIN::uMolar_Mixture_From_MoleFractions(double& umix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
 		h_over_RT();
 		umix = Dot(species_h_over_RT_, x) - 1.;
 		umix *= PhysicalConstants::R_J_kmol*this->T_;
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::gMolar_Mixture_From_MoleFractions(map& gmix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+	void ThermodynamicsMap_CHEMKIN::gMolar_Mixture_From_MoleFractions(double& gmix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
 		double hmix, smix;
 		hMolar_Mixture_From_MoleFractions(hmix,x);
@@ -567,38 +452,33 @@ namespace OpenSMOKE
 		gmix = hmix-this->T_*smix;
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::aMolar_Mixture_From_MoleFractions(map& amix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+	void ThermodynamicsMap_CHEMKIN::aMolar_Mixture_From_MoleFractions(double& amix, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
 		double umix, smix;
 		uMolar_Mixture_From_MoleFractions(umix,x);
 		sMolar_Mixture_From_MoleFractions(smix,x);
 		amix = umix-this->T_*smix;
 	}
-
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::cpMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& cp_species)
+ 
+	void ThermodynamicsMap_CHEMKIN::cpMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& cp_species)
 	{
 		cp_over_R();
 		Product(PhysicalConstants::R_J_kmol, species_cp_over_R_, &cp_species);
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::hMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& h_species)
+	void ThermodynamicsMap_CHEMKIN::hMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& h_species)
 	{
 		h_over_RT();
 		Product(PhysicalConstants::R_J_kmol*this->T_, species_h_over_RT_, &h_species);
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::sMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& s_species)
+	void ThermodynamicsMap_CHEMKIN::sMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& s_species)
 	{
 		s_over_R();
 		Product(PhysicalConstants::R_J_kmol, species_s_over_R_, &s_species);
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::sMolar_Species_MixtureAveraged_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& s_species, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+	void ThermodynamicsMap_CHEMKIN::sMolar_Species_MixtureAveraged_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& s_species, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
 		const double eps = 1.e-32;
 		const double log_P_pver_Patm = std::log(this->P_/101325.);
@@ -607,17 +487,15 @@ namespace OpenSMOKE
 			s_species[i] = (x[i]>eps) ? species_s_over_R_[i] - std::log(x[i]+eps) - log_P_pver_Patm : species_s_over_R_[i] - log_P_pver_Patm;
 		Product(PhysicalConstants::R_J_kmol, &s_species);
 	}
-
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::uMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& u_species)
+ 
+	void ThermodynamicsMap_CHEMKIN::uMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& u_species)
 	{
 		h_over_RT();
 		Add(species_h_over_RT_, -1., &u_species);
 		Product(PhysicalConstants::R_J_kmol*this->T_, &u_species);
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::gMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& g_species)
+	void ThermodynamicsMap_CHEMKIN::gMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& g_species)
 	{
 		h_over_RT();
 		s_over_R();
@@ -625,8 +503,7 @@ namespace OpenSMOKE
 		Product(PhysicalConstants::R_J_kmol*this->T_, &g_species);
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::gMolar_Species_MixtureAveraged_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& g_species, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+	void ThermodynamicsMap_CHEMKIN::gMolar_Species_MixtureAveraged_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& g_species, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
 		const double eps = 1.e-32;
 		const double log_P_pver_Patm = std::log(this->P_/101325.);
@@ -637,9 +514,8 @@ namespace OpenSMOKE
 			                            species_h_over_RT_[i] - (species_s_over_R_[i] - log_P_pver_Patm);
 		Product(PhysicalConstants::R_J_kmol*this->T_, &g_species);
 	}
-
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::aMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& a_species)
+ 
+	void ThermodynamicsMap_CHEMKIN::aMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& a_species)
 	{
 		h_over_RT();
 		s_over_R();
@@ -648,15 +524,13 @@ namespace OpenSMOKE
 		Product(PhysicalConstants::R_J_kmol*this->T_, &a_species);
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::aMolar_Species_MixtureAveraged_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& a_species, const OpenSMOKE::OpenSMOKEVectorDouble& x)
+	void ThermodynamicsMap_CHEMKIN::aMolar_Species_MixtureAveraged_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& a_species, const OpenSMOKE::OpenSMOKEVectorDouble& x)
 	{
 		gMolar_Species_MixtureAveraged_From_MoleFractions(a_species, x);
 		a_species -= PhysicalConstants::R_J_kmol*this->T_;
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::DerivativesOfConcentrationsWithRespectToMassFractions(const double cTot, const double MW, const OpenSMOKE::OpenSMOKEVectorDouble& omega, OpenSMOKE::OpenSMOKEMatrixDouble* dc_over_omega)
+	void ThermodynamicsMap_CHEMKIN::DerivativesOfConcentrationsWithRespectToMassFractions(const double cTot, const double MW, const OpenSMOKE::OpenSMOKEVectorDouble& omega, OpenSMOKE::OpenSMOKEMatrixDouble* dc_over_omega)
 	{
 		for(unsigned int j=1;j<=this->nspecies_;j++)
 		{
@@ -667,13 +541,11 @@ namespace OpenSMOKE
 		}
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::Test(const int nLoops, const map& T, int* index)
+	void ThermodynamicsMap_CHEMKIN::Test(const int nLoops, const double& T, int* index)
 	{
 	}
 	
-	template<typename map> 
-	double ThermodynamicsMap_CHEMKIN<map>::GetTemperatureFromEnthalpyAndMoleFractions(const double H, const double P_Pa, const OpenSMOKEVectorDouble& x, const double TFirstGuess)
+	double ThermodynamicsMap_CHEMKIN::GetTemperatureFromEnthalpyAndMoleFractions(const double H, const double P_Pa, const OpenSMOKEVectorDouble& x, const double TFirstGuess)
 	{
 		const double diff_temperature_to_switch_to_newtons = 15.;
 		const unsigned int max_number_of_enlargements = 10;
@@ -712,8 +584,7 @@ namespace OpenSMOKE
 		return 0;
 	}
 	
-	template<typename map> 
-	bool ThermodynamicsMap_CHEMKIN<map>::FindTheRightInterval(	const double H, const OpenSMOKEVectorDouble& x, const double TFirstGuess,
+	bool ThermodynamicsMap_CHEMKIN::FindTheRightInterval(	const double H, const OpenSMOKEVectorDouble& x, const double TFirstGuess,
 																double& TA, double&TB, double& HA, double& HB,
 																const double Diff_Temperature)
 	{
@@ -762,8 +633,7 @@ namespace OpenSMOKE
 	inline const T SIGN(const T &a, const T &b)
 		{return b >= 0 ? (a >= 0 ? a : -a) : (a >= 0 ? -a : a);}
 
-	template<typename map> 
-	double ThermodynamicsMap_CHEMKIN<map>::Brent(const double H, const double P_Pa, const OpenSMOKEVectorDouble& x, const double x1, const double x2, const double tol)
+	double ThermodynamicsMap_CHEMKIN::Brent(const double H, const double P_Pa, const OpenSMOKEVectorDouble& x, const double x1, const double x2, const double tol)
 	{
 		const unsigned int 	ITMAX=100;
 		const double 		EPS=2.2204460492503131e-16;
@@ -857,9 +727,8 @@ namespace OpenSMOKE
 		ErrorMessage("Brent", "Maximum number of iterations exceeded in zbrent");
 		return 0.0;
 	}
-
-	template<typename map> 
-	double ThermodynamicsMap_CHEMKIN<map>::Ridder(const double H, const double P_Pa, const OpenSMOKEVectorDouble& x, const double x1, const double x2, const double xacc)
+ 
+	double ThermodynamicsMap_CHEMKIN::Ridder(const double H, const double P_Pa, const OpenSMOKEVectorDouble& x, const double x1, const double x2, const double xacc)
 	{
 		const int MAXIT=60;
 		const double UNUSED=-1.11e30;
@@ -922,8 +791,7 @@ namespace OpenSMOKE
 		return 0.0;
 	}
 	
-	template<typename map> 
-	double ThermodynamicsMap_CHEMKIN<map>::NewtonRaphson(const double H, const double P_Pa, const OpenSMOKEVectorDouble& x, const double x1, const double x2, const double xacc)
+	double ThermodynamicsMap_CHEMKIN::NewtonRaphson(const double H, const double P_Pa, const OpenSMOKEVectorDouble& x, const double x1, const double x2, const double xacc)
 	{
 		const int JMAX=20;
 		int j;
@@ -945,8 +813,7 @@ namespace OpenSMOKE
 		return 0.0;
 	}
 
-	template<typename map> 
-	double ThermodynamicsMap_CHEMKIN<map>::Function(const double H, const double P_Pa, const OpenSMOKEVectorDouble& x, const double T)
+	double ThermodynamicsMap_CHEMKIN::Function(const double H, const double P_Pa, const OpenSMOKEVectorDouble& x, const double T)
 	{
 		double HCandidate;
 		SetTemperature(T);
@@ -955,8 +822,7 @@ namespace OpenSMOKE
 		return H-HCandidate;
 	}
 	
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::Function(const double H, const double P_Pa, const OpenSMOKEVectorDouble& x, const double T, double& f, double& df)
+	void ThermodynamicsMap_CHEMKIN::Function(const double H, const double P_Pa, const OpenSMOKEVectorDouble& x, const double T, double& f, double& df)
 	{
 		SetTemperature(T);
 		SetPressure(P_Pa);
@@ -966,8 +832,7 @@ namespace OpenSMOKE
 		f = H-f;
 	}	
 
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::NASA_LowT(const unsigned int i, double* coefficients) const
+	void ThermodynamicsMap_CHEMKIN::NASA_LowT(const unsigned int i, double* coefficients) const
 	{
 		unsigned int k = i*5;
 		unsigned int j = i*6;
@@ -980,8 +845,7 @@ namespace OpenSMOKE
 		coefficients[6] = DS_LT[j+5];
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::NASA_HighT(const unsigned int i, double* coefficients) const
+	void ThermodynamicsMap_CHEMKIN::NASA_HighT(const unsigned int i, double* coefficients) const
 	{
 		unsigned int k = i*5;
 		unsigned int j = i*6;
@@ -995,8 +859,7 @@ namespace OpenSMOKE
 		coefficients[6] = DS_HT[j+5];
 	}
 	
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::NASA_Coefficients(const unsigned int i, double* coefficients) const
+	void ThermodynamicsMap_CHEMKIN::NASA_Coefficients(const unsigned int i, double* coefficients) const
 	{
 		double sub_coefficients[7];
 
@@ -1015,8 +878,7 @@ namespace OpenSMOKE
 		
 	}
 
-	template<typename map> 
-	void ThermodynamicsMap_CHEMKIN<map>::NASA_Coefficients(double* coefficients) const
+	void ThermodynamicsMap_CHEMKIN::NASA_Coefficients(double* coefficients) const
 	{
 		double sub_coefficients[15];
 		
@@ -1027,110 +889,4 @@ namespace OpenSMOKE
 				coefficients[j*this->nspecies_ + i] = sub_coefficients[j];
 		}
 	}
-
-	/*
-	template<> 
-	void ThermodynamicsMap_CHEMKIN<double>::Test(const int nLoops, const double& T, int* index)
-	{
-		// Loops
-		int speciesLoopsThermo	= nLoops*100;
-		int mixtureLoopsThermo	= nLoops*100;
-
-		double cpmix, hmix, smix;
-
-		// Composition (mass fractions)
-		OpenSMOKEVectorDouble omega(this->nspecies_);
-		for(int i=1;i<=this->nspecies_;i++)
-			omega[i] = 1./double(this->nspecies_);
-
-
-		// Times
-		double speciesThermoTime, mixtureThermoTime;
-
-		{
-			double tStart = OpenSMOKEGetCpuTime();
-			for(int k=1;k<=speciesLoopsThermo;k++)
-			{
-				cp(T);
-			}
-			double tEnd = OpenSMOKEGetCpuTime();
-			speciesThermoTime = tEnd-tStart;
-			std::cout << "Species Cp " << "Time: " << tEnd - tStart << std::endl;
-		}
-
-		{
-			double tStart = OpenSMOKEGetCpuTime();
-			for(int k=1;k<=speciesLoopsThermo;k++)
-			{
-				h(T);
-			}
-			double tEnd = OpenSMOKEGetCpuTime();
-			speciesThermoTime += tEnd-tStart;
-			std::cout << "Species H " << "Time: " << tEnd - tStart << std::endl;
-		}
-		
-		{
-			double tStart = OpenSMOKEGetCpuTime();
-			for(int k=1;k<=speciesLoopsThermo;k++)
-			{
-				s(T);
-			}
-			double tEnd = OpenSMOKEGetCpuTime();
-			speciesThermoTime += tEnd-tStart;
-			std::cout << "Species S "<< "Time: " << tEnd - tStart << std::endl;
-		}
-
-		{
-			double tStart = OpenSMOKEGetCpuTime();
-			for(int k=1;k<=mixtureLoopsThermo;k++)
-			{
-				cpMix(cpmix, omega);
-			}
-			double tEnd = OpenSMOKEGetCpuTime();
-			mixtureThermoTime = tEnd-tStart;
-			std::cout << "Mixture Cp " << "Time: " << tEnd - tStart << std::endl;
-		}
-
-		{
-			double tStart = OpenSMOKEGetCpuTime();
-			for(int k=1;k<=mixtureLoopsThermo;k++)
-			{
-				hMix(hmix, omega);
-			}
-			double tEnd = OpenSMOKEGetCpuTime();
-			mixtureThermoTime += tEnd-tStart;
-			std::cout << "Mixture H " << "Time: " << tEnd - tStart << std::endl;
-		}
-		
-		{
-			double tStart = OpenSMOKEGetCpuTime();
-			for(int k=1;k<=mixtureLoopsThermo;k++)
-			{
-				sMix(smix, omega);
-			}
-			double tEnd = OpenSMOKEGetCpuTime();
-			mixtureThermoTime += tEnd-tStart;
-			std::cout << "Mixture S "<< "Time: " << tEnd - tStart << std::endl;
-		}
-
-	std::ofstream fBenchmark;
-	fBenchmark.open("Benchmark.plus", std::ios::out);
-	fBenchmark.setf(std::ios::scientific);
-	
-	// Thermodynamics
-	fBenchmark << cpSpecies_[index[1]] << " " << cpSpecies_[index[2]] << " " << cpSpecies_[index[3]] << std::endl; 
-	fBenchmark << hSpecies_[index[1]] << " " << hSpecies_[index[2]] << " " << hSpecies_[index[3]] << std::endl; 
-	fBenchmark << sSpecies_[index[1]] << " " << sSpecies_[index[2]] << " " << sSpecies_[index[3]] << std::endl; 
-	fBenchmark << cpmix << std::endl;
-	fBenchmark << hmix << std::endl;
-	fBenchmark << smix << std::endl;
-	fBenchmark << speciesLoopsThermo	<< " " << speciesThermoTime << " " << speciesThermoTime/double(speciesLoopsThermo)*1000.	<< std::endl;
-	fBenchmark << mixtureLoopsThermo	<< " " << mixtureThermoTime << " " << mixtureThermoTime/double(mixtureLoopsThermo)*1000.	<< std::endl;
-	
-	fBenchmark.close();
-
-
-	}
-	*/
-
 }

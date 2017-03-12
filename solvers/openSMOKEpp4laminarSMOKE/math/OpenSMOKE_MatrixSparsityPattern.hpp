@@ -165,7 +165,7 @@ namespace OpenSMOKE
 
 	void OpenSMOKE_MatrixSparsityPattern::FindDependence()
 	{
-		const int max_length_int_vector = std::pow(2., 32.) - 1;
+		const int max_length_int_vector = static_cast<int> (std::pow(2., 32.) - 1);
 
 		if (is_dependence_available_ == true)
 			return;

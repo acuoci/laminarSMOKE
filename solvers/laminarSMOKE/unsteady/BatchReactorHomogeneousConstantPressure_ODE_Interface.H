@@ -42,44 +42,44 @@
 #define	BatchReactorHomogeneousConstantPressure_ODE_Interface_H
 
 #include "math/OpenSMOKEVector.h"
-#include "ode/OpenSMOKE_OdeSystemObject.h"
+#include "math/external-ode-solvers/OpenSMOKE_OdeSystemObject.h"
 
-#include "ode/OpenSMOKE_CHEMEQ2.h"
-#include "ode/OpenSMOKE_CHEMEQ2_Interface.h"
+#include "math/external-ode-solvers/OpenSMOKE_CHEMEQ2.h"
+#include "math/external-ode-solvers/OpenSMOKE_CHEMEQ2_Interface.h"
 
 #if OPENSMOKE_USE_DVODE == 1
-#include "ode/OpenSMOKE_DVODE_Interface.h"
-#include "ode/OpenSMOKE_DVODE.h"
+#include "math/external-ode-solvers/OpenSMOKE_DVODE_Interface.h"
+#include "math/external-ode-solvers/OpenSMOKE_DVODE.h"
 #endif
 
 #if OPENSMOKE_USE_ODEPACK == 1
-#include "ode/OpenSMOKE_DLSODE_Interface.h"
-#include "ode/OpenSMOKE_DLSODE.h"
-#include "ode/OpenSMOKE_DLSODA_Interface.h"
-#include "ode/OpenSMOKE_DLSODA.h"
+#include "math/external-ode-solvers/OpenSMOKE_DLSODE_Interface.h"
+#include "math/external-ode-solvers/OpenSMOKE_DLSODE.h"
+#include "math/external-ode-solvers/OpenSMOKE_DLSODA_Interface.h"
+#include "math/external-ode-solvers/OpenSMOKE_DLSODA.h"
 #endif
 
 #if OPENSMOKE_USE_DASPK == 1
-#include "ode/OpenSMOKE_DASPK_Interface.h"
-#include "ode/OpenSMOKE_DASPK.h"
+#include "math/external-ode-solvers/OpenSMOKE_DASPK_Interface.h"
+#include "math/external-ode-solvers/OpenSMOKE_DASPK.h"
 #endif
 
 #if OPENSMOKE_USE_RADAU == 1
-#include "ode/OpenSMOKE_RADAU_Interface.h"
-#include "ode/OpenSMOKE_RADAU.h"
+#include "math/external-ode-solvers/OpenSMOKE_RADAU_Interface.h"
+#include "math/external-ode-solvers/OpenSMOKE_RADAU.h"
 #endif
 
 #if OPENSMOKE_USE_SUNDIALS == 1
-#include "ode/OpenSMOKE_CVODE_Sundials_Interface.h"
-#include "ode/OpenSMOKE_CVODE_Sundials.h"
+#include "math/external-ode-solvers/OpenSMOKE_CVODE_Sundials_Interface.h"
+#include "math/external-ode-solvers/OpenSMOKE_CVODE_Sundials.h"
 #endif
 
 #if OPENSMOKE_USE_MEBDF == 1
-#include "ode/OpenSMOKE_MEBDF_Interface.h"
-#include "ode/OpenSMOKE_MEBDF.h"
+#include "math/external-ode-solvers/OpenSMOKE_MEBDF_Interface.h"
+#include "math/external-ode-solvers/OpenSMOKE_MEBDF.h"
 #endif
 
-#include "ode/OpenSMOKE_OdeSystemObject.h"
+#include "math/external-ode-solvers/OpenSMOKE_OdeSystemObject.h"
 #include "ODESystemVirtualClassWithOpenSMOKEVectors.H"
 #include "BatchReactorHomogeneousConstantPressure.H"
 

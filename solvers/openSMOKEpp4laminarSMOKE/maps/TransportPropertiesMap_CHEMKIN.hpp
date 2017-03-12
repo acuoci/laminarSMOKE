@@ -43,14 +43,11 @@
 
 namespace OpenSMOKE
 {
-	template<typename map>
-	const double TransportPropertiesMap_CHEMKIN<map>::threshold_ = 1.e-14;
+	const double TransportPropertiesMap_CHEMKIN::threshold_ = 1.e-14;
 
-	template<typename map>
-	TransportPropertiesMap_CHEMKIN<map>::TransportPropertiesMap_CHEMKIN(const unsigned int nSpecies, const unsigned int nPoints)
+	TransportPropertiesMap_CHEMKIN::TransportPropertiesMap_CHEMKIN(const unsigned int nSpecies)
 	{
 		this->nspecies_ = nSpecies;
-		this->npoints_ = nPoints;
 		temperature_lambda_must_be_recalculated_ = true;
 		temperature_eta_must_be_recalculated_ = true;
 		temperature_gamma_must_be_recalculated_ = true;
@@ -65,10 +62,8 @@ namespace OpenSMOKE
 		MemoryAllocation();
 	}
 
-	template<typename map>
-	TransportPropertiesMap_CHEMKIN<map>::TransportPropertiesMap_CHEMKIN(rapidxml::xml_document<>& doc, const unsigned int nPoints)
+	TransportPropertiesMap_CHEMKIN::TransportPropertiesMap_CHEMKIN(rapidxml::xml_document<>& doc)
 	{
-		this->npoints_ = nPoints;
 		temperature_lambda_must_be_recalculated_ = true;
 		temperature_eta_must_be_recalculated_ = true;
 		temperature_gamma_must_be_recalculated_ = true;
@@ -84,14 +79,12 @@ namespace OpenSMOKE
 		ImportCoefficientsFromXMLFile(doc);
 	}
 
-	template<typename map>
-	TransportPropertiesMap_CHEMKIN<map>::TransportPropertiesMap_CHEMKIN(const TransportPropertiesMap_CHEMKIN<map>& rhs)
+	TransportPropertiesMap_CHEMKIN::TransportPropertiesMap_CHEMKIN(const TransportPropertiesMap_CHEMKIN& rhs)
 	{
 		CopyFromMap(rhs);
 	}
 
-	template<typename map>
-	TransportPropertiesMap_CHEMKIN<map>::~TransportPropertiesMap_CHEMKIN()
+	TransportPropertiesMap_CHEMKIN::~TransportPropertiesMap_CHEMKIN()
 	{
 		delete[] this->M;
 		delete[] this->fittingLambda;
@@ -122,14 +115,13 @@ namespace OpenSMOKE
 			delete[] this->bundling_fittingGammaSelfDiffusion_;
 			delete[] this->bundling_fittingGamma_;
 			delete[] this->bundling_gammaSpecies_;
-			delete[] this->bundling_gammaSpeciesSelfDiffusion;
+			delete[] this->bundling_gammaSpeciesSelfDiffusion_;
 		}
 
 		iThermalDiffusionRatios_.clear();
 	}
 
-	template<typename map>
-	void TransportPropertiesMap_CHEMKIN<map>::SetTemperature(const map& T)
+	void TransportPropertiesMap_CHEMKIN::SetTemperature(const double& T)
 	{
 		this->T_old_ = this->T_;
 		this->T_ = T;
@@ -144,8 +136,7 @@ namespace OpenSMOKE
 		}
 	}
 
-	template<typename map>
-	void TransportPropertiesMap_CHEMKIN<map>::SetPressure(const map& P)
+	void TransportPropertiesMap_CHEMKIN::SetPressure(const double& P)
 	{
 		this->P_old_ = this->P_;
 		this->P_ = P;
@@ -156,11 +147,9 @@ namespace OpenSMOKE
 		}
 	}
 
-	template<typename map>
-	void TransportPropertiesMap_CHEMKIN<map>::CopyFromMap(const TransportPropertiesMap_CHEMKIN<map>& rhs)
+	void TransportPropertiesMap_CHEMKIN::CopyFromMap(const TransportPropertiesMap_CHEMKIN& rhs)
 	{
 		this->nspecies_ = rhs.nspecies_;
-		this->npoints_ = rhs.npoints_;
 		this->species_bundling_ = rhs.species_bundling_;
 
 		MemoryAllocation();
@@ -196,10 +185,10 @@ namespace OpenSMOKE
 			for (unsigned int i = 0; i < this->nspecies_*(this->nspecies_ - 1) / 2; i++)
 				this->phi_eta_inf[i] = rhs.phi_eta_inf[i];
 
-			for (unsigned int i = 0; i < this->nspecies_*this->npoints_; i++)
+			for (unsigned int i = 0; i < this->nspecies_; i++)
 				this->sqrtEta[i] = rhs.sqrtEta[i];
 
-			for (unsigned int i = 0; i < this->nspecies_*this->npoints_; i++)
+			for (unsigned int i = 0; i < this->nspecies_; i++)
 				this->usqrtEta[i] = rhs.usqrtEta[i];
 		}
 		else if (viscosity_model == PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_HERNING)
@@ -223,8 +212,8 @@ namespace OpenSMOKE
 
 			this->bundling_fittingGammaSelfDiffusion_ = new double[4 * this->nspecies_];
 			this->bundling_fittingGamma_ = new double[this->bundling_number_groups_*(this->bundling_number_groups_ - 1) / 2 * 4];
-			this->bundling_gammaSpecies_ = new double[this->bundling_number_groups_*(this->bundling_number_groups_ - 1) / 2 * this->npoints_];
-			this->bundling_gammaSpeciesSelfDiffusion_ = new double[this->bundling_number_groups_ * this->npoints_];
+			this->bundling_gammaSpecies_ = new double[this->bundling_number_groups_*(this->bundling_number_groups_ - 1) / 2];
+			this->bundling_gammaSpeciesSelfDiffusion_ = new double[this->bundling_number_groups_];
 
 			for (unsigned int i = 0; i < 4 * this->nspecies_; i++)
 				this->bundling_fittingGammaSelfDiffusion_[i] = rhs.bundling_fittingGammaSelfDiffusion_[i];
@@ -232,18 +221,17 @@ namespace OpenSMOKE
 			for (unsigned int i = 0; i < this->bundling_number_groups_*(this->bundling_number_groups_ - 1) / 2 * 4; i++)
 				this->bundling_fittingGamma_[i] = rhs.bundling_fittingGamma_[i];
 
-			for (unsigned int i = 0; i < this->bundling_number_groups_*(this->bundling_number_groups_ - 1) / 2 * this->npoints_; i++)
+			for (unsigned int i = 0; i < this->bundling_number_groups_*(this->bundling_number_groups_ - 1) / 2; i++)
 				this->bundling_gammaSpecies_[i] = rhs.bundling_gammaSpecies_[i];
 
-			for (unsigned int i = 0; i < this->bundling_number_groups_ * this->npoints_; i++)
+			for (unsigned int i = 0; i < this->bundling_number_groups_; i++)
 				this->bundling_gammaSpeciesSelfDiffusion_[i] = rhs.bundling_gammaSpeciesSelfDiffusion_[i];
 		}
 
 		ChangeDimensions(this->nspecies_*iThermalDiffusionRatios_.size(), &this->tetaSpecies_, true);
 	}
 
-	template<typename map>
-	void TransportPropertiesMap_CHEMKIN<map>::MemoryAllocation()
+	void TransportPropertiesMap_CHEMKIN::MemoryAllocation()
 	{
 		//		viscosity_model = PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_HERNING;
 		viscosity_model = PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_WILKE;
@@ -258,15 +246,15 @@ namespace OpenSMOKE
 		// fittingTeta is not inizialized here, because the number of species for which the thermal diffusion ratios is 
 		// important is not yet known
 
-		ChangeDimensions(this->nspecies_*this->npoints_, &sumK, true);
+		ChangeDimensions(this->nspecies_, &sumK, true);
 		if (viscosity_model == PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_WILKE)
 		{
 			MWRatio1over4 = new double[this->nspecies_*(this->nspecies_ - 1) / 2];
 			phi_eta_sup = new double[this->nspecies_*(this->nspecies_ - 1) / 2];
 			phi_eta_inf = new double[this->nspecies_*(this->nspecies_ - 1) / 2];
 
-			sqrtEta = new double[this->nspecies_*this->npoints_];
-			usqrtEta = new double[this->nspecies_*this->npoints_];
+			sqrtEta = new double[this->nspecies_];
+			usqrtEta = new double[this->nspecies_];
 		}
 		else if (viscosity_model == PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_HERNING)
 		{
@@ -275,18 +263,17 @@ namespace OpenSMOKE
 			sqrtMW = new double[this->nspecies_];
 		}
 
-		sum_diffusion_coefficients = new double[this->nspecies_*this->npoints_];
-		x_corrected = new double[this->nspecies_*this->npoints_];
+		sum_diffusion_coefficients = new double[this->nspecies_];
+		x_corrected = new double[this->nspecies_];
 
-		ChangeDimensions(this->nspecies_*this->npoints_, &this->lambdaSpecies_, true);
-		ChangeDimensions(this->nspecies_*this->npoints_, &this->etaSpecies_, true);
-		ChangeDimensions(this->nspecies_*(this->nspecies_ - 1) / 2 * this->npoints_, &this->gammaSpecies_, true);
+		ChangeDimensions(this->nspecies_, &this->lambdaSpecies_, true);
+		ChangeDimensions(this->nspecies_, &this->etaSpecies_, true);
+		ChangeDimensions(this->nspecies_*(this->nspecies_ - 1) / 2, &this->gammaSpecies_, true);
 
 		// Thermal diffusion ratios are allocated after reading the properties
 	}
 
-	template<typename map>
-	void TransportPropertiesMap_CHEMKIN<map>::SetCoefficients(const unsigned int j, const double* coefficients)
+	void TransportPropertiesMap_CHEMKIN::SetCoefficients(const unsigned int j, const double* coefficients)
 	{
 		// Molecular weight
 		M[j] = coefficients[0];
@@ -338,8 +325,7 @@ namespace OpenSMOKE
 			CompleteInitialization();
 	}
 
-	template<typename map>
-	void TransportPropertiesMap_CHEMKIN<map>::ImportCoefficientsFromASCIIFile(std::istream& fInput)
+	void TransportPropertiesMap_CHEMKIN::ImportCoefficientsFromASCIIFile(std::istream& fInput)
 	{
 		{
 			fInput >> count_species_thermal_diffusion_ratios_;
@@ -404,8 +390,7 @@ namespace OpenSMOKE
 		CompleteInitialization();
 	}
 
-	template<typename map>
-	void TransportPropertiesMap_CHEMKIN<map>::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)
+	void TransportPropertiesMap_CHEMKIN::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)
 	{
 		std::cout << " * Reading transport properties from XML file..." << std::endl;
 
@@ -423,10 +408,10 @@ namespace OpenSMOKE
 				ImportCoefficientsFromASCIIFile(fInput);
 			}
 			else
-				ErrorMessage("TransportPropertiesMap_CHEMKIN<map>::ImportCoefficientsFromXMLFile", "Transport type not supported!");
+				ErrorMessage("TransportPropertiesMap_CHEMKIN::ImportCoefficientsFromXMLFile", "Transport type not supported!");
 		}
 		else
-			ErrorMessage("TransportPropertiesMap_CHEMKIN<map>::ImportCoefficientsFromXMLFile", "Transport tag was not found!");
+			ErrorMessage("TransportPropertiesMap_CHEMKIN::ImportCoefficientsFromXMLFile", "Transport tag was not found!");
 	}
 
 	unsigned int index_from_mtrix_to_vector(const unsigned int n, const unsigned int i, const unsigned int j)
@@ -440,8 +425,7 @@ namespace OpenSMOKE
 		return index;
 	}
 
-	template<typename map>
-	void TransportPropertiesMap_CHEMKIN<map>::ImportSpeciesBundlingFromXMLFile(rapidxml::xml_document<>& doc, const double epsilon)
+	void TransportPropertiesMap_CHEMKIN::ImportSpeciesBundlingFromXMLFile(rapidxml::xml_document<>& doc, const double epsilon)
 	{
 		std::cout << " * Reading species bundling from XML file..." << std::endl;
 
@@ -543,8 +527,8 @@ namespace OpenSMOKE
 					bundling_sum_x_groups_.resize(this->bundling_number_groups_);
 
 					this->bundling_fittingGamma_ = new double[this->bundling_number_groups_*(this->bundling_number_groups_ - 1) / 2 * 4];
-					this->bundling_gammaSpecies_ = new double[this->bundling_number_groups_*(this->bundling_number_groups_ - 1) / 2 * this->npoints_];
-					this->bundling_gammaSpeciesSelfDiffusion_ = new double[this->bundling_number_groups_ * this->npoints_];
+					this->bundling_gammaSpecies_ = new double[this->bundling_number_groups_*(this->bundling_number_groups_ - 1) / 2];
+					this->bundling_gammaSpeciesSelfDiffusion_ = new double[this->bundling_number_groups_];
 
 					unsigned int countFitting = 0;
 					for (unsigned int i = 0; i < this->bundling_number_groups_; i++)
@@ -569,14 +553,13 @@ namespace OpenSMOKE
 			}
 
 			if (iFound == false)
-				ErrorMessage("TransportPropertiesMap_CHEMKIN<map>::ImportSpeciesBundlingFromXMLFile", "The requested epsilon for species bundling was not found");
+				ErrorMessage("TransportPropertiesMap_CHEMKIN::ImportSpeciesBundlingFromXMLFile", "The requested epsilon for species bundling was not found");
 		}
 		else
-			ErrorMessage("TransportPropertiesMap_CHEMKIN<map>::ImportSpeciesBundlingFromXMLFile", "The kinetic mechanism was preprocessed without enabling species bundling");
+			ErrorMessage("TransportPropertiesMap_CHEMKIN::ImportSpeciesBundlingFromXMLFile", "The kinetic mechanism was preprocessed without enabling species bundling");
 	}
 
-	template<typename map> 
-	void TransportPropertiesMap_CHEMKIN<map>::ImportSpeciesFromXMLFile(rapidxml::xml_document<>& doc)
+	void TransportPropertiesMap_CHEMKIN::ImportSpeciesFromXMLFile(rapidxml::xml_document<>& doc)
 	{
 		rapidxml::xml_node<>* opensmoke_node = doc.first_node("opensmoke");
 		rapidxml::xml_node<>* number_of_species_node = opensmoke_node->first_node("NumberOfSpecies");
@@ -605,12 +588,11 @@ namespace OpenSMOKE
 		}
 		catch (...)
 		{
-			ErrorMessage("TransportPropertiesMap_CHEMKIN<map>::ImportSpeciesFromXMLFile", "Error in reading the list of species.");
+			ErrorMessage("TransportPropertiesMap_CHEMKIN::ImportSpeciesFromXMLFile", "Error in reading the list of species.");
 		}
 	}
 
-	template<typename map> 
-	void TransportPropertiesMap_CHEMKIN<map>::CompleteInitialization()
+	void TransportPropertiesMap_CHEMKIN::CompleteInitialization()
 	{
 		if (viscosity_model == PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_WILKE)
 		{
@@ -646,8 +628,7 @@ namespace OpenSMOKE
 		ChangeDimensions(this->nspecies_*boost::lexical_cast<unsigned int>(iThermalDiffusionRatios_.size()), &this->tetaSpecies_, true);
 	}
 
-	template<> 
-	inline void TransportPropertiesMap_CHEMKIN<double>::lambda()
+	inline void TransportPropertiesMap_CHEMKIN::lambda()
 	{
             if (temperature_lambda_must_be_recalculated_ == true)
             {
@@ -686,101 +667,14 @@ namespace OpenSMOKE
             }
 	}
 
-	template<typename map> 
-	inline void TransportPropertiesMap_CHEMKIN<map>::lambda()
+	inline void TransportPropertiesMap_CHEMKIN::eta()
 	{
-            /*
-		int count = 1;
-		for (unsigned int i=1;i<=this->npoints_;i++)
-		{
-			const double logT=std::log(T[i]);
+        if (temperature_eta_must_be_recalculated_ == true)
+        {
+			const double logT=std::log(T_);
 			const double logT2=logT*logT;
 			const double logT3=logT*logT2;
-			
-			#if OPENSMOKE_USE_MKL == 0
 
-				const double* k = fittingLambda;
-				for (unsigned int j=1;j<=this->nspecies_;j++)
-				{
-					double sum = (*k++);
-						   sum+= (*k++)*logT;
-						   sum+= (*k++)*logT2;
-						   sum+= (*k++)*logT3;
-					this->lambdaSpecies_[count++]=std::exp(sum);
-				}
-
-			#elif OPENSMOKE_USE_MKL == 1
-	
-				const double* k = fittingLambda;
-				for (unsigned int j=1;j<=this->nspecies_;j++)
-				{
-					double sum = (*k++);
-						   sum+= (*k++)*logT;
-						   sum+= (*k++)*logT2;
-						   sum+= (*k++)*logT3;
-					this->lambdaSpecies_[count++]=sum;
-				}
-	
-			#endif
-		}
-
-		#if OPENSMOKE_USE_MKL == 1
-			vdExp( this->nspecies_*this->npoints_, this->lambdaSpecies_.GetHandle(), this->lambdaSpecies_.GetHandle() );
-		#endif
-            */
-	}
-
-	template<> 
-	inline void TransportPropertiesMap_CHEMKIN<double>::eta()
-	{
-            if (temperature_eta_must_be_recalculated_ == true)
-            {
-		const double logT=std::log(T_);
-		const double logT2=logT*logT;
-		const double logT3=logT*logT2;
-
-		#if OPENSMOKE_USE_MKL == 0
-
-			const double* k = fittingEta;
-			for (unsigned int j=1;j<=this->nspecies_;j++)
-			{
-				double sum = (*k++);
-					   sum+= (*k++)*logT;
-					   sum+= (*k++)*logT2;
-					   sum+= (*k++)*logT3;
-				this->etaSpecies_[j]=std::exp(sum);
-			}
-
-		#elif OPENSMOKE_USE_MKL == 1
-	
-			const double* k = fittingEta;
-			for (unsigned int j=1;j<=this->nspecies_;j++)
-			{
-				double sum = (*k++);
-					   sum+= (*k++)*logT;
-					   sum+= (*k++)*logT2;
-					   sum+= (*k++)*logT3;
-				this->etaSpecies_[j]=sum;
-			}
-			vdExp( this->nspecies_, this->etaSpecies_.GetHandle(), this->etaSpecies_.GetHandle() );
-	
-		#endif
-
-                temperature_eta_must_be_recalculated_ = false;
-            }
-	}
-	
-	template<typename map> 
-	inline void TransportPropertiesMap_CHEMKIN<map>::eta()
-	{
-            /*
-		int count = 1;
-		for (unsigned int i=1;i<=this->npoints_;i++)
-		{
-			const double logT=std::log(T[i]);
-			const double logT2=logT*logT;
-			const double logT3=logT*logT2;
-			
 			#if OPENSMOKE_USE_MKL == 0
 
 				const double* k = fittingEta;
@@ -790,7 +684,7 @@ namespace OpenSMOKE
 						   sum+= (*k++)*logT;
 						   sum+= (*k++)*logT2;
 						   sum+= (*k++)*logT3;
-					this->etaSpecies_[count++]=std::exp(sum);
+					this->etaSpecies_[j]=std::exp(sum);
 				}
 
 			#elif OPENSMOKE_USE_MKL == 1
@@ -802,56 +696,47 @@ namespace OpenSMOKE
 						   sum+= (*k++)*logT;
 						   sum+= (*k++)*logT2;
 						   sum+= (*k++)*logT3;
-					this->etaSpecies_[count++]=sum;
+					this->etaSpecies_[j]=sum;
 				}
+				vdExp( this->nspecies_, this->etaSpecies_.GetHandle(), this->etaSpecies_.GetHandle() );
 	
 			#endif
-		}
 
-		#if OPENSMOKE_USE_MKL == 1
-			vdExp( this->nspecies_*this->npoints_, this->etaSpecies_.GetHandle(), this->etaSpecies_.GetHandle() );
-		#endif
-            */
+			temperature_eta_must_be_recalculated_ = false;
+		}
 	}
 	
-	template<> 
-	inline void TransportPropertiesMap_CHEMKIN<double>::teta()
+	inline void TransportPropertiesMap_CHEMKIN::teta()
 	{
-            if (temperature_teta_must_be_recalculated_ == true)
-            {
-		const double T2=T_*T_;
-		const double T3=T_*T2;
+		if (temperature_teta_must_be_recalculated_ == true)
+		{
+			const double T2=T_*T_;
+			const double T3=T_*T2;
 		
-		// Thermal diffusion ratios evaluation
-		for (unsigned int i=1;i<=iThermalDiffusionRatios_.size();i++)
-		{
-			unsigned int j = 4*(i-1)*this->nspecies_;
-			unsigned int m = (i-1)*this->nspecies_+1;
-
-			double* ptFitting = &fittingTeta[j];
-
-			for (unsigned int k=1;k<=this->nspecies_;k++)
+			// Thermal diffusion ratios evaluation
+			for (unsigned int i=1;i<=iThermalDiffusionRatios_.size();i++)
 			{
-				double sum  = (*ptFitting++);
-				       sum += (*ptFitting++)*T_;
-					   sum += (*ptFitting++)*T2;
-					   sum += (*ptFitting++)*T3;
-				this->tetaSpecies_[m++] = sum; 
+				unsigned int j = 4*(i-1)*this->nspecies_;
+				unsigned int m = (i-1)*this->nspecies_+1;
 
+				double* ptFitting = &fittingTeta[j];
+
+				for (unsigned int k=1;k<=this->nspecies_;k++)
+				{
+					double sum  = (*ptFitting++);
+						   sum += (*ptFitting++)*T_;
+						   sum += (*ptFitting++)*T2;
+						   sum += (*ptFitting++)*T3;
+					this->tetaSpecies_[m++] = sum; 
+
+				}
 			}
-		}
                 
-                temperature_teta_must_be_recalculated_ = false;
-            }
+			temperature_teta_must_be_recalculated_ = false;
+		}
 	}
 
-	template<typename map> 
-	inline void TransportPropertiesMap_CHEMKIN<map>::teta()
-	{
-	}
-
-	template<> 
-	inline void TransportPropertiesMap_CHEMKIN<double>::gamma()
+	inline void TransportPropertiesMap_CHEMKIN::gamma()
 	{
 		if ( temperature_gamma_must_be_recalculated_ == false && pressure_gamma_must_be_recalculated_  == true )
 		{
@@ -914,8 +799,7 @@ namespace OpenSMOKE
         }
 	}
 
-	template<>
-	inline void TransportPropertiesMap_CHEMKIN<double>::bundling_gamma()
+	inline void TransportPropertiesMap_CHEMKIN::bundling_gamma()
 	{
 		if (temperature_gamma_must_be_recalculated_ == false && pressure_gamma_must_be_recalculated_ == true )
 		{
@@ -1000,15 +884,8 @@ namespace OpenSMOKE
 			pressure_gamma_must_be_recalculated_ = false;
 		}
 	}
-	
-	template<typename map> 
-	inline void TransportPropertiesMap_CHEMKIN<map>::gamma()
-	{
-		OpenSMOKE::FatalErrorMessage("Calculation of mass diffusion coefficient is allowed only for maps of type: double");
-	}
 
-	template<> 
-	void TransportPropertiesMap_CHEMKIN<double>::lambdaMix(double& lambdamix, OpenSMOKEVectorDouble& moleFractions)
+	void TransportPropertiesMap_CHEMKIN::lambdaMix(double& lambdamix, OpenSMOKEVectorDouble& moleFractions)
 	{
 		// Calcolo della conducibilita della miscela
 		// Formula di Mathur, Todor, Saxena - Molecular Physics 52:569 (1967)
@@ -1018,14 +895,7 @@ namespace OpenSMOKE
 		lambdamix = 0.50 * ( sum1 + 1./sum2 );
 	}
 
-	template<typename map> 
-	void TransportPropertiesMap_CHEMKIN<map>::lambdaMix(map& lambdamix, OpenSMOKEVectorDouble& moleFractions)
-	{
-		OpenSMOKE::FatalErrorMessage("Calculation of mass thermal conductivity is allowed only for maps of type: double");
-	}
-
-	template<> 
-	void TransportPropertiesMap_CHEMKIN<double>::etaMix(double& etamix, OpenSMOKEVectorDouble& moleFractions)
+	void TransportPropertiesMap_CHEMKIN::etaMix(double& etamix, OpenSMOKEVectorDouble& moleFractions)
 	{
 		sumK = moleFractions;
 
@@ -1084,14 +954,7 @@ namespace OpenSMOKE
 		
 	}
 
-	template<typename map> 
-	void TransportPropertiesMap_CHEMKIN<map>::etaMix(map& etamix, OpenSMOKEVectorDouble& moleFractions)
-	{
-		OpenSMOKE::FatalErrorMessage("Calculation of dynamic viscosity is allowed only for maps of type: double");
-	}
-
-	template<> 
-	void TransportPropertiesMap_CHEMKIN<double>::gammaMix(OpenSMOKEVectorDouble& gammamix, OpenSMOKEVectorDouble& moleFractions)
+	void TransportPropertiesMap_CHEMKIN::gammaMix(OpenSMOKEVectorDouble& gammamix, OpenSMOKEVectorDouble& moleFractions)
 	{	
 		// Reset
 		for(unsigned int k=0;k<this->nspecies_;k++)
@@ -1120,8 +983,7 @@ namespace OpenSMOKE
 			gammamix[k+1] = (MWmix - x_corrected[k]*M[k]) / (MWmix*sum_diffusion_coefficients[k]);
 	}
 
-	template<>
-	void TransportPropertiesMap_CHEMKIN<double>::bundling_gammaMix(OpenSMOKEVectorDouble& gammamix, OpenSMOKEVectorDouble& moleFractions)
+	void TransportPropertiesMap_CHEMKIN::bundling_gammaMix(OpenSMOKEVectorDouble& gammamix, OpenSMOKEVectorDouble& moleFractions)
 	{
 		// Reset
 		for (unsigned int k = 0; k<this->bundling_number_groups_; k++)
@@ -1163,14 +1025,7 @@ namespace OpenSMOKE
 		}
 	}
 
-	template<typename map> 
-	void TransportPropertiesMap_CHEMKIN<map>::gammaMix(OpenSMOKEVectorDouble& gammamix, OpenSMOKEVectorDouble& moleFractions)
-	{
-		OpenSMOKE::FatalErrorMessage("Calculation of mass diffusion coefficients is allowed only for maps of type: double");
-	}
-
-	template<> 
-	void TransportPropertiesMap_CHEMKIN<double>::tetaMix(OpenSMOKEVectorDouble& tetamix, OpenSMOKEVectorDouble& moleFractions)
+	void TransportPropertiesMap_CHEMKIN::tetaMix(OpenSMOKEVectorDouble& tetamix, OpenSMOKEVectorDouble& moleFractions)
 	{
 		for (unsigned int j=1;j<=this->nspecies_;j++)
 			tetamix[j] = 0.;
@@ -1186,13 +1041,7 @@ namespace OpenSMOKE
 		}
 	}
 
-	template<typename map> 
-	void TransportPropertiesMap_CHEMKIN<map>::tetaMix(OpenSMOKEVectorDouble& tetamix, OpenSMOKEVectorDouble& moleFractions)
-	{
-	}
-
-	template<typename map>
-	void TransportPropertiesMap_CHEMKIN<map>::kPlanckMix(double& kPlanck, OpenSMOKEVectorDouble& moleFractions)
+	void TransportPropertiesMap_CHEMKIN::kPlanckMix(double& kPlanck, OpenSMOKEVectorDouble& moleFractions)
 	{
 		const double uT = 1000. / this->T_;
 		const double T = this->T_;
@@ -1231,8 +1080,7 @@ namespace OpenSMOKE
 		kPlanck = (as_H2O + as_CO2 + as_CO + as_CH4) * (this->P_ / 1.e5);	// [1/m]
 	}
 
-	template<> 
-	void TransportPropertiesMap_CHEMKIN<double>::Test(const int nLoops, const double& T, int* index)
+	void TransportPropertiesMap_CHEMKIN::Test(const int nLoops, const double& T, int* index)
 	{
 		double lambdamix, etamix;
 		OpenSMOKEVectorDouble gammamix(this->nspecies_);
@@ -1442,8 +1290,4 @@ namespace OpenSMOKE
 
 		fBenchmark.close();
 	}
-
-	template<typename map> 
-	void TransportPropertiesMap_CHEMKIN<map>::Test(const int nLoops, const map& T, int* index)
-	{}
 }

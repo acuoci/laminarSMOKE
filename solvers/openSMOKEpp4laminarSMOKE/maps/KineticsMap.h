@@ -47,7 +47,6 @@ namespace OpenSMOKE
 			This class provides a common interface to kinetic mapsfor the evaluation of reaction and formation rates
 	*/
 
-	template<typename map> 
 	class KineticsMap
 	{
 	
@@ -56,12 +55,12 @@ namespace OpenSMOKE
 		/**
 		* Sets the temperature (in K)
 		*/
-		virtual void SetTemperature(const map& T) = 0;
+		virtual void SetTemperature(const double& T) = 0;
 
 		/**
 		* Sets the pressure (in Pa)
 		*/
-		virtual void SetPressure(const map& P) = 0;
+		virtual void SetPressure(const double& P) = 0;
 
 		/**
 		* @brief Returns the number of reactions
@@ -75,13 +74,13 @@ namespace OpenSMOKE
 		unsigned int number_of_reactions_;		//!< total number of reactions
 		unsigned int number_of_points_;			//!< number of points to be mapped (currently only 1)
 
-		map T_;									//!< map of temperatures
-		map uT_;								//!< map of reciprocal of temperatures
-		map logT_;								//!< map of log of temperatures
-		map P_;									//!< map of pressures
+		double T_;								//!< temperature [K]
+		double uT_;								//!< reciprocal of temperature [1/K]
+		double logT_;							//!< log of temperature [temperature in K]
+		double P_;								//!< pressure [Pa]
 
-		map T_old_;								//!< map of temperatures (previous values)
-		map P_old_;								//!< map of pressures (previous values)
+		double T_old_;							//!< temperature [K] (previous values)
+		double P_old_;							//!< pressure [Pa] (previous values)
 	};
 }
 

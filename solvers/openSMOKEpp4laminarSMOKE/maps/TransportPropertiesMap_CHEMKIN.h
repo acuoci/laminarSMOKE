@@ -52,47 +52,44 @@ namespace OpenSMOKE
 		 if the temperature changes.
 	*/
 
-	template<typename map> 
-	class TransportPropertiesMap_CHEMKIN : public TransportPropertiesMap<map>
+	class TransportPropertiesMap_CHEMKIN : public TransportPropertiesMap
 	{
 	public:
 
 		/**
 		*@brief Creates a transport map for the evaluation of transport properties (obsolete TOREMOVE)
 		*@param nSpecies number of species
-		*@param nPoints number of points in the map (for a scalar map the number of points is 1)
 		*/
-		TransportPropertiesMap_CHEMKIN(const unsigned int nSpecies, const unsigned int nPoints = 1);
+		TransportPropertiesMap_CHEMKIN(const unsigned int nSpecies);
 
 		/**
 		*@brief Creates a transport map for the evaluation of transport properties
 		*@param doc file in XML format
-		*@param nPoints number of points in the map (for a scalar map the number of points is 1)
 		*/
-		TransportPropertiesMap_CHEMKIN(rapidxml::xml_document<>& doc, const unsigned int nPoints = 1);
+		TransportPropertiesMap_CHEMKIN(rapidxml::xml_document<>& doc);
                 
-                /**
+        /**
 		*@brief Copy constructor
 		*@param rhs the object to be copied in the current object
 		*/
-                TransportPropertiesMap_CHEMKIN( const TransportPropertiesMap_CHEMKIN& rhs );
+        TransportPropertiesMap_CHEMKIN( const TransportPropertiesMap_CHEMKIN& rhs );
                 
-                /**
+        /**
 		*@brief Default destructor
 		*/
 		~TransportPropertiesMap_CHEMKIN();
                 
-                /**
+        /**
 		*@brief Set the temperature at which the properties have to be evaluated
 		*@param T the temperature value in K
 		*/
-		virtual void SetTemperature(const map& T);
+		virtual void SetTemperature(const double& T);
 
 		/**
 		*@brief Set the pressure at which the properties have to be evaluated
 		*@param P the pressure value in Pa
 		*/
-		virtual void SetPressure(const map& P);		
+		virtual void SetPressure(const double& P);		
 
 		/**
 		*@brief Sets the transport coefficient for the requested species
@@ -122,19 +119,19 @@ namespace OpenSMOKE
 		/**
 		*@brief TODO (This is just a test subroutine!)
 		*/
-		void Test(const int nLoops, const map& T, int* index);
+		void Test(const int nLoops, const double& T, int* index);
 
 	public:
 
 		/**
 		*@brief Combines the species thermal conductivities to calculate the mixture thermal conductivity
 		*/
-		virtual void lambdaMix(map& lambdamix, OpenSMOKEVectorDouble& omega);
+		virtual void lambdaMix(double& lambdamix, OpenSMOKEVectorDouble& omega);
 
 		/**
 		*@brief Combines the species dynamic viscosities to calculate the mixture dynamic viscosity
 		*/
-		virtual void etaMix(map& etamix, OpenSMOKEVectorDouble& omega);
+		virtual void etaMix(double& etamix, OpenSMOKEVectorDouble& omega);
 
 		/**
 		*@brief Combines the species mass diffusion coefficients to calculate the mixture mass diffusion coefficients

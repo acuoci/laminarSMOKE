@@ -41,14 +41,14 @@
 #ifndef BatchReactorHomogeneousConstantPressure_H
 #define	BatchReactorHomogeneousConstantPressure_H
 
-#include "soot/hmom/HMOM.h"
+#include "utilities/soot/hmom/HMOM.h"
 
 class BatchReactorHomogeneousConstantPressure
 {
 public:
 
-	BatchReactorHomogeneousConstantPressure(	OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermodynamicsMap, 
-												OpenSMOKE::KineticsMap_CHEMKIN<double>& kineticsMap);
+	BatchReactorHomogeneousConstantPressure(	OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMap, 
+												OpenSMOKE::KineticsMap_CHEMKIN& kineticsMap);
 
 	void SetReactor( const double P0 );
 	void SetTemperature( const double T, double* y );
@@ -94,8 +94,8 @@ private:
 	unsigned int NR_;
 	unsigned int NHMOM_;
 
-	OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>&	thermodynamicsMap_;		//!< thermodynamic map
-	OpenSMOKE::KineticsMap_CHEMKIN<double>&			kineticsMap_;			//!< kinetic map
+	OpenSMOKE::ThermodynamicsMap_CHEMKIN&	thermodynamicsMap_;		//!< thermodynamic map
+	OpenSMOKE::KineticsMap_CHEMKIN&			kineticsMap_;			//!< kinetic map
 
 	OpenSMOKE::OpenSMOKEVectorDouble omega_;
 	OpenSMOKE::OpenSMOKEVectorDouble x_;
@@ -167,7 +167,7 @@ unsigned int BatchReactorHomogeneousConstantPressure::NumberOfEquations() const
 }
 
 BatchReactorHomogeneousConstantPressure::BatchReactorHomogeneousConstantPressure
-(	OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermodynamicsMap, OpenSMOKE::KineticsMap_CHEMKIN<double>& kineticsMap ):
+(	OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMap, OpenSMOKE::KineticsMap_CHEMKIN& kineticsMap ):
 	thermodynamicsMap_(thermodynamicsMap), 
 	kineticsMap_(kineticsMap)
 	{

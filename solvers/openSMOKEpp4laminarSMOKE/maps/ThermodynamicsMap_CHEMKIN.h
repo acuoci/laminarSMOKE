@@ -52,8 +52,7 @@ namespace OpenSMOKE
 	if the temperature changes.
 	*/
 
-	template<typename map>
-	class ThermodynamicsMap_CHEMKIN : public ThermodynamicsMap<map>
+	class ThermodynamicsMap_CHEMKIN : public ThermodynamicsMap
 	{
 
 	public:
@@ -61,24 +60,21 @@ namespace OpenSMOKE
 		/**
 		*@brief Creates a thermodynamic map for the evaluation of thermodynamic properties (obsolete TOREMOVE)
 		*@param nSpecies number of species
-		*@param nPoints number of points in the map (for a scalar map the number of points is 1)
 		*/
-		ThermodynamicsMap_CHEMKIN(const unsigned int nSpecies, const unsigned int nPoints = 1);
+		ThermodynamicsMap_CHEMKIN(const unsigned int nSpecies);
 
 		/**
 		*@brief Creates a thermodynamic map for the evaluation of thermodynamic properties
 		*@param doc file in XML format
-		*@param nPoints number of points in the map (for a scalar map the number of points is 1)
 		*/
-		ThermodynamicsMap_CHEMKIN(rapidxml::xml_document<>& doc, const unsigned int nPoints = 1);
+		ThermodynamicsMap_CHEMKIN(rapidxml::xml_document<>& doc);
 
 		/**
 		*@brief Creates a thermodynamic map for the evaluation of thermodynamic properties
 		*@param doc file in XML format
 		*@param verbose activate or deactivate output
-		*@param nPoints number of points in the map (for a scalar map the number of points is 1)
 		*/
-		ThermodynamicsMap_CHEMKIN(rapidxml::xml_document<>& doc, bool verbose, const unsigned int nPoints = 1);
+		ThermodynamicsMap_CHEMKIN(rapidxml::xml_document<>& doc, bool verbose);
 
 		/**
 		*@brief Copy constructor
@@ -101,13 +97,13 @@ namespace OpenSMOKE
 		*@brief Set the temperature at which the properties have to be evaluated
 		*@param T the temperature value in K
 		*/
-		virtual void SetTemperature(const map& T);
+		virtual void SetTemperature(const double& T);
 
 		/**
 		*@brief Set the pressure at which the properties have to be evaluated
 		*@param P the pressure value in Pa
 		*/
-		virtual void SetPressure(const map& P);
+		virtual void SetPressure(const double& P);
 
 
 		/**
@@ -115,66 +111,66 @@ namespace OpenSMOKE
 		*@param x mole fractions of species
 		*@param MW the molecular weight in kg/kmol
 		*/
-		virtual inline void MolecularWeight_From_MoleFractions(map& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		virtual inline void MolecularWeight_From_MoleFractions(double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x);
 
 		/**
 		*@brief Returns the molecular weight of the mixture from the mass fractions
 		*@param y mass fractions of species
 		*@param MW the molecular weight in kg/kmol
 		*/
-		virtual inline void MolecularWeight_From_MassFractions(map& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y);
+		virtual inline void MolecularWeight_From_MassFractions(double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y);
 
 		/**
 		*@brief Calculates the mass fractions and the molecular weight from the mole fractions
 		*/
-		virtual inline void MassFractions_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& y, map& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		virtual inline void MassFractions_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& y, double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x);
 
 		/**
 		*@brief Calculates the mole fractions and the molecular weight from the mass fractions
 		*/
-		virtual inline void MoleFractions_From_MassFractions(OpenSMOKE::OpenSMOKEVectorDouble& x, map& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y);
+		virtual inline void MoleFractions_From_MassFractions(OpenSMOKE::OpenSMOKEVectorDouble& x, double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y);
 
 		/**
 		*@brief Calculates the mixture averaged specific heat (equivalent to CKCPBL in CHEMKIN software)
 		*@param x the vector of mole fractions for all the species
 		*@param cpmix the mixture-averaged specific heat in J/kmol/K
 		*/
-		virtual void cpMolar_Mixture_From_MoleFractions(map& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		virtual void cpMolar_Mixture_From_MoleFractions(double& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x);
 
 		/**
 		*@brief Calculates the mixture averaged enthalpy (equivalent to CKHBML in CHEMKIN software)
 		*@param x the vector of mole fractions for all the species
 		*@param hmix the mixture-averaged enthalpy in J/kmol
 		*/
-		virtual void hMolar_Mixture_From_MoleFractions(map& hmix, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		virtual void hMolar_Mixture_From_MoleFractions(double& hmix, const OpenSMOKE::OpenSMOKEVectorDouble& x);
 
 		/**
 		*@brief Calculates the mixture averaged entropy (equivalent to CKSBML in CHEMKIN software)
 		*@param x the vector of mole fractions for all the species
 		*@param smix the mixture-averaged entropy in J/kmol/K
 		*/
-		void sMolar_Mixture_From_MoleFractions(map& smix, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		void sMolar_Mixture_From_MoleFractions(double& smix, const OpenSMOKE::OpenSMOKEVectorDouble& x);
 
 		/**
 		*@brief Calculates the mixture averaged internal energy (equivalent to CKUBML in CHEMKIN software)
 		*@param x the vector of mole fractions for all the species
 		*@param umix mixture-averaged internal energy in J/kmol
 		*/
-		virtual void uMolar_Mixture_From_MoleFractions(map& umix, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		virtual void uMolar_Mixture_From_MoleFractions(double& umix, const OpenSMOKE::OpenSMOKEVectorDouble& x);
 
 		/**
 		*@brief Calculates the mixture averaged Gibb's free energy (equivalent to CKGBML in CHEMKIN software)
 		*@param x the vector of mole fractions for all the species
 		*@param gmix the mixture-averaged Gibb's free energy in J/kmol
 		*/
-		virtual void gMolar_Mixture_From_MoleFractions(map& gmix, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		virtual void gMolar_Mixture_From_MoleFractions(double& gmix, const OpenSMOKE::OpenSMOKEVectorDouble& x);
 
 		/**
 		*@brief Calculates the mixture averaged Helmholtz free energy (equivalent to CKABML in CHEMKIN software)
 		*@param x the vector of mole fractions for all the species
 		*@param amix the mixture-averaged Helmholtz free energy in J/kmol
 		*/
-		virtual void aMolar_Mixture_From_MoleFractions(map& amix, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		virtual void aMolar_Mixture_From_MoleFractions(double& amix, const OpenSMOKE::OpenSMOKEVectorDouble& x);
 
 		/**
 		*@brief Calculates the standard specific heats of species at constant pressure (equivalent to CKCPOR in CHEMKIN software)
@@ -264,7 +260,7 @@ namespace OpenSMOKE
 		/**
 		*@brief TODO (This is just a test subroutine!)
 		*/
-		void Test(const int nLoops, const map& T, int* index);
+		void Test(const int nLoops, const double& T, int* index);
 
 		/**
 		*@brief Calculates the normalized specific heats for the species

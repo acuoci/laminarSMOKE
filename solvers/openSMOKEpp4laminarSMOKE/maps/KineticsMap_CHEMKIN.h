@@ -58,8 +58,7 @@ namespace OpenSMOKE
 		 if the temperature changes
 	*/
 
-	template<typename map> 
-	class KineticsMap_CHEMKIN : public KineticsMap<map>
+	class KineticsMap_CHEMKIN : public KineticsMap
 	{
 
 	public:
@@ -70,7 +69,7 @@ namespace OpenSMOKE
 		*@param nSpecies number of species 
 		*@param nPoints number op points in the map (for a scalar map the number of oints is 1)
 		*/
-		KineticsMap_CHEMKIN(ThermodynamicsMap_CHEMKIN<map>& thermo, const unsigned int nSpecies, const unsigned int nPoints = 1);
+		KineticsMap_CHEMKIN(ThermodynamicsMap_CHEMKIN& thermo, const unsigned int nSpecies, const unsigned int nPoints = 1);
 
 		/**
 		*@brief Creates a thermodynamic map for the evaluation of thermodynamic properties
@@ -78,7 +77,7 @@ namespace OpenSMOKE
 		*@param doc xml file  
 		*@param nPoints number op points in the map (for a scalar map the number of oints is 1)
 		*/
-		KineticsMap_CHEMKIN(ThermodynamicsMap_CHEMKIN<map>& thermo, rapidxml::xml_document<>& doc, const unsigned int nPoints = 1);
+		KineticsMap_CHEMKIN(ThermodynamicsMap_CHEMKIN& thermo, rapidxml::xml_document<>& doc, const unsigned int nPoints = 1);
                 
                 /**
 		*@brief Creates a thermodynamic map for the evaluation of thermodynamic properties
@@ -87,7 +86,7 @@ namespace OpenSMOKE
                 *@param verbose activate output
 		*@param nPoints number op points in the map (for a scalar map the number of oints is 1)
 		*/
-		KineticsMap_CHEMKIN(ThermodynamicsMap_CHEMKIN<map>& thermo, rapidxml::xml_document<>& doc, bool verbose, const unsigned int nPoints = 1);
+		KineticsMap_CHEMKIN(ThermodynamicsMap_CHEMKIN& thermo, rapidxml::xml_document<>& doc, bool verbose, const unsigned int nPoints = 1);
 
                 /**
 		*@brief Copy constructor
@@ -104,14 +103,14 @@ namespace OpenSMOKE
                 *       (rhs.thermodynamics_) and the provided map (thermo). It is up to the user to be sure about the consistency.
 		*@param rhs the object to be copied in the current object
 		*/
-                KineticsMap_CHEMKIN( const KineticsMap_CHEMKIN& rhs, ThermodynamicsMap_CHEMKIN<map>& thermo );
+                KineticsMap_CHEMKIN( const KineticsMap_CHEMKIN& rhs, ThermodynamicsMap_CHEMKIN& thermo );
                 		
 		/**
 		*@brief Default destructor
 		*/
 		~KineticsMap_CHEMKIN();
 
-		ThermodynamicsMap_CHEMKIN<map>& thermodynamics() const { return thermodynamics_; }
+		ThermodynamicsMap_CHEMKIN& thermodynamics() const { return thermodynamics_; }
 
 		/**
 		*@brief Sets the verbose output
@@ -122,13 +121,13 @@ namespace OpenSMOKE
 		*@brief Set the temperature at which the properties have to be evaluated
 		*@param T the temperature value in K
 		*/
-		virtual void SetTemperature(const map& T);
+		virtual void SetTemperature(const double& T);
 
 		/**
 		*@brief Set the pressure at which the properties have to be evaluated
 		*@param P the pressure value in Pa
 		*/
-		virtual void SetPressure(const map& P);		
+		virtual void SetPressure(const double& P);		
 
 		/**
 		*@brief Returns the names of the species
@@ -148,7 +147,7 @@ namespace OpenSMOKE
 		/**
 		*@brief Calculates the kinetic constants of the reverse reactions
 		*/
-		void FittedReverseKineticConstants(OpenSMOKEVectorDouble& x_bath, const unsigned int nparameters, Eigen::MatrixXd& fittedKineticParameters);
+		void FittedReverseKineticConstants(const OpenSMOKEVectorDouble& x_bath, const unsigned int nparameters, Eigen::MatrixXd& fittedKineticParameters, const bool only_reversible);
 
 		/**
 		*@brief Calculates the kinetic constants of the reverse reactions
@@ -158,7 +157,7 @@ namespace OpenSMOKE
 		/**
 		*@brief Write the data for the reaction tables
 		*/
-		void WriteKineticData(std::ostream& fOut, const unsigned int k, OpenSMOKEVectorDouble& c_bath, const double conversion_forward=1., const double conversion_backward=1.);
+		void WriteKineticData(std::ostream& fOut, const unsigned int k, OpenSMOKEVectorDouble& c_bath, const std::vector<double> list_of_temperatures, const double conversion_forward=1., const double conversion_backward=1.);
 		
 		/**
 		*@brief Write the data for the reaction tables
@@ -292,7 +291,7 @@ namespace OpenSMOKE
 		*@brief Return the frequency factor of a single reaction [kmol, m, s]
 		*@param j index of reaction (starting from zero)
 		*/
-		double A(const unsigned int j) { return std::exp(lnA_[j + 1]); }
+		double A(const unsigned int j) { return sign_lnA_[j+1]*std::exp(lnA_[j+1]); }
 
 		/**
 		*@brief Return the temperature exponent a single reaction 
@@ -323,22 +322,29 @@ namespace OpenSMOKE
 		*@brief Calculates the corrections for the cabr reactions
 		*/
 		void ChemicallyActivatedBimolecularReactions(const double cTot, const OpenSMOKEVectorDouble& c);
-                
-                /**
+             
+		/**
+		*@brief Calculates the kinetic constants for extended pressure log reactions
+		*/
+		void ExtendedPressureLogReactions(const double cTot, const OpenSMOKEVectorDouble& c);
+
+		/**
+		*@brief Calculates the kinetic constants for extended falloff reactions
+		*/
+		void ExtendedFallOffReactions(const double cTot, const OpenSMOKEVectorDouble& c);
+
+        /**
 		*@brief Copies the data from another kinetic map (used by copy constructors)
 		*/
-                void CopyFromMap( const KineticsMap_CHEMKIN& rhs );
+        void CopyFromMap( const KineticsMap_CHEMKIN& rhs );
                 
-                // TODO
-                void FallOffReactions(const unsigned int k, const double cTot, const OpenSMOKEVectorDouble& c, double &F, double &dF_over_dA0, double &dF_over_dAInf);
+        // TODO
+        void FallOffReactions(const unsigned int k, const double cTot, const OpenSMOKEVectorDouble& c, double &F, double &dF_over_dA0, double &dF_over_dAInf);
 		void ChemicallyActivatedBimolecularReactions(const unsigned int k, const double cTot, const OpenSMOKEVectorDouble& c, double &F, double &dF_over_dA0, double &dF_over_dAInf);
-
-
-
 
 	private:
 
-		ThermodynamicsMap_CHEMKIN<map>& thermodynamics_;		//!< reference to the thermodynamics
+		ThermodynamicsMap_CHEMKIN& thermodynamics_;		//!< reference to the thermodynamics
 
 		OpenSMOKEVectorDouble reaction_entropy_over_R_;			//!< list of reaction entropies
 		OpenSMOKEVectorDouble reaction_enthalpy_over_RT_;		//!< list of reaction enthalpies
@@ -349,9 +355,11 @@ namespace OpenSMOKE
 		OpenSMOKEVectorUnsignedInt indices_of_explicitly_reversible_reactions_;		//!< indices of reversible (explicit) reactions
 		OpenSMOKEVectorUnsignedInt indices_of_thirdbody_reactions_;					//!< indices of three-body reactions
 		OpenSMOKEVectorUnsignedInt indices_of_falloff_reactions_;					//!< indices of falloff reactions
+		OpenSMOKEVectorUnsignedInt indices_of_extendedfalloff_reactions_;					//!< indices of extended falloff reactions
 		OpenSMOKEVectorUnsignedInt indices_of_cabr_reactions_;						//!< indices of cabr reactions
 		OpenSMOKEVectorUnsignedInt indices_of_chebyshev_reactions_;					//!< indices of chebyshev reactions
 		OpenSMOKEVectorUnsignedInt indices_of_pressurelog_reactions_;				//!< indices of pressurelog (PLOG) reactions
+		OpenSMOKEVectorUnsignedInt indices_of_extendedpressurelog_reactions_;		//!< indices of extended pressurelog (EXTPLOG) reactions
 		OpenSMOKEVectorUnsignedInt indices_of_fit1_reactions_;						//!< indices of FIT1 reactions
 		OpenSMOKEVectorUnsignedInt indices_of_janevlanger_reactions_;				//!< indices of JAN reactions
 		OpenSMOKEVectorUnsignedInt indices_of_landauteller_reactions_;				//!< indices of LT reactions
@@ -369,9 +377,11 @@ namespace OpenSMOKE
 		unsigned int number_of_explicitly_reversible_reactions_;
 		unsigned int number_of_thirdbody_reactions_;
 		unsigned int number_of_falloff_reactions_;
+		unsigned int number_of_extendedfalloff_reactions_;
 		unsigned int number_of_cabr_reactions_;
 		unsigned int number_of_chebyshev_reactions_;
 		unsigned int number_of_pressurelog_reactions_;
+		unsigned int number_of_extendedpressurelog_reactions_;
 		unsigned int number_of_fit1_reactions_;
 		unsigned int number_of_janevlanger_reactions_;
 		unsigned int number_of_landauteller_reactions_;
@@ -388,6 +398,8 @@ namespace OpenSMOKE
 		OpenSMOKEVectorDouble lnA_;								//!< frequency factors (log)
 		OpenSMOKEVectorDouble Beta_;							//!< temperature exponents
 		OpenSMOKEVectorDouble E_over_R_;						//!< activation temperatures
+		OpenSMOKEVectorInt    negative_lnA_;					//!< list of reactions with negative frequency factor (1-index based)
+		OpenSMOKEVectorInt    sign_lnA_;						//!< sign of frequency factors of reactions (+1 or -1)
 
 		OpenSMOKEVectorDouble lnA_reversible_;					//!< frequency factors (log) for explicitly reversible reactions
 		OpenSMOKEVectorDouble Beta_reversible_;					//!< temperature exponents for explicitly reversible reactions
@@ -457,8 +469,11 @@ namespace OpenSMOKE
 		OpenSMOKEVectorDouble correction_falloff_;						//!< correction factors for the falloff reactions
 		OpenSMOKEVectorDouble correction_cabr_;							//!< correction factors for the cabr reactions
 
-		ChebyshevPolynomialRateExpression* chebyshev_reactions_;		//!< pointer to the list of Chebyshev reactions
-		PressureLogarithmicRateExpression* pressurelog_reactions_;		//!< pointer to the list of PLOG reactions
+		ChebyshevPolynomialRateExpression* chebyshev_reactions_;						//!< pointer to the list of Chebyshev reactions
+		PressureLogarithmicRateExpression* pressurelog_reactions_;						//!< pointer to the list of PLOG reactions
+		ExtendedPressureLogarithmicRateExpression* extendedpressurelog_reactions_;		//!< pointer to the list of PLOGMX/PLOGSP reactions
+		ExtendedFallOff* extendedfalloff_reactions_;									//!< pointer to the list of extended falloff reactions
+
 	//	Fit1RateExpression* fit1_reactions_;					//!< pointer to the list of FIT1 reactions
 	//	JanevLangerRateExpression* janevlanger_reactions_;			//!< pointer to the list of JAN reactions
 	//	LandauTellerRateExpression* landauteller_reactions_;			//!< pointer to the list of LT reactions
@@ -472,7 +487,6 @@ namespace OpenSMOKE
 
 		JacobianSparsityPatternMap<KineticsMap_CHEMKIN>* jacobian_sparsity_pattern_map_;
 	};
-
 
 }
 

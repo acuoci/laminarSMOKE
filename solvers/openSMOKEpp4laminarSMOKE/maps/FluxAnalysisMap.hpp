@@ -40,8 +40,7 @@
 
 namespace OpenSMOKE
 {
-	template<typename map> 
-	void FluxAnalysisMap<map>::AnalyzeNetFluxes(	const unsigned int index_j,
+	void FluxAnalysisMap::AnalyzeNetFluxes(	const unsigned int index_j,
 													std::vector<unsigned int>& important_indices,
 													std::vector<double>& important_normal_fluxes,
 													std::vector<double>& important_fluxes)
@@ -178,16 +177,14 @@ namespace OpenSMOKE
 		}
 	}
 
-	template<typename map> 
-	void FluxAnalysisMap<map>::OpenGraphFile(const std::string file_name)
+	void FluxAnalysisMap::OpenGraphFile(const std::string file_name)
 	{
 		fOut.open(file_name.c_str(), std::ios::out);
 		fOut << "digraph myFirst {" << std::endl;
 		fOut << "node [shape=circle];  " << std::endl;
 	}
 
-	template<typename map> 
-	void FluxAnalysisMap<map>::CloseGraphFile()
+	void FluxAnalysisMap::CloseGraphFile()
 	{
 		fOut << "overlap=false" << std::endl;
 		fOut << "label=\"Reaction Flux Analysis from OpenSMOKE++ Suite (www.opensmoke.polimi.it)\"" << std::endl;
@@ -196,8 +193,7 @@ namespace OpenSMOKE
 		fOut.close();
 	}
 
-	template<typename map> 
-	void FluxAnalysisMap<map>::AddSpeciesToGraphFile(	const unsigned int index_j,
+	void FluxAnalysisMap::AddSpeciesToGraphFile(	const unsigned int index_j,
 														std::vector<unsigned int>& local_indices,
 														std::vector<double>& local_thickness,
 														std::vector<double>& local_normal_fluxes,
@@ -259,8 +255,7 @@ namespace OpenSMOKE
 		}
 	}
 
-	template<typename map> 
-	void FluxAnalysisMap<map>::GloballyAnalyze(	const std::vector<unsigned int>& important_indices, const int current_depth )
+	void FluxAnalysisMap::GloballyAnalyze(	const std::vector<unsigned int>& important_indices, const int current_depth )
 	{
 		if (current_depth <= max_depth_)
 		{
@@ -278,8 +273,7 @@ namespace OpenSMOKE
 		}
 	}
 
-	template<typename map> 
-	void FluxAnalysisMap<map>::CalculateThickness()
+	void FluxAnalysisMap::CalculateThickness()
 	{
 		if (normal_thickness_ == false)
 		{
@@ -311,9 +305,8 @@ namespace OpenSMOKE
 			}
 		}
 	}
-
-	template<typename map> 
-	void FluxAnalysisMap<map>::Plot(const std::string file_name)
+ 
+	void FluxAnalysisMap::Plot(const std::string file_name)
 	{
 		OpenGraphFile(file_name);
 		for (unsigned int j=0;j<list_of_analyzed_species_.size();j++)
@@ -325,8 +318,7 @@ namespace OpenSMOKE
 		CloseGraphFile();
 	}
 
-	template<typename map> 
-	void FluxAnalysisMap<map>::WriteStoichiometricMatrix( const std::string file_name)
+	void FluxAnalysisMap::WriteStoichiometricMatrix( const std::string file_name)
 	{
 		std::ofstream fOut(file_name.c_str(), std::ios::out);
 

@@ -27,7 +27,7 @@ namespace OpenSMOKE
 		*@param thermodynamicsMapXML thermodynamic map
 		*@param kineticsMapXML kinetics map
 		*/
-		DRG(OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>* thermodynamicsMapXML, OpenSMOKE::KineticsMap_CHEMKIN<double>* kineticsMapXML);
+		DRG(OpenSMOKE::ThermodynamicsMap_CHEMKIN* thermodynamicsMapXML, OpenSMOKE::KineticsMap_CHEMKIN* kineticsMapXML);
 
 		/**
 		*@brief Sets the key-species (i.e. the target species which are considered important)
@@ -107,8 +107,8 @@ namespace OpenSMOKE
 
 	private:
 
-		OpenSMOKE::ThermodynamicsMap_CHEMKIN<double>& thermodynamicsMapXML_;	/**< reference to the thermodynamic map */
-		OpenSMOKE::KineticsMap_CHEMKIN<double>& kineticsMapXML_;		/**< reference to the kinetics map */
+		OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMapXML_;	/**< reference to the thermodynamic map */
+		OpenSMOKE::KineticsMap_CHEMKIN& kineticsMapXML_;		/**< reference to the kinetics map */
 
 		std::vector<unsigned int> index_key_species_;				/**< indices of target or key species (zero-based) */
 

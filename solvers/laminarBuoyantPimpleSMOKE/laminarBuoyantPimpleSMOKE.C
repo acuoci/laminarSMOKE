@@ -52,14 +52,14 @@
 
 // CHEMKIN maps
 #include "maps/Maps_CHEMKIN"
-#include "soot/OpenSMOKE_PolimiSoot_Analyzer.h"
+#include "utilities/soot/polimi/OpenSMOKE_PolimiSoot_Analyzer.h"
 
 // OpenSMOKE++ Dictionaries
 #include "dictionary/OpenSMOKE_Dictionary"
 
 // ODE solvers
-#include "math/multivalue-ode-solvers/MultiValueSolver"
-#include "ode/ODE_Parameters.h"
+#include "math/native-ode-solvers/MultiValueSolver"
+#include "math/external-ode-solvers/ODE_Parameters.h"
 
 // OpenFOAM
 #include "fvCFD.H"
@@ -93,7 +93,7 @@
 
 // Soot
 #include "sootUtilities.H"
-#include "soot/hmom/HMOM.h"
+#include "utilities/soot/hmom/HMOM.h"
 
 template<typename Solver, typename OdeBatch>
 void SolveOpenSourceSolvers(OdeBatch& ode, const double t0, const double tf, const OpenSMOKE::OpenSMOKEVectorDouble& y0, OpenSMOKE::OpenSMOKEVectorDouble& yf, const OpenSMOKE::ODE_Parameters& parameters)
