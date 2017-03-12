@@ -1,8 +1,8 @@
-#OpenFOAM VERSION (22, 23, 24, 30)
+#OpenFOAM VERSION (22, 23, or 24)
 export OPENFOAM_VERSION='-DOPENFOAM_VERSION=24'
 
 #Compulsory path
-export EIGEN_LIBRARY_PATH=/software/chimica2/libraries/eigen/eigen-3.3-dev
+export EIGEN_LIBRARY_PATH=/software/chimica2/libraries/eigen/eigen-3.3.3
 export BOOST_LIBRARY_PATH=/software/chimica2/libraries/boost/boost-1.60.0-gcc-4.8.2
 export RAPIDXML_LIBRARY_PATH=/software/chimica2/libraries/rapidxml/rapidxml-1.13
 
@@ -27,3 +27,4 @@ export ODEPACK_LIBS=/software/chimica2/libraries/odepack/odepack-gcc-4.8.2/lib/l
 export LINPACK_LIBS=/software/chimica2/libraries/linpack/linpack-gcc-4.8.2/lib/libLINPACK_gcc_64bit.a
 export SUNDIALS_PATH=/software/chimica2/libraries/sundials/sundials-2.6.2-opensmoke++/serial-gcc-4.8.2/
 export SUNDIALS_LIBS='$(SUNDIALS_PATH)/lib/libsundials_cvode.a $(SUNDIALS_PATH)/lib/libsundials_nvecserial.a'
+
