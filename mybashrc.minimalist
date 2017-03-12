@@ -1,8 +1,8 @@
 #OpenFOAM VERSION (22, 23, 24, 30)
-export OPENFOAM_VERSION='-DOPENFOAM_VERSION=30'
+export OPENFOAM_VERSION='-DOPENFOAM_VERSION=24'
 
 #Compulsory path
-export EIGEN_LIBRARY_PATH=/software/chimica2/libraries/eigen/eigen-3.3.2
+export EIGEN_LIBRARY_PATH=/software/chimica2/libraries/eigen/eigen-3.3.3
 export BOOST_LIBRARY_PATH=/software/chimica2/libraries/boost/boost-1.60.0-gcc-4.8.2
 export RAPIDXML_LIBRARY_PATH=/software/chimica2/libraries/rapidxml/rapidxml-1.13
  
