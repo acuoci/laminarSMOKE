@@ -43,9 +43,14 @@
 #if OPENSMOKE_USE_MKL == 1
 	#include "mkl.h"
 	#include "mkl_lapacke.h"
+	#if defined(_WIN32) || defined(_WIN64) 
+	#else
+		#include "mm_malloc.h"
+	#endif
 #elif OPENSMOKE_USE_OPENBLAS == 1
 	#include "cblas.h"
 	#include "lapacke.h"
+	#include "malloc.h"
 #endif
 
 namespace OpenSMOKE

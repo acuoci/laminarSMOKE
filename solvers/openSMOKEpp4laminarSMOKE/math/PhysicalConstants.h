@@ -6,11 +6,12 @@
 
 namespace PhysicalConstants
 {
+	// Mathematical constants
 	const double pi          		= boost::math::constants::pi<double>();			// pi
 	const double pi_times_2    		= 2.*boost::math::constants::pi<double>();		// 2pi
 	const double pi_over_2			= 0.5*boost::math::constants::pi<double>();		// pi/2
 	const double pi_over_4			= 0.25*boost::math::constants::pi<double>();	// pi/4
-	const double ln_10				= std::log(10.);										// ln(10)
+	const double ln_10				= std::log(10.);								// ln(10)
 
 	// Boltzmann constant
 	const double kBoltzmann  		= 1.3806504e-23;    // Boltzmann constant [J/K]
@@ -25,14 +26,8 @@ namespace PhysicalConstants
 
 	// Avogadro number
     const double Nav_mol         	= 6.0221417930e23;		// Avogadro constant [1/mol]
-	const double Nav_kmol      		= 6.0221417930e26;  // Avogadro constant [1/kmol]
+	const double Nav_kmol      		= 6.0221417930e26;		// Avogadro constant [1/kmol]
 
-/*
-	// Conversions // Moved to Conversions.h
-    const double J_from_cal		= R_J_mol/R_cal_mol;
-    const double J_from_eV		= R_J_mol/R_eV_mol;
-    const double J_from_kcal	= 1.e3*J_from_cal;
-*/
 	// Constants
 	const double sigmaStefanBoltzmann = 5.670373e-8;		// Stefan-Boltzmann constant [W/m2/K4]
     
@@ -51,23 +46,5 @@ namespace PhysicalConstants
 	enum OpenSMOKE_GasMixture_Viscosity_Model { OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_WILKE, OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_HERNING};
 }
 
-namespace Conversions
-{
-	const double from_atm_to_Pa = 101325.;
-	const double from_bar_to_Pa = 100000.;
-}
-
 #endif	/* PHYSICAL_CONSTANTS_H */
-
-
-/*
-   
-    const double Nav_mol         	= 6.02214129e23;	// Avogadro constant [1/mol]
-    const double Nav_kmol      		= 6.02214129e26;	// Avogadro constant [1/kmol]
-	const double hPlanck     		= 6.62606957e-34;	// Planck constant [J.s]
-	
-	const double g           		= 9.80665;			// gravitational acceleration [m/s2]
-	const double m_u         		= 1.660538921e-27;  // atomic mass constant [kg]
-
-*/
 

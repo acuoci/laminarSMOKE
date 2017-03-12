@@ -38,7 +38,7 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#include "soot/OpenSMOKE_PolimiSoot_Analyzer.h"
+#include "utilities/soot/polimi/OpenSMOKE_PolimiSoot_Analyzer.h"
 
 // Returns the integral mass of soot particles (large BINS) [kg] 
 double largeBinMass(OpenSMOKE::PolimiSoot_Analyzer* soot_analyzer, volScalarField& rho, PtrList<volScalarField>& Y)

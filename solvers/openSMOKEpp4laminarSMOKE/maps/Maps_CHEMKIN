@@ -34,12 +34,11 @@
 \*-----------------------------------------------------------------------*/
 
 // Base classes
-#include "thermo/Thermodynamics_CHEMKIN"
-#include "transport/Transport_CHEMKIN"
-#include "kinetics/ReactionPolicy_CHEMKIN.h"
+#include "kernel/thermo/Thermodynamics_CHEMKIN"
+#include "kernel/transport/Transport_CHEMKIN"
+#include "kernel/kinetics/ReactionPolicy_CHEMKIN.h"
 
 // CHEMKIN maps
 #include "maps/ThermodynamicsMap_CHEMKIN.h"
 #include "maps/TransportPropertiesMap_CHEMKIN.h"
 #include "maps/KineticsMap_CHEMKIN.h"
-#include "maps/SensitivityMap.h"

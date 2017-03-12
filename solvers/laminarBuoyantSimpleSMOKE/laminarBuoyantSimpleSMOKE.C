@@ -52,7 +52,7 @@
 
 // CHEMKIN maps
 #include "maps/Maps_CHEMKIN"
-#include "soot/OpenSMOKE_PolimiSoot_Analyzer.h"
+#include "utilities/soot/polimi/OpenSMOKE_PolimiSoot_Analyzer.h"
 
 // OpenSMOKE++ Dictionaries
 #include "dictionary/OpenSMOKE_Dictionary"

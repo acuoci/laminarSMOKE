@@ -108,8 +108,8 @@
 #include <Eigen/Dense>
 
 // Base classes
-#include "thermo/ThermoPolicy_CHEMKIN.h"
-#include "kinetics/ReactionPolicy_CHEMKIN.h"
+#include "kernel/thermo/ThermoPolicy_CHEMKIN.h"
+#include "kernel/kinetics/ReactionPolicy_CHEMKIN.h"
 #include "math/PhysicalConstants.h"
 #include "math/OpenSMOKEUtilities.h"
 
@@ -129,7 +129,7 @@
 
 // Soot
 #include "sootUtilities.H"
-#include "soot/OpenSMOKE_PolimiSoot_Analyzer.h"
+#include "utilities/soot/polimi/OpenSMOKE_PolimiSoot_Analyzer.h"
 #include "SootClassesReader.h"
 
 using namespace Foam;
