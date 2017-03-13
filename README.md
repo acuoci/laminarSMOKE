@@ -2,6 +2,20 @@ laminarSMOKE
 ============
 CFD solver for laminar reacting flows with detailed kinetic mechanisms based on OpenFOAM and OpenSMOKE++ Library
 
+If you use laminarSMOKE for your publications, we kindly ask you to cite the following papers:
+
+> Cuoci, A., Frassoldati, A., Faravelli, T., Ranzi, E., 
+> Numerical modeling of laminar flames with detailed kinetics based on the operator-splitting method
+> (2013) Energy and Fuels, 27 (12), pp. 7730-7753, DOI: 10.1021/ef4016334
+ 
+> Cuoci, A., Frassoldati, A., Faravelli, T., Ranzi, E., 
+> A computational tool for the detailed kinetic modeling of laminar flames: Application to C2H4/CH4 coflow flames
+> (2013) Combustion and Flame, 160 (5), pp. 870-886, DOI: 10.1016/j.combustflame.2013.01.011
+ 
+> Cuoci, A., Frassoldati, A., Faravelli, T., Ranzi, E., 
+> OpenSMOKE++: An object-oriented framework for the numerical modeling of reactive systems with detailed kinetic mechanisms 
+> (2015) Computer Physics Communications, 192, pp. 237-264, DOI: 10.1016/j.cpc.2015.02.014
+
 Compulsory libraries
 --------------------
 - Eigen (http://eigen.tuxfamily.org/index.php?title=Main_Page)
