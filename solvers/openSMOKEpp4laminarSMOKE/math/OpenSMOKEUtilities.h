@@ -109,14 +109,14 @@ namespace OpenSMOKE
 	* Example: Sum(n,x,y,z) means \f$ z=x+y \f$;
 	*/	
 	template <class T>
-	void Sum(const int n, T* lval, T* rval, T* result);
+	void Sum(const int n, const T* lval, const T* rval, T* result);
 
 	/**
 	* The sum of a constant to a vector
 	* Example: Sum(n,x,c,z) means \f$ z=x+c \f$;
 	*/	
 	template <class T>
-	void Sum(const int n, T* lval, const T rval, T* result);
+	void Sum(const int n, const T* lval, const T rval, T* result);
 
 	/**
 	* Adds a constant value to a vector
@@ -130,7 +130,7 @@ namespace OpenSMOKE
 	* Example: Sum(n,x,y)  means \f$ x=x+y \f$;
 	*/	
 	template <class T>
-	void Sum(const int n, T* lvalAndResult, T* rval);
+	void Sum(const int n, T* lvalAndResult, const T* rval);
 
 	/**
 	* The sum of two equal vectors
@@ -165,28 +165,28 @@ namespace OpenSMOKE
 	* Meaning: \f$ todo \f$;
 	*/	
 	template <class T>
-	T Dot(const int n, T* lval, T* rval);
+	T Dot(const int n, const T* lval, const T* rval);
 
 	/**
 	* The scalar (dot) product of two vectors	
 	* Meaning: \f$ todo \f$;
 	*/
 	template <class T>
-	T UDot(const int n, T* lval, T* rval);
+	T UDot(const int n, const T* lval, const T* rval);
 
 	/**
 	* The product of a value with a vector	
 	* Example: Product(n,c,v,r)	multiplies n values of the vector v by c, resulting in r
 	*/	
 	template <class T>
-	void Prod(const int n, T lval, T* rval, T* result);
+	void Prod(const int n, const T lval, const T* rval, T* result);
 
 	/**
 	* The product of a value with a vector	
 	* Example: Product(n,c,v) multiplies n values of the vector v by c, substituting in v
 	*/	
 	template <class T>
-	void Prod(const int n, T lval, T* rvalAndResult);
+	void Prod(const int n, const T lval, T* rvalAndResult);
 
 	/**
 	* Dividing a vector by a value
@@ -201,6 +201,12 @@ namespace OpenSMOKE
 	*/	
 	template <class T>
 	void Div(const int n, T* lvalAndResult, T rval);
+
+	template <class T>
+	void ElementByElementProduct(const int n, const T* lval, const T* rval, T* result);
+
+	template <class T>
+	void ElementByElementDivision(const int n, const T* lval, const T* rval, T* result);
 
 	template<typename T>
 	void Load(std::ifstream& fInput, const OpenSMOKE_File_Format fileFormat, T& value);
@@ -277,6 +283,12 @@ namespace OpenSMOKE
 	*/
 	template <typename T>
 	std::string ToString(const T value);
+
+	template<typename T>
+	void Load(std::vector<T>& v, std::istream& fInput, const OpenSMOKE_File_Format fileFormat);
+
+	template<typename T>
+	void Exp(const std::vector<T>& lval, std::vector<T>* rval);
 }
 
 #include "OpenSMOKEUtilities.hpp"

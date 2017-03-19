@@ -81,9 +81,9 @@ volScalarField h
 				massFractions[i+1] = Y[i].boundaryField()[patchi][facei];
 
 			double MWmix;
-			thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions,MWmix,massFractions);
+			thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions.GetHandle(),MWmix,massFractions.GetHandle());
 
-			thermodynamicsMapXML->hMolar_Mixture_From_MoleFractions(ph[facei], moleFractions);		// [J/kmol]
+			ph[facei] = thermodynamicsMapXML->hMolar_Mixture_From_MoleFractions(moleFractions.GetHandle());		// [J/kmol]
 			ph[facei] /= MWmix;	
 		}
 	}

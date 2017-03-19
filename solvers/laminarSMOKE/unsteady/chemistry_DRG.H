@@ -83,7 +83,7 @@
 						omega_[i+1] = Y[i].internalField()[celli];
 							
 					double MW_;
-					thermodynamicsMapXML->MoleFractions_From_MassFractions(x_, MW_, omega_);
+					thermodynamicsMapXML->MoleFractions_From_MassFractions(x_.GetHandle(), MW_, omega_.GetHandle());
 					double cTot_ = thermodynamicPressure/PhysicalConstants::R_J_kmol/TCells[celli];
 					Product(cTot_, x_, &c_);
 
@@ -200,7 +200,7 @@
 						{
 							for (int i=0;i<outputFormationRatesIndices.size();i++)
 								FormationRates[i].internalField()[celli] = batchReactorHomogeneousConstantPressure.R()[outputFormationRatesIndices[i]+1] *
-                                       	      		                                                   thermodynamicsMapXML->MW()[outputFormationRatesIndices[i]+1];
+                                       	      		                                                   thermodynamicsMapXML->MW(outputFormationRatesIndices[i]);
 						}
 					}
 					else
@@ -210,7 +210,7 @@
 						{
 							for (int i=0;i<outputFormationRatesIndices.size();i++)
 								FormationRates[i].internalField()[celli] = batchReactorHomogeneousConstantVolume.R()[outputFormationRatesIndices[i]+1] *
-                                           	                                                           thermodynamicsMapXML->MW()[outputFormationRatesIndices[i]+1];
+                                           	                                                           thermodynamicsMapXML->MW(outputFormationRatesIndices[i]);
 						}
 					}
 				}

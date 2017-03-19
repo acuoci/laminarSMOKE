@@ -37,8 +37,6 @@
 #ifndef OpenSMOKE_JacobianSparsityPatternMap_H
 #define OpenSMOKE_JacobianSparsityPatternMap_H
 
-#include "math/OpenSMOKEClass.hpp"
-#include "math/OpenSMOKEVector.h"
 #include <Eigen/Sparse>
 
 namespace OpenSMOKE
@@ -75,9 +73,9 @@ namespace OpenSMOKE
                 
 		void RecognizeJacobianSparsityPattern(std::vector<unsigned int>& row, std::vector<unsigned int>& col);
 		
-		void Jacobian(const OpenSMOKE::OpenSMOKEVectorDouble& omega, const double T, const double P_Pa, Eigen::SparseMatrix<double> &J);
+		void Jacobian(const double* omega, const double T, const double P_Pa, Eigen::SparseMatrix<double> &J);
 
-		void Jacobian(const OpenSMOKE::OpenSMOKEVectorDouble& omega, const double T, const double P_Pa, Eigen::VectorXd &Jdiagonal);
+		void Jacobian(const double* omega, const double T, const double P_Pa, Eigen::VectorXd &Jdiagonal);
 
 
 		Eigen::SparseMatrix<double>* jacobian_matrix() { return jacobian_matrix_; }
@@ -99,12 +97,12 @@ namespace OpenSMOKE
 		Eigen::VectorXi analytical_thirdbody_species_;
 		Eigen::VectorXi analytical_falloff_reactions_;
 
-		OpenSMOKE::OpenSMOKEVectorDouble analytical_omegaStar_;
-		OpenSMOKE::OpenSMOKEVectorDouble analytical_cStar_;
-		OpenSMOKE::OpenSMOKEVectorDouble analytical_xStar_;
-		OpenSMOKE::OpenSMOKEVectorDouble analytical_RStar_;
-		OpenSMOKE::OpenSMOKEVectorDouble analytical_rf_;
-		OpenSMOKE::OpenSMOKEVectorDouble analytical_rb_;
+		Eigen::VectorXd analytical_omegaStar_;
+		Eigen::VectorXd analytical_cStar_;
+		Eigen::VectorXd analytical_xStar_;
+		Eigen::VectorXd analytical_RStar_;
+		Eigen::VectorXd analytical_rf_;
+		Eigen::VectorXd analytical_rb_;
 
 		unsigned int nr;
 		unsigned int nc;

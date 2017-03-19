@@ -458,7 +458,7 @@ if (postProcessingPolimiSoot == true)
 		
 
 		// Molecular weight
-		thermodynamicsMapXML->MoleFractions_From_MassFractions(x, mw, y);
+		thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), mw, y.GetHandle());
 
 		// Eigen vectors
 		for(unsigned int i=0;i<ns;i++)
@@ -506,11 +506,11 @@ if (postProcessingPolimiSoot == true)
 		kineticsMapXML->SetTemperature(TCells[celli]);
 		kineticsMapXML->SetPressure(pCells[celli]);
 		kineticsMapXML->KineticConstants();
-		kineticsMapXML->ReactionRates(c);
-		kineticsMapXML->FormationRates(&R);
-		kineticsMapXML->GetReactionRates(&r);
+		kineticsMapXML->ReactionRates(c.GetHandle());
+		kineticsMapXML->FormationRates(R.GetHandle());
+		kineticsMapXML->GiveMeReactionRates(r.GetHandle());
 		for(unsigned int i=1;i<=ns;i++)
-			R[i] *= thermodynamicsMapXML->MW()[i];
+			R[i] *= thermodynamicsMapXML->MW(i-1);
 
 		soot_R_largeCells[celli] = largeBinMassFormationRates(sootAnalyzer, R);
 		soot_R_smallCells[celli] = smallBinMassFormationRates(sootAnalyzer, R);
@@ -593,7 +593,7 @@ if (postProcessingPolimiSoot == true)
 				y[i+1] /= sum;
 
 			// Molecular weight
-			thermodynamicsMapXML->MoleFractions_From_MassFractions(x, mw, y);
+			thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), mw, y.GetHandle());
 
 			// Eigen vectors
 			for(unsigned int i=0;i<ns;i++)
@@ -642,11 +642,11 @@ if (postProcessingPolimiSoot == true)
 			kineticsMapXML->SetTemperature(pT[facei]);
 			kineticsMapXML->SetPressure(pp[facei]);
 			kineticsMapXML->KineticConstants();
-			kineticsMapXML->ReactionRates(c);
-			kineticsMapXML->FormationRates(&R);
-			kineticsMapXML->GetReactionRates(&r);
+			kineticsMapXML->ReactionRates(c.GetHandle());
+			kineticsMapXML->FormationRates(R.GetHandle());
+			kineticsMapXML->GiveMeReactionRates(r.GetHandle());
 			for(unsigned int i=1;i<=ns;i++)
-				R[i] *= thermodynamicsMapXML->MW()[i];
+				R[i] *= thermodynamicsMapXML->MW(i-1);
 
 			psoot_R_large[facei] = largeBinMassFormationRates(sootAnalyzer, R);
 			psoot_R_small[facei] = smallBinMassFormationRates(sootAnalyzer, R);
@@ -761,7 +761,7 @@ if (postProcessingPolimiSoot == true)
 					y[i+1] /= sum;
 	
 				// Molecular weight
-				thermodynamicsMapXML->MoleFractions_From_MassFractions(x, mw, y);
+				thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), mw, y.GetHandle());
 
 				// Eigen vectors
 				for(unsigned int i=0;i<ns;i++)
@@ -834,7 +834,7 @@ if (postProcessingPolimiSoot == true)
 					y[i+1] /= sum;
 
 				// Molecular weight
-				thermodynamicsMapXML->MoleFractions_From_MassFractions(x, mw, y);
+				thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), mw, y.GetHandle());
 
 				// Eigen vectors
 				for(unsigned int i=0;i<ns;i++)

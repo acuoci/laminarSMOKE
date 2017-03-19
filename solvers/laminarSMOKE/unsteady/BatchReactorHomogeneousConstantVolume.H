@@ -131,12 +131,12 @@ void BatchReactorHomogeneousConstantVolume::SetTemperature( const double T, doub
 		omega_[i] = y[i-1];
 
 	// Mole fractions
-	thermodynamicsMap_.MoleFractions_From_MassFractions(x_, MW_, omega_);
+	thermodynamicsMap_.MoleFractions_From_MassFractions(x_.GetHandle(), MW_, omega_.GetHandle());
 
 	// Enthalpy
 	thermodynamicsMap_.SetTemperature(T_);
 	thermodynamicsMap_.SetPressure(P_);
-	thermodynamicsMap_.hMolar_Mixture_From_MoleFractions(enthalpy_, x_);
+	enthalpy_ = thermodynamicsMap_.hMolar_Mixture_From_MoleFractions(x_.GetHandle());
 	enthalpy_ /= MW_;
 }
 
@@ -162,7 +162,7 @@ int BatchReactorHomogeneousConstantVolume::Equations(const double t, const OpenS
 	T_ = y[NC_+1];
 
 	// Calculates the pressure and the concentrations of species
-	thermodynamicsMap_.MoleFractions_From_MassFractions(x_, MW_, omega_);
+	thermodynamicsMap_.MoleFractions_From_MassFractions(x_.GetHandle(), MW_, omega_.GetHandle());
 	cTot_ = rho0_/MW_;
 	Product(cTot_, x_, &c_);
 	P_ = cTot_ * PhysicalConstants::R_J_kmol * T_;
@@ -175,22 +175,21 @@ int BatchReactorHomogeneousConstantVolume::Equations(const double t, const OpenS
 	kineticsMap_.SetTemperature(T_);
 	kineticsMap_.SetPressure(P_);
 	kineticsMap_.KineticConstants();
-	kineticsMap_.ReactionRates(c_);
-	kineticsMap_.FormationRates(&R_);
+	kineticsMap_.ReactionRates(c_.GetHandle());
+	kineticsMap_.FormationRates(R_.GetHandle());
 	
 	// Species equations
 	for (unsigned int i=1;i<=NC_;++i)	
-		dy[i] = thermodynamicsMap_.MW()[i]*R_[i]/rho0_;
+		dy[i] = thermodynamicsMap_.MW(i-1)*R_[i]/rho0_;
                 
     // Energy equation
     dy[NC_+1] = 0.;   
     if (energyEquation_ == true)
     {
-		double CpMixMolar; 
-		thermodynamicsMap_.cpMolar_Mixture_From_MoleFractions(CpMixMolar,x_);
+		const double CpMixMolar = thermodynamicsMap_.cpMolar_Mixture_From_MoleFractions(x_.GetHandle());
 		CvMixMass_ = (CpMixMolar - PhysicalConstants::R_J_kmol) / MW_;
 	
-		QR_ = kineticsMap_.HeatRelease(R_);
+		QR_ = kineticsMap_.HeatRelease(R_.GetHandle());
 		const double sumMoleFormationRates = R_.SumElements();
 		
 		dy[NC_+1]  = (QR_ + PhysicalConstants::R_J_kmol*T_*sumMoleFormationRates) / (rho0_*CvMixMass_);

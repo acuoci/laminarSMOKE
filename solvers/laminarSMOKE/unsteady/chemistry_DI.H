@@ -193,8 +193,8 @@
 						double cpmix;
 						for(int i=1;i<=NC;i++)
 							massFractions[i] = yf(i-1);
-						thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions,mwmix,massFractions);
-						thermodynamicsMapXML->cpMolar_Mixture_From_MoleFractions(cpmix, moleFractions);			//[J/Kmol/K]
+						thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions.GetHandle(),mwmix,massFractions.GetHandle());
+						cpmix = thermodynamicsMapXML->cpMolar_Mixture_From_MoleFractions(moleFractions.GetHandle());			//[J/Kmol/K]
 						cpmix /= mwmix;
 						const double rhomix = thermodynamicPressure*mwmix/PhysicalConstants::R_J_kmol/yf(NC);
 				
@@ -233,7 +233,7 @@
 						{
 							for (int i=0;i<outputFormationRatesIndices.size();i++)
 								FormationRates[i].internalField()[celli] = batchReactorHomogeneousConstantPressure.R()[outputFormationRatesIndices[i]+1] *
-	                               	      		                                                   thermodynamicsMapXML->MW()[outputFormationRatesIndices[i]+1];
+	                               	      		                                                   thermodynamicsMapXML->MW(outputFormationRatesIndices[i]);
 						}
 					}
 					else
@@ -243,7 +243,7 @@
 						{
 							for (int i=0;i<outputFormationRatesIndices.size();i++)
 								FormationRates[i].internalField()[celli] = batchReactorHomogeneousConstantVolume.R()[outputFormationRatesIndices[i]+1] *
-	                                   	                                                           thermodynamicsMapXML->MW()[outputFormationRatesIndices[i]+1];
+	                                   	                                                           thermodynamicsMapXML->MW(outputFormationRatesIndices[i]);
 						}
 					}
 				*/
@@ -362,8 +362,8 @@
 							double cpmix;
 							for(int i=1;i<=NC;i++)
 								massFractions[i] = yf(i-1);
-							thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions,mwmix,massFractions);
-							thermodynamicsMapXML->cpMolar_Mixture_From_MoleFractions(cpmix, moleFractions);			//[J/Kmol/K]
+							thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions.GetHandle(),mwmix,massFractions.GetHandle());
+							cpmix = thermodynamicsMapXML->cpMolar_Mixture_From_MoleFractions(moleFractions.GetHandle());			//[J/Kmol/K]
 							cpmix /= mwmix;
 							const double rhomix = thermodynamicPressure*mwmix/PhysicalConstants::R_J_kmol/yf(NC);
 				
@@ -564,8 +564,8 @@
 							double cpmix;
 							for(int i=1;i<=NC;i++)
 								massFractions[i] = yf[i];
-							thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions,mwmix,massFractions);
-							thermodynamicsMapXML->cpMolar_Mixture_From_MoleFractions(cpmix, moleFractions);			//[J/Kmol/K]
+							thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions.GetHandle(),mwmix,massFractions.GetHandle());
+							cpmix = thermodynamicsMapXML->cpMolar_Mixture_From_MoleFractions(moleFractions.GetHandle());			//[J/Kmol/K]
 							cpmix /= mwmix;
 							const double rhomix = thermodynamicPressure*mwmix/PhysicalConstants::R_J_kmol/yf[NC+1];
 				
@@ -605,7 +605,7 @@
 						{
 							for (int i=0;i<outputFormationRatesIndices.size();i++)
 								FormationRates[i].internalField()[celli] = batchReactorHomogeneousConstantPressure.R()[outputFormationRatesIndices[i]+1] *
-                                       	      		                                                   thermodynamicsMapXML->MW()[outputFormationRatesIndices[i]+1];
+                                       	      		                                                   thermodynamicsMapXML->MW(outputFormationRatesIndices[i]);
 						}
 					}
 					else
@@ -615,7 +615,7 @@
 						{
 							for (int i=0;i<outputFormationRatesIndices.size();i++)
 								FormationRates[i].internalField()[celli] = batchReactorHomogeneousConstantVolume.R()[outputFormationRatesIndices[i]+1] *
-                                           	                                                           thermodynamicsMapXML->MW()[outputFormationRatesIndices[i]+1];
+                                           	                                                           thermodynamicsMapXML->MW(outputFormationRatesIndices[i]);
 						}
 					}
 				}

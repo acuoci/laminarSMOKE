@@ -76,7 +76,7 @@ volScalarField rho
 		
 
 		// Molecular weight
-		thermodynamicsMapXML->MoleFractions_From_MassFractions(x, mw, y);
+		thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), mw, y.GetHandle());
 
 		// Eigen vectors
 		for(unsigned int i=0;i<ns;i++)
@@ -109,7 +109,7 @@ volScalarField rho
 				y[i+1] /= sum;
 
 			// Molecular weight
-			thermodynamicsMapXML->MoleFractions_From_MassFractions(x, mw, y);
+			thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), mw, y.GetHandle());
 
 			// Eigen vectors
 			for(unsigned int i=0;i<ns;i++)

@@ -91,7 +91,7 @@ if (iPolimiSoot == true)
 				y[i+1] /= sum;
 		
 			// Molecular weight
-			thermodynamicsMapXML->MoleFractions_From_MassFractions(x, mw, y);
+			thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), mw, y.GetHandle());
 
 			// Eigen vectors
 			for(unsigned int i=0;i<ns;i++)
@@ -129,10 +129,10 @@ if (iPolimiSoot == true)
 			kineticsMapXML->SetTemperature(TCells[celli]);
 			kineticsMapXML->SetPressure(pCells[celli]);
 			kineticsMapXML->KineticConstants();
-			kineticsMapXML->ReactionRates(c);
-			kineticsMapXML->FormationRates(&R);
+			kineticsMapXML->ReactionRates(c.GetHandle());
+			kineticsMapXML->FormationRates(R.GetHandle());
 			for(unsigned int i=1;i<=ns;i++)
-				R[i] *= thermodynamicsMapXML->MW()[i];
+				R[i] *= thermodynamicsMapXML->MW(i-1);
 
 			R_soot_largeCells[celli] = largeBinMassFormationRates(sootAnalyzer, R);
 			R_soot_smallCells[celli] = smallBinMassFormationRates(sootAnalyzer, R);
@@ -178,7 +178,7 @@ if (iPolimiSoot == true)
 					y[i+1] /= sum;
 
 				// Molecular weight
-				thermodynamicsMapXML->MoleFractions_From_MassFractions(x, mw, y);
+				thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), mw, y.GetHandle());
 
 				// Eigen vectors
 				for(unsigned int i=0;i<ns;i++)
@@ -214,10 +214,10 @@ if (iPolimiSoot == true)
 				kineticsMapXML->SetTemperature(pT[facei]);
 				kineticsMapXML->SetPressure(pp[facei]);
 				kineticsMapXML->KineticConstants();
-				kineticsMapXML->ReactionRates(c);
-				kineticsMapXML->FormationRates(&R);
+				kineticsMapXML->ReactionRates(c.GetHandle());
+				kineticsMapXML->FormationRates(R.GetHandle());
 				for(unsigned int i=1;i<=ns;i++)
-					R[i] *= thermodynamicsMapXML->MW()[i];
+					R[i] *= thermodynamicsMapXML->MW(i-1);
 
 				pR_soot_large[facei] = largeBinMassFormationRates(sootAnalyzer, R);
 				pR_soot_small[facei] = smallBinMassFormationRates(sootAnalyzer, R);
@@ -284,7 +284,7 @@ if (iPolimiSoot == true)
 						y[i+1] /= sum;
 
 					// Molecular weight
-					thermodynamicsMapXML->MoleFractions_From_MassFractions(x, mw, y);
+					thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), mw, y.GetHandle());
 
 					// Eigen vectors
 					for(unsigned int i=0;i<ns;i++)
@@ -383,7 +383,7 @@ if (iPolimiSoot == true)
 			for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 				massFractions[i+1] = Y[i].internalField()[celli];
 			double dummy;
-			thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions,dummy,massFractions);
+			thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions.GetHandle(),dummy,massFractions.GetHandle());
 
 			// Concentrations
 			const double cTot = pCells[celli]/PhysicalConstants::R_J_kmol/TCells[celli];
@@ -393,13 +393,13 @@ if (iPolimiSoot == true)
 			kineticsMapXML->SetTemperature(TCells[celli]);
 			kineticsMapXML->SetPressure(pCells[celli]);
 			kineticsMapXML->KineticConstants();
-			kineticsMapXML->ReactionRates(c);
-			kineticsMapXML->FormationRates(&R);
+			kineticsMapXML->ReactionRates(c.GetHandle());
+			kineticsMapXML->FormationRates(R.GetHandle());
 
 			for (int j=0;j<outputFormationRatesIndices.size();j++)
 			{
 				const int index = outputFormationRatesIndices(j)+1;
-				FormationRates[j].internalField()[celli] = thermodynamicsMapXML->MW()[index]*R[index];
+				FormationRates[j].internalField()[celli] = thermodynamicsMapXML->MW(index-1)*R[index];
 			}
 		}
 
@@ -418,7 +418,7 @@ if (iPolimiSoot == true)
 				for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 					massFractions[i+1] = Y[i].boundaryField()[patchi][facei];
 				double dummy;
-				thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions,dummy,massFractions);
+				thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions.GetHandle(),dummy,massFractions.GetHandle());
 				
 				// Concentrations
 				const double cTot = pp[facei]/(PhysicalConstants::R_J_kmol*pT[facei]);
@@ -428,13 +428,13 @@ if (iPolimiSoot == true)
 				kineticsMapXML->SetTemperature(pT[facei]);
 				kineticsMapXML->SetPressure(pp[facei]);
 				kineticsMapXML->KineticConstants();
-				kineticsMapXML->ReactionRates(c);
-				kineticsMapXML->FormationRates(&R);
+				kineticsMapXML->ReactionRates(c.GetHandle());
+				kineticsMapXML->FormationRates(R.GetHandle());
 
 				for (int j=0;j<outputFormationRatesIndices.size();j++)
 				{
 					const int index = outputFormationRatesIndices(j)+1;
-					FormationRates[j].boundaryField()[patchi][facei] = thermodynamicsMapXML->MW()[index]*R[index];
+					FormationRates[j].boundaryField()[patchi][facei] = thermodynamicsMapXML->MW(index-1)*R[index];
 				}
 			}
 		}

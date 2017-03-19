@@ -158,8 +158,8 @@ namespace OpenSMOKE
 		thermodynamicsMapXML_.SetPressure(P_Pa);
 
 		// Now we can calculate (internally) the reaction rates concentrations are needed
-		kineticsMapXML_.ReactionRates(c);
-		kineticsMapXML_.GetReactionRates(&rNet_);	// [kmol/m3/s]
+		kineticsMapXML_.ReactionRates(c.GetHandle());
+		kineticsMapXML_.GiveMeReactionRates(rNet_.GetHandle());	// [kmol/m3/s]
 
 		// Calculate the pair-wise error matrix
 		r_.setZero();

@@ -93,7 +93,7 @@ if (calculateThermophoreticVelocity == true)
 		
 
 			// Molecular weight
-			thermodynamicsMapXML->MoleFractions_From_MassFractions(x, mw, y);
+			thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), mw, y.GetHandle());
 
 			// Eigen vectors
 			for(unsigned int i=0;i<ns;i++)
@@ -108,7 +108,7 @@ if (calculateThermophoreticVelocity == true)
 			// Viscosity
 			transportMapXML->SetPressure(pCells[celli]);
 			transportMapXML->SetTemperature(TCells[celli]);
-			transportMapXML->DynamicViscosity(muCells[celli],x);
+			muCells[celli] = transportMapXML->DynamicViscosity(x.GetHandle());
 		}
 
 
@@ -131,7 +131,7 @@ if (calculateThermophoreticVelocity == true)
 					y[i+1] /= sum;
 
 				// Molecular weight
-				thermodynamicsMapXML->MoleFractions_From_MassFractions(x, mw, y);
+				thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), mw, y.GetHandle());
 
 				// Eigen vectors
 				for(unsigned int i=0;i<ns;i++)
@@ -146,7 +146,7 @@ if (calculateThermophoreticVelocity == true)
 				// Viscosity
 				transportMapXML->SetPressure(pp[facei]);
 				transportMapXML->SetTemperature(pT[facei]);
-				transportMapXML->DynamicViscosity(pmu[facei],x);
+				pmu[facei] = transportMapXML->DynamicViscosity(x.GetHandle());
 			}
 		}
 

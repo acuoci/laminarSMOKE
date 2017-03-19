@@ -100,7 +100,7 @@ void linearModel::reactionSourceTerms(	OpenSMOKE::ThermodynamicsMap_CHEMKIN& the
 
 	// Calculates the pressure and the concentrations of species
 	double MW_ = 0.;
-	thermodynamicsMap_.MoleFractions_From_MassFractions(x_, MW_, omega_);
+	thermodynamicsMap_.MoleFractions_From_MassFractions(x_.GetHandle(), MW_, omega_.GetHandle());
 	const double cTot_ = P0/PhysicalConstants::R_J_kmol/T;
     	const double rho_ = cTot_*MW_;
 	Product(cTot_, x_, &c_);
@@ -113,18 +113,17 @@ void linearModel::reactionSourceTerms(	OpenSMOKE::ThermodynamicsMap_CHEMKIN& the
 	kineticsMap_.SetTemperature(T);
 	kineticsMap_.SetPressure(P0);
 	kineticsMap_.KineticConstants();
-	kineticsMap_.ReactionRates(c_);
-	kineticsMap_.FormationRates(&R_);
+	kineticsMap_.ReactionRates(c_.GetHandle());
+	kineticsMap_.FormationRates(R_.GetHandle());
 
 	for (unsigned int i=1;i<=NC_;++i)	
-		S[i] = R_[i]*thermodynamicsMap_.MW()[i];
+		S[i] = R_[i]*thermodynamicsMap_.MW(i-1);
 
 	
     	{
-		double CpMixMolar; 
-		thermodynamicsMap_.cpMolar_Mixture_From_MoleFractions(CpMixMolar,x_);
+		const double CpMixMolar = thermodynamicsMap_.cpMolar_Mixture_From_MoleFractions(x_.GetHandle());
 		const double CpMixMass_ = CpMixMolar / MW_;
-		const double QR_ = kineticsMap_.HeatRelease(R_);
+		const double QR_ = kineticsMap_.HeatRelease(R_.GetHandle());
 		
 		S[NC_+1]  = QR_;
 	}
@@ -185,9 +184,9 @@ void linearModel::reactionJacobianSparse( OpenSMOKE::ThermodynamicsMap_CHEMKIN& 
 		const double T = y[NC_+1];
 
 		kineticsMap_.jacobian_sparsity_pattern_map()->SetEpsilon(1e-13); 
-		kineticsMap_.jacobian_sparsity_pattern_map()->Jacobian(omega_, T, P0, Jdiagonal_);
+		kineticsMap_.jacobian_sparsity_pattern_map()->Jacobian(omega_.GetHandle(), T, P0, Jdiagonal_);
 		for(unsigned int i=0;i<NC_;++i)
-			J(i) = Jdiagonal_(i) * thermodynamicsMap_.MW()[i+1];
+			J(i) = Jdiagonal_(i) * thermodynamicsMap_.MW(i);
 	}
 
 	// Only with respect to the temperature

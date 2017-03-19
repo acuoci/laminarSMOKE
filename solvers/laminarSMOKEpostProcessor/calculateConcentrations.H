@@ -58,7 +58,7 @@ if (calculateConcentrations == true)
 			y[i+1] = Y[i].internalField()[celli];
 
 		// Convert to mole fractions
-		thermodynamicsMapXML->MoleFractions_From_MassFractions(x, mw, y);
+		thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), mw, y.GetHandle());
 
 		double cTot = pCells[celli]/PhysicalConstants::R_J_kmol/TCells[celli];
 
@@ -80,7 +80,7 @@ if (calculateConcentrations == true)
 				y[i] = Y[i-1].boundaryField()[patchi][facei];
 
 			// Convert to mole fractions
-			thermodynamicsMapXML->MoleFractions_From_MassFractions(x, mw, y);
+			thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), mw, y.GetHandle());
 
 			double cTot = pp[facei]/PhysicalConstants::R_J_kmol/pT[facei];
 

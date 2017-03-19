@@ -239,7 +239,7 @@ namespace OpenSMOKE
 	}
 
 	template <class T>
-	void Sum(const int n, T* lval, T* rval, T* result)
+	void Sum(const int n, const T* lval, const T* rval, T* result)
 	{
 		T sum;
 		for(int i=0;i<n;i++)
@@ -250,7 +250,7 @@ namespace OpenSMOKE
 	}
 
 	template <class T>
-	void Sum(const int n, T* lval, const T rval, T* result)
+	void Sum(const int n, const T* lval, const T rval, T* result)
 	{
 		T sum;
 		for(int i=0;i<n;i++)
@@ -272,7 +272,7 @@ namespace OpenSMOKE
 	}
 
 	template <class T>
-	void Sum(const int n, T* lvalAndResult, T* rval)
+	void Sum(const int n, T* lvalAndResult, const T* rval)
 	{
 		T sum;
 		for(int i=0;i<n;i++)
@@ -327,7 +327,7 @@ namespace OpenSMOKE
 	}
 
 	template <class T>
-	T Dot(const int n, T* lval, T* rval)
+	T Dot(const int n, const T* lval, const T* rval)
 	{
 		T result = 0;
 		for(int i=0;i<n;i++)
@@ -336,7 +336,7 @@ namespace OpenSMOKE
 	}
 
 	template <class T>
-	T UDot(const int n, T* lval, T* rval)
+	T UDot(const int n, const T* lval, const T* rval)
 	{
 		T result = 0;
 		for(int i=0;i<n;i++)
@@ -345,14 +345,14 @@ namespace OpenSMOKE
 	}
 
 	template <class T>
-	void Prod(const int n, T lval, T* rval, T* result)
+	void Prod(const int n, const T lval, const T* rval, T* result)
 	{
 		for(int i=0;i<n;i++)
 			*result++ = lval * (*rval++);
 	}
 
 	template <class T>
-	void Prod(const int n, T lval, T* rvalAndResult)
+	void Prod(const int n, const T lval, T* rvalAndResult)
 	{
 		for(int i=0;i<n;i++)
 		{
@@ -381,6 +381,20 @@ namespace OpenSMOKE
 			*lvalAndResult = (*lvalAndResult)/double(rval);
 			 lvalAndResult++;
 		}
+	}
+
+	template <class T>
+	void ElementByElementProduct(const int n, const T* lval, const T* rval, T* result)
+	{
+		for (int i = 0; i<n; i++)
+			(*result++) = (*lval++) * (*rval++);
+	}
+
+	template <class T>
+	void ElementByElementDivision(const int n, const T* lval, const T* rval, T* result)
+	{
+		for (int i = 0; i<n; i++)
+			(*result++) = (*lval++) / (*rval++);
 	}
 
 	template<typename T>
@@ -731,6 +745,60 @@ namespace OpenSMOKE
 		strs << value;
 		std::string str = strs.str ();
 		return str;
+	}
+
+	template<typename T>
+	void Load(std::vector<T>& v, std::istream& fInput, const OpenSMOKE_File_Format fileFormat)
+	{
+		if (fileFormat == OPENSMOKE_FORMATTED_FILE)
+		{
+			int n;
+			fInput >> n;
+			v.resize(n);
+			for (int i = 0; i<n; i++)
+				fInput >> v[i];
+		}
+		else if (fileFormat == OPENSMOKE_BINARY_FILE)
+		{
+			int n;
+
+			// Reading vector size
+			if (!fInput.read(reinterpret_cast<char *>(&n), sizeof(int)))
+				ErrorMessage("void Load(std::vector<T>& v, std::istream& fInput, const OpenSMOKE_File_Format fileFormat)", "I was unable to read from binary file (Error 1)");
+
+			// Initializing
+			v.resize(n);
+
+			// Reading vector elements
+			for (int i = 0; i < n; i++)
+			{
+				if (!fInput.read(reinterpret_cast<char *>(&v[i]), sizeof(T)))
+					ErrorMessage("void Load(std::vector<T>& v, std::istream& fInput, const OpenSMOKE_File_Format fileFormat)", "I was unable to read from binary file (Error 2)");
+				else
+					std::cout << n << " " << v[i] << std::endl;
+			}
+		}
+	}
+
+	template<typename T>
+	void Exp(const std::vector<T>& lval, std::vector<T>* rval)
+	{
+		if(lval.size() != rval->size())
+			ErrorMessage("void Exp(std::vector<T> const& lval, std::vector<T>* rval)", "Dimension check failure");
+                
+        #if OPENSMOKE_USE_MKL == 1
+        {
+                int n = lval.size();
+                const T* ptlval = lval.data();
+                T* ptrval = rval->data();
+                vdExp( n, ptlval, ptrval );       
+        }
+        #else
+        {
+                for(int i=0;i<rval->size();i++)
+                    (*rval)[i] = std::exp(lval[i]);          
+        }
+        #endif
 	}
 }
 

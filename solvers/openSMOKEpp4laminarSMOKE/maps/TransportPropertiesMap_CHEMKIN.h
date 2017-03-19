@@ -37,8 +37,6 @@
 #ifndef OpenSMOKE_TransportPropertiesMap_CHEMKIN_H
 #define OpenSMOKE_TransportPropertiesMap_CHEMKIN_H
 
-#include "math/OpenSMOKEClass.hpp"
-#include "math/OpenSMOKEVector.h"
 #include "TransportPropertiesMap.h"
 #include "rapidxml.hpp"
 
@@ -126,33 +124,33 @@ namespace OpenSMOKE
 		/**
 		*@brief Combines the species thermal conductivities to calculate the mixture thermal conductivity
 		*/
-		virtual void lambdaMix(double& lambdamix, OpenSMOKEVectorDouble& omega);
+		virtual double lambdaMix(const double* x);
 
 		/**
 		*@brief Combines the species dynamic viscosities to calculate the mixture dynamic viscosity
 		*/
-		virtual void etaMix(double& etamix, OpenSMOKEVectorDouble& omega);
+		virtual double etaMix(const double* x);
 
 		/**
 		*@brief Combines the species mass diffusion coefficients to calculate the mixture mass diffusion coefficients
 		*/
-		virtual void gammaMix(OpenSMOKEVectorDouble& gammamix, OpenSMOKEVectorDouble& omega);
+		virtual void gammaMix(double* gammamix, const double* x);
 
 		/**
 		*@brief Combines the species mass diffusion coefficients to calculate the mixture mass diffusion coefficients using the bundling algorithm
 		*/
-		virtual void bundling_gammaMix(OpenSMOKEVectorDouble& gammamix, OpenSMOKEVectorDouble& omega);
+		virtual void bundling_gammaMix(double* gammamix, const double* x);
 
 		/**
 		*@brief Combines the species thermal diffusion coefficients to calculate the mixture thermal diffusion coefficients
 		*/
-		virtual void tetaMix(OpenSMOKEVectorDouble& tetamix, OpenSMOKEVectorDouble& omega);
+		virtual void tetaMix(double* tetamix, const double* x);
 
 		/**
 		*@brief Combines the planck mean absorption coefficients of relevant species, according to their mole fractions
 		        Returns the Planck mean absorption coefficient of the mixture in [1/m]
 		*/
-		virtual void kPlanckMix(double& kPlanck, OpenSMOKEVectorDouble& moleFractions);
+		virtual double kPlanckMix(const double* moleFractions);
 
 		/**
 		*@brief Calculates the thermal conductivities for all the species 
@@ -198,12 +196,12 @@ namespace OpenSMOKE
 		*/
 		void CompleteInitialization();
                 
-                /**
+        /**
 		*@brief Copies the data from another transport map (used by copy constructors)
 		*/
-                void CopyFromMap( const TransportPropertiesMap_CHEMKIN& rhs );
+        void CopyFromMap( const TransportPropertiesMap_CHEMKIN& rhs );
                 
-        private:
+	private:
 
 		PhysicalConstants::OpenSMOKE_GasMixture_Viscosity_Model viscosity_model;
 
@@ -219,7 +217,7 @@ namespace OpenSMOKE
 
 		double* sqrtEta;				//!< auxiliary vector for the dynamic viscosity calculation
 		double* usqrtEta;				//!< auxiliary vector for the dynamic viscosity calculation
-		OpenSMOKEVectorDouble sumK;		//!< auxiliary vector for the dynamic viscosity calculation
+		Eigen::VectorXd sumK;			//!< auxiliary vector for the dynamic viscosity calculation
 
 		double* sqrtMWRatio_inf;		//!< auxiliary vector for the dynamic viscosity calculation
 		double* sqrtMWRatio_sup;		//!< auxiliary vector for the dynamic viscosity calculation

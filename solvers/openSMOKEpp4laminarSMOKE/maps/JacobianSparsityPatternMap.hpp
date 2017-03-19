@@ -48,12 +48,23 @@ namespace OpenSMOKE
 		epsilon_ = 1e-15;
 		sum_mass_fractions_ = 1. + nc*epsilon_;
 
-		ChangeDimensions(nc, &analytical_omegaStar_, true);
-		ChangeDimensions(nc, &analytical_cStar_, true);
-		ChangeDimensions(nc, &analytical_xStar_, true);
-		ChangeDimensions(nc, &analytical_RStar_, true);
-		ChangeDimensions(nr, &analytical_rf_, true);
-		ChangeDimensions(nr, &analytical_rb_, true);
+		analytical_omegaStar_.resize(nc);
+		analytical_omegaStar_.setZero();
+
+		analytical_cStar_.resize(nc);
+		analytical_cStar_.setZero();
+
+		analytical_xStar_.resize(nc);
+		analytical_xStar_.setZero();
+
+		analytical_RStar_.resize(nc);
+		analytical_RStar_.setZero();
+
+		analytical_rf_.resize(nr);
+		analytical_rf_.setZero();
+
+		analytical_rb_.resize(nr);
+		analytical_rb_.setZero();
 
 		// Reactants
 		{
@@ -120,7 +131,7 @@ namespace OpenSMOKE
 				{
 					for (unsigned int s = 1; s <= kinetics_map_.NumberOfThirdBodyReactions(); s++)
 					{
-						const unsigned int j = kinetics_map_.indices_of_thirdbody_reactions()[s];
+						const unsigned int j = kinetics_map_.IndicesOfThirdbodyReactions()[s-1];
 						if (j == it.row() + 1)
 						{
 							analytical_thirdbody_reactions_(count) = s;
@@ -128,9 +139,9 @@ namespace OpenSMOKE
 						}
 					}
 
-					for (int k = 1; k <= kinetics_map_.indices_of_thirdbody_species()[analytical_thirdbody_reactions_(count) - 1].Size(); k++)
+					for (unsigned int k = 1; k <= kinetics_map_.IndicesOfThirdbodySpecies()[analytical_thirdbody_reactions_(count) - 1].size(); k++)
 					{
-						if (kinetics_map_.indices_of_thirdbody_species()[analytical_thirdbody_reactions_(count) - 1][k] == it.col() + 1)
+						if (kinetics_map_.IndicesOfThirdbodySpecies()[analytical_thirdbody_reactions_(count) - 1][k-1] == it.col() + 1)
 						{
 							analytical_thirdbody_species_(count) = k;
 							break;
@@ -168,7 +179,7 @@ namespace OpenSMOKE
 				{
 					for (unsigned int k = 1; k <= kinetics_map_.NumberOfFallOffReactions(); k++)
 					{
-						const unsigned int j = kinetics_map_.indices_of_falloff_reactions()[k];
+						const unsigned int j = kinetics_map_.IndicesOfFalloffReactions()[k-1];
 						if (j == it.row() + 1)
 						{
 							analytical_falloff_reactions_(count) = k;
@@ -280,18 +291,18 @@ namespace OpenSMOKE
 	}
 
 	template<typename map>
-	void JacobianSparsityPatternMap<map>::Jacobian(const OpenSMOKE::OpenSMOKEVectorDouble& omega, const double T, const double P_Pa, Eigen::SparseMatrix<double> &J)
+	void JacobianSparsityPatternMap<map>::Jacobian(const double* omega, const double T, const double P_Pa, Eigen::SparseMatrix<double> &J)
 	{
-		for (unsigned int i = 1; i <= nc; ++i)
-			analytical_omegaStar_[i] = (omega[i] > epsilon_) ? omega[i] : epsilon_; // (omega[i] + epsilon_) / sum_mass_fractions_;
+		for (unsigned int i = 0; i < nc; ++i)
+			analytical_omegaStar_(i) = (omega[i] > epsilon_) ? omega[i] : epsilon_; // (omega[i] + epsilon_) / sum_mass_fractions_;
 
 		double MWStar;
-		kinetics_map_.thermodynamics().MoleFractions_From_MassFractions(analytical_xStar_, MWStar, analytical_omegaStar_);
+		kinetics_map_.thermodynamics().MoleFractions_From_MassFractions(analytical_xStar_.data(), MWStar, analytical_omegaStar_.data());
 		double cTotStar = P_Pa / PhysicalConstants::R_J_kmol / T;
 		double rhoStar = cTotStar*MWStar;
 
-		for (unsigned int i = 1; i <= nc; ++i)
-			analytical_cStar_[i] = analytical_omegaStar_[i] * rhoStar / kinetics_map_.thermodynamics().MW()[i];
+		for (unsigned int i = 0; i < nc; ++i)
+			analytical_cStar_(i) = analytical_omegaStar_(i) * rhoStar / kinetics_map_.thermodynamics().MW(i);
 
 		// Calculates thermodynamic properties
 		kinetics_map_.thermodynamics().SetTemperature(T);
@@ -300,12 +311,12 @@ namespace OpenSMOKE
 		// Calculates kinetics
 		kinetics_map_.SetTemperature(T);
 		kinetics_map_.SetPressure(P_Pa);
-		kinetics_map_.ReactionRates(analytical_cStar_, cTotStar);
-		kinetics_map_.FormationRates(&analytical_RStar_);
+		kinetics_map_.ReactionRates(analytical_cStar_.data(), cTotStar);
+		kinetics_map_.FormationRates(analytical_RStar_.data());
 
 		// Reaction rates
-		kinetics_map_.GetForwardReactionRates(&analytical_rf_);
-		kinetics_map_.GetBackwardReactionRates(&analytical_rb_);
+		kinetics_map_.GetForwardReactionRates(analytical_rf_.data());
+		kinetics_map_.GetBackwardReactionRates(analytical_rb_.data());
 
 		// Reactants
 		for (int k = 0; k < kinetics_map_.stoichiometry().reactionorders_matrix_reactants().outerSize(); ++k)
@@ -313,7 +324,7 @@ namespace OpenSMOKE
 			Eigen::SparseMatrix<double>::InnerIterator it_rf(*drf_over_domega_, k);
 			for (Eigen::SparseMatrix<double>::InnerIterator it(kinetics_map_.stoichiometry().reactionorders_matrix_reactants(), k); it; ++it)
 			{
-				it_rf.valueRef() = it.value()*analytical_rf_[it.row() + 1] / analytical_omegaStar_[it.col() + 1];
+				it_rf.valueRef() = it.value()*analytical_rf_(it.row()) / analytical_omegaStar_(it.col());
 				++it_rf;
 			}
 		}
@@ -324,7 +335,7 @@ namespace OpenSMOKE
 			Eigen::SparseMatrix<double>::InnerIterator it_rb(*drb_over_domega_, k);
 			for (Eigen::SparseMatrix<double>::InnerIterator it(kinetics_map_.stoichiometry().reactionorders_matrix_products(), k); it; ++it)
 			{
-				it_rb.valueRef() = it.value()*analytical_rb_[it.row() + 1] / analytical_omegaStar_[it.col() + 1];
+				it_rb.valueRef() = it.value()*analytical_rb_(it.row()) / analytical_omegaStar_(it.col());
 				++it_rb;
 			}
 		}
@@ -337,9 +348,9 @@ namespace OpenSMOKE
 			{
 				for (Eigen::SparseMatrix<double>::InnerIterator it(*dthirdbody_over_domega_, k); it; ++it)
 				{
-					it.valueRef() = (analytical_rf_[it.row() + 1] - analytical_rb_[it.row() + 1]) * analytical_cStar_[it.col() + 1] / analytical_omegaStar_[it.col() + 1] *
-						kinetics_map_.indices_of_thirdbody_efficiencies()[analytical_thirdbody_reactions_(count) - 1][analytical_thirdbody_species_(count)] /
-						kinetics_map_.Meff()[analytical_thirdbody_reactions_(count)];
+					it.valueRef() = (analytical_rf_(it.row()) - analytical_rb_(it.row())) * analytical_cStar_(it.col()) / analytical_omegaStar_(it.col()) *
+						kinetics_map_.IndicesOfThirdbodyEfficiencies()[analytical_thirdbody_reactions_(count) - 1][analytical_thirdbody_species_(count)-1] /
+						kinetics_map_.M()[analytical_thirdbody_reactions_(count)-1];
 
 					count++;
 				}
@@ -350,22 +361,21 @@ namespace OpenSMOKE
 		if (kinetics_map_.NumberOfFallOffReactions() != 0)
 		{
 			const double eps = 1.e-4;
-			OpenSMOKE::OpenSMOKEVectorDouble cStarPlus(nc);
-			cStarPlus = analytical_cStar_;
+			Eigen::VectorXd cStarPlus = analytical_cStar_;
 
 			unsigned count = 0;
 			for (int k = 0; k < dfalloff_over_domega_->outerSize(); ++k)
 			{
 				for (Eigen::SparseMatrix<double>::InnerIterator it(*dfalloff_over_domega_, k); it; ++it)
 				{
-					cStarPlus[it.col() + 1] = (analytical_omegaStar_[it.col() + 1] + eps) * rhoStar / kinetics_map_.thermodynamics().MW()[it.col() + 1];
+					cStarPlus(it.col()) = (analytical_omegaStar_(it.col()) + eps) * rhoStar / kinetics_map_.thermodynamics().MW(it.col());
 
-					const double GammaFallOff = kinetics_map_.FallOffReactionsCorrection(analytical_falloff_reactions_(count), cTotStar, analytical_cStar_);
-					const double GammaFallOffPlus = kinetics_map_.FallOffReactionsCorrection(analytical_falloff_reactions_(count), cTotStar, cStarPlus);
+					const double GammaFallOff = kinetics_map_.FallOffReactionsCorrection(analytical_falloff_reactions_(count), cTotStar, analytical_cStar_.data());
+					const double GammaFallOffPlus = kinetics_map_.FallOffReactionsCorrection(analytical_falloff_reactions_(count), cTotStar, cStarPlus.data());
 					const double dGammaFallOff = (GammaFallOffPlus - GammaFallOff) / eps;
-					cStarPlus[it.col() + 1] = analytical_omegaStar_[it.col() + 1] * rhoStar / kinetics_map_.thermodynamics().MW()[it.col() + 1];
+					cStarPlus(it.col()) = analytical_omegaStar_(it.col()) * rhoStar / kinetics_map_.thermodynamics().MW(it.col());
 
-					it.valueRef() = (analytical_rf_[it.row() + 1] - analytical_rb_[it.row() + 1]) * dGammaFallOff / GammaFallOff;
+					it.valueRef() = (analytical_rf_(it.row()) - analytical_rb_(it.row())) * dGammaFallOff / GammaFallOff;
 
 					count++;
 				}
@@ -380,7 +390,7 @@ namespace OpenSMOKE
 			{
 				for (Eigen::SparseMatrix<double>::InnerIterator it(*dcabr_over_domega_, k); it; ++it)
 				{
-					it.valueRef() = (analytical_rf_[it.row() + 1] - analytical_rb_[it.row() + 1]);
+					it.valueRef() = (analytical_rf_(it.row()) - analytical_rb_(it.row()));
 					count++;
 				}
 			}
@@ -390,232 +400,40 @@ namespace OpenSMOKE
 		{
 			for (int k = 0; k < J.outerSize(); ++k)
 			{
-				kinetics_map_.netReactionRates() = 0.;
+				std::fill(kinetics_map_.NetReactionRates().begin(), kinetics_map_.NetReactionRates().end(), 0.);
 				for (Eigen::SparseMatrix<double>::InnerIterator it(*drf_over_domega_, k); it; ++it)
-					kinetics_map_.netReactionRates()[it.row() + 1] = it.value();
+					kinetics_map_.NetReactionRates()[it.row()] = it.value();
 				for (Eigen::SparseMatrix<double>::InnerIterator it(*drb_over_domega_, k); it; ++it)
-					kinetics_map_.netReactionRates()[it.row() + 1] -= it.value();
+					kinetics_map_.NetReactionRates()[it.row()] -= it.value();
 
 				for (Eigen::SparseMatrix<double>::InnerIterator it(*dthirdbody_over_domega_, k); it; ++it)
-					kinetics_map_.netReactionRates()[it.row() + 1] += it.value();
+					kinetics_map_.NetReactionRates()[it.row()] += it.value();
 				for (Eigen::SparseMatrix<double>::InnerIterator it(*dfalloff_over_domega_, k); it; ++it)
-					kinetics_map_.netReactionRates()[it.row() + 1] += it.value();
+					kinetics_map_.NetReactionRates()[it.row()] += it.value();
 				for (Eigen::SparseMatrix<double>::InnerIterator it(*dcabr_over_domega_, k); it; ++it)
-					kinetics_map_.netReactionRates()[it.row() + 1] += it.value();
+					kinetics_map_.NetReactionRates()[it.row()] += it.value();
 
-				kinetics_map_.FormationRates(&analytical_RStar_);
+				kinetics_map_.FormationRates(analytical_RStar_.data());
 
 				for (Eigen::SparseMatrix<double>::InnerIterator it(J, k); it; ++it)
-				{
-					const int index = it.row() + 1;
-					it.valueRef() = analytical_RStar_[index];// *thermodynamics_.MW()[index] / rhoStar;
-				}
+					it.valueRef() = analytical_RStar_[it.row()];// *thermodynamics_.MW(index-1) / rhoStar;
 			}
 		}
-
-		/*
-		bool output_analytical = false;
-		bool output_numerical = false;
-
-		// Output Analytical
-		if (output_analytical == true)
-		{
-			std::ofstream fOut("Jacobian.analytical.out", std::ios::out);
-			fOut.setf(std::ios::scientific);
-
-			std::cout << "drf ana" << std::endl;
-			for (int k = 0; k < drf_over_domega_->outerSize(); ++k)
-			{
-				for (Eigen::SparseMatrix<double>::InnerIterator it(*drf_over_domega_, k); it; ++it)
-				{
-					std::cout << " forw " << it.row() << " " << it.col() << " " << it.value() << " " << analytical_rf_[it.row() + 1] << " " << it.value()*analytical_rf_[it.row() + 1] / analytical_omegaStar_[it.col() + 1] << std::endl;;
-				}
-			}
-			std::cout << "drb ana" << std::endl;
-			for (int k = 0; k < drb_over_domega_->outerSize(); ++k)
-			{
-				for (Eigen::SparseMatrix<double>::InnerIterator it(*drb_over_domega_, k); it; ++it)
-				{
-					std::cout << " back " << it.row() << " " << it.col() << " " << it.value() << " " << analytical_rf_[it.row() + 1] << " " << it.value()*analytical_rf_[it.row() + 1] / analytical_omegaStar_[it.col() + 1] << std::endl;;
-				}
-			}
-
-			Eigen::SparseMatrix<double> diff = *drf_over_domega_ - *drb_over_domega_;
-			std::cout << "diff" << std::endl;
-			for (int k = 0; k < diff.outerSize(); ++k)
-			{
-				for (Eigen::SparseMatrix<double>::InnerIterator it(diff, k); it; ++it)
-				{
-					std::cout << " diff " << it.row() << " " << it.col() << " " << it.value() << std::endl;;
-				}
-			}
-
-			for (int k = 0; k < J.outerSize(); ++k)
-			{
-				for (Eigen::SparseMatrix<double>::InnerIterator it(J, k); it; ++it)
-				{
-					fOut << it.row() + 1 << "\t" << it.col() + 1 << "\t" << it.value() << std::endl;;
-				}
-			}
-
-			fOut.close();
-		}
-
-
-
-		// Numerical calculations
-		if (output_numerical == true)
-		{
-			const double ZERO_DER = std::sqrt(OPENSMOKE_TINY_FLOAT);
-			const double ETA2 = std::sqrt(OPENSMOKE_MACH_EPS_DOUBLE);
-			const double TOLR = 100. * OPENSMOKE_MACH_EPS_FLOAT;
-			const double TOLA = 1.e-15;
-
-			// Calculates thermodynamic properties
-			thermodynamics_.SetTemperature(T);
-			thermodynamics_.SetPressure(P_Pa);
-
-			// Calculates kinetics
-			SetTemperature(T);
-			SetPressure(P_Pa);
-			ReactionRates(analytical_cStar_, cTotStar);
-			FormationRates(&analytical_RStar_);
-
-			// Reaction rates
-			OpenSMOKE::OpenSMOKEVectorDouble r(this->number_of_reactions_);
-			GetReactionRates(&r);
-			GetForwardReactionRates(&analytical_rf_);
-			GetBackwardReactionRates(&analytical_rb_);
-
-			OpenSMOKE::OpenSMOKEVectorDouble r0(this->number_of_reactions_);
-			r0 = r;
-			OpenSMOKE::OpenSMOKEVectorDouble RStar0(this->number_of_reactions_);
-			RStar0 = analytical_RStar_;
-			OpenSMOKE::OpenSMOKEVectorDouble omegaStar0 = analytical_omegaStar_;
-
-			// calculate dr_over_domega
-			Eigen::MatrixXd dr_over_domega(this->number_of_reactions_, this->number_of_species_);
-
-			dr_over_domega.setZero();
-			for (unsigned int j = 1; j <= this->number_of_species_; ++j)
-			{
-				double hf = 1.e0;
-				double error_weight = 1. / (TOLA + TOLR*std::fabs(omegaStar0[j]));
-				double hJ = ETA2 * std::fabs(std::max(omegaStar0[j], 1. / error_weight));
-				double hJf = hf / error_weight;
-				hJ = std::max(hJ, hJf);
-				hJ = std::max(hJ, ZERO_DER);
-				double dom = std::min(hJ, 1.e-3 + 1e-3*std::fabs(omegaStar0[j]));
-
-
-				analytical_omegaStar_[j] = omegaStar0[j] + dom;
-				for (unsigned int i = 1; i <= this->number_of_species_; ++i)
-					analytical_cStar_[i] = analytical_omegaStar_[i] * rhoStar / thermodynamics_.MW()[i];
-
-				ReactionRates(analytical_cStar_, cTotStar);
-				GetReactionRates(&r);
-				for (unsigned int i = 1; i <= this->number_of_reactions_; ++i)
-				{
-					dr_over_domega(i - 1, j - 1) = (r[i] - r0[i]) / dom;
-				}
-				analytical_omegaStar_[j] = omegaStar0[j];
-			}
-
-			// write dr_over_domega
-			std::cout << "Matrix drdomega num" << std::endl;
-			for (unsigned int i = 0; i < this->number_of_reactions_; ++i)
-			{
-				for (unsigned int j = 0; j < this->number_of_species_; ++j)
-					std::cout << dr_over_domega(i, j) << "\t";
-				std::cout << std::endl;
-			}
-
-			std::ofstream fOut("Jacobian.numerical.out", std::ios::out);
-			fOut.setf(std::ios::scientific);
-
-			// Jacobian
-			Eigen::MatrixXd Jac(this->number_of_species_, this->number_of_species_);
-
-			Jac.setZero();
-			for (unsigned int j = 1; j <= this->number_of_species_; ++j)
-			{
-				double hf = 1.e0;
-				double error_weight = 1. / (TOLA + TOLR*std::fabs(omegaStar0[j]));
-				double hJ = ETA2 * std::fabs(std::max(omegaStar0[j], 1. / error_weight));
-				double hJf = hf / error_weight;
-				hJ = std::max(hJ, hJf);
-				hJ = std::max(hJ, ZERO_DER);
-				double dom = std::min(hJ, 1.e-3 + 1e-3*std::fabs(omegaStar0[j]));
-
-				analytical_omegaStar_[j] = omegaStar0[j] + dom;
-				for (unsigned int i = 1; i <= this->number_of_species_; ++i)
-					analytical_cStar_[i] = analytical_omegaStar_[i] * rhoStar / thermodynamics_.MW()[i];
-
-				ReactionRates(analytical_cStar_, cTotStar);
-				FormationRates(&analytical_RStar_);
-
-				for (unsigned int i = 1; i <= this->number_of_species_; ++i)
-				{
-					Jac(i - 1, j - 1) = (analytical_RStar_[i] - RStar0[i]) / dom;
-					//Jac(i - 1, j - 1) *= thermodynamics_.MW()[i] / rhoStar;
-				}
-				analytical_omegaStar_[j] = omegaStar0[j];
-			}
-
-			for (unsigned int i = 0; i < this->number_of_species_; ++i)
-			{
-				for (unsigned int j = 0; j < this->number_of_species_; ++j)
-				if (std::fabs(Jac(j, i)) > 0.)
-					fOut << j + 1 << "\t" << i + 1 << "\t" << Jac(j, i) << std::endl;
-			}
-
-			fOut.close();
-		}
-
-		if (output_analytical == true || output_numerical == true)
-			getchar();
-		*/
-
-		/*
-		{
-
-		J.setZero();
-		for (unsigned int i = 0; i < this->number_of_species_; ++i)
-		{
-		for (unsigned int j = 0; j < this->number_of_reactions_; ++j)
-		netReactionRates_[j + 1] = dr_over_domega(j, i);
-		FormationRates(&analytical_RStar_);
-		for (unsigned int j = 0; j < this->number_of_species_; ++j)
-		J(j, i) = analytical_RStar_(j + 1)*thermodynamics_.MW()[j + 1] / rhoStar;
-		}
-
-
-		std::cout << "J an" << std::endl;
-		for (unsigned int i = 0; i < this->number_of_species_; ++i)
-		{
-		for (unsigned int j = 0; j < this->number_of_species_; ++j)
-		std::cout << J(i, j) << "\t";
-		std::cout << std::endl;
-		}
-		getchar();
-
-		}
-		*/
 	}
 
 	template<typename map>
-	void JacobianSparsityPatternMap<map>::Jacobian(const OpenSMOKE::OpenSMOKEVectorDouble& omega, const double T, const double P_Pa, Eigen::VectorXd &Jdiagonal)
+	void JacobianSparsityPatternMap<map>::Jacobian(const double* omega, const double T, const double P_Pa, Eigen::VectorXd &Jdiagonal)
 	{
-		for (unsigned int i = 1; i <= nc; ++i)
-			analytical_omegaStar_[i] = (omega[i] > epsilon_) ? omega[i] : epsilon_; // (omega[i] + epsilon_) / sum_mass_fractions_;
+		for (unsigned int i = 0; i < nc; ++i)
+			analytical_omegaStar_(i) = (omega[i] > epsilon_) ? omega[i] : epsilon_; // (omega[i] + epsilon_) / sum_mass_fractions_;
 
 		double MWStar;
-		kinetics_map_.thermodynamics().MoleFractions_From_MassFractions(analytical_xStar_, MWStar, analytical_omegaStar_);
+		kinetics_map_.thermodynamics().MoleFractions_From_MassFractions(analytical_xStar_.data(), MWStar, analytical_omegaStar_.data());
 		double cTotStar = P_Pa / PhysicalConstants::R_J_kmol / T;
 		double rhoStar = cTotStar*MWStar;
 
-		for (unsigned int i = 1; i <= nc; ++i)
-			analytical_cStar_[i] = analytical_omegaStar_[i] * rhoStar / kinetics_map_.thermodynamics().MW()[i];
+		for (unsigned int i = 0; i < nc; ++i)
+			analytical_cStar_(i) = analytical_omegaStar_(i) * rhoStar / kinetics_map_.thermodynamics().MW(i);
 
 		// Calculates thermodynamic properties
 		kinetics_map_.thermodynamics().SetTemperature(T);
@@ -624,12 +442,12 @@ namespace OpenSMOKE
 		// Calculates kinetics
 		kinetics_map_.SetTemperature(T);
 		kinetics_map_.SetPressure(P_Pa);
-		kinetics_map_.ReactionRates(analytical_cStar_, cTotStar);
-		kinetics_map_.FormationRates(&analytical_RStar_);
+		kinetics_map_.ReactionRates(analytical_cStar_.data(), cTotStar);
+		kinetics_map_.FormationRates(analytical_RStar_.data());
 
 		// Reaction rates
-		kinetics_map_.GetForwardReactionRates(&analytical_rf_);
-		kinetics_map_.GetBackwardReactionRates(&analytical_rb_);
+		kinetics_map_.GetForwardReactionRates(analytical_rf_.data());
+		kinetics_map_.GetBackwardReactionRates(analytical_rb_.data());
 
 		// Reactants
 		for (int k = 0; k < kinetics_map_.stoichiometry().reactionorders_matrix_reactants().outerSize(); ++k)
@@ -637,7 +455,7 @@ namespace OpenSMOKE
 			Eigen::SparseMatrix<double>::InnerIterator it_rf(*drf_over_domega_, k);
 			for (Eigen::SparseMatrix<double>::InnerIterator it(kinetics_map_.stoichiometry().reactionorders_matrix_reactants(), k); it; ++it)
 			{
-				it_rf.valueRef() = it.value()*analytical_rf_[it.row() + 1] / analytical_omegaStar_[it.col() + 1];
+				it_rf.valueRef() = it.value()*analytical_rf_(it.row()) / analytical_omegaStar_(it.col());
 				++it_rf;
 			}
 		}
@@ -648,7 +466,7 @@ namespace OpenSMOKE
 			Eigen::SparseMatrix<double>::InnerIterator it_rb(*drb_over_domega_, k);
 			for (Eigen::SparseMatrix<double>::InnerIterator it(kinetics_map_.stoichiometry().reactionorders_matrix_products(), k); it; ++it)
 			{
-				it_rb.valueRef() = it.value()*analytical_rb_[it.row() + 1] / analytical_omegaStar_[it.col() + 1];
+				it_rb.valueRef() = it.value()*analytical_rb_(it.row()) / analytical_omegaStar_(it.col());
 				++it_rb;
 			}
 		}
@@ -661,9 +479,9 @@ namespace OpenSMOKE
 			{
 				for (Eigen::SparseMatrix<double>::InnerIterator it(*dthirdbody_over_domega_, k); it; ++it)
 				{
-					it.valueRef() = (analytical_rf_[it.row() + 1] - analytical_rb_[it.row() + 1]) * analytical_cStar_[it.col() + 1] / analytical_omegaStar_[it.col() + 1] *
-						kinetics_map_.indices_of_thirdbody_efficiencies()[analytical_thirdbody_reactions_(count) - 1][analytical_thirdbody_species_(count)] /
-						kinetics_map_.Meff()[analytical_thirdbody_reactions_(count)];
+					it.valueRef() = (analytical_rf_(it.row()) - analytical_rb_(it.row())) * analytical_cStar_(it.col()) / analytical_omegaStar_(it.col()) *
+						kinetics_map_.IndicesOfThirdbodyEfficiencies()[analytical_thirdbody_reactions_(count) - 1][analytical_thirdbody_species_(count)-1] /
+						kinetics_map_.M()[analytical_thirdbody_reactions_(count)-1];
 
 					count++;
 				}
@@ -674,22 +492,21 @@ namespace OpenSMOKE
 		if (kinetics_map_.NumberOfFallOffReactions() != 0)
 		{
 			const double eps = 1.e-4;
-			OpenSMOKE::OpenSMOKEVectorDouble cStarPlus(nc);
-			cStarPlus = analytical_cStar_;
+			Eigen::VectorXd cStarPlus = analytical_cStar_;
 
 			unsigned count = 0;
 			for (int k = 0; k < dfalloff_over_domega_->outerSize(); ++k)
 			{
 				for (Eigen::SparseMatrix<double>::InnerIterator it(*dfalloff_over_domega_, k); it; ++it)
 				{
-					cStarPlus[it.col() + 1] = (analytical_omegaStar_[it.col() + 1] + eps) * rhoStar / kinetics_map_.thermodynamics().MW()[it.col() + 1];
+					cStarPlus(it.col()) = (analytical_omegaStar_(it.col()) + eps) * rhoStar / kinetics_map_.thermodynamics().MW(it.col());
 
-					const double GammaFallOff = kinetics_map_.FallOffReactionsCorrection(analytical_falloff_reactions_(count), cTotStar, analytical_cStar_);
-					const double GammaFallOffPlus = kinetics_map_.FallOffReactionsCorrection(analytical_falloff_reactions_(count), cTotStar, cStarPlus);
+					const double GammaFallOff = kinetics_map_.FallOffReactionsCorrection(analytical_falloff_reactions_(count), cTotStar, analytical_cStar_.data());
+					const double GammaFallOffPlus = kinetics_map_.FallOffReactionsCorrection(analytical_falloff_reactions_(count), cTotStar, cStarPlus.data());
 					const double dGammaFallOff = (GammaFallOffPlus - GammaFallOff) / eps;
-					cStarPlus[it.col() + 1] = analytical_omegaStar_[it.col() + 1] * rhoStar / kinetics_map_.thermodynamics().MW()[it.col() + 1];
+					cStarPlus(it.col()) = analytical_omegaStar_(it.col()) * rhoStar / kinetics_map_.thermodynamics().MW(it.col());
 
-					it.valueRef() = (analytical_rf_[it.row() + 1] - analytical_rb_[it.row() + 1]) * dGammaFallOff / GammaFallOff;
+					it.valueRef() = (analytical_rf_(it.row()) - analytical_rb_(it.row())) * dGammaFallOff / GammaFallOff;
 
 					count++;
 				}
@@ -704,7 +521,7 @@ namespace OpenSMOKE
 			{
 				for (Eigen::SparseMatrix<double>::InnerIterator it(*dcabr_over_domega_, k); it; ++it)
 				{
-					it.valueRef() = (analytical_rf_[it.row() + 1] - analytical_rb_[it.row() + 1]);
+					it.valueRef() = (analytical_rf_(it.row()) - analytical_rb_(it.row()));
 					count++;
 				}
 			}

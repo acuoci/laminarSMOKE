@@ -88,12 +88,12 @@ namespace OpenSMOKE
 					if (destruction_analysis_ == true)
 					{
 						for (unsigned int j=0;j<couples.size();j++)
-							if (r_[couples[j]+1]>0.) fluxes_as_reactant[k] += n_k*n_j * r_[couples[j]+1]/number_of_atoms[couples[j]];			
+							if (r__[couples[j]]>0.) fluxes_as_reactant[k] += n_k*n_j * r__[couples[j]]/number_of_atoms[couples[j]];			
 					}
 					else
 					{
 						for (unsigned int j=0;j<couples.size();j++)
-							if (r_[couples[j]+1]<0.) fluxes_as_reactant[k] += n_k*n_j * r_[couples[j]+1]/number_of_atoms[couples[j]];			
+							if (r__[couples[j]]<0.) fluxes_as_reactant[k] += n_k*n_j * r__[couples[j]]/number_of_atoms[couples[j]];			
 					}
 				}
 			}
@@ -124,12 +124,12 @@ namespace OpenSMOKE
 					if (destruction_analysis_ == true)
 					{
 						for (unsigned int j=0;j<couples.size();j++)
-							if (r_[couples[j]+1]<0.) fluxes_as_product[k] += n_k*n_j * r_[couples[j]+1]/number_of_atoms[couples[j]];			
+							if (r__[couples[j]]<0.) fluxes_as_product[k] += n_k*n_j * r__[couples[j]]/number_of_atoms[couples[j]];			
 					}
 					else
 					{
 						for (unsigned int j=0;j<couples.size();j++)
-							if (r_[couples[j]+1]>0.) fluxes_as_product[k] += n_k*n_j * r_[couples[j]+1]/number_of_atoms[couples[j]];			
+							if (r__[couples[j]]>0.) fluxes_as_product[k] += n_k*n_j * r__[couples[j]]/number_of_atoms[couples[j]];			
 					}
 				}
 			}
@@ -349,6 +349,13 @@ namespace OpenSMOKE
 				fOut << k+1 << " " << it.row()+1 << " " << it.value() << std::endl;
 
 		fOut.close();
+	}
+
+	void FluxAnalysisMap::SetReactionRates(unsigned int n, const double* r)
+	{
+		r__.resize(n);
+		for(unsigned int j=0;j<n;j++)
+			r__[j] = r[j];
 	}
 }
 

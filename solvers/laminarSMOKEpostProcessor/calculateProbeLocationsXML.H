@@ -80,7 +80,7 @@ if (pnts_xml.size() > 0)
 
 			// Molecular weight
 			double mw;
-			thermodynamicsMapXML->MoleFractions_From_MassFractions(x, mw, y);
+			thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), mw, y.GetHandle());
 
 			// Density
 			const double rho = pint*mw/PhysicalConstants::R_J_kmol/Tint;
@@ -120,7 +120,7 @@ if (pnts_xml.size() > 0)
 				fXML << "<mass-fractions>" << std::endl;
 				fXML << thermodynamicsMapXML->NumberOfSpecies() << std::endl;
 				for(unsigned int i=1;i<=thermodynamicsMapXML->NumberOfSpecies();i++)
-					fXML << thermodynamicsMapXML->NamesOfSpecies()[i-1] << " " << thermodynamicsMapXML->MW()[i] << " " << n_additional+i << std::endl;
+					fXML << thermodynamicsMapXML->NamesOfSpecies()[i-1] << " " << thermodynamicsMapXML->MW(i-1) << " " << n_additional+i << std::endl;
 				fXML << "</mass-fractions>" << std::endl;
 
 				fXML << "<profiles>" << std::endl;

@@ -228,7 +228,8 @@ namespace OpenSMOKE
 				this->bundling_gammaSpeciesSelfDiffusion_[i] = rhs.bundling_gammaSpeciesSelfDiffusion_[i];
 		}
 
-		ChangeDimensions(this->nspecies_*iThermalDiffusionRatios_.size(), &this->tetaSpecies_, true);
+		this->tetaSpecies_.resize(this->nspecies_*iThermalDiffusionRatios_.size());
+		this->tetaSpecies_.setZero();
 	}
 
 	void TransportPropertiesMap_CHEMKIN::MemoryAllocation()
@@ -246,7 +247,9 @@ namespace OpenSMOKE
 		// fittingTeta is not inizialized here, because the number of species for which the thermal diffusion ratios is 
 		// important is not yet known
 
-		ChangeDimensions(this->nspecies_, &sumK, true);
+		sumK.resize(this->nspecies_);
+		sumK.setZero();
+
 		if (viscosity_model == PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_WILKE)
 		{
 			MWRatio1over4 = new double[this->nspecies_*(this->nspecies_ - 1) / 2];
@@ -266,9 +269,14 @@ namespace OpenSMOKE
 		sum_diffusion_coefficients = new double[this->nspecies_];
 		x_corrected = new double[this->nspecies_];
 
-		ChangeDimensions(this->nspecies_, &this->lambdaSpecies_, true);
-		ChangeDimensions(this->nspecies_, &this->etaSpecies_, true);
-		ChangeDimensions(this->nspecies_*(this->nspecies_ - 1) / 2, &this->gammaSpecies_, true);
+		this->lambdaSpecies_.resize(this->nspecies_);
+		this->lambdaSpecies_.setZero();
+
+		this->etaSpecies_.resize(this->nspecies_);
+		this->etaSpecies_.setZero();
+
+		this->gammaSpecies_.resize(this->nspecies_*(this->nspecies_ - 1) / 2);
+		this->gammaSpecies_.setZero();
 
 		// Thermal diffusion ratios are allocated after reading the properties
 	}
@@ -625,46 +633,47 @@ namespace OpenSMOKE
 				}
 		}
 		
-		ChangeDimensions(this->nspecies_*boost::lexical_cast<unsigned int>(iThermalDiffusionRatios_.size()), &this->tetaSpecies_, true);
+		this->tetaSpecies_.resize(this->nspecies_*boost::lexical_cast<unsigned int>(iThermalDiffusionRatios_.size()));
+		this->tetaSpecies_.setZero();
 	}
 
 	inline void TransportPropertiesMap_CHEMKIN::lambda()
 	{
-            if (temperature_lambda_must_be_recalculated_ == true)
-            {
-		const double logT=std::log(T_);
-		const double logT2=logT*logT;
-		const double logT3=logT*logT2;
+        if (temperature_lambda_must_be_recalculated_ == true)
+        {
+			const double logT=std::log(T_);
+			const double logT2=logT*logT;
+			const double logT3=logT*logT2;
 
-		#if OPENSMOKE_USE_MKL == 0
+			#if OPENSMOKE_USE_MKL == 0
 
-			const double* k = fittingLambda;
-			for (unsigned int j=1;j<=this->nspecies_;j++)
-			{
-				double sum = (*k++);
-					   sum+= (*k++)*logT;
-					   sum+= (*k++)*logT2;
-					   sum+= (*k++)*logT3;
-				this->lambdaSpecies_[j]=std::exp(sum);
-			}
+				const double* k = fittingLambda;
+				for (unsigned int j=0;j<this->nspecies_;j++)
+				{
+					double sum = (*k++);
+							sum+= (*k++)*logT;
+							sum+= (*k++)*logT2;
+							sum+= (*k++)*logT3;
+					this->lambdaSpecies_(j)=std::exp(sum);
+				}
 
-		#elif OPENSMOKE_USE_MKL == 1
+			#elif OPENSMOKE_USE_MKL == 1
 	
-			const double* k = fittingLambda;
-			for (unsigned int j=1;j<=this->nspecies_;j++)
-			{
-				double sum = (*k++);
-					   sum+= (*k++)*logT;
-					   sum+= (*k++)*logT2;
-					   sum+= (*k++)*logT3;
-				this->lambdaSpecies_[j]=sum;
-			}
-			vdExp( this->nspecies_, this->lambdaSpecies_.GetHandle(), this->lambdaSpecies_.GetHandle() );
+				const double* k = fittingLambda;
+				for (unsigned int j=0;j<this->nspecies_;j++)
+				{
+					double sum = (*k++);
+							sum+= (*k++)*logT;
+							sum+= (*k++)*logT2;
+							sum+= (*k++)*logT3;
+					this->lambdaSpecies_(j)=sum;
+				}
+				vdExp( this->nspecies_, this->lambdaSpecies_.data(), this->lambdaSpecies_.data() );
 	
-		#endif
+			#endif
 
-                temperature_lambda_must_be_recalculated_ = false;
-            }
+            temperature_lambda_must_be_recalculated_ = false;
+        }
 	}
 
 	inline void TransportPropertiesMap_CHEMKIN::eta()
@@ -678,27 +687,27 @@ namespace OpenSMOKE
 			#if OPENSMOKE_USE_MKL == 0
 
 				const double* k = fittingEta;
-				for (unsigned int j=1;j<=this->nspecies_;j++)
+				for (unsigned int j=0;j<this->nspecies_;j++)
 				{
 					double sum = (*k++);
 						   sum+= (*k++)*logT;
 						   sum+= (*k++)*logT2;
 						   sum+= (*k++)*logT3;
-					this->etaSpecies_[j]=std::exp(sum);
+					this->etaSpecies_(j)=std::exp(sum);
 				}
 
 			#elif OPENSMOKE_USE_MKL == 1
 	
 				const double* k = fittingEta;
-				for (unsigned int j=1;j<=this->nspecies_;j++)
+				for (unsigned int j=0;j<this->nspecies_;j++)
 				{
 					double sum = (*k++);
 						   sum+= (*k++)*logT;
 						   sum+= (*k++)*logT2;
 						   sum+= (*k++)*logT3;
-					this->etaSpecies_[j]=sum;
+					this->etaSpecies_(j)=sum;
 				}
-				vdExp( this->nspecies_, this->etaSpecies_.GetHandle(), this->etaSpecies_.GetHandle() );
+				vdExp( this->nspecies_, this->etaSpecies_.data(), this->etaSpecies_.data() );
 	
 			#endif
 
@@ -717,7 +726,7 @@ namespace OpenSMOKE
 			for (unsigned int i=1;i<=iThermalDiffusionRatios_.size();i++)
 			{
 				unsigned int j = 4*(i-1)*this->nspecies_;
-				unsigned int m = (i-1)*this->nspecies_+1;
+				unsigned int m = (i-1)*this->nspecies_;
 
 				double* ptFitting = &fittingTeta[j];
 
@@ -741,7 +750,7 @@ namespace OpenSMOKE
 		if ( temperature_gamma_must_be_recalculated_ == false && pressure_gamma_must_be_recalculated_  == true )
 		{
             const double multiplier = P_/P_old_;
-			double* D = this->gammaSpecies_.GetHandle();
+			double* D = this->gammaSpecies_.data();
 			for (unsigned int j=0;j<this->nspecies_;j++)
 			for (unsigned int k=j+1;k<this->nspecies_;k++)
 			{
@@ -764,7 +773,7 @@ namespace OpenSMOKE
 			#if OPENSMOKE_USE_MKL == 0
 
 			const double* d = fittingGamma;
-			double* D = this->gammaSpecies_.GetHandle();
+			double* D = this->gammaSpecies_.data();
 			for (unsigned int j=1;j<=this->nspecies_;j++)
 				for (unsigned int k=j+1;k<=this->nspecies_;k++)
 				{
@@ -779,7 +788,7 @@ namespace OpenSMOKE
 	
 			const double lnP_bar = std::log(P_bar);
 			const double* d = fittingGamma;
-			double* D = this->gammaSpecies_.GetHandle();
+			double* D = this->gammaSpecies_.data();
 			for (unsigned int j=0;j<this->nspecies_;j++)
 				for (unsigned int k=j+1;k<this->nspecies_;k++)
 				{
@@ -790,7 +799,7 @@ namespace OpenSMOKE
 					*D++ = lnP_bar-sum;
 				}
 
-			vdExp( this->nspecies_*(this->nspecies_-1)/2, this->gammaSpecies_.GetHandle(), this->gammaSpecies_.GetHandle() );
+			vdExp( this->nspecies_*(this->nspecies_-1)/2, this->gammaSpecies_.data(), this->gammaSpecies_.data() );
 
 			#endif
 
@@ -885,56 +894,60 @@ namespace OpenSMOKE
 		}
 	}
 
-	void TransportPropertiesMap_CHEMKIN::lambdaMix(double& lambdamix, OpenSMOKEVectorDouble& moleFractions)
+	double TransportPropertiesMap_CHEMKIN::lambdaMix(const double* moleFractions)
 	{
 		// Calcolo della conducibilita della miscela
 		// Formula di Mathur, Todor, Saxena - Molecular Physics 52:569 (1967)
 
-		double sum1 = Dot(moleFractions, this->lambdaSpecies_);
-		double sum2 = UDot(moleFractions, this->lambdaSpecies_);
-		lambdamix = 0.50 * ( sum1 + 1./sum2 );
+		const double sum1 = Dot(this->nspecies_, moleFractions, this->lambdaSpecies_.data());
+		const double sum2 = UDot(this->nspecies_, moleFractions, this->lambdaSpecies_.data());
+		const double lambdamix = 0.50 * ( sum1 + 1./sum2 );
+		
+		return lambdamix;
 	}
 
-	void TransportPropertiesMap_CHEMKIN::etaMix(double& etamix, OpenSMOKEVectorDouble& moleFractions)
+	double TransportPropertiesMap_CHEMKIN::etaMix(const double* moleFractions)
 	{
-		sumK = moleFractions;
+		for (unsigned int k = 0; k < this->nspecies_; k++)
+			sumK(k) = moleFractions[k];
 
 		// Wilke - Journal of Chemical Physics 18:517 (1950)
 		// Modified by Bird, Stewart, Lightfoot - Transport phenomena (1960)
 		// Available in: Reid, Prausnitz, Poling - The properties of gases and liquids, p. 407
-
 		if(viscosity_model == PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_WILKE)
 		{
 			#if OPENSMOKE_USE_MKL == 0
 			
 				for(unsigned int k=0;k<this->nspecies_;k++)
 				{
-					sqrtEta[k] = std::sqrt(this->etaSpecies_[k+1]);
+					sqrtEta[k] = std::sqrt(this->etaSpecies_(k));
 					usqrtEta[k] = 1./sqrtEta[k];
 				}
 
 			#elif OPENSMOKE_USE_MKL == 1
 			
-				vdSqrt(this->nspecies_, this->etaSpecies_.GetHandle(), sqrtEta);
+				vdSqrt(this->nspecies_, this->etaSpecies_.data(), sqrtEta);
 				vdInv(this->nspecies_, sqrtEta, usqrtEta);
 			
 			#endif
-			
+
 			const double* ptMWRatio1over4=MWRatio1over4;
 			const double* ptphi_eta_sup=phi_eta_sup;
 			const double* ptphi_eta_inf=phi_eta_inf;
 
-			for(unsigned int k=1;k<=this->nspecies_;k++)
-				for(unsigned int j=k+1;j<=this->nspecies_;j++)
+			for (unsigned int k = 0; k < this->nspecies_; k++)
+				for (unsigned int j = k + 1; j < this->nspecies_; j++)
 				{
-					double delta_phi = sqrtEta[k-1]*usqrtEta[j-1]*(*ptMWRatio1over4++);	// F.(49)
-					sumK[k] += moleFractions[j]*(*ptphi_eta_sup++)*(1.+delta_phi)*(1.+delta_phi);
-					sumK[j] += moleFractions[k]*(*ptphi_eta_inf++)*(1.+1./delta_phi)*(1.+1./delta_phi);
+					double delta_phi = sqrtEta[k] * usqrtEta[j] * (*ptMWRatio1over4++);	// F.(49)
+					sumK(k) += moleFractions[j] * (*ptphi_eta_sup++)*(1. + delta_phi)*(1. + delta_phi);
+					sumK(j) += moleFractions[k] * (*ptphi_eta_inf++)*(1. + 1. / delta_phi)*(1. + 1. / delta_phi);
 				}
 
-			etamix = 0.;
-			for(unsigned int k=1;k<=this->nspecies_;k++)
-				etamix += moleFractions[k]*this->etaSpecies_[k]/sumK[k];				// F.(48)
+			double etamix = 0.;
+			for(unsigned int k=0;k<this->nspecies_;k++)
+				etamix += moleFractions[k]*this->etaSpecies_(k)/sumK(k);				// F.(48)
+
+			return etamix;
 		}
 
 		// Herning and Zipperer
@@ -943,18 +956,21 @@ namespace OpenSMOKE
 		else if (viscosity_model == PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_HERNING)
 		{
 			double sum = 0;
-			for(unsigned int k=1;k<=this->nspecies_;k++)
-				sum += moleFractions[k]*sqrtMW[k-1];
+			for (unsigned int k = 0; k < this->nspecies_; k++)
+				sum += moleFractions[k] * sqrtMW[k];
 
-			etamix = 0.;
-			for(unsigned int k=1;k<=this->nspecies_;k++)
-				etamix += moleFractions[k]*this->etaSpecies_[k]*sqrtMW[k-1];				// F.(48)
+			double etamix = 0.;
+			for (unsigned int k = 0; k < this->nspecies_; k++)
+				etamix += moleFractions[k] * this->etaSpecies_(k) * sqrtMW[k];				// F.(48)
 			etamix /= sum;
+
+			return etamix;
 		}
-		
+	
+		return 0.;
 	}
 
-	void TransportPropertiesMap_CHEMKIN::gammaMix(OpenSMOKEVectorDouble& gammamix, OpenSMOKEVectorDouble& moleFractions)
+	void TransportPropertiesMap_CHEMKIN::gammaMix(double* gammamix, const double* moleFractions)
 	{	
 		// Reset
 		for(unsigned int k=0;k<this->nspecies_;k++)
@@ -962,14 +978,14 @@ namespace OpenSMOKE
 
 		// Adjust mole fractions
 		for(unsigned int i=0;i<this->nspecies_;i++)
-			x_corrected[i] = (moleFractions[i+1]+threshold_)/sum_threshold_;
+			x_corrected[i] = (moleFractions[i]+threshold_)/sum_threshold_;
 
 		double MWmix = 0.;
 		for(unsigned int i=0;i<this->nspecies_;i++)
 			MWmix += x_corrected[i]*M[i];
 		
 		// a. Evaluating Mass Diffusion coefficients (mixture averaged)
-		const double *d = this->gammaSpecies_.GetHandle();
+		const double *d = this->gammaSpecies_.data();
 		for(unsigned int k=0;k<this->nspecies_;k++)
 			for(unsigned int j=k+1;j<this->nspecies_;j++)
 			{
@@ -980,10 +996,10 @@ namespace OpenSMOKE
 			
 		// b. Evaluating Mass Diffusion coefficients (mixture averaged)
 		for(unsigned int k=0;k<this->nspecies_;k++)
-			gammamix[k+1] = (MWmix - x_corrected[k]*M[k]) / (MWmix*sum_diffusion_coefficients[k]);
+			gammamix[k] = (MWmix - x_corrected[k]*M[k]) / (MWmix*sum_diffusion_coefficients[k]);
 	}
 
-	void TransportPropertiesMap_CHEMKIN::bundling_gammaMix(OpenSMOKEVectorDouble& gammamix, OpenSMOKEVectorDouble& moleFractions)
+	void TransportPropertiesMap_CHEMKIN::bundling_gammaMix(double* gammamix, const double* moleFractions)
 	{
 		// Reset
 		for (unsigned int k = 0; k<this->bundling_number_groups_; k++)
@@ -991,7 +1007,7 @@ namespace OpenSMOKE
 
 		// Adjust mole fractions
 		for (unsigned int i = 0; i<this->nspecies_; i++)
-			x_corrected[i] = (moleFractions[i + 1] + threshold_) / sum_threshold_;
+			x_corrected[i] = (moleFractions[i] + threshold_) / sum_threshold_;
 
 		double MWmix = 0.;
 		for (unsigned int i = 0; i<this->nspecies_; i++)
@@ -1020,28 +1036,28 @@ namespace OpenSMOKE
 			const unsigned int group = this->bundling_species_group_[k];
 			const double correction = (this->bundling_sum_x_groups_[group] - x_corrected[k])*this->bundling_gammaSpeciesSelfDiffusion_[group];
 
-			gammamix[k + 1] =	(MWmix - x_corrected[k] * M[k]) / 
-								(MWmix* (this->bundling_sum_diffusion_coefficients_[group] + correction));
+			gammamix[k] =	(MWmix - x_corrected[k] * M[k]) / 
+							(MWmix* (this->bundling_sum_diffusion_coefficients_[group] + correction));
 		}
 	}
 
-	void TransportPropertiesMap_CHEMKIN::tetaMix(OpenSMOKEVectorDouble& tetamix, OpenSMOKEVectorDouble& moleFractions)
+	void TransportPropertiesMap_CHEMKIN::tetaMix(double* tetamix, const double* moleFractions)
 	{
-		for (unsigned int j=1;j<=this->nspecies_;j++)
+		for (unsigned int j=0;j<this->nspecies_;j++)
 			tetamix[j] = 0.;
 
-		for (unsigned int k=1;k<=iThermalDiffusionRatios_.size();k++)
+		for (unsigned int k=0;k<iThermalDiffusionRatios_.size();k++)
 		{
-			unsigned int iSpecies = iThermalDiffusionRatios_[k-1];
-			unsigned int i = (k-1)*this->nspecies_+1;
-			for (unsigned int j=1;j<=this->nspecies_;j++)
+			unsigned int iSpecies = iThermalDiffusionRatios_[k]-1;
+			unsigned int i = k*this->nspecies_;
+			for (unsigned int j=0;j<this->nspecies_;j++)
 			{
 				tetamix[iSpecies] += this->tetaSpecies_[i++]*moleFractions[iSpecies]*moleFractions[j];
 			}
 		}
 	}
 
-	void TransportPropertiesMap_CHEMKIN::kPlanckMix(double& kPlanck, OpenSMOKEVectorDouble& moleFractions)
+	double TransportPropertiesMap_CHEMKIN::kPlanckMix(const double* moleFractions)
 	{
 		const double uT = 1000. / this->T_;
 		const double T = this->T_;
@@ -1065,10 +1081,10 @@ namespace OpenSMOKE
 		const double K_CH4 = 6.6334 + T*(-0.0035686 + T*(1.6682e-08 + T*(2.5611e-10 - 2.6558e-14*T)));
 
 		// Mole fractions
-		const double x_H2O = (index_H2O_>0) ? moleFractions[index_H2O_] : 0.;
-		const double x_CO2 = (index_CO2_>0) ? moleFractions[index_CO2_] : 0.;
-		const double x_CO  = (index_CO_>0)  ? moleFractions[index_CO_]  : 0.;
-		const double x_CH4 = (index_CH4_>0) ? moleFractions[index_CH4_] : 0.;
+		const double x_H2O = (index_H2O_>0) ? moleFractions[index_H2O_-1] : 0.;
+		const double x_CO2 = (index_CO2_>0) ? moleFractions[index_CO2_-1] : 0.;
+		const double x_CO  = (index_CO_>0)  ? moleFractions[index_CO_-1]  : 0.;
+		const double x_CH4 = (index_CH4_>0) ? moleFractions[index_CH4_-1] : 0.;
 
 		// Absorption coefficients
 		const double as_H2O = K_H2O*x_H2O;	// [1/m/bar]
@@ -1077,19 +1093,21 @@ namespace OpenSMOKE
 		const double as_CH4 = K_CH4*x_CH4;	// [1/m/bar]
 
 		// Global absorption coefficient
-		kPlanck = (as_H2O + as_CO2 + as_CO + as_CH4) * (this->P_ / 1.e5);	// [1/m]
+		const double kPlanck = (as_H2O + as_CO2 + as_CO + as_CH4) * (this->P_ / 1.e5);	// [1/m]
+
+		return kPlanck;
 	}
 
 	void TransportPropertiesMap_CHEMKIN::Test(const int nLoops, const double& T, int* index)
 	{
 		double lambdamix, etamix;
-		OpenSMOKEVectorDouble gammamix(this->nspecies_);
-		OpenSMOKEVectorDouble tetamix(this->nspecies_);
+		Eigen::VectorXd gammamix(this->nspecies_);
+		Eigen::VectorXd tetamix(this->nspecies_);
 		
 		// Composition (mole fractions)
-		OpenSMOKEVectorDouble x(this->nspecies_);
-		for(unsigned int i=1;i<=this->nspecies_;i++)
-			x[i] = 1./double(this->nspecies_);
+		Eigen::VectorXd x(this->nspecies_);
+		for(unsigned int i=0;i<this->nspecies_;i++)
+			x(i) = 1./double(this->nspecies_);
 
 		// Loops
 		unsigned int speciesLoopsLambda	= nLoops*125;
@@ -1158,7 +1176,7 @@ namespace OpenSMOKE
 			double tStart = OpenSMOKEGetCpuTime();
 			for(unsigned int k=1;k<=mixtureLoopsLambda;k++)
 			{
-				lambdaMix(lambdamix, x);
+				lambdamix = lambdaMix(x.data());
 			}
 			double tEnd = OpenSMOKEGetCpuTime();
 			mixtureLambdaTime = tEnd - tStart;
@@ -1169,7 +1187,7 @@ namespace OpenSMOKE
 			double tStart = OpenSMOKEGetCpuTime();
 			for(unsigned int k=1;k<=mixtureLoopsEta;k++)
 			{
-				etaMix(etamix, x);
+				etamix = etaMix(x.data());
 			}
 			double tEnd = OpenSMOKEGetCpuTime();
 			mixtureEtaTime = tEnd - tStart;
@@ -1180,7 +1198,7 @@ namespace OpenSMOKE
 			double tStart = OpenSMOKEGetCpuTime();
 			for(unsigned int k=1;k<=mixtureLoopsGamma;k++)
 			{
-				gammaMix(gammamix, x);
+				gammaMix(gammamix.data(), x.data());
 			}
 			double tEnd = OpenSMOKEGetCpuTime();
 			mixtureGammaTime = tEnd - tStart;
@@ -1191,7 +1209,7 @@ namespace OpenSMOKE
 			double tStart = OpenSMOKEGetCpuTime();
 			for(unsigned int k=1;k<=mixtureLoopsTeta;k++)
 			{
-				tetaMix(tetamix, x);
+				tetaMix(tetamix.data(), x.data());
 			}
 			double tEnd = OpenSMOKEGetCpuTime();
 			mixtureTetaTime = tEnd - tStart;
@@ -1212,16 +1230,16 @@ namespace OpenSMOKE
 		fBenchmark << "---------------------------------------------------------------------------------------------------------" << std::endl;
 
 		fBenchmark << "Thermal conductivities     ";
-		fBenchmark << this->lambdaSpecies_[index[1]]	<< " " << this->lambdaSpecies_[index[2]] << " " << this->lambdaSpecies_[index[3]] << std::endl; 
+		fBenchmark << this->lambdaSpecies_(index[1]-1)	<< " " << this->lambdaSpecies_(index[2]-1) << " " << this->lambdaSpecies_(index[3]-1) << std::endl; 
 
 		fBenchmark << "Dynamic viscosities        ";
-		fBenchmark << this->etaSpecies_[index[1]]		<< " " << this->etaSpecies_[index[2]] << " " << this->etaSpecies_[index[3]] << std::endl; 
+		fBenchmark << this->etaSpecies_(index[1]-1)		<< " " << this->etaSpecies_(index[2]-1) << " " << this->etaSpecies_(index[3]-1) << std::endl; 
 
 		fBenchmark << "Mass diffusivities         ";
-		fBenchmark << this->gammaSpecies_[index[1]]	<< " " << this->gammaSpecies_[index[2]] << " " << this->gammaSpecies_[index[3]] << std::endl; 
+		fBenchmark << this->gammaSpecies_(index[1]-1)	<< " " << this->gammaSpecies_(index[2]-1) << " " << this->gammaSpecies_(index[3]-1) << std::endl; 
 
 		fBenchmark << "Therm. diff ratios         ";
-		fBenchmark << this->tetaSpecies_[index[1]]	<< " " << this->tetaSpecies_[index[2]] << " " << this->tetaSpecies_[index[3]] << std::endl; 
+		fBenchmark << this->tetaSpecies_(index[1]-1)	<< " " << this->tetaSpecies_(index[2]-1) << " " << this->tetaSpecies_(index[3]-1) << std::endl; 
 
 		fBenchmark << "Thermal conductivity (mix) ";
 		fBenchmark << lambdamix << std::endl;
@@ -1230,10 +1248,10 @@ namespace OpenSMOKE
 		fBenchmark << etamix << std::endl;
 
 		fBenchmark << "Mass diffusivities (mix)   ";
-		fBenchmark << gammamix[index[1]] << " " << gammamix[index[2]] << " " << gammamix[index[3]] << std::endl;
+		fBenchmark << gammamix(index[1]-1) << " " << gammamix(index[2]-1) << " " << gammamix(index[3]-1) << std::endl;
 
 		fBenchmark << "Th. diff. ratios (mix)     ";
-		fBenchmark << tetamix[index[1]] << " " << tetamix[index[2]] << " " << tetamix[index[3]] << std::endl;
+		fBenchmark << tetamix(index[1]-1) << " " << tetamix(index[2]-1) << " " << tetamix(index[3]-1) << std::endl;
 	
 		fBenchmark << std::endl;
 

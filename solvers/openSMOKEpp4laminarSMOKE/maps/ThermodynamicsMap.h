@@ -37,10 +37,6 @@
 #ifndef OpenSMOKE_ThermodynamicsMap_H
 #define OpenSMOKE_ThermodynamicsMap_H
 
-#include "math/OpenSMOKEClass.hpp"
-#include "math/OpenSMOKEVector.h"
-
-
 namespace OpenSMOKE
 {
 	//!  A virtual class to provide a common interface to thermodynamic maps
@@ -64,9 +60,14 @@ namespace OpenSMOKE
 		const std::vector<std::string>& NamesOfSpecies() const { return names_; }
 
 		/**
-		* @brief returns the molecular weights of the species [kg/kmol]
+		* @brief returns the molecular weights of a species [kg/kmol]
 		*/
-		const OpenSMOKE::OpenSMOKEVectorDouble& MW() const { return MW_;}
+		const std::vector<double>& MWs() const { return MW__; }
+
+		/**
+		* @brief returns the molecular weights of a species [kg/kmol]
+		*/
+		const double MW(const unsigned int i) const { return MW__[i];}
 
 		/**
 		* @brief Sets the temperature (in K)
@@ -81,107 +82,107 @@ namespace OpenSMOKE
 		/**
 		* @brief Calculates the molecular weight of a mixture from the mole fractions
 		*/
-		virtual void MolecularWeight_From_MoleFractions(double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual double MolecularWeight_From_MoleFractions(const double* x) = 0;
 
 		/**
 		* @brief Calculates the molecular weight of a mixture from the mass fractions
 		*/
-		virtual void MolecularWeight_From_MassFractions(double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y) = 0;
+		virtual double MolecularWeight_From_MassFractions(const double* y) = 0;
 
 		/**
 		* @brief Calculates the mass fractions from the mole fractions
 		*/
-		virtual void MassFractions_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& y, double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual void MassFractions_From_MoleFractions(double* y, double& MW, const double* x) = 0;
 
 		/**
 		* @brief Calculates the mole fractions from the mass fractions
 		*/
-		virtual void MoleFractions_From_MassFractions(OpenSMOKE::OpenSMOKEVectorDouble& x, double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y) = 0;
+		virtual void MoleFractions_From_MassFractions(double* x, double& MW, const double* y) = 0;
 
 		/**
 		* @brief Calculates the molar specific heat of the mixture from the mole fractions
 		*/
-		virtual void cpMolar_Mixture_From_MoleFractions(double& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual double cpMolar_Mixture_From_MoleFractions(const double* x) = 0;
 
 		/**
 		* @brief Calculates the molar enthalpy of the mixture from the mole fractions
 		*/
-		virtual void hMolar_Mixture_From_MoleFractions(double& hmix, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual double hMolar_Mixture_From_MoleFractions(const double* x) = 0;
 
 		/**
 		* @brief Calculates the molar entropy of the mixture from the mole fractions
 		*/
-		virtual void sMolar_Mixture_From_MoleFractions(double& hmix, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual double sMolar_Mixture_From_MoleFractions(const double* x) = 0;
 
 		/**
 		* @brief Calculates the molar internal energy of the mixture from the mole fractions
 		*/
-		virtual void uMolar_Mixture_From_MoleFractions(double& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual double uMolar_Mixture_From_MoleFractions(const double* x) = 0;
 
 		/**
 		* @brief Calculates the molar free Gibbs' energy of the mixture from the mole fractions
 		*/
-		virtual void gMolar_Mixture_From_MoleFractions(double& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual double gMolar_Mixture_From_MoleFractions(const double* x) = 0;
 
 		/**
 		* @brief Calculates the molar free Helmoltz' energy of the mixture from the mole fractions
 		*/
-		virtual void aMolar_Mixture_From_MoleFractions(double& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual double aMolar_Mixture_From_MoleFractions(const double* x) = 0;
 
 		/**
 		* @brief Calculates the molar specific heats of the species from the mole fractions
 		*/
-		virtual void cpMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& cp_species) = 0;
+		virtual void cpMolar_Species(double* cp_species) = 0;
 
 		/**
 		* @brief Calculates the molar enthalpies of the species from the mole fractions
 		*/
-		virtual void hMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& h_species) = 0;
+		virtual void hMolar_Species(double* h_species) = 0;
 
 		/**
 		* @brief Calculates the molar entropies of the species from the mole fractions
 		*/
-		virtual void sMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& s_species) = 0;
+		virtual void sMolar_Species(double* s_species) = 0;
 
 		/**
 		* @brief Calculates the molar internal energies of the species from the mole fractions
 		*/
-		virtual void uMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& u_species) = 0;
+		virtual void uMolar_Species(double* u_species) = 0;
 
 		/**
 		* @brief Calculates the molar Gibbs' free energies of the species from the mole fractions
 		*/
-		virtual void gMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& g_species) = 0;
+		virtual void gMolar_Species(double* g_species) = 0;
 
 		/**
 		* @brief Calculates the molar Helmoltz' free energies of the species from the mole fractions
 		*/
-		virtual void aMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& a_species) = 0;
+		virtual void aMolar_Species(double* a_species) = 0;
 
 		/**
 		* @brief Calculates the mixture averaged molar entropies of the species from the mole fractions
 		*/
-		virtual void sMolar_Species_MixtureAveraged_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& s_species, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual void sMolar_Species_MixtureAveraged_From_MoleFractions(double* s_species, const double* x) = 0;
 
 		/**
 		* @brief Calculates the mixture averaged free Gibbs' energies of the species from the mole fractions
 		*/
-		virtual void gMolar_Species_MixtureAveraged_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& g_species, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual void gMolar_Species_MixtureAveraged_From_MoleFractions(double* g_species, const double* x) = 0;
 		
 		/**
 		* @brief Calculates the mixture averaged molar Helmoltz's free energies of the species from the mole fractions
 		*/		
-		virtual void aMolar_Species_MixtureAveraged_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& a_species, const OpenSMOKE::OpenSMOKEVectorDouble& x) = 0;
+		virtual void aMolar_Species_MixtureAveraged_From_MoleFractions(double* a_species, const double* x) = 0;
 
 		/**
 		* @brief returns the normalized reaction enthalpies for the species
 		*/	
-		virtual const OpenSMOKE::OpenSMOKEVectorDouble& species_h_over_RT()  = 0;
+		virtual const std::vector<double>& Species_H_over_RT()  = 0;
 
 		/**
 		* @brief returns the normalized reaction entropies for the species
 		*/
-		virtual const OpenSMOKE::OpenSMOKEVectorDouble& species_s_over_R() = 0;
+		virtual const std::vector<double>& Species_S_over_R() = 0;
 
 		/**
 		* @brief returns the names of the species
@@ -238,16 +239,14 @@ namespace OpenSMOKE
 		unsigned int nspecies_;					//!< number of species
 
 		std::vector<std::string> names_;		//!< names of the species
+		std::vector<double> MW__;				//!< molecular weights of the species
 
-		double T_;									//!< temperature [K]
-		double P_;									//!< pressure [Pa]
-
-		OpenSMOKE::OpenSMOKEVectorDouble MW_;	//!< molecular weights of the species
+		double T_;								//!< temperature [K]
+		double P_;								//!< pressure [Pa]
 
 		Eigen::MatrixXd atomic_composition_;	//!< atomic composition
 		std::vector<std::string> elements_;		//!< names of elements
-		
-		OpenSMOKE::OpenSMOKEVectorDouble mw_elements_;	//!< molecular weights of elements
+		std::vector<double> mw_elements__;		//!< molecular weights of elements
 	};
 }
 

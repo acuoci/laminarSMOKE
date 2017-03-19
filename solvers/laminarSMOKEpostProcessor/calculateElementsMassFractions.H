@@ -104,7 +104,7 @@ volScalarField omega_C
 
 		// Molecular weight
 		double MWmix;
-		thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions, MWmix, massFractions);
+		thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions.GetHandle(), MWmix, massFractions.GetHandle());
 
 		if (jC>0)
 		{
@@ -141,7 +141,7 @@ volScalarField omega_C
 
 			// Molecular weight
 			double MWmix;
-			thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions, MWmix, massFractions);
+			thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions.GetHandle(), MWmix, massFractions.GetHandle());
 
 			if (jC>0)
 			{

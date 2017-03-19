@@ -265,7 +265,7 @@ namespace OpenSMOKE
 				if (thermo_.NamesOfSpecies()[i].compare(0, bin_minimum_.size(), bin_minimum_) == 0)
 				{
 					iFound = true;
-					if (thermo_.MW()[i + 1] < min_mw_soot)	min_mw_soot = thermo_.MW()[i + 1];
+					if (thermo_.MW(i) < min_mw_soot)	min_mw_soot = thermo_.MW(i);
 				}
 
 			if (iFound == false)
@@ -301,10 +301,10 @@ namespace OpenSMOKE
 
 			bin_indices_.push_back(i);						// Index of bin in the gas phase kinetic scheme [-]
 			bin_names_.push_back(thermo_.NamesOfSpecies()[i]);			// Name of bin in the gas phase kinetic scheme [-]
-			bin_mw_.push_back(thermo_.MW()[i + 1]);					// Molecular weight [kg/kmol]
-			bin_m_.push_back(thermo_.MW()[i + 1] / PhysicalConstants::Nav_kmol);		// Mass of particle [kg]
+			bin_mw_.push_back(thermo_.MW(i));					// Molecular weight [kg/kmol]
+			bin_m_.push_back(thermo_.MW(i) / PhysicalConstants::Nav_kmol);		// Mass of particle [kg]
 
-			bin_ds_.push_back(std::pow(6. / PhysicalConstants::pi*thermo_.MW()[i + 1] / (bin_density_[bin_density_.size() - 1] / 1000.)
+			bin_ds_.push_back(std::pow(6. / PhysicalConstants::pi*thermo_.MW(i) / (bin_density_[bin_density_.size() - 1] / 1000.)
 				/ (PhysicalConstants::Nav_mol), 1. / 3.)*1.e-2);	// Diameter of particle [m]
 
 			bin_V_.push_back(PhysicalConstants::pi / 6.*std::pow(bin_ds_[bin_ds_.size() - 1], 3.));	// Volume of particle [m3]
@@ -317,7 +317,7 @@ namespace OpenSMOKE
 			if (nh > 0)	bin_o_over_h_.push_back(no / nh);	// Ratio O/H
 			else    	bin_o_over_h_.push_back(0.);	// Ratio O/H
 
-			if ( thermo_.MW()[i+1] >=  min_mw_soot)	
+			if ( thermo_.MW(i) >=  min_mw_soot)	
 			{
 				int index = bin_indices_.size()-1;
 				bin_indices_large_.push_back(index);
@@ -348,7 +348,7 @@ namespace OpenSMOKE
 					bin_dc_.push_back(std::sqrt(5. / 3.)*bin_ds_[bin_minimum_fractal_dimension_index] * std::pow(bin_np_[bin_np_.size() - 1] / std::pow(1. + 2. / Df_, Df_ / 2.), 1. / Df_));
 					bin_d_.push_back(bin_dc_[bin_dc_.size() - 1]);
 
-					if (thermo_.MW()[i + 1] >= min_mw_soot)
+					if (thermo_.MW(i) >= min_mw_soot)
 					{
 						bin_indices_large_aggregates_.push_back(bin_indices_.size() - 1);
 						bin_indices_large_aggregates_global_.push_back(i);
@@ -360,7 +360,7 @@ namespace OpenSMOKE
 					bin_dc_.push_back(0.);
 					bin_d_.push_back(bin_ds_[bin_ds_.size() - 1]);
 
-					if (thermo_.MW()[i + 1] >= min_mw_soot)
+					if (thermo_.MW(i) >= min_mw_soot)
 					{
 						bin_indices_large_spherical_.push_back(bin_indices_.size() - 1);
 						bin_indices_large_spherical_global_.push_back(i);

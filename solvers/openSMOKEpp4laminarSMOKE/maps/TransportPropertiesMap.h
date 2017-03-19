@@ -37,9 +37,6 @@
 #ifndef OpenSMOKE_TransportPropertiesMap_H
 #define OpenSMOKE_TransportPropertiesMap_H
 
-#include "math/OpenSMOKEClass.hpp"
-#include "math/OpenSMOKEVector.h"
-
 namespace OpenSMOKE
 {
 	//!  A struct to store common data for transport properties maps
@@ -53,10 +50,10 @@ namespace OpenSMOKE
 
 			unsigned int nspecies_;
 
-			OpenSMOKEVectorDouble lambdaSpecies_;
-			OpenSMOKEVectorDouble etaSpecies_;
-			OpenSMOKEVectorDouble gammaSpecies_;
-			OpenSMOKEVectorDouble tetaSpecies_;
+			Eigen::VectorXd lambdaSpecies_;
+			Eigen::VectorXd etaSpecies_;
+			Eigen::VectorXd gammaSpecies_;
+			Eigen::VectorXd tetaSpecies_;
 	};
 
 
@@ -83,22 +80,22 @@ namespace OpenSMOKE
 		/**
 		*@brief Calculates the thermal conductivity of a mixture from the mole fractions
 		*/
-		void ThermalConductivity(double& lambdamix, OpenSMOKEVectorDouble& moleFractions);
+		double ThermalConductivity(const double* moleFractions);
 		
 		/**
 		*@brief Calculates the dynamic viscosity of a mixture from the mole fractions
 		*/		
-		void DynamicViscosity(double& etamix, OpenSMOKEVectorDouble& moleFractions);
+		double DynamicViscosity(const double* moleFractions);
 
 		/**
 		*@brief Calculates the mass diffusion coefficients (mixture averaged formulation) of a mixture from the mole fractions
 		*/
-		void MassDiffusionCoefficients(OpenSMOKEVectorDouble& gammamix, OpenSMOKEVectorDouble& moleFractions, const bool bundling=false);
+		void MassDiffusionCoefficients(double* gammamix, const double* moleFractions, const bool bundling=false);
 		
 		/**
 		*@brief Calculates the thermal diffusion coefficients (mixture averaged formulation) of a mixture from the mole fractions
 		*/		
-		void ThermalDiffusionRatios(OpenSMOKEVectorDouble& tetamix, OpenSMOKEVectorDouble& moleFractions);
+		void ThermalDiffusionRatios(double* tetamix, const double* moleFractions);
 
 		/**
 		*@brief Sets the coefficients of transport properties for each species
@@ -125,32 +122,32 @@ namespace OpenSMOKE
 		/**
 		*@brief Combines the species thermal conductivities to calculate the mixture thermal conductivity
 		*/
-		virtual void lambdaMix(double& lambdamix, OpenSMOKEVectorDouble& moleFractions) = 0;
+		virtual double lambdaMix(const double* moleFractions) = 0;
 
 		/**
 		*@brief Combines the species dynamic viscosities to calculate the mixture dynamic viscosity
 		*/
-		virtual void etaMix(double& etamix, OpenSMOKEVectorDouble& moleFractions) = 0;
+		virtual double etaMix(const double* moleFractions) = 0;
 
 		/**
 		*@brief Combines the species mass diffusion coefficients to calculate the mixture mass diffusion coefficients
 		*/
-		virtual void gammaMix(OpenSMOKEVectorDouble& gammamix, OpenSMOKEVectorDouble& moleFractions) = 0;
+		virtual void gammaMix(double* gammamix, const double* moleFractions) = 0;
 
 		/**
 		*@brief Combines the species mass diffusion coefficients to calculate the mixture mass diffusion coefficients using the bundling algorithm
 		*/
-		virtual void bundling_gammaMix(OpenSMOKEVectorDouble& gammamix, OpenSMOKEVectorDouble& moleFractions) = 0;
+		virtual void bundling_gammaMix(double* gammamix, const double* moleFractions) = 0;
 
 		/**
 		*@brief Combines the species thermal diffusion coefficients to calculate the mixture thermal diffusion coefficients
 		*/
-		virtual void tetaMix(OpenSMOKEVectorDouble& tetamix, OpenSMOKEVectorDouble& moleFractions) = 0;
+		virtual void tetaMix(double* tetamix, const double* moleFractions) = 0;
 
 		/**
 		*@brief Combines the planck mean absorption coefficients of relevant species, according to their mole fractions
 		*/
-		virtual void kPlanckMix(double& kPlanck, OpenSMOKEVectorDouble& moleFractions) = 0;
+		virtual double kPlanckMix(const double* moleFractions) = 0;
 
 		/**
 		*@brief Calculates the thermal conductivities for all the species 

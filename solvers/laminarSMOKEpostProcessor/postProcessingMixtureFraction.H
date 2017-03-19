@@ -95,7 +95,7 @@ if (reconstructMixtureFraction == true)
 		
 				// Molecular weight
 				double mw;
-				thermodynamicsMapXML->MoleFractions_From_MassFractions(x, mw, y);
+				thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), mw, y.GetHandle());
 
 				for(unsigned int j=0;j<fuel_names.size();j++)
 					mole_fuel[j] = x[thermodynamicsMapXML->IndexOfSpecies(fuel_names[j])];
@@ -112,7 +112,7 @@ if (reconstructMixtureFraction == true)
 		
 				// Molecular weight
 				double mw;
-				thermodynamicsMapXML->MoleFractions_From_MassFractions(x, mw, y);
+				thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), mw, y.GetHandle());
 
 				for(unsigned int j=0;j<oxidizer_names.size();j++)
 					mole_oxidizer[j] = x[thermodynamicsMapXML->IndexOfSpecies(oxidizer_names[j])];
@@ -132,7 +132,7 @@ if (reconstructMixtureFraction == true)
 					x[j+1] = moles_st[j];
 		
 				double mw;
-				thermodynamicsMapXML->MassFractions_From_MoleFractions(y, mw, x);
+				thermodynamicsMapXML->MassFractions_From_MoleFractions(y.GetHandle(), mw, x.GetHandle());
 
 				for(unsigned int j=0;j<ns;j++)
 					masses_st[j] = y[j+1];

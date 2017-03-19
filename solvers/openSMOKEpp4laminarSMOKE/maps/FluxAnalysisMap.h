@@ -87,9 +87,9 @@ namespace OpenSMOKE
 	
 		void SetAtom(const unsigned int index_atom) { index_atom_ = index_atom; }
 	
-		void SetReactionRates(const OpenSMOKE::OpenSMOKEVectorDouble& r) { r_ = r; }
+		void SetReactionRates(unsigned int n, const double* r);
 
-		void GloballyAnalyze(	const std::vector<unsigned int>& important_indices, const int current_depth );
+		void GloballyAnalyze(const std::vector<unsigned int>& important_indices, const int current_depth );
 
 		void CalculateThickness();
 
@@ -110,7 +110,7 @@ namespace OpenSMOKE
 		unsigned int NC;
 		unsigned int NR;
 		unsigned int index_atom_;
-		OpenSMOKE::OpenSMOKEVectorDouble r_;
+		std::vector<double> r__;
 		int max_width_;
 		int max_depth_;
 		double min_percentage_threshold_;

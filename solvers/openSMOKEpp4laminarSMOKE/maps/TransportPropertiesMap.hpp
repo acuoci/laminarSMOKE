@@ -38,19 +38,19 @@
 
 namespace OpenSMOKE
 {
-	void TransportPropertiesMap::ThermalConductivity(double& lambdamix, OpenSMOKEVectorDouble& moleFractions)
+	double TransportPropertiesMap::ThermalConductivity(const double* moleFractions)
 	{
 		lambda();
-		lambdaMix(lambdamix, moleFractions);
+		return lambdaMix(moleFractions);
 	}
 
-	void TransportPropertiesMap::DynamicViscosity(double& etamix, OpenSMOKEVectorDouble& moleFractions)
+	double TransportPropertiesMap::DynamicViscosity(const double* moleFractions)
 	{
 		eta();
-		etaMix(etamix, moleFractions);
+		return etaMix(moleFractions);
 	}
 
-	void TransportPropertiesMap::MassDiffusionCoefficients(OpenSMOKEVectorDouble& gammamix, OpenSMOKEVectorDouble& moleFractions, const bool bundling)
+	void TransportPropertiesMap::MassDiffusionCoefficients(double* gammamix, const double* moleFractions, const bool bundling)
 	{
 		if (bundling == false)
 		{
@@ -64,7 +64,7 @@ namespace OpenSMOKE
 		}
 	}
 
-	void TransportPropertiesMap::ThermalDiffusionRatios(OpenSMOKEVectorDouble& tetamix, OpenSMOKEVectorDouble& moleFractions)
+	void TransportPropertiesMap::ThermalDiffusionRatios(double* tetamix, const double* moleFractions)
 	{
 		teta();
 		tetaMix(tetamix, moleFractions);

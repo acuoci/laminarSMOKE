@@ -5,7 +5,7 @@ std::vector<std::string> species_names(thermodynamicsMapXML->NumberOfSpecies());
 for (unsigned int i=0;i<species_names.size();i++)
 {
 	species_names[i] = thermodynamicsMapXML->NamesOfSpecies()[i];
-	W[i] = thermodynamicsMapXML->MW()[i+1];
+	W[i] = thermodynamicsMapXML->MW(i);
 }
 
 autoPtr<Foam::laminarSMOKEthermoClass> myLaminarSMOKEthermo(Foam::laminarSMOKEthermoClass::New(T,p,Y, W, species_names));

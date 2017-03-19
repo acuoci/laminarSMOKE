@@ -37,8 +37,6 @@
 #ifndef OpenSMOKE_StoichiometricMap_H
 #define OpenSMOKE_StoichiometricMap_H
 
-#include "math/OpenSMOKEClass.hpp"
-#include "math/OpenSMOKEVector.h"
 #include <Eigen/Sparse>
 
 namespace OpenSMOKE
@@ -91,7 +89,7 @@ namespace OpenSMOKE
 		/**
 		*@brief Returns the change of mole for each reaction
 		*/
-		const OpenSMOKEVectorDouble& changeOfMoles() const { return changeOfMoles_; };
+		const std::vector<double>& ChangeOfMoles() const { return changeOfMoles_; };
 
 		/**
 		*@brief Prints a short summary about useful information
@@ -101,32 +99,32 @@ namespace OpenSMOKE
 		/**
 		*@brief Evaluates the equilibrium constants
 		*/
-		void EquilibriumConstants(OpenSMOKEVectorDouble& Kp, const OpenSMOKEVectorDouble& exp_g_over_RT, const double Patm_over_RT);
+		void EquilibriumConstants(double* Kp, const double* exp_g_over_RT, const double Patm_over_RT);
 
 		/**
 		*@brief Evaluates the rwaction enthalpies and entropies
 		*/
-		void ReactionEnthalpyAndEntropy(OpenSMOKEVectorDouble& reaction_dh_over_RT, OpenSMOKEVectorDouble& reaction_ds_over_R, const OpenSMOKEVectorDouble& species_h_over_RT, const OpenSMOKEVectorDouble& species_s_over_R);
-		
+		void ReactionEnthalpyAndEntropy(std::vector<double>& reaction_dh_over_RT, std::vector<double>& reaction_ds_over_R, const std::vector<double>& species_h_over_RT, const std::vector<double>& species_s_over_R);
+
 		/**
 		*@brief Evaluates the product of concentrations for each reaction (according to the stoichiometry and the reaction orders)
 		*/
-		void ProductOfConcentrations(OpenSMOKEVectorDouble& productDirect, OpenSMOKEVectorDouble& productReverse, const OpenSMOKEVectorDouble& c);
-		
+		void ProductOfConcentrations(std::vector<double>& productDirect, std::vector<double>& productReverse, const double* c);
+
 		/**
 		*@brief Evaluates the formation rates from the reaction rates
 		*/	
-		void FormationRatesFromReactionRates(OpenSMOKEVectorDouble* R, const OpenSMOKEVectorDouble& r);
+		void FormationRatesFromReactionRates(double* R, const double* r);
 
 		/**
 		*@brief Evaluates the Production and the destruction rates from the reaction rates
 		*/
-		void ProductionAndDestructionRatesFromReactionRates(OpenSMOKEVectorDouble* F, OpenSMOKEVectorDouble* D, const OpenSMOKEVectorDouble& r);
+		void ProductionAndDestructionRatesFromReactionRates(double* F, double* D, const double* r);
 
 		/**
 		*@brief Evaluates the Production and the destruction rates from the reaction rates (gross definition)
 		*/
-		void ProductionAndDestructionRatesFromReactionRatesGross(OpenSMOKEVectorDouble* P, OpenSMOKEVectorDouble* D, const OpenSMOKEVectorDouble& rF, const OpenSMOKEVectorDouble& rB);
+		void ProductionAndDestructionRatesFromReactionRatesGross(double* P, double* D, const double* rF, const double* rB);
 
 		/**
 		*@brief Builds the stoichiometric matrix (sparse matrix of course!)
@@ -141,10 +139,10 @@ namespace OpenSMOKE
 		/**
 		*@brief Internal function (TODO)
 		*/
-		void CompleteChangeOfMoles(OpenSMOKEVectorBool& isThermodynamicReversible);
+		void CompleteChangeOfMoles(const bool* isThermodynamicReversible);
 
-		void RateOfProductionAnalysis(const OpenSMOKEVectorDouble& r, const bool iNormalize);
-		void RateOfProductionAnalysis(const OpenSMOKEVectorDouble& rf, const OpenSMOKEVectorDouble& rb);
+		void RateOfProductionAnalysis(const double* r, const bool iNormalize);
+		void RateOfProductionAnalysis(const double* rf, const double* rb);
 
 
 		void WriteRateOfProductionAnalysis(std::ostream& fout);
@@ -167,32 +165,33 @@ namespace OpenSMOKE
 
 		bool global_reactions_;
                 
-                bool verbose_output_;
+        bool verbose_output_;
 
-		OpenSMOKEVectorUnsignedInt	numDir1,	numDir2,	numDir3,	numDir4,	numDir5;
-		OpenSMOKEVectorUnsignedInt	numRevTot1, numRevTot2,	numRevTot3,	numRevTot4, numRevTot5;
-		OpenSMOKEVectorUnsignedInt	numRevEq1,	numRevEq2,	numRevEq3,	numRevEq4,	numRevEq5;
-		OpenSMOKEVectorUnsignedInt	jDir1,		jDir2,		jDir3,		jDir4,		jDir5;
-		OpenSMOKEVectorUnsignedInt	jRevTot1,	jRevTot2,	jRevTot3,	jRevTot4,	jRevTot5;
-		OpenSMOKEVectorUnsignedInt	jRevEq1,	jRevEq2,	jRevEq3,	jRevEq4,	jRevEq5;
+		std::vector<unsigned int>	numDir1_,	numDir2_,	numDir3_,	numDir4_,	numDir5_;
+		std::vector<unsigned int>	numRevTot1_, numRevTot2_,	numRevTot3_,	numRevTot4_, numRevTot5_;
+		std::vector<unsigned int>	numRevEq1_,	numRevEq2_,	numRevEq3_,	numRevEq4_,	numRevEq5_;
+		
+		std::vector<unsigned int>	jDir1_,		jDir2_,		jDir3_,		jDir4_,		jDir5_;
+		std::vector<unsigned int>	jRevTot1_,	jRevTot2_,	jRevTot3_,	jRevTot4_,	jRevTot5_;
+		std::vector<unsigned int>	jRevEq1_,	jRevEq2_,	jRevEq3_,	jRevEq4_,	jRevEq5_;
 
-		OpenSMOKEVectorDouble valueDir5;
-		OpenSMOKEVectorDouble valueRevTot5;
-		OpenSMOKEVectorDouble valueRevEq5;
+		std::vector<double>	valueDir5_;
+		std::vector<double> valueRevTot5_;
+		std::vector<double> valueRevEq5_;
 
-		OpenSMOKEVectorUnsignedInt	lambda_jDir1, lambda_jDir2, lambda_jDir3, lambda_jDir4, lambda_jDir5;
-		OpenSMOKEVectorUnsignedInt	lambda_jRevEq1, lambda_jRevEq2, lambda_jRevEq3, lambda_jRevEq4, lambda_jRevEq5;
-		OpenSMOKEVectorUnsignedInt	lambda_numDir1, lambda_numDir2, lambda_numDir3, lambda_numDir4, lambda_numDir5;
-		OpenSMOKEVectorUnsignedInt	lambda_numRevEq1, lambda_numRevEq2, lambda_numRevEq3, lambda_numRevEq4, lambda_numRevEq5;
-		OpenSMOKEVectorDouble		lambda_valueDir5;
-		OpenSMOKEVectorDouble		lambda_valueRevEq5;
+		std::vector<unsigned int>	lambda_jDir1_, lambda_jDir2_, lambda_jDir3_, lambda_jDir4_, lambda_jDir5_;
+		std::vector<unsigned int>	lambda_jRevEq1_, lambda_jRevEq2_, lambda_jRevEq3_, lambda_jRevEq4_, lambda_jRevEq5_;
+		std::vector<unsigned int>	lambda_numDir1_, lambda_numDir2_, lambda_numDir3_, lambda_numDir4_, lambda_numDir5_;
+		std::vector<unsigned int>	lambda_numRevEq1_, lambda_numRevEq2_, lambda_numRevEq3_, lambda_numRevEq4_, lambda_numRevEq5_;
+		std::vector<double>	lambda_valueDir5_;
+		std::vector<double>	lambda_valueRevEq5_;
 
-		OpenSMOKEVectorDouble		changeOfMoles_;
+		std::vector<double>			changeOfMoles_;
 
-		OpenSMOKEVectorUnsignedInt	indices_of_reactions_without_change_of_moles_;
-		OpenSMOKEVectorUnsignedInt	indices_of_reactions_with_change_of_moles_plus_one_;
-		OpenSMOKEVectorUnsignedInt	indices_of_reactions_with_change_of_moles_minus_one_;
-		OpenSMOKEVectorUnsignedInt	indices_of_reactions_with_change_of_moles_;
+		std::vector<unsigned int>	indices_of_reactions_without_change_of_moles_;
+		std::vector<unsigned int>	indices_of_reactions_with_change_of_moles_plus_one_;
+		std::vector<unsigned int>	indices_of_reactions_with_change_of_moles_minus_one_;
+		std::vector<unsigned int>	indices_of_reactions_with_change_of_moles_;
 
 		bool isTheStoichiometricMatrixAvailable_;
 		bool isTheReactionOrderMatrixAvailable_;
@@ -207,7 +206,6 @@ namespace OpenSMOKE
 		Eigen::SparseMatrix<double> Cp;
 		Eigen::SparseMatrix<double> Cd;
 		Eigen::SparseMatrix<double> stoichiometric_matrix_;
-
 	};
 }
 

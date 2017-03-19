@@ -158,12 +158,12 @@ void BatchReactorHomogeneousConstantPressure::SetTemperature( const double T, do
 		omega_[i] = y[i-1];
 
 	// Mole fractions
-	thermodynamicsMap_.MoleFractions_From_MassFractions(x_, MW_, omega_);
+	thermodynamicsMap_.MoleFractions_From_MassFractions(x_.GetHandle(), MW_, omega_.GetHandle());
 
 	// Enthalpy
 	thermodynamicsMap_.SetTemperature(T_);
 	thermodynamicsMap_.SetPressure(P0_);
-	thermodynamicsMap_.hMolar_Mixture_From_MoleFractions(enthalpy_, x_);
+	enthalpy_ = thermodynamicsMap_.hMolar_Mixture_From_MoleFractions(x_.GetHandle());
 	enthalpy_ /= MW_;
 }
 
@@ -191,7 +191,7 @@ int BatchReactorHomogeneousConstantPressure::Equations(const double t, const Ope
 		T_ = y[NC_+1];
 
 		// Calculates the pressure and the concentrations of species
-		thermodynamicsMap_.MoleFractions_From_MassFractions(x_, MW_, omega_);
+		thermodynamicsMap_.MoleFractions_From_MassFractions(x_.GetHandle(), MW_, omega_.GetHandle());
 		cTot_ = P0_/PhysicalConstants::R_J_kmol/T_;
 		Product(cTot_, x_, &c_);
 	    	rho_ = cTot_*MW_;
@@ -204,21 +204,21 @@ int BatchReactorHomogeneousConstantPressure::Equations(const double t, const Ope
 		kineticsMap_.SetTemperature(T_);
 		kineticsMap_.SetPressure(P0_);
 		kineticsMap_.KineticConstants();
-		kineticsMap_.ReactionRates(c_);
-		kineticsMap_.FormationRates(&R_);
+		kineticsMap_.ReactionRates(c_.GetHandle());
+		kineticsMap_.FormationRates(R_.GetHandle());
 
 		// Species equations
 		for (unsigned int i=1;i<=NC_;++i)	
-			dy[i] = thermodynamicsMap_.MW()[i]*R_[i]/rho_;
+			dy[i] = thermodynamicsMap_.MW(i-1)*R_[i]/rho_;
 		   
 	    	// Energy equation
 	    	dy[NC_+1] = 0.;     
 	    	if (energyEquation_ == true)
 	    	{
 			double CpMixMolar; 
-			thermodynamicsMap_.cpMolar_Mixture_From_MoleFractions(CpMixMolar,x_);
+			CpMixMolar = thermodynamicsMap_.cpMolar_Mixture_From_MoleFractions(x_.GetHandle());
 			CpMixMass_ = CpMixMolar / MW_;
-			QR_ = kineticsMap_.HeatRelease(R_);
+			QR_ = kineticsMap_.HeatRelease(R_.GetHandle());
 		
 			dy[NC_+1]  = QR_ / (rho_*CpMixMass_);
 		}
@@ -241,8 +241,8 @@ int BatchReactorHomogeneousConstantPressure::Equations(const double t, const Ope
 			double sum = 0.;
 			for(unsigned int i=0;i<NC_;i++)
 			{
-				Info << " * " << thermodynamicsMap_.NamesOfSpecies()[i] << ": " << thermodynamicsMap_.MW()[i+1]*R_[i+1] << endl;
-				sum += thermodynamicsMap_.MW()[i+1]*R_[i+1];
+				Info << " * " << thermodynamicsMap_.NamesOfSpecies()[i] << ": " << thermodynamicsMap_.MW(i)*R_[i+1] << endl;
+				sum += thermodynamicsMap_.MW(i)*R_[i+1];
 			}
 			Info << " * sum: " << sum << endl;
 
@@ -275,7 +275,7 @@ int BatchReactorHomogeneousConstantPressure::Equations(const double t, const Ope
 		T_ = y[index_T];
 
 		// Calculates the pressure and the concentrations of species
-		thermodynamicsMap_.MoleFractions_From_MassFractions(x_, MW_, omega_);
+		thermodynamicsMap_.MoleFractions_From_MassFractions(x_.GetHandle(), MW_, omega_.GetHandle());
 		cTot_ = P0_/PhysicalConstants::R_J_kmol/T_;
 	    	rho_ = cTot_*MW_;
 		Product(cTot_, x_, &c_);
@@ -288,33 +288,32 @@ int BatchReactorHomogeneousConstantPressure::Equations(const double t, const Ope
 		kineticsMap_.SetTemperature(T_);
 		kineticsMap_.SetPressure(P0_);
 		kineticsMap_.KineticConstants();
-		kineticsMap_.ReactionRates(c_);
+		kineticsMap_.ReactionRates(c_.GetHandle());
 
 		// Reaction rates
-		kineticsMap_.GetReactionRates(&r_);
+		kineticsMap_.GiveMeReactionRates(r_.GetHandle());
 
 		// Remove useless reactions
 		for (unsigned int i=0;i<drg_->indices_unimportant_reactions().size();++i)
 			r_[drg_->indices_unimportant_reactions()[i]+1] = 0.;
 
 		// Formation rates
-		kineticsMap_.stoichiometry().FormationRatesFromReactionRates(&R_, r_);
+		kineticsMap_.stoichiometry().FormationRatesFromReactionRates(R_.GetHandle(), r_.GetHandle());
 
 		// Equations
 		for (unsigned int i=0;i<drg_->number_important_species();++i)	
 		{
 			const unsigned int j = drg_->indices_important_species()[i]+1;
-			dy[i+1] = thermodynamicsMap_.MW()[j]*R_[j]/rho_;
+			dy[i+1] = thermodynamicsMap_.MW(j-1)*R_[j]/rho_;
 		}	
 
 	    	// Energy equation
 	    	dy[index_T] = 0.;     
 	    	if (energyEquation_ == true)
 	    	{
-			double CpMixMolar; 
-			thermodynamicsMap_.cpMolar_Mixture_From_MoleFractions(CpMixMolar,x_);
+			const double CpMixMolar = thermodynamicsMap_.cpMolar_Mixture_From_MoleFractions(x_.GetHandle());
 			CpMixMass_ = CpMixMolar / MW_;
-			QR_ = kineticsMap_.HeatRelease(R_);
+			QR_ = kineticsMap_.HeatRelease(R_.GetHandle());
 			
 			dy[index_T]  = QR_ / (rho_*CpMixMass_);
 		}
@@ -330,11 +329,11 @@ void BatchReactorHomogeneousConstantPressure::Equations(double* y, std::vector<d
 		omega_[i] = y[i-1];
 	
 	// Calculates the mole fractions
-	thermodynamicsMap_.MoleFractions_From_MassFractions(x_, MW_, omega_);
+	thermodynamicsMap_.MoleFractions_From_MassFractions(x_.GetHandle(), MW_, omega_.GetHandle());
 
 	// Temperature from enthalpy
 	if (energyEquation_ == true)
-		T_ = thermodynamicsMap_.GetTemperatureFromEnthalpyAndMoleFractions(enthalpy_*MW_, P0_, x_, T_);
+		T_ = thermodynamicsMap_.GetTemperatureFromEnthalpyAndMoleFractions(enthalpy_*MW_, P0_, x_.GetHandle(), T_);
 
 	// Calculates concentrations of species
 	cTot_ = P0_/PhysicalConstants::R_J_kmol/T_;
@@ -349,16 +348,16 @@ void BatchReactorHomogeneousConstantPressure::Equations(double* y, std::vector<d
 	kineticsMap_.SetTemperature(T_);
 	kineticsMap_.SetPressure(P0_);
 	kineticsMap_.KineticConstants();
-	kineticsMap_.ReactionRates(c_);
-	kineticsMap_.FormationRates(&R_);
-	kineticsMap_.ProductionAndDestructionRates(&Rf_, &Rb_);
+	kineticsMap_.ReactionRates(c_.GetHandle());
+	kineticsMap_.FormationRates(R_.GetHandle());
+	kineticsMap_.ProductionAndDestructionRates(Rf_.GetHandle(), Rb_.GetHandle());
 	
 	// Species equations
 	for (unsigned int i=1;i<=NC_;++i)	
-		q[i-1] = thermodynamicsMap_.MW()[i]*Rf_[i]/rho_;
+		q[i-1] = thermodynamicsMap_.MW(i-1)*Rf_[i]/rho_;
 
 	for (unsigned int i=1;i<=NC_;++i)	
-		d[i-1] = thermodynamicsMap_.MW()[i]*Rb_[i]/rho_;
+		d[i-1] = thermodynamicsMap_.MW(i-1)*Rb_[i]/rho_;
 }
 
 int BatchReactorHomogeneousConstantPressure::Print(const double t, const OpenSMOKE::OpenSMOKEVectorDouble& y)

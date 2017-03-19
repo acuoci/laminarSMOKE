@@ -37,8 +37,6 @@
 #ifndef OpenSMOKE_ThermodynamicsMap_CHEMKIN_CHEMKIN_H
 #define OpenSMOKE_ThermodynamicsMap_CHEMKIN_CHEMKIN_H
 
-#include "math/OpenSMOKEClass.hpp"
-#include "math/OpenSMOKEVector.h"
 #include "ThermodynamicsMap.h"
 #include "rapidxml.hpp"
 
@@ -105,108 +103,107 @@ namespace OpenSMOKE
 		*/
 		virtual void SetPressure(const double& P);
 
-
 		/**
 		*@brief Returns the molecular weight of the mixture from the mole fractions
 		*@param x mole fractions of species
 		*@param MW the molecular weight in kg/kmol
 		*/
-		virtual inline void MolecularWeight_From_MoleFractions(double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		virtual inline double MolecularWeight_From_MoleFractions(const double* x);
 
 		/**
 		*@brief Returns the molecular weight of the mixture from the mass fractions
 		*@param y mass fractions of species
 		*@param MW the molecular weight in kg/kmol
 		*/
-		virtual inline void MolecularWeight_From_MassFractions(double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y);
+		virtual inline double MolecularWeight_From_MassFractions(const double* y);
 
 		/**
 		*@brief Calculates the mass fractions and the molecular weight from the mole fractions
 		*/
-		virtual inline void MassFractions_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& y, double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		virtual inline void MassFractions_From_MoleFractions(double* y, double& MW, const double* x);
 
 		/**
 		*@brief Calculates the mole fractions and the molecular weight from the mass fractions
 		*/
-		virtual inline void MoleFractions_From_MassFractions(OpenSMOKE::OpenSMOKEVectorDouble& x, double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y);
+		virtual inline void MoleFractions_From_MassFractions(double* x, double& MW, const double* y);
 
 		/**
 		*@brief Calculates the mixture averaged specific heat (equivalent to CKCPBL in CHEMKIN software)
 		*@param x the vector of mole fractions for all the species
 		*@param cpmix the mixture-averaged specific heat in J/kmol/K
 		*/
-		virtual void cpMolar_Mixture_From_MoleFractions(double& cpmix, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		virtual double cpMolar_Mixture_From_MoleFractions(const double* x);
 
 		/**
 		*@brief Calculates the mixture averaged enthalpy (equivalent to CKHBML in CHEMKIN software)
 		*@param x the vector of mole fractions for all the species
 		*@param hmix the mixture-averaged enthalpy in J/kmol
 		*/
-		virtual void hMolar_Mixture_From_MoleFractions(double& hmix, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		virtual double hMolar_Mixture_From_MoleFractions(const double* x);
 
 		/**
 		*@brief Calculates the mixture averaged entropy (equivalent to CKSBML in CHEMKIN software)
 		*@param x the vector of mole fractions for all the species
 		*@param smix the mixture-averaged entropy in J/kmol/K
 		*/
-		void sMolar_Mixture_From_MoleFractions(double& smix, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		virtual double sMolar_Mixture_From_MoleFractions(const double* x);
 
 		/**
 		*@brief Calculates the mixture averaged internal energy (equivalent to CKUBML in CHEMKIN software)
 		*@param x the vector of mole fractions for all the species
 		*@param umix mixture-averaged internal energy in J/kmol
 		*/
-		virtual void uMolar_Mixture_From_MoleFractions(double& umix, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		virtual double uMolar_Mixture_From_MoleFractions(const double* x);
 
 		/**
 		*@brief Calculates the mixture averaged Gibb's free energy (equivalent to CKGBML in CHEMKIN software)
 		*@param x the vector of mole fractions for all the species
 		*@param gmix the mixture-averaged Gibb's free energy in J/kmol
 		*/
-		virtual void gMolar_Mixture_From_MoleFractions(double& gmix, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		virtual double gMolar_Mixture_From_MoleFractions(const double* x);
 
 		/**
 		*@brief Calculates the mixture averaged Helmholtz free energy (equivalent to CKABML in CHEMKIN software)
 		*@param x the vector of mole fractions for all the species
 		*@param amix the mixture-averaged Helmholtz free energy in J/kmol
 		*/
-		virtual void aMolar_Mixture_From_MoleFractions(double& amix, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		virtual double aMolar_Mixture_From_MoleFractions(const double* x);
 
 		/**
 		*@brief Calculates the standard specific heats of species at constant pressure (equivalent to CKCPOR in CHEMKIN software)
 		*@return the specific heats at constant pressure in J/kmol/K
 		*/
-		virtual void cpMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& cp_species);
+		virtual void cpMolar_Species(double* cp_species);
 
 		/**
 		*@brief Calculates the standard enthalpies of species (equivalent to CKHORT in CHEMKIN software)
 		*@return the standard enthalpies in J/kmol
 		*/
-		virtual void hMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& h_species);
+		virtual void hMolar_Species(double* h_species);
 
 		/**
 		*@brief Calculates the standard entropies of species (equivalent to CKSOR in CHEMKIN software)
 		*@return the standard entropies in J/kmol/K
 		*/
-		virtual void sMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& s_species);
+		virtual void sMolar_Species(double* s_species);
 
 		/**
 		*@brief Calculates the standard internal energies of species (equivalent to CKUML in CHEMKIN software)
 		*@return the standard entropies in J/kmol
 		*/
-		virtual void uMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& u_species);
+		virtual void uMolar_Species(double* u_species);
 
 		/**
 		*@brief Calculates the standard Gibb's free energies of species (equivalent to CKGML in CHEMKIN software)
 		*@return the standard Gibb's free energies in J/kmol
 		*/
-		virtual void gMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& g_species);
+		virtual void gMolar_Species(double* g_species);
 
 		/**
 		*@brief Calculates the standard Helmholtz's free energies of species (equivalent to CKAML in CHEMKIN software)
 		*@return the standard Helmholtz's free energies in J/kmol
 		*/
-		virtual void aMolar_Species(OpenSMOKE::OpenSMOKEVectorDouble& a_species);
+		virtual void aMolar_Species(double* a_species);
 
 		/**
 		*@brief Calculates the mixture averaged entropies of species (no equivalent in CHEMKIN software)
@@ -214,7 +211,7 @@ namespace OpenSMOKE
 		*       and must account for the appropriate pressure abd entropy-of-mixing terms
 		*@return the mixture averaged entropies in J/kmol/K
 		*/
-		virtual void sMolar_Species_MixtureAveraged_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& s_species, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		virtual void sMolar_Species_MixtureAveraged_From_MoleFractions(double* s_species, const double* x);
 
 		/**
 		*@brief Calculates the mixture averaged Gibb's free energies of species (no equivalent in CHEMKIN software)
@@ -222,7 +219,7 @@ namespace OpenSMOKE
 		*       and must account for the appropriate pressure abd entropy-of-mixing terms
 		*@return the mixture averaged Gibb's free energies in J/kmol
 		*/
-		virtual void gMolar_Species_MixtureAveraged_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& g_species, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		virtual void gMolar_Species_MixtureAveraged_From_MoleFractions(double* g_species, const double* x);
 
 		/**
 		*@brief Calculates the mixture averaged Helmholtz's free energies of species (no equivalent in CHEMKIN software)
@@ -230,17 +227,17 @@ namespace OpenSMOKE
 		*       and must account for the appropriate pressure abd entropy-of-mixing terms
 		*@return the mixture averaged Helmholtz's free energies in J/kmol
 		*/
-		virtual void aMolar_Species_MixtureAveraged_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& a_species, const OpenSMOKE::OpenSMOKEVectorDouble& x);
+		virtual void aMolar_Species_MixtureAveraged_From_MoleFractions(double* a_species, const double* x);
 
 		/**
 		*@brief Returns the normalized species enthalpies
 		*/
-		virtual const OpenSMOKE::OpenSMOKEVectorDouble& species_h_over_RT() { h_over_RT(); return species_h_over_RT_; }
+		virtual const std::vector<double>& Species_H_over_RT() { h_over_RT(); return species_h_over_RT__; }
 
 		/**
 		*@brief Returns the normalized species entropies
 		*/
-		virtual const OpenSMOKE::OpenSMOKEVectorDouble& species_s_over_R() { s_over_R(); return species_s_over_R_; }
+		virtual const std::vector<double>& Species_S_over_R() { s_over_R(); return species_s_over_R__; }
 
 		/**
 		*@brief Import the coefficients from a file in ASCII format (obsolete, TOREMOVE)
@@ -267,7 +264,7 @@ namespace OpenSMOKE
 		*/
 		inline void cp_over_R();
 
-		void DerivativesOfConcentrationsWithRespectToMassFractions(const double cTot, const double MW, const OpenSMOKE::OpenSMOKEVectorDouble& omega, OpenSMOKE::OpenSMOKEMatrixDouble* dc_over_omega);
+		void DerivativesOfConcentrationsWithRespectToMassFractions(const double cTot, const double MW, const double* omega, Eigen::MatrixXd* dc_over_omega);
 
 
 		const Eigen::MatrixXd& atomic_composition() const { return this->atomic_composition_; }
@@ -281,35 +278,23 @@ namespace OpenSMOKE
 		*@param x molar fraction
 		*@param TFirstGuess first guess for the temperature
 		*/
-		double GetTemperatureFromEnthalpyAndMoleFractions(const double H, const double P_Pa, const OpenSMOKEVectorDouble& x, const double TFirstGuess);
+		double GetTemperatureFromEnthalpyAndMoleFractions(const double H, const double P_Pa, const double* x, const double TFirstGuess);
 
 		/**
 		*@brief Copies the data from another thermodynamic map (used by copy constructors)
 		*/
 		void CopyFromMap(const ThermodynamicsMap_CHEMKIN& rhs);
 
-		bool FindTheRightInterval(const double H, const OpenSMOKEVectorDouble& x, const double TFirstGuess,
-			double& TA, double&TB, double& HA, double& HB,
-			const double Diff_Temperature);
-		/*
-		double DivideTheInterval(	const double H, const OpenSMOKEVectorDouble& x,
-		const double diff_temperature_to_switch_to_newtons,
-		const double TA_, const double TB_, const double HA_, const double HB_);
-		double DivideTheIntervalBy2(	const double H, const OpenSMOKEVectorDouble& x,
-		const double diff_temperature_to_switch_to_newtons,
-		const double TA_, const double TB_, const double HA_, const double HB_);
+		bool FindTheRightInterval(	const double H, const double* x, const double TFirstGuess,
+									double& TA, double&TB, double& HA, double& HB,
+									const double Diff_Temperature );
 
+		double Brent(const double H, const double P_Pa, const double* x, const double x1, const double x2, const double tol);
+		double Ridder(const double H, const double P_Pa, const double* x, const double x1, const double x2, const double xacc);
+		double NewtonRaphson(const double H, const double P_Pa, const double* x, const double x1, const double x2, const double xacc);
 
-		double NewtonMethod(	const double H, const OpenSMOKEVectorDouble& x,
-		const double T0);
-		*/
-
-		double Brent(const double H, const double P_Pa, const OpenSMOKEVectorDouble& x, const double x1, const double x2, const double tol);
-		double Ridder(const double H, const double P_Pa, const OpenSMOKEVectorDouble& x, const double x1, const double x2, const double xacc);
-		double NewtonRaphson(const double H, const double P_Pa, const OpenSMOKEVectorDouble& x, const double x1, const double x2, const double xacc);
-
-		double Function(const double H, const double P_Pa, const OpenSMOKEVectorDouble& x, const double T);
-		void Function(const double H, const double P_Pa, const OpenSMOKEVectorDouble& x, const double T, double& f, double& df);
+		double Function(const double H, const double P_Pa, const double* x, const double T);
+		void Function(const double H, const double P_Pa, const double* x, const double T, double& f, double& df);
 
 		void NASA_LowT(const unsigned int i, double* coefficients) const;
 		void NASA_HighT(const unsigned int i, double* coefficients) const;
@@ -345,10 +330,10 @@ namespace OpenSMOKE
 
 	private:
 
-		OpenSMOKEVectorDouble species_cp_over_R_;
-		OpenSMOKEVectorDouble species_h_over_RT_;
-		OpenSMOKEVectorDouble species_g_over_RT_;
-		OpenSMOKEVectorDouble species_s_over_R_;
+		std::vector<double> species_cp_over_R__;
+		std::vector<double> species_h_over_RT__;
+		std::vector<double> species_g_over_RT__;
+		std::vector<double> species_s_over_R__;
 
 		double*	Cp_LT;	/**< correlation coefficients, specific heat, low temperature region */
 		double*	Cp_HT;	/**< correlation coefficients, specific heat, high temperature region */

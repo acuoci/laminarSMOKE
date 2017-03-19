@@ -70,14 +70,14 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 		// Corrections
 		if (mwCorrectionInDiffusionFluxes == true)
 		{
-			dimensionedScalar Mi( "Mi", dimensionSet(1,0,0,0,-1,0,0),thermodynamicsMapXML->MW()[i+1] );
+			dimensionedScalar Mi( "Mi", dimensionSet(1,0,0,0,-1,0,0),thermodynamicsMapXML->MW(i) );
 
 			{
 				sumDiffusionCorrections *= 0.;
 				for (label k=0; k<Y.size(); k++)
 				{
 					volScalarField& Yk = Y[k];	
-					dimensionedScalar Mk( "Mk", dimensionSet(1,0,0,0,-1,0,0), thermodynamicsMapXML->MW()[k+1] );
+					dimensionedScalar Mk( "Mk", dimensionSet(1,0,0,0,-1,0,0), thermodynamicsMapXML->MW(k) );
 
 					if (i!=k)
 					sumDiffusionCorrections += fvc::laplacian(rho*MWmix/Mk*Dmixi*Yi, Yk);

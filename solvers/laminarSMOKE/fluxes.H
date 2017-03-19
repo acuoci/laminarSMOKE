@@ -46,7 +46,7 @@
 		{
 			volScalarField& Xi = X[i];
 			volScalarField& Dmixi = Dmix[i];
-			dimensionedScalar MWi("MWi", dimensionSet(1,0,0,0,-1,0,0),scalar(thermodynamicsMapXML->MW()[i+1]) ); 
+			dimensionedScalar MWi("MWi", dimensionSet(1,0,0,0,-1,0,0),scalar(thermodynamicsMapXML->MW(i)) ); 
 
 			J[i] = ( fvc::interpolate ( -rho*Dmixi*MWi/MWmix ) ) * ( fvc::interpolate ( fvc::grad(Xi) ) & mesh.Sf() );
 		}

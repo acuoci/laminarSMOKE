@@ -350,7 +350,7 @@ std::vector<int> physicalSootDiffusivityCorrectionIndex;
 				if (thermodynamicsMapXML->NamesOfSpecies()[i].compare(0,3,"BIN") == 0)
 				{
 					count++;
-					double MWratio = std::min(	thermodynamicsMapXML->MW()[i+1]/thermodynamicsMapXML->MW()[physicalSootDiffusivityReferenceIndex+1], 
+					double MWratio = std::min(	thermodynamicsMapXML->MW(i)/thermodynamicsMapXML->MW(physicalSootDiffusivityReferenceIndex), 
 									std::pow(2., double(physicalSootDiffusivityIndex)) );
 					physicalSootDiffusivityCorrection.push_back( std::pow(MWratio, physicalSootDiffusivityExponent) );
 					physicalSootDiffusivityCorrectionIndex.push_back(i);

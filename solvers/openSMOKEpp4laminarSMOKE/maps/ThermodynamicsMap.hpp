@@ -96,9 +96,9 @@ namespace OpenSMOKE
 			for(unsigned int j=0;j<number_of_elements;j++)
 				values_names >> this->elements_[j];
 				
-			OpenSMOKE::ChangeDimensions(number_of_elements, &this->mw_elements_, true);
+			this->mw_elements__.resize(number_of_elements);
 			for(unsigned int j=0;j<number_of_elements;j++)
-				this->mw_elements_[j+1] = OpenSMOKE::AtomicWeights[this->elements_[j]];
+				this->mw_elements__[j] = OpenSMOKE::AtomicWeights[this->elements_[j]];
 		}
 
 		{

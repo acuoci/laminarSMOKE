@@ -93,31 +93,28 @@ namespace OpenSMOKE
         this->number_of_species_ = rhs.number_of_species_;
         this->number_of_reactions_ = rhs.number_of_reactions_;
 		this->number_of_points_ = rhs.number_of_points_;
-            
-        this->reaction_entropy_over_R_ = rhs.reaction_entropy_over_R_ ;
-        this->reaction_enthalpy_over_RT_ = rhs.reaction_enthalpy_over_RT_ ;
 
-        this->indices_of_irreversible_reactions_ = rhs.indices_of_irreversible_reactions_ ;
-        this->indices_of_reversible_reactions_ = rhs.indices_of_reversible_reactions_ ;
-        this->indices_of_thermodynamic_reversible_reactions_ = rhs.indices_of_thermodynamic_reversible_reactions_ ;
-        this->indices_of_explicitly_reversible_reactions_ = rhs.indices_of_explicitly_reversible_reactions_ ;
-        this->indices_of_thirdbody_reactions_ = rhs.indices_of_thirdbody_reactions_ ;
-        this->indices_of_falloff_reactions_ = rhs.indices_of_falloff_reactions_ ;
-		this->indices_of_extendedfalloff_reactions_ = rhs.indices_of_extendedfalloff_reactions_;
-        this->indices_of_cabr_reactions_ = rhs.indices_of_cabr_reactions_ ;
-        this->indices_of_chebyshev_reactions_ = rhs.indices_of_chebyshev_reactions_ ;
-        this->indices_of_pressurelog_reactions_ = rhs.indices_of_pressurelog_reactions_ ;
-		this->indices_of_extendedpressurelog_reactions_ = rhs.indices_of_extendedpressurelog_reactions_;
-        this->indices_of_fit1_reactions_ = rhs.indices_of_fit1_reactions_ ;
-        this->indices_of_janevlanger_reactions_ = rhs.indices_of_janevlanger_reactions_ ;
-        this->indices_of_landauteller_reactions_ = rhs.indices_of_landauteller_reactions_ ;
+        this->indices_of_irreversible_reactions__ = rhs.indices_of_irreversible_reactions__ ;
+        this->indices_of_reversible_reactions__ = rhs.indices_of_reversible_reactions__ ;
+        this->indices_of_thermodynamic_reversible_reactions__ = rhs.indices_of_thermodynamic_reversible_reactions__ ;
+        this->indices_of_explicitly_reversible_reactions__ = rhs.indices_of_explicitly_reversible_reactions__ ;
+        this->indices_of_thirdbody_reactions__ = rhs.indices_of_thirdbody_reactions__ ;
+        this->indices_of_falloff_reactions__ = rhs.indices_of_falloff_reactions__ ;
+		this->indices_of_extendedfalloff_reactions__ = rhs.indices_of_extendedfalloff_reactions__;
+        this->indices_of_cabr_reactions__ = rhs.indices_of_cabr_reactions__ ;
+        this->indices_of_chebyshev_reactions__ = rhs.indices_of_chebyshev_reactions__ ;
+        this->indices_of_pressurelog_reactions__ = rhs.indices_of_pressurelog_reactions__ ;
+		this->indices_of_extendedpressurelog_reactions__ = rhs.indices_of_extendedpressurelog_reactions__;
+        this->indices_of_fit1_reactions__ = rhs.indices_of_fit1_reactions__ ;
+        this->indices_of_janevlanger_reactions__ = rhs.indices_of_janevlanger_reactions__ ;
+        this->indices_of_landauteller_reactions__ = rhs.indices_of_landauteller_reactions__ ;
 
-        this->indices_of_falloff_lindemann_reactions_ = rhs.indices_of_falloff_lindemann_reactions_ ;
-        this->indices_of_cabr_lindemann_reactions_ = rhs.indices_of_cabr_lindemann_reactions_ ;
-        this->indices_of_falloff_troe_reactions_ = rhs.indices_of_falloff_troe_reactions_ ;
-        this->indices_of_cabr_troe_reactions_ = rhs.indices_of_cabr_troe_reactions_ ;
-        this->indices_of_falloff_sri_reactions_ = rhs.indices_of_falloff_sri_reactions_ ;
-        this->indices_of_cabr_sri_reactions_ = rhs.indices_of_cabr_sri_reactions_ ;
+        this->indices_of_falloff_lindemann_reactions__ = rhs.indices_of_falloff_lindemann_reactions__ ;
+        this->indices_of_cabr_lindemann_reactions__ = rhs.indices_of_cabr_lindemann_reactions__ ;
+        this->indices_of_falloff_troe_reactions__ = rhs.indices_of_falloff_troe_reactions__ ;
+        this->indices_of_cabr_troe_reactions__ = rhs.indices_of_cabr_troe_reactions__ ;
+        this->indices_of_falloff_sri_reactions__ = rhs.indices_of_falloff_sri_reactions__ ;
+        this->indices_of_cabr_sri_reactions__ = rhs.indices_of_cabr_sri_reactions__ ;
 
         this->number_of_irreversible_reactions_ = rhs.number_of_irreversible_reactions_ ;
         this->number_of_reversible_reactions_ = rhs.number_of_reversible_reactions_ ;
@@ -143,53 +140,53 @@ namespace OpenSMOKE
 
         this->verbose_output_ = rhs.verbose_output_ ;
 
-        this->lnA_ = rhs.lnA_ ;
-        this->Beta_ = rhs.Beta_ ;
-        this->E_over_R_ = rhs.E_over_R_ ;
-		this->negative_lnA_ = rhs.negative_lnA_;
-		this->sign_lnA_ = rhs.sign_lnA_;
+        this->lnA__ = rhs.lnA__;
+        this->Beta__ = rhs.Beta__;
+        this->E_over_R__ = rhs.E_over_R__;
+		this->negative_lnA__ = rhs.negative_lnA__;
+		this->sign_lnA__ = rhs.sign_lnA__;
 
-        this->lnA_reversible_ = rhs.lnA_reversible_ ;
-        this->Beta_reversible_ = rhs.Beta_reversible_ ;
-        this->E_over_R_reversible_ = rhs.E_over_R_reversible_ ;
+        this->lnA_reversible__ = rhs.lnA_reversible__;
+        this->Beta_reversible__ = rhs.Beta_reversible__;
+        this->E_over_R_reversible__ = rhs.E_over_R_reversible__;
 
-        this->Meff_ = rhs.Meff_ ;
-        this->indices_of_thirdbody_species_ = rhs.indices_of_thirdbody_species_ ;
-        this->indices_of_thirdbody_efficiencies_ = rhs.indices_of_thirdbody_efficiencies_ ;
+        this->Meff__ = rhs.Meff__ ;
+        this->indices_of_thirdbody_species__ = rhs.indices_of_thirdbody_species__ ;
+        this->indices_of_thirdbody_efficiencies__ = rhs.indices_of_thirdbody_efficiencies__ ;
 
-        this->lnA_falloff_inf_ = rhs.lnA_falloff_inf_ ;
-        this->Beta_falloff_inf_ = rhs.Beta_falloff_inf_ ;
-        this->E_over_R_falloff_inf_ = rhs.E_over_R_falloff_inf_ ;
+        this->lnA_falloff_inf__ = rhs.lnA_falloff_inf__;
+        this->Beta_falloff_inf__ = rhs.Beta_falloff_inf__;
+        this->E_over_R_falloff_inf__ = rhs.E_over_R_falloff_inf__;
 
-        this->falloff_indices_of_thirdbody_species_ = rhs.falloff_indices_of_thirdbody_species_ ;
-        this->falloff_indices_of_thirdbody_efficiencies_ = rhs.falloff_indices_of_thirdbody_efficiencies_ ;
-        this->falloff_index_of_single_thirdbody_species_ = rhs.falloff_index_of_single_thirdbody_species_ ;
+        this->falloff_indices_of_thirdbody_species__ = rhs.falloff_indices_of_thirdbody_species__ ;
+        this->falloff_indices_of_thirdbody_efficiencies__ = rhs.falloff_indices_of_thirdbody_efficiencies__ ;
+        this->falloff_index_of_single_thirdbody_species__ = rhs.falloff_index_of_single_thirdbody_species__ ;
 
-        this->falloff_reaction_type_ = rhs.falloff_reaction_type_ ;
-        this->a_falloff_ = rhs.a_falloff_ ;
-        this->b_falloff_ = rhs.b_falloff_ ;
-        this->c_falloff_ = rhs.c_falloff_ ;
-        this->d_falloff_ = rhs.d_falloff_ ;
-        this->e_falloff_ = rhs.e_falloff_ ;
-        this->logFcent_falloff_ = rhs.logFcent_falloff_ ;
+        this->falloff_reaction_type__ = rhs.falloff_reaction_type__ ;
+        this->a_falloff__ = rhs.a_falloff__ ;
+        this->b_falloff__ = rhs.b_falloff__ ;
+        this->c_falloff__ = rhs.c_falloff__ ;
+        this->d_falloff__ = rhs.d_falloff__ ;
+        this->e_falloff__ = rhs.e_falloff__ ;
+        this->logFcent_falloff__ = rhs.logFcent_falloff__ ;
 
-        this->lnA_cabr_inf_ = rhs.lnA_cabr_inf_ ;
-        this->Beta_cabr_inf_ = rhs.Beta_cabr_inf_ ;
-        this->E_over_R_cabr_inf_ = rhs.E_over_R_cabr_inf_ ;
+        this->lnA_cabr_inf__ = rhs.lnA_cabr_inf__ ;
+        this->Beta_cabr_inf__ = rhs.Beta_cabr_inf__ ;
+        this->E_over_R_cabr_inf__ = rhs.E_over_R_cabr_inf__ ;
 
-        this->cabr_indices_of_thirdbody_species_ = rhs.cabr_indices_of_thirdbody_species_ ;
-        this->cabr_indices_of_thirdbody_efficiencies_ = rhs.cabr_indices_of_thirdbody_efficiencies_ ;
-        this->cabr_index_of_single_thirdbody_species_ = rhs.cabr_index_of_single_thirdbody_species_ ;
+        this->cabr_indices_of_thirdbody_species__ = rhs.cabr_indices_of_thirdbody_species__ ;
+        this->cabr_indices_of_thirdbody_efficiencies__ = rhs.cabr_indices_of_thirdbody_efficiencies__ ;
+        this->cabr_index_of_single_thirdbody_species__ = rhs.cabr_index_of_single_thirdbody_species__ ;
 
-        this->cabr_reaction_type_ = rhs.cabr_reaction_type_ ;
-        this->a_cabr_ = rhs.a_cabr_ ;
-        this->b_cabr_ = rhs.b_cabr_ ;
-        this->c_cabr_ = rhs.c_cabr_ ;
-        this->d_cabr_ = rhs.d_cabr_ ;
-        this->e_cabr_ = rhs.e_cabr_ ;
-        this->logFcent_cabr_ = rhs.logFcent_cabr_ ;
+        this->cabr_reaction_type__ = rhs.cabr_reaction_type__ ;
+        this->a_cabr__ = rhs.a_cabr__ ;
+        this->b_cabr__ = rhs.b_cabr__ ;
+        this->c_cabr__ = rhs.c_cabr__ ;
+        this->d_cabr__ = rhs.d_cabr__ ;
+        this->e_cabr__ = rhs.e_cabr__ ;
+        this->logFcent_cabr__ = rhs.logFcent_cabr__ ;
 
-        this->changeOfMoles_ = rhs.changeOfMoles_ ;
+        this->changeOfMoles__ = rhs.changeOfMoles__ ;
             
         stoichiometry_ = new StoichiometricMap(*rhs.stoichiometry_);
 
@@ -198,21 +195,21 @@ namespace OpenSMOKE
         this->reaction_h_and_s_must_be_recalculated_ = true;
         this->isJacobianSparsityMapAvailable_ = false;
 
-        ChangeDimensions(rhs.reaction_s_over_R_.Size(), &reaction_s_over_R_, true);
-        ChangeDimensions(rhs.reaction_h_over_RT_.Size(), &reaction_h_over_RT_, true);
-        ChangeDimensions(rhs.kArrheniusModified_.Size(), &kArrheniusModified_, true);
-        ChangeDimensions(rhs.kArrhenius_.Size(), &kArrhenius_, true);
-        ChangeDimensions(rhs.uKeq_.Size(), &uKeq_, true);
-        ChangeDimensions(rhs.kArrhenius_reversible_.Size(), &kArrhenius_reversible_, true);
-        ChangeDimensions(rhs.kArrhenius_falloff_inf_.Size(), &kArrhenius_falloff_inf_, true);
-        ChangeDimensions(rhs.kArrhenius_cabr_inf_.Size(), &kArrhenius_cabr_inf_, true);
+		reaction_s_over_R__.resize(rhs.reaction_s_over_R__.size());
+		reaction_h_over_RT__.resize(rhs.reaction_h_over_RT__.size());
+		kArrheniusModified__.resize(rhs.kArrheniusModified__.size());
+		kArrhenius__.resize(rhs.kArrhenius__.size());
+		uKeq__.resize(rhs.uKeq__.size());
+		kArrhenius_reversible__.resize(rhs.kArrhenius_reversible__.size());
+		kArrhenius_falloff_inf__.resize(rhs.kArrhenius_falloff_inf__.size());
+		kArrhenius_cabr_inf__.resize(rhs.kArrhenius_cabr_inf__.size());
 
-        ChangeDimensions(rhs.forwardReactionRates_.Size(), &forwardReactionRates_, true);
-        ChangeDimensions(rhs.reverseReactionRates_.Size(), &reverseReactionRates_, true);
-        ChangeDimensions(rhs.netReactionRates_.Size(), &netReactionRates_, true);
+		forwardReactionRates__.resize(rhs.forwardReactionRates__.size());
+		reverseReactionRates__.resize(rhs.reverseReactionRates__.size());
+		netReactionRates__.resize(rhs.netReactionRates__.size());
 
-        ChangeDimensions(rhs.correction_falloff_.Size(), &correction_falloff_, true);
-        ChangeDimensions(rhs.correction_cabr_.Size(), &correction_cabr_, true);
+		correction_falloff__.resize(rhs.correction_falloff__.size());
+		correction_cabr__.resize(rhs.correction_cabr__.size());
             
         this->chebyshev_reactions_ = new ChebyshevPolynomialRateExpression[this->number_of_chebyshev_reactions_];
 		for(unsigned int j=0;j<this->number_of_chebyshev_reactions_;j++)
@@ -242,21 +239,21 @@ namespace OpenSMOKE
 		//for(unsigned int j=0;j<this->number_of_landauteller_reactions_;j++)
         //    this->landauteller_reactions_[j] = rhs.landauteller_reactions_[j];    
                         
-        this->isThermodynamicallyReversible_ = rhs.isThermodynamicallyReversible_ ;
-        this->isExplicitlyReversible_ = rhs.isExplicitlyReversible_ ;
+        this->isThermodynamicallyReversible__ = rhs.isThermodynamicallyReversible__ ;
+        this->isExplicitlyReversible__ = rhs.isExplicitlyReversible__ ;
 
-        this->type_of_reaction_ = rhs.type_of_reaction_ ;
-        this->local_family_index_ = rhs.local_family_index_ ;
+        this->type_of_reaction__ = rhs.type_of_reaction__ ;
+        this->local_family_index__ = rhs.local_family_index__ ;
     }
 
 	KineticsMap_CHEMKIN::~KineticsMap_CHEMKIN()
 	{
-		indices_of_thirdbody_species_.clear();			
-		indices_of_thirdbody_efficiencies_.clear();		
-		falloff_indices_of_thirdbody_species_.clear();
-		falloff_indices_of_thirdbody_efficiencies_.clear();
-		cabr_indices_of_thirdbody_species_.clear();
-		cabr_indices_of_thirdbody_efficiencies_.clear();
+		indices_of_thirdbody_species__.clear();			
+		indices_of_thirdbody_efficiencies__.clear();		
+		falloff_indices_of_thirdbody_species__.clear();
+		falloff_indices_of_thirdbody_efficiencies__.clear();
+		cabr_indices_of_thirdbody_species__.clear();
+		cabr_indices_of_thirdbody_efficiencies__.clear();
                 
         if (number_of_chebyshev_reactions_ > 0)
             delete [] chebyshev_reactions_;
@@ -343,8 +340,8 @@ namespace OpenSMOKE
 			rapidxml::xml_node<>* current_node = kinetics_node->first_node("Irreversible");
 			std::stringstream fInput;
 			fInput << current_node->value();
-			indices_of_irreversible_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-			number_of_irreversible_reactions_ = indices_of_irreversible_reactions_.Size();
+			Load(indices_of_irreversible_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+			number_of_irreversible_reactions_ = indices_of_irreversible_reactions__.size();
 		}
 		
 		// Reversible reactions
@@ -352,8 +349,8 @@ namespace OpenSMOKE
 			rapidxml::xml_node<>* current_node = kinetics_node->first_node("Reversible");
 			std::stringstream fInput;
 			fInput << current_node->value();
-			indices_of_reversible_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-			number_of_reversible_reactions_ = indices_of_reversible_reactions_.Size();
+			Load(indices_of_reversible_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+			number_of_reversible_reactions_ = indices_of_reversible_reactions__.size();
 		}
 
 		// Thermodynamic Reversible reactions
@@ -361,8 +358,8 @@ namespace OpenSMOKE
 			rapidxml::xml_node<>* current_node = kinetics_node->first_node("Reversible-Thermodynamics");
 			std::stringstream fInput;
 			fInput << current_node->value();
-			indices_of_thermodynamic_reversible_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-			number_of_thermodynamic_reversible_reactions_ = indices_of_thermodynamic_reversible_reactions_.Size();
+			Load(indices_of_thermodynamic_reversible_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+			number_of_thermodynamic_reversible_reactions_ = indices_of_thermodynamic_reversible_reactions__.size();
 		}
 
 		// Explicit Reversible reactions
@@ -370,8 +367,8 @@ namespace OpenSMOKE
 			rapidxml::xml_node<>* current_node = kinetics_node->first_node("Reversible-Explicit");
 			std::stringstream fInput;
 			fInput << current_node->value();
-			indices_of_explicitly_reversible_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-			number_of_explicitly_reversible_reactions_ = indices_of_explicitly_reversible_reactions_.Size();
+			Load(indices_of_explicitly_reversible_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+			number_of_explicitly_reversible_reactions_ = indices_of_explicitly_reversible_reactions__.size();
 		}
 
 		// Three-body reactions
@@ -379,8 +376,8 @@ namespace OpenSMOKE
 			rapidxml::xml_node<>* current_node = kinetics_node->first_node("ThreeBody");
 			std::stringstream fInput;
 			fInput << current_node->value();
-			indices_of_thirdbody_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-			number_of_thirdbody_reactions_  = indices_of_thirdbody_reactions_.Size();
+			Load(indices_of_thirdbody_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+			number_of_thirdbody_reactions_  = indices_of_thirdbody_reactions__.size();
 		}
 
 		// FallOff
@@ -390,8 +387,8 @@ namespace OpenSMOKE
 			{
 				std::stringstream fInput;
 				fInput << falloff_node->value();
-				indices_of_falloff_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-				number_of_falloff_reactions_  = indices_of_falloff_reactions_.Size();
+				Load(indices_of_falloff_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+				number_of_falloff_reactions_  = indices_of_falloff_reactions__.size();
 			}
 
 			// FallOff Lindemann
@@ -399,8 +396,8 @@ namespace OpenSMOKE
 				rapidxml::xml_node<>* current_node = falloff_node->first_node("Lindemann");
 				std::stringstream fInput;
 				fInput << current_node->value();
-				indices_of_falloff_lindemann_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-				number_of_falloff_lindemann_reactions_  = indices_of_falloff_lindemann_reactions_.Size();
+				Load(indices_of_falloff_lindemann_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+				number_of_falloff_lindemann_reactions_  = indices_of_falloff_lindemann_reactions__.size();
 			}
 
 			// FallOff Troe
@@ -408,8 +405,8 @@ namespace OpenSMOKE
 				rapidxml::xml_node<>* current_node = falloff_node->first_node("Troe");
 				std::stringstream fInput;
 				fInput << current_node->value();
-				indices_of_falloff_troe_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-				number_of_falloff_troe_reactions_  = indices_of_falloff_troe_reactions_.Size();
+				Load(indices_of_falloff_troe_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+				number_of_falloff_troe_reactions_  = indices_of_falloff_troe_reactions__.size();
 			}
 
 			// FallOff SRI
@@ -417,8 +414,8 @@ namespace OpenSMOKE
 				rapidxml::xml_node<>* current_node = falloff_node->first_node("SRI");
 				std::stringstream fInput;
 				fInput << current_node->value();
-				indices_of_falloff_sri_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-				number_of_falloff_sri_reactions_  = indices_of_falloff_sri_reactions_.Size();
+				Load(indices_of_falloff_sri_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+				number_of_falloff_sri_reactions_  = indices_of_falloff_sri_reactions__.size();
 			}
 		}	
 
@@ -429,8 +426,8 @@ namespace OpenSMOKE
 			{
 				std::stringstream fInput;
 				fInput << cabr_node->value();
-				indices_of_cabr_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-				number_of_cabr_reactions_  = indices_of_cabr_reactions_.Size();
+				Load(indices_of_cabr_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+				number_of_cabr_reactions_  = indices_of_cabr_reactions__.size();
 			}
 
 			// CABR Lindemann
@@ -438,8 +435,8 @@ namespace OpenSMOKE
 				rapidxml::xml_node<>* current_node = cabr_node->first_node("Lindemann");
 				std::stringstream fInput;
 				fInput << current_node->value();
-				indices_of_cabr_lindemann_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-				number_of_cabr_lindemann_reactions_  = indices_of_cabr_lindemann_reactions_.Size();
+				Load(indices_of_cabr_lindemann_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+				number_of_cabr_lindemann_reactions_  = indices_of_cabr_lindemann_reactions__.size();
 			}
 
 			// CABR Troe
@@ -447,8 +444,8 @@ namespace OpenSMOKE
 				rapidxml::xml_node<>* current_node = cabr_node->first_node("Troe");
 				std::stringstream fInput;
 				fInput << current_node->value();
-				indices_of_cabr_troe_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-				number_of_cabr_troe_reactions_  = indices_of_cabr_troe_reactions_.Size();
+				Load(indices_of_cabr_troe_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+				number_of_cabr_troe_reactions_  = indices_of_cabr_troe_reactions__.size();
 			}
 
 			// CABR SRI
@@ -456,8 +453,8 @@ namespace OpenSMOKE
 				rapidxml::xml_node<>* current_node = cabr_node->first_node("SRI");
 				std::stringstream fInput;
 				fInput << current_node->value();
-				indices_of_cabr_sri_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-				number_of_cabr_sri_reactions_  = indices_of_cabr_sri_reactions_.Size();
+				Load(indices_of_cabr_sri_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+				number_of_cabr_sri_reactions_  = indices_of_cabr_sri_reactions__.size();
 			}
 		}	
 
@@ -470,8 +467,8 @@ namespace OpenSMOKE
 			{
 				std::stringstream fInput;
 				fInput << current_node->value();
-				indices_of_chebyshev_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-				number_of_chebyshev_reactions_ = indices_of_chebyshev_reactions_.Size();
+				Load(indices_of_chebyshev_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+				number_of_chebyshev_reactions_ = indices_of_chebyshev_reactions__.size();
 			}
 		}
 
@@ -484,8 +481,8 @@ namespace OpenSMOKE
 			{
 				std::stringstream fInput;
 				fInput << current_node->value();
-				indices_of_pressurelog_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-				number_of_pressurelog_reactions_ = indices_of_pressurelog_reactions_.Size();
+				Load(indices_of_pressurelog_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+				number_of_pressurelog_reactions_ = indices_of_pressurelog_reactions__.size();
 			}
 		}
 
@@ -498,8 +495,8 @@ namespace OpenSMOKE
 			{
 				std::stringstream fInput;
 				fInput << current_node->value();
-				indices_of_extendedpressurelog_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-				number_of_extendedpressurelog_reactions_ = indices_of_extendedpressurelog_reactions_.Size();
+				Load(indices_of_extendedpressurelog_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+				number_of_extendedpressurelog_reactions_ = indices_of_extendedpressurelog_reactions__.size();
 			}
 		}
 
@@ -512,8 +509,8 @@ namespace OpenSMOKE
 			{
 				std::stringstream fInput;
 				fInput << current_node->value();
-				indices_of_extendedfalloff_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-				number_of_extendedfalloff_reactions_ = indices_of_extendedfalloff_reactions_.Size();
+				Load(indices_of_extendedfalloff_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+				number_of_extendedfalloff_reactions_ = indices_of_extendedfalloff_reactions__.size();
 			}
 		}
 
@@ -526,8 +523,8 @@ namespace OpenSMOKE
 			{
 				std::stringstream fInput;
 				fInput << current_node->value();
-				indices_of_fit1_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-				number_of_fit1_reactions_ = indices_of_fit1_reactions_.Size();
+				Load(indices_of_fit1_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+				number_of_fit1_reactions_ = indices_of_fit1_reactions__.size();
 			}
 		}
 
@@ -540,8 +537,8 @@ namespace OpenSMOKE
 			{
 				std::stringstream fInput;
 				fInput << current_node->value();
-				indices_of_janevlanger_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-				number_of_janevlanger_reactions_ = indices_of_janevlanger_reactions_.Size();
+				Load(indices_of_janevlanger_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+				number_of_janevlanger_reactions_ = indices_of_janevlanger_reactions__.size();
 			}
 		}
 
@@ -554,8 +551,8 @@ namespace OpenSMOKE
 			{
 				std::stringstream fInput;
 				fInput << current_node->value();
-				indices_of_landauteller_reactions_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-				number_of_landauteller_reactions_ = indices_of_landauteller_reactions_.Size();
+				Load(indices_of_landauteller_reactions__, fInput, OPENSMOKE_FORMATTED_FILE);
+				number_of_landauteller_reactions_ = indices_of_landauteller_reactions__.size();
 			}
 		}
 
@@ -573,7 +570,7 @@ namespace OpenSMOKE
 					rapidxml::xml_node<>* current_node = direct_node->first_node("lnA");
 					std::stringstream fInput;
 					fInput << current_node->value();
-					lnA_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
+					Load(lnA__, fInput, OPENSMOKE_FORMATTED_FILE);
 				}
 
 				// negative-lnA
@@ -584,14 +581,14 @@ namespace OpenSMOKE
 					{
 						std::stringstream fInput;
 						fInput << current_node->value();
-						negative_lnA_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
+						Load(negative_lnA__, fInput, OPENSMOKE_FORMATTED_FILE);
 					}
 
 					// Sign of frequency factors
-					ChangeDimensions(lnA_.Size(), &sign_lnA_, true);
-					sign_lnA_ = 1;
-					for (int i = 1; i <= negative_lnA_.Size(); i++)
-						sign_lnA_[negative_lnA_[i]] = -1;
+					sign_lnA__.resize(lnA__.size());
+					std::fill(sign_lnA__.begin(), sign_lnA__.end(), 1);
+					for (unsigned int i = 0; i < negative_lnA__.size(); i++)
+						sign_lnA__[negative_lnA__[i]-1] = -1;
 				}
 
 				// Beta
@@ -599,7 +596,7 @@ namespace OpenSMOKE
 					rapidxml::xml_node<>* current_node = direct_node->first_node("Beta");
 					std::stringstream fInput;
 					fInput << current_node->value();
-					Beta_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
+					Load(Beta__, fInput, OPENSMOKE_FORMATTED_FILE);
 				}
 
 				// E_over_R
@@ -607,7 +604,7 @@ namespace OpenSMOKE
 					rapidxml::xml_node<>* current_node = direct_node->first_node("E_over_R");
 					std::stringstream fInput;
 					fInput << current_node->value();
-					E_over_R_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
+					Load(E_over_R__, fInput, OPENSMOKE_FORMATTED_FILE);
 				}
 			}
 
@@ -621,7 +618,7 @@ namespace OpenSMOKE
 					rapidxml::xml_node<>* current_node = reverse_node->first_node("lnA");
 					std::stringstream fInput;
 					fInput << current_node->value();
-					lnA_reversible_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
+					Load(lnA_reversible__, fInput, OPENSMOKE_FORMATTED_FILE);
 				}
 
 				// Beta
@@ -629,7 +626,7 @@ namespace OpenSMOKE
 					rapidxml::xml_node<>* current_node = reverse_node->first_node("Beta");
 					std::stringstream fInput;
 					fInput << current_node->value();
-					Beta_reversible_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
+					Load(Beta_reversible__, fInput, OPENSMOKE_FORMATTED_FILE);
 				}
 
 				// E_over_R
@@ -637,7 +634,7 @@ namespace OpenSMOKE
 					rapidxml::xml_node<>* current_node = reverse_node->first_node("E_over_R");
 					std::stringstream fInput;
 					fInput << current_node->value();
-					E_over_R_reversible_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
+					Load(E_over_R_reversible__, fInput, OPENSMOKE_FORMATTED_FILE);
 				}
 			}
                         
@@ -645,8 +642,8 @@ namespace OpenSMOKE
 			    std::cout << " * Reading kinetic parameters of third body reactions..." << std::endl;
 			if (number_of_thirdbody_reactions_ != 0)
 			{
-				indices_of_thirdbody_species_.resize(number_of_thirdbody_reactions_);
-				indices_of_thirdbody_efficiencies_.resize(number_of_thirdbody_reactions_);
+				indices_of_thirdbody_species__.resize(number_of_thirdbody_reactions_);
+				indices_of_thirdbody_efficiencies__.resize(number_of_thirdbody_reactions_);
 
 				rapidxml::xml_node<>* threebody_node = kinetic_parameters_node->first_node("ThreeBody");
 			
@@ -656,16 +653,19 @@ namespace OpenSMOKE
 					std::stringstream fInput;
 					fInput << current_node->value();
 
-					indices_of_thirdbody_species_[i].Load(fInput, OPENSMOKE_FORMATTED_FILE);
-					indices_of_thirdbody_efficiencies_[i].Load(fInput, OPENSMOKE_FORMATTED_FILE);
-					indices_of_thirdbody_efficiencies_[i] -= 1.;
+					Load(indices_of_thirdbody_species__[i], fInput, OPENSMOKE_FORMATTED_FILE);
+					Load(indices_of_thirdbody_efficiencies__[i], fInput, OPENSMOKE_FORMATTED_FILE);
+
+					for (std::vector<double>::iterator it = indices_of_thirdbody_efficiencies__[i].begin(); it != indices_of_thirdbody_efficiencies__[i].end(); ++it)
+						*it -= 1.;
 
 					i++;
 				}
 			}
 
-                        if(verbose_output_ == true)
+			if(verbose_output_ == true)
 			    std::cout << " * Reading kinetic parameters of pressure-dependent reactions..." << std::endl;
+			
 			if (number_of_falloff_reactions_ != 0)
 			{
 				rapidxml::xml_node<>* falloff_node = kinetic_parameters_node->first_node("FallOff");
@@ -675,7 +675,7 @@ namespace OpenSMOKE
 					rapidxml::xml_node<>* current_node = falloff_node->first_node("lnA");
 					std::stringstream fInput;
 					fInput << current_node->value();
-					lnA_falloff_inf_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
+					Load(lnA_falloff_inf__, fInput, OPENSMOKE_FORMATTED_FILE);
 				}
 
 				// Beta
@@ -683,7 +683,7 @@ namespace OpenSMOKE
 					rapidxml::xml_node<>* current_node = falloff_node->first_node("Beta");
 					std::stringstream fInput;
 					fInput << current_node->value();
-					Beta_falloff_inf_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
+					Load(Beta_falloff_inf__, fInput, OPENSMOKE_FORMATTED_FILE);
 				}
 
 				// E_over_R
@@ -691,22 +691,33 @@ namespace OpenSMOKE
 					rapidxml::xml_node<>* current_node = falloff_node->first_node("E_over_R");
 					std::stringstream fInput;
 					fInput << current_node->value();
-					E_over_R_falloff_inf_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
+					Load(E_over_R_falloff_inf__, fInput, OPENSMOKE_FORMATTED_FILE);
 				}
 
 				// Parameters
 				{
-					ChangeDimensions(number_of_falloff_reactions_, &falloff_reaction_type_, true);
-					ChangeDimensions(number_of_falloff_reactions_, &falloff_index_of_single_thirdbody_species_, true);
+					falloff_reaction_type__.resize(number_of_falloff_reactions_);
 
-					ChangeDimensions(number_of_falloff_reactions_, &a_falloff_, true);
-					ChangeDimensions(number_of_falloff_reactions_, &b_falloff_, true);
-					ChangeDimensions(number_of_falloff_reactions_, &c_falloff_, true);
-					ChangeDimensions(number_of_falloff_reactions_, &d_falloff_, true);
-					ChangeDimensions(number_of_falloff_reactions_, &e_falloff_, true);
+					falloff_index_of_single_thirdbody_species__.resize(number_of_falloff_reactions_);
+					std::fill(falloff_index_of_single_thirdbody_species__.begin(), falloff_index_of_single_thirdbody_species__.end(), 0);
 
-					falloff_indices_of_thirdbody_species_.resize(number_of_falloff_reactions_);
-					falloff_indices_of_thirdbody_efficiencies_.resize(number_of_falloff_reactions_);
+					a_falloff__.resize(number_of_falloff_reactions_);
+					std::fill(a_falloff__.begin(), a_falloff__.end(), 0.);
+
+					b_falloff__.resize(number_of_falloff_reactions_);
+					std::fill(b_falloff__.begin(), b_falloff__.end(), 0.);
+
+					c_falloff__.resize(number_of_falloff_reactions_);
+					std::fill(c_falloff__.begin(), c_falloff__.end(), 0.);
+
+					d_falloff__.resize(number_of_falloff_reactions_);
+					std::fill(d_falloff__.begin(), d_falloff__.end(), 0.);
+
+					e_falloff__.resize(number_of_falloff_reactions_);
+					std::fill(e_falloff__.begin(), e_falloff__.end(), 0.);
+
+					falloff_indices_of_thirdbody_species__.resize(number_of_falloff_reactions_);
+					falloff_indices_of_thirdbody_efficiencies__.resize(number_of_falloff_reactions_);
 
 					rapidxml::xml_node<>* parameters_node = falloff_node->first_node("Parameters");
 
@@ -721,38 +732,38 @@ namespace OpenSMOKE
 						
 						if (dummy == "lindemann")
 						{
-							falloff_reaction_type_[i] = PhysicalConstants::REACTION_LINDEMANN_FALLOFF;
+							falloff_reaction_type__[i-1] = PhysicalConstants::REACTION_LINDEMANN_FALLOFF;
 						}
 						if (dummy == "troe")
 						{
-							falloff_reaction_type_[i] = PhysicalConstants::REACTION_TROE_FALLOFF;
+							falloff_reaction_type__[i-1] = PhysicalConstants::REACTION_TROE_FALLOFF;
 
 							OpenSMOKEVectorDouble coefficients;
 							coefficients.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-							a_falloff_[i] = coefficients[1];
-							b_falloff_[i] = coefficients[2];
-							c_falloff_[i] = coefficients[3];
+							a_falloff__[i-1] = coefficients[1];
+							b_falloff__[i-1] = coefficients[2];
+							c_falloff__[i-1] = coefficients[3];
 							if (coefficients.Size() == 4)
-								d_falloff_[i] = coefficients[4];
+								d_falloff__[i-1] = coefficients[4];
 						}
 						else if (dummy == "sri")
 						{
-							falloff_reaction_type_[i] = PhysicalConstants::REACTION_SRI_FALLOFF;
+							falloff_reaction_type__[i-1] = PhysicalConstants::REACTION_SRI_FALLOFF;
 					
 							OpenSMOKEVectorDouble coefficients;
 							coefficients.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-							a_falloff_[i] = coefficients[1];
-							b_falloff_[i] = coefficients[2];
-							c_falloff_[i] = coefficients[3];
+							a_falloff__[i-1] = coefficients[1];
+							b_falloff__[i-1] = coefficients[2];
+							c_falloff__[i-1] = coefficients[3];
 							if (coefficients.Size() == 5)
 							{
-								d_falloff_[i] = coefficients[4];
-								e_falloff_[i] = coefficients[5];
+								d_falloff__[i-1] = coefficients[4];
+								e_falloff__[i-1] = coefficients[5];
 							}
 							else
 							{
-								d_falloff_[i] = 1.;
-								e_falloff_[i] = 0.;
+								d_falloff__[i-1] = 1.;
+								e_falloff__[i-1] = 0.;
 							}
 						}
 
@@ -761,13 +772,15 @@ namespace OpenSMOKE
 						{
 							unsigned int species;
 							fInput >> species;
-							falloff_index_of_single_thirdbody_species_[i] = species;
+							falloff_index_of_single_thirdbody_species__[i-1] = species;
 						}
 						else
 						{
-							falloff_indices_of_thirdbody_species_[i-1].Load(fInput, OPENSMOKE_FORMATTED_FILE);
-							falloff_indices_of_thirdbody_efficiencies_[i-1].Load(fInput, OPENSMOKE_FORMATTED_FILE);
-							falloff_indices_of_thirdbody_efficiencies_[i-1] -= 1.;
+							Load(falloff_indices_of_thirdbody_species__[i - 1], fInput, OPENSMOKE_FORMATTED_FILE);
+							Load(falloff_indices_of_thirdbody_efficiencies__[i - 1], fInput, OPENSMOKE_FORMATTED_FILE);
+							
+							for (std::vector<double>::iterator it = falloff_indices_of_thirdbody_efficiencies__[i - 1].begin(); it != falloff_indices_of_thirdbody_efficiencies__[i - 1].end(); ++it)
+								*it -= 1.;
 						}
 
 						i++;
@@ -784,7 +797,7 @@ namespace OpenSMOKE
 					rapidxml::xml_node<>* current_node = cabr_node->first_node("lnA");
 					std::stringstream fInput;
 					fInput << current_node->value();
-					lnA_cabr_inf_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
+					Load(lnA_cabr_inf__, fInput, OPENSMOKE_FORMATTED_FILE);
 				}
 
 				// Beta
@@ -792,7 +805,7 @@ namespace OpenSMOKE
 					rapidxml::xml_node<>* current_node = cabr_node->first_node("Beta");
 					std::stringstream fInput;
 					fInput << current_node->value();
-					Beta_cabr_inf_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
+					Load(Beta_cabr_inf__, fInput, OPENSMOKE_FORMATTED_FILE);
 				}
 
 				// E_over_R
@@ -800,22 +813,33 @@ namespace OpenSMOKE
 					rapidxml::xml_node<>* current_node = cabr_node->first_node("E_over_R");
 					std::stringstream fInput;
 					fInput << current_node->value();
-					E_over_R_cabr_inf_.Load(fInput, OPENSMOKE_FORMATTED_FILE);
+					Load(E_over_R_cabr_inf__, fInput, OPENSMOKE_FORMATTED_FILE);
 				}
 
 				// Parameters
 				{
-					ChangeDimensions(number_of_cabr_reactions_, &cabr_reaction_type_, true);
-					ChangeDimensions(number_of_cabr_reactions_, &cabr_index_of_single_thirdbody_species_, true);
+					cabr_reaction_type__.resize(number_of_cabr_reactions_);
 
-					ChangeDimensions(number_of_cabr_reactions_, &a_cabr_, true);
-					ChangeDimensions(number_of_cabr_reactions_, &b_cabr_, true);
-					ChangeDimensions(number_of_cabr_reactions_, &c_cabr_, true);
-					ChangeDimensions(number_of_cabr_reactions_, &d_cabr_, true);
-					ChangeDimensions(number_of_cabr_reactions_, &e_cabr_, true);
+					cabr_index_of_single_thirdbody_species__.resize(number_of_cabr_reactions_);
+					std::fill(cabr_index_of_single_thirdbody_species__.begin(), cabr_index_of_single_thirdbody_species__.end(), 0);
 
-					cabr_indices_of_thirdbody_species_.resize(number_of_cabr_reactions_);
-					cabr_indices_of_thirdbody_efficiencies_.resize(number_of_cabr_reactions_);
+					a_cabr__.resize(number_of_cabr_reactions_);
+					std::fill(a_cabr__.begin(), a_cabr__.end(), 0.);
+
+					b_cabr__.resize(number_of_cabr_reactions_);
+					std::fill(b_cabr__.begin(), b_cabr__.end(), 0.);
+
+					c_cabr__.resize(number_of_cabr_reactions_);
+					std::fill(c_cabr__.begin(), c_cabr__.end(), 0.);
+
+					d_cabr__.resize(number_of_cabr_reactions_);
+					std::fill(d_cabr__.begin(), d_cabr__.end(), 0.);
+
+					e_cabr__.resize(number_of_cabr_reactions_);
+					std::fill(e_cabr__.begin(), e_cabr__.end(), 0.);
+
+					cabr_indices_of_thirdbody_species__.resize(number_of_cabr_reactions_);
+					cabr_indices_of_thirdbody_efficiencies__.resize(number_of_cabr_reactions_);
 
 					rapidxml::xml_node<>* parameters_node = cabr_node->first_node("Parameters");
 
@@ -829,38 +853,38 @@ namespace OpenSMOKE
 						fInput >> dummy;
 						if (dummy == "lindemann")
 						{
-							cabr_reaction_type_[i] = PhysicalConstants::REACTION_LINDEMANN_CABR;
+							cabr_reaction_type__[i-1] = PhysicalConstants::REACTION_LINDEMANN_CABR;
 						}
 						if (dummy == "troe")
 						{
-							cabr_reaction_type_[i] = PhysicalConstants::REACTION_TROE_CABR;
+							cabr_reaction_type__[i-1] = PhysicalConstants::REACTION_TROE_CABR;
 
 							OpenSMOKEVectorDouble coefficients;
 							coefficients.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-							a_cabr_[i] = coefficients[1];
-							b_cabr_[i] = coefficients[2];
-							c_cabr_[i] = coefficients[3];
+							a_cabr__[i-1] = coefficients[1];
+							b_cabr__[i-1] = coefficients[2];
+							c_cabr__[i-1] = coefficients[3];
 							if (coefficients.Size() == 4)
-								d_cabr_[i] = coefficients[4];
+								d_cabr__[i-1] = coefficients[4];
 						}
 						else if (dummy == "sri")
 						{
-							cabr_reaction_type_[i] = PhysicalConstants::REACTION_SRI_CABR;
+							cabr_reaction_type__[i-1] = PhysicalConstants::REACTION_SRI_CABR;
 					
 							OpenSMOKEVectorDouble coefficients;
 							coefficients.Load(fInput, OPENSMOKE_FORMATTED_FILE);
-							a_cabr_[i] = coefficients[1];
-							b_cabr_[i] = coefficients[2];
-							c_cabr_[i] = coefficients[3];
+							a_cabr__[i-1] = coefficients[1];
+							b_cabr__[i-1] = coefficients[2];
+							c_cabr__[i-1] = coefficients[3];
 							if (coefficients.Size() == 5)
 							{
-								d_cabr_[i] = coefficients[4];
-								e_cabr_[i] = coefficients[5];
+								d_cabr__[i-1] = coefficients[4];
+								e_cabr__[i-1] = coefficients[5];
 							}
 							else
 							{
-								d_cabr_[i] = 1.;
-								e_cabr_[i] = 0.;
+								d_cabr__[i-1] = 1.;
+								e_cabr__[i-1] = 0.;
 							}
 						}
 
@@ -869,13 +893,15 @@ namespace OpenSMOKE
 						{
 							unsigned int species;
 							fInput >> species;
-							cabr_index_of_single_thirdbody_species_[i] = species;
+							cabr_index_of_single_thirdbody_species__[i-1] = species;
 						}
 						else
 						{
-							cabr_indices_of_thirdbody_species_[i-1].Load(fInput, OPENSMOKE_FORMATTED_FILE);
-							cabr_indices_of_thirdbody_efficiencies_[i-1].Load(fInput, OPENSMOKE_FORMATTED_FILE);
-							cabr_indices_of_thirdbody_efficiencies_[i-1] -= 1.;
+							Load(cabr_indices_of_thirdbody_species__[i - 1], fInput, OPENSMOKE_FORMATTED_FILE);
+							Load(cabr_indices_of_thirdbody_efficiencies__[i - 1], fInput, OPENSMOKE_FORMATTED_FILE);
+							
+							for (std::vector<double>::iterator it = cabr_indices_of_thirdbody_efficiencies__[i - 1].begin(); it != cabr_indices_of_thirdbody_efficiencies__[i - 1].end(); ++it)
+								*it -= 1.;
 						}
 
 						i++;
@@ -990,79 +1016,111 @@ namespace OpenSMOKE
 			fInput << stoichiometry_node->value();
 
 			stoichiometry_->ReadFromASCIIFile(fInput);
-			changeOfMoles_ = stoichiometry_->changeOfMoles();
+			changeOfMoles__ = stoichiometry_->ChangeOfMoles();
 			{
 				OpenSMOKE::OpenSMOKEVectorBool tmp(this->number_of_reactions_);
 				tmp = false;
 				for(unsigned int k=1;k<=number_of_thermodynamic_reversible_reactions_;k++)
-					tmp[indices_of_thermodynamic_reversible_reactions_[k]] = true;
-				stoichiometry_->CompleteChangeOfMoles(tmp);
+					tmp[indices_of_thermodynamic_reversible_reactions__[k-1]] = true;
+				stoichiometry_->CompleteChangeOfMoles(tmp.GetHandle());
  			}
 			
 			// Memory allocation
-			ChangeDimensions(this->number_of_reactions_, &reaction_s_over_R_, true);
-			ChangeDimensions(this->number_of_reactions_, &reaction_h_over_RT_, true);
-			ChangeDimensions(this->number_of_reactions_, &kArrhenius_, true);
-			ChangeDimensions(this->number_of_reactions_, &kArrheniusModified_, true);
-			ChangeDimensions(number_of_thermodynamic_reversible_reactions_, &uKeq_, false);
-			ChangeDimensions(number_of_explicitly_reversible_reactions_, &kArrhenius_reversible_, false);
+			reaction_s_over_R__.resize(this->number_of_reactions_);
+			std::fill(reaction_s_over_R__.begin(), reaction_s_over_R__.end(), 0.);
+			
+			reaction_h_over_RT__.resize(this->number_of_reactions_);
+			std::fill(reaction_h_over_RT__.begin(), reaction_h_over_RT__.end(), 0.);
+			
+			kArrhenius__.resize(this->number_of_reactions_);
+			std::fill(kArrhenius__.begin(), kArrhenius__.end(), 0.);
+			
+			kArrheniusModified__.resize(this->number_of_reactions_);
+			std::fill(kArrheniusModified__.begin(), kArrheniusModified__.end(), 0.);
+			
+			uKeq__.resize(this->number_of_thermodynamic_reversible_reactions_);
+			std::fill(uKeq__.begin(), uKeq__.end(), 0.);
 		
-			ChangeDimensions(number_of_falloff_reactions_, &kArrhenius_falloff_inf_, false);
-			ChangeDimensions(number_of_falloff_reactions_, &logFcent_falloff_, false);
-			ChangeDimensions(number_of_cabr_reactions_, &kArrhenius_cabr_inf_, false);
-			ChangeDimensions(number_of_cabr_reactions_, &logFcent_cabr_, false);
+			kArrhenius_reversible__.resize(this->number_of_explicitly_reversible_reactions_);
+			std::fill(kArrhenius_reversible__.begin(), kArrhenius_reversible__.end(), 0.);
+		
+			kArrhenius_falloff_inf__.resize(this->number_of_falloff_reactions_);
+			std::fill(kArrhenius_falloff_inf__.begin(), kArrhenius_falloff_inf__.end(), 0.);
 
-			ChangeDimensions(number_of_thirdbody_reactions_, &Meff_, false);
-			ChangeDimensions(number_of_falloff_reactions_, &correction_falloff_, false);
-			ChangeDimensions(number_of_cabr_reactions_, &correction_cabr_, false);
+			logFcent_falloff__.resize(number_of_falloff_reactions_);
+			std::fill(logFcent_falloff__.begin(), logFcent_falloff__.end(), 0.);
 
-			ChangeDimensions(this->number_of_reactions_, &forwardReactionRates_, true);
-			ChangeDimensions(this->number_of_reactions_, &reverseReactionRates_, true);
-			ChangeDimensions(this->number_of_reactions_, &netReactionRates_, true);
+			kArrhenius_cabr_inf__.resize(number_of_cabr_reactions_);
+			std::fill(kArrhenius_cabr_inf__.begin(), kArrhenius_cabr_inf__.end(), 0.);
+			
+			logFcent_cabr__.resize(number_of_cabr_reactions_);
+			std::fill(logFcent_cabr__.begin(), logFcent_cabr__.end(), 0.);
 
-			ChangeDimensions(this->number_of_reactions_, &isThermodynamicallyReversible_, true);
-			ChangeDimensions(this->number_of_reactions_, &isExplicitlyReversible_, true);
+			Meff__.resize(number_of_thirdbody_reactions_);
+			std::fill(Meff__.begin(), Meff__.end(), 0.);
+
+			correction_falloff__.resize(number_of_falloff_reactions_);
+			std::fill(correction_falloff__.begin(), correction_falloff__.end(), 0.);
+
+			correction_cabr__.resize(number_of_cabr_reactions_);
+			std::fill(correction_cabr__.begin(), correction_cabr__.end(), 0.);
+
+			forwardReactionRates__.resize(this->number_of_reactions_);
+			std::fill(forwardReactionRates__.begin(), forwardReactionRates__.end(), 0.);
+
+			reverseReactionRates__.resize(this->number_of_reactions_);
+			std::fill(reverseReactionRates__.begin(), reverseReactionRates__.end(), 0.);
+
+			netReactionRates__.resize(this->number_of_reactions_);
+			std::fill(netReactionRates__.begin(), netReactionRates__.end(), 0.);
+
+			isThermodynamicallyReversible__.resize(this->number_of_reactions_);
+			std::fill(isThermodynamicallyReversible__.begin(), isThermodynamicallyReversible__.end(), 0);
+			
+			isExplicitlyReversible__.resize(this->number_of_reactions_);
+			std::fill(isExplicitlyReversible__.begin(), isExplicitlyReversible__.end(), 0);
 
 			for(unsigned int k=1;k<=number_of_thermodynamic_reversible_reactions_;k++)
-				isThermodynamicallyReversible_[indices_of_thermodynamic_reversible_reactions_[k]] = k;
+				isThermodynamicallyReversible__[indices_of_thermodynamic_reversible_reactions__[k-1]-1] = k;
 			for(unsigned int k=1;k<=number_of_explicitly_reversible_reactions_;k++)
-				isExplicitlyReversible_[indices_of_explicitly_reversible_reactions_[k]] = k;
+				isExplicitlyReversible__[indices_of_explicitly_reversible_reactions__[k-1]-1] = k;
 
 			// Additional indices for sensitivity analysis
 			{
-				ChangeDimensions(this->number_of_reactions_, &type_of_reaction_, true);
-				ChangeDimensions(this->number_of_reactions_, &local_family_index_, true);
+				type_of_reaction__.resize(this->number_of_reactions_);
+				std::fill(type_of_reaction__.begin(), type_of_reaction__.end(), PhysicalConstants::REACTION_SIMPLE);
 
-				type_of_reaction_ = PhysicalConstants::REACTION_SIMPLE;
+				local_family_index__.resize(this->number_of_reactions_);
+				std::fill(local_family_index__.begin(), local_family_index__.end(), 0);
 
 				for(unsigned int k=1;k<=number_of_thirdbody_reactions_;k++)
 				{
-					type_of_reaction_[indices_of_thirdbody_reactions_[k]] = PhysicalConstants::REACTION_THIRDBODY;
-					local_family_index_[indices_of_thirdbody_reactions_[k]] = k;
+					type_of_reaction__[indices_of_thirdbody_reactions__[k-1]-1] = PhysicalConstants::REACTION_THIRDBODY;
+					local_family_index__[indices_of_thirdbody_reactions__[k-1]-1] = k;
 				}
 				for(unsigned int k=1;k<=number_of_chebyshev_reactions_;k++)
 				{
-					type_of_reaction_[indices_of_chebyshev_reactions_[k]] = PhysicalConstants::REACTION_CHEBYSHEV;
-					local_family_index_[indices_of_chebyshev_reactions_[k]] = k;
+					type_of_reaction__[indices_of_chebyshev_reactions__[k-1]-1] = PhysicalConstants::REACTION_CHEBYSHEV;
+					local_family_index__[indices_of_chebyshev_reactions__[k-1]-1] = k;
 				}
 
 				for(unsigned int k=1;k<=number_of_falloff_lindemann_reactions_;k++)
-					type_of_reaction_[indices_of_falloff_lindemann_reactions_[k]] = PhysicalConstants::REACTION_LINDEMANN_FALLOFF;	
+					type_of_reaction__[indices_of_falloff_lindemann_reactions__[k-1]-1] = PhysicalConstants::REACTION_LINDEMANN_FALLOFF;	
 				for(unsigned int k=1;k<=number_of_falloff_troe_reactions_;k++)
-					type_of_reaction_[indices_of_falloff_troe_reactions_[k]] = PhysicalConstants::REACTION_TROE_FALLOFF;
+					type_of_reaction__[indices_of_falloff_troe_reactions__[k-1]-1] = PhysicalConstants::REACTION_TROE_FALLOFF;
 				for(unsigned int k=1;k<=number_of_falloff_sri_reactions_;k++)
-					type_of_reaction_[indices_of_falloff_sri_reactions_[k]] = PhysicalConstants::REACTION_SRI_FALLOFF;
+					type_of_reaction__[indices_of_falloff_sri_reactions__[k-1]-1] = PhysicalConstants::REACTION_SRI_FALLOFF;
 				for(unsigned int k=1;k<=number_of_falloff_reactions_;k++)
-					local_family_index_[indices_of_falloff_reactions_[k]] = k;
+					local_family_index__[indices_of_falloff_reactions__[k-1]-1] = k;
 
 				for(unsigned int k=1;k<=number_of_cabr_lindemann_reactions_;k++)
-					type_of_reaction_[indices_of_cabr_lindemann_reactions_[k]] = PhysicalConstants::REACTION_LINDEMANN_CABR;
+					type_of_reaction__[indices_of_cabr_lindemann_reactions__[k-1]-1] = PhysicalConstants::REACTION_LINDEMANN_CABR;
 				for(unsigned int k=1;k<=number_of_cabr_troe_reactions_;k++)
-					type_of_reaction_[indices_of_cabr_troe_reactions_[k]] = PhysicalConstants::REACTION_TROE_CABR;
+					type_of_reaction__[indices_of_cabr_troe_reactions__[k-1]-1] = PhysicalConstants::REACTION_TROE_CABR;
 				for(unsigned int k=1;k<=number_of_cabr_sri_reactions_;k++)
-					type_of_reaction_[indices_of_cabr_sri_reactions_[k]] = PhysicalConstants::REACTION_SRI_CABR;
+					type_of_reaction__[indices_of_cabr_sri_reactions__[k-1]-1] = PhysicalConstants::REACTION_SRI_CABR;
 				for(unsigned int k=1;k<=number_of_cabr_reactions_;k++)
-					local_family_index_[indices_of_cabr_reactions_[k]] = k;
+					local_family_index__[indices_of_cabr_reactions__[k-1]-1] = k;
 			}
 
 			// Sparsity Analysis
@@ -1098,7 +1156,7 @@ namespace OpenSMOKE
 				std::cout << "   Fit1 reactions:               " << number_of_fit1_reactions_ << " (" << number_of_fit1_reactions_ / std::max(1., double(this->number_of_reactions_))*100. << "%)" << std::endl;
 				std::cout << "   Janev-Langer reactions:       " << number_of_janevlanger_reactions_ << " (" << number_of_janevlanger_reactions_ / std::max(1., double(this->number_of_reactions_))*100. << "%)" << std::endl;
 				std::cout << "   Landau-Teller reactions:      " << number_of_landauteller_reactions_ << " (" << number_of_landauteller_reactions_ / std::max(1., double(this->number_of_reactions_))*100. << "%)" << std::endl;
-				std::cout << " Negative frequency factors:     " << negative_lnA_.Size() << " (" << negative_lnA_.Size() / std::max(1., double(this->number_of_reactions_))*100. << "%)" << std::endl;
+				std::cout << " Negative frequency factors:     " << negative_lnA__.size() << " (" << negative_lnA__.size() / std::max(1., double(this->number_of_reactions_))*100. << "%)" << std::endl;
 				std::cout << std::endl;
 
 				stoichiometry_->Summary(std::cout);
@@ -1124,8 +1182,8 @@ namespace OpenSMOKE
 	{
 		if (reaction_h_and_s_must_be_recalculated_ == true)
 		{
-			stoichiometry_->ReactionEnthalpyAndEntropy(	reaction_h_over_RT_, reaction_s_over_R_, 
-									thermodynamics_.species_h_over_RT(), thermodynamics_.species_s_over_R() );
+			stoichiometry_->ReactionEnthalpyAndEntropy(	reaction_h_over_RT__, reaction_s_over_R__, 
+														thermodynamics_.Species_H_over_RT(), thermodynamics_.Species_S_over_R() );
 
 			reaction_h_and_s_must_be_recalculated_ = false;
 		}
@@ -1139,29 +1197,29 @@ namespace OpenSMOKE
 		{
 			// Forward kinetic constants (Arrhenius' Law)
 			{
-				double *pt_lnA = lnA_.GetHandle();
-				double *pt_Beta = Beta_.GetHandle();
-				double *pt_E_over_R = E_over_R_.GetHandle();
-				double *pt_kArrheniusT = kArrhenius_.GetHandle();
+				double *pt_lnA = lnA__.data();
+				double *pt_Beta = Beta__.data();
+				double *pt_E_over_R = E_over_R__.data();
+				double *pt_kArrheniusT = kArrhenius__.data();
 			
 				for(unsigned int j=0;j<this->number_of_reactions_;j++)
 					*pt_kArrheniusT++ = (*pt_lnA++) + (*pt_Beta++)*this->logT_ - (*pt_E_over_R++)*this->uT_;
 			
-				Exp(kArrhenius_, &kArrhenius_);
+				Exp(kArrhenius__, &kArrhenius__);
 
 				// Negative frequency factors: reactions must be reversed
-				for (int j = 1; j <= negative_lnA_.Size(); j++)
-					kArrhenius_[negative_lnA_[j]] *= -1.;
+				for (unsigned int j = 0; j < negative_lnA__.size(); j++)
+					kArrhenius__[negative_lnA__[j]-1] *= -1.;
 			}
 
 			// Equilibrium constants (inverse value)
 			{
-				for(unsigned int k=1;k<=number_of_thermodynamic_reversible_reactions_;k++)
+				for(unsigned int k=0;k<number_of_thermodynamic_reversible_reactions_;k++)
 				{
-					unsigned int j = indices_of_thermodynamic_reversible_reactions_[k];
-					uKeq_[k] = -reaction_s_over_R_[j] + reaction_h_over_RT_[j] - log_Patm_over_RT_ * changeOfMoles_[j];
+					unsigned int j = indices_of_thermodynamic_reversible_reactions__[k]-1;
+					uKeq__[k] = -reaction_s_over_R__[j] + reaction_h_over_RT__[j] - log_Patm_over_RT_ * changeOfMoles__[j];
 				}
-				Exp(uKeq_, &uKeq_);
+				Exp(uKeq__, &uKeq__);
 
 				/* 
 				// Alternative method as suggested by Lu & Law for calculating the equilibrium constants
@@ -1184,47 +1242,47 @@ namespace OpenSMOKE
 			// Explicit reverse Arrhenius constants
 			if (number_of_explicitly_reversible_reactions_ != 0)
 			{
-				double *pt_lnA = lnA_reversible_.GetHandle();
-				double *pt_Beta = Beta_reversible_.GetHandle();
-				double *pt_E_over_R = E_over_R_reversible_.GetHandle();
-				double *pt_kArrhenius = kArrhenius_reversible_.GetHandle();
+				double *pt_lnA = lnA_reversible__.data();
+				double *pt_Beta = Beta_reversible__.data();
+				double *pt_E_over_R = E_over_R_reversible__.data();
+				double *pt_kArrhenius = kArrhenius_reversible__.data();
 
 				for(unsigned int k=0;k<number_of_explicitly_reversible_reactions_;k++)
 					*pt_kArrhenius++ = (*pt_lnA++) + (*pt_Beta++)*this->logT_ - (*pt_E_over_R++)*this->uT_;
 			
-				Exp(kArrhenius_reversible_, &kArrhenius_reversible_);
+				Exp(kArrhenius_reversible__, &kArrhenius_reversible__);
 			}
 
 			// Fall-off high temperature region kinetic constants
 			if (number_of_falloff_reactions_ != 0)
 			{
-				double *pt_lnA = lnA_falloff_inf_.GetHandle();
-				double *pt_Beta = Beta_falloff_inf_.GetHandle();
-				double *pt_E_over_R = E_over_R_falloff_inf_.GetHandle();
-				double *pt_kArrhenius = kArrhenius_falloff_inf_.GetHandle();
+				double *pt_lnA = lnA_falloff_inf__.data();
+				double *pt_Beta = Beta_falloff_inf__.data();
+				double *pt_E_over_R = E_over_R_falloff_inf__.data();
+				double *pt_kArrhenius = kArrhenius_falloff_inf__.data();
 
 				for(unsigned int k=0;k<number_of_falloff_reactions_;k++)
 					*pt_kArrhenius++ = (*pt_lnA++) + (*pt_Beta++)*this->logT_ - (*pt_E_over_R++)*this->uT_;
 			
-				Exp(kArrhenius_falloff_inf_, &kArrhenius_falloff_inf_);
+				Exp(kArrhenius_falloff_inf__, &kArrhenius_falloff_inf__);
 
-				for(unsigned int k=1;k<=number_of_falloff_reactions_;k++)
+				for(unsigned int k=0;k<number_of_falloff_reactions_;k++)
 				{
-					switch(falloff_reaction_type_[k])
+					switch(falloff_reaction_type__[k])
 					{
 						case PhysicalConstants::REACTION_TROE_FALLOFF:
 							
-							logFcent_falloff_[k] = (d_falloff_[k] != 0.) ? (1.-a_falloff_[k])*std::exp(-this->T_/b_falloff_[k]) + a_falloff_[k]*std::exp(-this->T_/c_falloff_[k]) + std::exp(-d_falloff_[k]/this->T_) :
-																		 (1.-a_falloff_[k])*std::exp(-this->T_/b_falloff_[k]) + a_falloff_[k]*std::exp(-this->T_/c_falloff_[k]);
+							logFcent_falloff__[k] = (d_falloff__[k] != 0.) ? (1.-a_falloff__[k])*std::exp(-this->T_/b_falloff__[k]) + a_falloff__[k]*std::exp(-this->T_/c_falloff__[k]) + std::exp(-d_falloff__[k]/this->T_) :
+																		 (1.-a_falloff__[k])*std::exp(-this->T_/b_falloff__[k]) + a_falloff__[k]*std::exp(-this->T_/c_falloff__[k]);
 							
-							if(logFcent_falloff_[k] < 1.e-300)	logFcent_falloff_[k] = -300.;
-							else								logFcent_falloff_[k] = std::log10(logFcent_falloff_[k]);
+							if(logFcent_falloff__[k] < 1.e-300)	logFcent_falloff__[k] = -300.;
+							else								logFcent_falloff__[k] = std::log10(logFcent_falloff__[k]);
 
 							break;
 						
 						case PhysicalConstants::REACTION_SRI_FALLOFF:
 
-							logFcent_falloff_[k] = ( a_falloff_[k]*std::exp(-b_falloff_[k]/this->T_) +  std::exp(-this->T_/c_falloff_[k]));
+							logFcent_falloff__[k] = ( a_falloff__[k]*std::exp(-b_falloff__[k]/this->T_) +  std::exp(-this->T_/c_falloff__[k]));
 							
 							break;
 					}
@@ -1234,33 +1292,33 @@ namespace OpenSMOKE
 			// Cabr high temperature region kinetic constants
 			if (number_of_cabr_reactions_ != 0)
 			{
-				double *pt_lnA = lnA_cabr_inf_.GetHandle();
-				double *pt_Beta = Beta_cabr_inf_.GetHandle();
-				double *pt_E_over_R = E_over_R_cabr_inf_.GetHandle();
-				double *pt_kArrhenius = kArrhenius_cabr_inf_.GetHandle();
+				double *pt_lnA = lnA_cabr_inf__.data();
+				double *pt_Beta = Beta_cabr_inf__.data();
+				double *pt_E_over_R = E_over_R_cabr_inf__.data();
+				double *pt_kArrhenius = kArrhenius_cabr_inf__.data();
 
 				for(unsigned int k=0;k<number_of_cabr_reactions_;k++)
 					*pt_kArrhenius++ = (*pt_lnA++) + (*pt_Beta++)*this->logT_ - (*pt_E_over_R++)*this->uT_;
 			
-				Exp(kArrhenius_cabr_inf_, &kArrhenius_cabr_inf_);
+				Exp(kArrhenius_cabr_inf__, &kArrhenius_cabr_inf__);
 
-				for(unsigned int k=1;k<=number_of_cabr_reactions_;k++)
+				for(unsigned int k=0;k<number_of_cabr_reactions_;k++)
 				{
-					switch(cabr_reaction_type_[k])
+					switch(cabr_reaction_type__[k])
 					{
 						case PhysicalConstants::REACTION_TROE_CABR:
 							
-							logFcent_cabr_[k] = (d_cabr_[k] != 0.) ? (1.-a_cabr_[k])*std::exp(-this->T_/b_cabr_[k]) + a_cabr_[k]*std::exp(-this->T_/c_cabr_[k]) + std::exp(-d_cabr_[k]/this->T_) :
-																		 (1.-a_cabr_[k])*std::exp(-this->T_/b_cabr_[k]) + a_cabr_[k]*std::exp(-this->T_/c_cabr_[k]);
+							logFcent_cabr__[k] = (d_cabr__[k] != 0.) ? (1.-a_cabr__[k])*std::exp(-this->T_/b_cabr__[k]) + a_cabr__[k]*std::exp(-this->T_/c_cabr__[k]) + std::exp(-d_cabr__[k]/this->T_) :
+																		 (1.-a_cabr__[k])*std::exp(-this->T_/b_cabr__[k]) + a_cabr__[k]*std::exp(-this->T_/c_cabr__[k]);
 							
-							if(logFcent_cabr_[k] < 1.e-300)	logFcent_cabr_[k] = -300.;
-							else							logFcent_cabr_[k] = std::log10(logFcent_cabr_[k]);
+							if(logFcent_cabr__[k] < 1.e-300)	logFcent_cabr__[k] = -300.;
+							else							logFcent_cabr__[k] = std::log10(logFcent_cabr__[k]);
 							
 							break;
 						
 						case PhysicalConstants::REACTION_SRI_CABR:
 
-							logFcent_cabr_[k] = ( a_cabr_[k]*std::exp(-b_cabr_[k]/this->T_) +  std::exp(-this->T_/c_cabr_[k]));
+							logFcent_cabr__[k] = ( a_cabr__[k]*std::exp(-b_cabr__[k]/this->T_) +  std::exp(-this->T_/c_cabr__[k]));
 							
 							break;
 					}
@@ -1274,19 +1332,19 @@ namespace OpenSMOKE
 		{
 			// Chebishev-Polynomials reactions
 			{
-				for(unsigned int k=1;k<=number_of_chebyshev_reactions_;k++)
+				for(unsigned int k=0;k<number_of_chebyshev_reactions_;k++)
 				{
-					const unsigned int j = indices_of_chebyshev_reactions_[k];
-					kArrhenius_[j] = chebyshev_reactions_[k-1].KineticConstant(this->T_, this->P_);
+					const unsigned int j = indices_of_chebyshev_reactions__[k];
+					kArrhenius__[j-1] = chebyshev_reactions_[k].KineticConstant(this->T_, this->P_);
 				}
 			}
 
 			// Pressure logarithmic interpolated reactions
 			{
-				for(unsigned int k=1;k<=number_of_pressurelog_reactions_;k++)
+				for(unsigned int k=0;k<number_of_pressurelog_reactions_;k++)
 				{
-					const unsigned int j = indices_of_pressurelog_reactions_[k];
-					kArrhenius_[j] = pressurelog_reactions_[k-1].KineticConstant(this->T_,this->P_);
+					const unsigned int j = indices_of_pressurelog_reactions__[k];
+					kArrhenius__[j-1] = pressurelog_reactions_[k].KineticConstant(this->T_,this->P_);
 				}
 			}
 
@@ -1296,46 +1354,46 @@ namespace OpenSMOKE
 
 			// Fit1 reactions
 			{
-				for(unsigned int k=1;k<=number_of_fit1_reactions_;k++)
+				for(unsigned int k=0;k<number_of_fit1_reactions_;k++)
 				{
-					const unsigned int j = indices_of_fit1_reactions_[k];
-				//	kArrhenius_[j] = fit1_reactions_[k-1].KineticConstant(this->T_,this->P_);
+					const unsigned int j = indices_of_fit1_reactions__[k];
+				//	kArrhenius_[j] = fit1_reactions_[k].KineticConstant(this->T_,this->P_);
 				}
 			}
 
 			// Janev-Langer reactions
 			{
-				for(unsigned int k=1;k<=number_of_janevlanger_reactions_;k++)
+				for(unsigned int k=0;k<number_of_janevlanger_reactions_;k++)
 				{
-					const unsigned int j = indices_of_janevlanger_reactions_[k];
-				//	kArrhenius_[j] = janevlanger_reactions_[k-1].KineticConstant(this->T_,this->P_);
+					const unsigned int j = indices_of_janevlanger_reactions__[k];
+				//	kArrhenius_[j] = janevlanger_reactions_[k].KineticConstant(this->T_,this->P_);
 				}
 			}
 
 			// Landau-Teller reactions
 			{
-				for(unsigned int k=1;k<=number_of_landauteller_reactions_;k++)
+				for(unsigned int k=0;k<number_of_landauteller_reactions_;k++)
 				{
-					const unsigned int j = indices_of_landauteller_reactions_[k];
-				//	kArrhenius_[j] = landauteller_reactions_[k-1].KineticConstant(this->T_,this->P_);
+					const unsigned int j = indices_of_landauteller_reactions__[k];
+				//	kArrhenius_[j] = landauteller_reactions_[k].KineticConstant(this->T_,this->P_);
 				}
 			}
 
 			nonconventional_kinetic_constants_must_be_recalculated_ = false;
 		}
 
-		kArrheniusModified_ = kArrhenius_;
+		kArrheniusModified__ = kArrhenius__;
 	}
 
-	void KineticsMap_CHEMKIN::ThirdBodyReactions(const double cTot, const OpenSMOKEVectorDouble& c)
+	void KineticsMap_CHEMKIN::ThirdBodyReactions(const double cTot, const double* c)
 	{	
-		for(unsigned int s=1;s<=number_of_thirdbody_reactions_;s++)
+		for(unsigned int s=0;s<number_of_thirdbody_reactions_;s++)
 		{
-			const unsigned int j=indices_of_thirdbody_reactions_[s];
+			const unsigned int j=indices_of_thirdbody_reactions__[s];
 
-			Meff_[s] = cTot;
-			for(int k=1;k<=indices_of_thirdbody_species_[s-1].Size();k++)
-				Meff_[s] += c[ indices_of_thirdbody_species_[s-1][k] ] * indices_of_thirdbody_efficiencies_[s-1][k];
+			Meff__[s] = cTot;
+			for(unsigned int k=0;k<indices_of_thirdbody_species__[s].size();k++)
+				Meff__[s] += c[indices_of_thirdbody_species__[s][k] - 1] * indices_of_thirdbody_efficiencies__[s][k];
 		}
 	}
 
@@ -1345,14 +1403,14 @@ namespace OpenSMOKE
 		species.resize(0);
 
 		// Third-body third-body
-		for (unsigned int s = 1; s <= number_of_thirdbody_reactions_; s++)
+		for (unsigned int s = 0; s < number_of_thirdbody_reactions_; s++)
 		{
-			const unsigned int j = indices_of_thirdbody_reactions_[s];
+			const unsigned int j = indices_of_thirdbody_reactions__[s];
 
-			for (int k = 1; k <= indices_of_thirdbody_species_[s - 1].Size(); k++)
+			for (unsigned int k = 0; k < indices_of_thirdbody_species__[s].size(); k++)
 			{
 				reactions.push_back(j);
-				species.push_back(indices_of_thirdbody_species_[s - 1][k]);
+				species.push_back(indices_of_thirdbody_species__[s][k]);
 			}
 		}
 	}
@@ -1363,22 +1421,22 @@ namespace OpenSMOKE
 		species.resize(0);
 
 		// Fall-off reactions
-		for (unsigned int k = 1; k <= number_of_falloff_reactions_; k++)
+		for (unsigned int k = 0; k < number_of_falloff_reactions_; k++)
 		{
-			const unsigned int j = indices_of_falloff_reactions_[k];
+			const unsigned int j = indices_of_falloff_reactions__[k];
 
-			if (falloff_index_of_single_thirdbody_species_[k] == 0)
+			if (falloff_index_of_single_thirdbody_species__[k] == 0)
 			{
-				for (int s = 1; s <= falloff_indices_of_thirdbody_species_[k - 1].Size(); s++)
+				for (unsigned int s = 0; s < falloff_indices_of_thirdbody_species__[k].size(); s++)
 				{
 					reactions.push_back(j);
-					species.push_back(falloff_indices_of_thirdbody_species_[k - 1][s]);
+					species.push_back(falloff_indices_of_thirdbody_species__[k][s]);
 				}
 			}
 			else
 			{
 				reactions.push_back(j);
-				species.push_back(falloff_index_of_single_thirdbody_species_[k]);
+				species.push_back(falloff_index_of_single_thirdbody_species__[k]);
 			}
 		}
 	}
@@ -1389,22 +1447,22 @@ namespace OpenSMOKE
 		species.resize(0);
 
 		// CABR
-		for (unsigned int k = 1; k <= number_of_cabr_reactions_; k++)
+		for (unsigned int k = 0; k < number_of_cabr_reactions_; k++)
 		{
-			const unsigned int j = indices_of_cabr_reactions_[k];
+			const unsigned int j = indices_of_cabr_reactions__[k];
 
-			if (cabr_index_of_single_thirdbody_species_[k] == 0)
+			if (cabr_index_of_single_thirdbody_species__[k] == 0)
 			{
-				for (int s = 1; s <= cabr_indices_of_thirdbody_species_[k - 1].Size(); s++)
+				for (unsigned int s = 0; s < cabr_indices_of_thirdbody_species__[k].size(); s++)
 				{
 					reactions.push_back(j);
-					species.push_back(cabr_indices_of_thirdbody_species_[k - 1][s]);
+					species.push_back(cabr_indices_of_thirdbody_species__[k][s]);
 				}
 			}
 			else
 			{
 				reactions.push_back(j);
-				species.push_back(cabr_index_of_single_thirdbody_species_[k]);
+				species.push_back(cabr_index_of_single_thirdbody_species__[k]);
 			}
 		}
 	}
@@ -1414,65 +1472,65 @@ namespace OpenSMOKE
 		reactions.resize(0);
 
 		// Third-body third-body
-		for (unsigned int s = 1; s <= number_of_thirdbody_reactions_; s++)
+		for (unsigned int s = 0; s < number_of_thirdbody_reactions_; s++)
 		{
-			const unsigned int j = indices_of_thirdbody_reactions_[s];
+			const unsigned int j = indices_of_thirdbody_reactions__[s];
 			reactions.push_back(j);
 		}
 
 		// Fall-off reactions
-		for (unsigned int k = 1; k <= number_of_falloff_reactions_; k++)
+		for (unsigned int k = 0; k < number_of_falloff_reactions_; k++)
 		{
-			const unsigned int j = indices_of_falloff_reactions_[k];
+			const unsigned int j = indices_of_falloff_reactions__[k];
 			reactions.push_back(j);
 		}
 
 		// CABR
-		for (unsigned int k = 1; k <= number_of_cabr_reactions_; k++)
+		for (unsigned int k = 0; k < number_of_cabr_reactions_; k++)
 		{
-			const unsigned int j = indices_of_cabr_reactions_[k];
+			const unsigned int j = indices_of_cabr_reactions__[k];
 			reactions.push_back(j);
 		}
 	}
 	
-	void KineticsMap_CHEMKIN::FallOffReactions(const double cTot, const OpenSMOKEVectorDouble& c)
+	void KineticsMap_CHEMKIN::FallOffReactions(const double cTot, const double* c)
 	{
 		//if (arrhenius_kinetic_constants_must_be_corrected_ == true)
 		{
-			for(unsigned int k=1;k<=number_of_falloff_reactions_;k++)
+			for(unsigned int k=0;k<number_of_falloff_reactions_;k++)
 			{
 				double M;
-				if (falloff_index_of_single_thirdbody_species_[k] == 0)
+				if (falloff_index_of_single_thirdbody_species__[k] == 0)
 				{
 					M = cTot;
-					for(int s=1;s<=falloff_indices_of_thirdbody_species_[k-1].Size();s++)
-						M += c[ falloff_indices_of_thirdbody_species_[k-1][s] ] * falloff_indices_of_thirdbody_efficiencies_[k-1][s];
+					for(unsigned int s=0;s<falloff_indices_of_thirdbody_species__[k].size();s++)
+						M += c[falloff_indices_of_thirdbody_species__[k][s]-1] * falloff_indices_of_thirdbody_efficiencies__[k][s];
 				}
 				else
 				{
 					const double epsilon = 1.e-16;
-					M = c[falloff_index_of_single_thirdbody_species_[k]] + epsilon;
+					M = c[falloff_index_of_single_thirdbody_species__[k]-1] + epsilon;
 				}
 			
-				const unsigned int j=indices_of_falloff_reactions_[k];
-				const double Pr = kArrhenius_[j] * M / kArrhenius_falloff_inf_[k];
+				const unsigned int j=indices_of_falloff_reactions__[k];
+				const double Pr = kArrhenius__[j-1] * M / kArrhenius_falloff_inf__[k];
 		
 				double wF = 1.;
-				switch(falloff_reaction_type_[k])
+				switch(falloff_reaction_type__[k])
 				{
 					case PhysicalConstants::REACTION_TROE_FALLOFF:
 
                         if (Pr > 1.e-32)
                         {
-                            const double nTroe = 0.75-1.27*logFcent_falloff_[k];
-                            const double cTroe = -0.4-0.67*logFcent_falloff_[k];
+                            const double nTroe = 0.75-1.27*logFcent_falloff__[k];
+                            const double cTroe = -0.4-0.67*logFcent_falloff__[k];
                             const double sTroe = std::log10(Pr) + cTroe;
-                            wF = std::pow(10., logFcent_falloff_[k]/(1. + boost::math::pow<2>(sTroe/(nTroe-0.14*sTroe)))); 
+                            wF = std::pow(10., logFcent_falloff__[k]/(1. + boost::math::pow<2>(sTroe/(nTroe-0.14*sTroe)))); 
                         }
                         else
                         {
                             // Asymptotic value for wF when sTroe --> -Inf
-                            wF = std::pow(10., logFcent_falloff_[k]/(1. + boost::math::pow<2>(1./0.14)));
+                            wF = std::pow(10., logFcent_falloff__[k]/(1. + boost::math::pow<2>(1./0.14)));
                         }
                                                 
 						break;
@@ -1480,51 +1538,51 @@ namespace OpenSMOKE
 					case PhysicalConstants::REACTION_SRI_FALLOFF:
 
 						const double xSRI = 1. / (1. + boost::math::pow<2>(std::log10(Pr)));
-						wF = std::pow(logFcent_falloff_[k], xSRI) * d_falloff_[k];
-						if(e_falloff_[k] != 0.)
-							wF *= std::pow(this->T_, e_falloff_[k]);
+						wF = std::pow(logFcent_falloff__[k], xSRI) * d_falloff__[k];
+						if(e_falloff__[k] != 0.)
+							wF *= std::pow(this->T_, e_falloff__[k]);
 						break;
 				}
 	
-				correction_falloff_[k] = kArrhenius_falloff_inf_[k] * (Pr/(1.+Pr)) * wF / kArrhenius_[j];
+				correction_falloff__[k] = kArrhenius_falloff_inf__[k] * (Pr/(1.+Pr)) * wF / kArrhenius__[j-1];
 			}
 		}
 	}
 
-	double KineticsMap_CHEMKIN::FallOffReactionsCorrection(const unsigned int local_k, const double cTot, const OpenSMOKEVectorDouble& c)
+	double KineticsMap_CHEMKIN::FallOffReactionsCorrection(const unsigned int local_k, const double cTot, const double* c)
 	{
 		double M;
-		if (falloff_index_of_single_thirdbody_species_[local_k] == 0)
+		if (falloff_index_of_single_thirdbody_species__[local_k-1] == 0)
 		{
 			M = cTot;
-			for (int s = 1; s <= falloff_indices_of_thirdbody_species_[local_k - 1].Size(); s++)
-				M += c[falloff_indices_of_thirdbody_species_[local_k - 1][s]] * falloff_indices_of_thirdbody_efficiencies_[local_k - 1][s];
+			for (unsigned int s = 0; s < falloff_indices_of_thirdbody_species__[local_k - 1].size(); s++)
+				M += c[falloff_indices_of_thirdbody_species__[local_k - 1][s]-1] * falloff_indices_of_thirdbody_efficiencies__[local_k - 1][s];
 		}
 		else
 		{
 			const double epsilon = 1.e-16;
-			M = c[falloff_index_of_single_thirdbody_species_[local_k]] + epsilon;
+			M = c[falloff_index_of_single_thirdbody_species__[local_k-1]-1] + epsilon;
 		}
 
-		const unsigned int j = indices_of_falloff_reactions_[local_k];
-		const double Pr = kArrhenius_[j] * M / kArrhenius_falloff_inf_[local_k];
+		const unsigned int j = indices_of_falloff_reactions__[local_k-1];
+		const double Pr = kArrhenius__[j-1] * M / kArrhenius_falloff_inf__[local_k-1];
 
 		double wF = 1.;
-		switch (falloff_reaction_type_[local_k])
+		switch (falloff_reaction_type__[local_k-1])
 		{
 			case PhysicalConstants::REACTION_TROE_FALLOFF:
 
 				if (Pr > 1.e-32)
 				{
-					const double nTroe = 0.75 - 1.27*logFcent_falloff_[local_k];
-					const double cTroe = -0.4 - 0.67*logFcent_falloff_[local_k];
+					const double nTroe = 0.75 - 1.27*logFcent_falloff__[local_k-1];
+					const double cTroe = -0.4 - 0.67*logFcent_falloff__[local_k-1];
 					const double sTroe = std::log10(Pr) + cTroe;
-					wF = std::pow(10., logFcent_falloff_[local_k] / (1. + boost::math::pow<2>(sTroe / (nTroe - 0.14*sTroe))));
+					wF = std::pow(10., logFcent_falloff__[local_k-1] / (1. + boost::math::pow<2>(sTroe / (nTroe - 0.14*sTroe))));
 				}
 				else
 				{
 					// Asymptotic value for wF when sTroe --> -Inf
-					wF = std::pow(10., logFcent_falloff_[local_k] / (1. + boost::math::pow<2>(1. / 0.14)));
+					wF = std::pow(10., logFcent_falloff__[local_k-1] / (1. + boost::math::pow<2>(1. / 0.14)));
 				}
 
 				break;
@@ -1534,101 +1592,104 @@ namespace OpenSMOKE
 				if (Pr > 1.e-32)
 				{
 					const double xSRI = 1. / (1. + boost::math::pow<2>(std::log10(Pr)));
-					wF = std::pow(logFcent_falloff_[local_k], xSRI) * d_falloff_[local_k];
-					if (e_falloff_[local_k] != 0.)
-						wF *= std::pow(this->T_, e_falloff_[local_k]);
+					wF = std::pow(logFcent_falloff__[local_k-1], xSRI) * d_falloff__[local_k-1];
+					if (e_falloff__[local_k-1] != 0.)
+						wF *= std::pow(this->T_, e_falloff__[local_k-1]);
 				}
 				else
 				{
 					const double xSRI = 0.;
-					wF = std::pow(logFcent_falloff_[local_k], xSRI) * d_falloff_[local_k];
-					if (e_falloff_[local_k] != 0.)
-						wF *= std::pow(this->T_, e_falloff_[local_k]);
+					wF = std::pow(logFcent_falloff__[local_k-1], xSRI) * d_falloff__[local_k-1];
+					if (e_falloff__[local_k-1] != 0.)
+						wF *= std::pow(this->T_, e_falloff__[local_k-1]);
 				}
 
 				break;
 		}
 
-		return ( kArrhenius_falloff_inf_[local_k] * (Pr / (1. + Pr)) * wF / kArrhenius_[j] );
+		return ( kArrhenius_falloff_inf__[local_k-1] * (Pr / (1. + Pr)) * wF / kArrhenius__[j-1] );
 	}
  
-	void KineticsMap_CHEMKIN::ChemicallyActivatedBimolecularReactions(const double cTot, const OpenSMOKEVectorDouble& c)
+	void KineticsMap_CHEMKIN::ChemicallyActivatedBimolecularReactions(const double cTot, const double* c)
 	{
 		//if (arrhenius_kinetic_constants_must_be_corrected_ == true)
 		{
-			for(unsigned int k=1;k<=number_of_cabr_reactions_;k++)
+			for(unsigned int k=0;k<number_of_cabr_reactions_;k++)
 			{
 				double M;
-				if (cabr_index_of_single_thirdbody_species_[k] == 0)
+				if (cabr_index_of_single_thirdbody_species__[k] == 0)
 				{
 					M = cTot;
-					for(int s=1;s<=cabr_indices_of_thirdbody_species_[k-1].Size();s++)
-						M += c[ cabr_indices_of_thirdbody_species_[k-1][s] ] * cabr_indices_of_thirdbody_efficiencies_[k-1][s];
+					for(unsigned int s=0;s<cabr_indices_of_thirdbody_species__[k].size();s++)
+						M += c[cabr_indices_of_thirdbody_species__[k][s]-1] * cabr_indices_of_thirdbody_efficiencies__[k][s];
 				}
 				else
 				{
 					const double epsilon = 1.e-16;
-					M = c[cabr_index_of_single_thirdbody_species_[k]] + epsilon;
+					M = c[cabr_index_of_single_thirdbody_species__[k]-1] + epsilon;
 				}
 			
-				const unsigned int j=indices_of_cabr_reactions_[k];
-				const double Pr = kArrhenius_[j] * M / kArrhenius_cabr_inf_[k];
+				const unsigned int j=indices_of_cabr_reactions__[k];
+				const double Pr = kArrhenius__[j-1] * M / kArrhenius_cabr_inf__[k];
 		
 				double wF = 1.;
 				double nTroe, cTroe, sTroe, xSRI;
-				switch(cabr_reaction_type_[k])
+				switch(cabr_reaction_type__[k])
 				{
 					case PhysicalConstants::REACTION_TROE_CABR:
 
-						nTroe = 0.75-1.27*logFcent_cabr_[k];
-						cTroe = -0.4-0.67*logFcent_cabr_[k];
+						nTroe = 0.75-1.27*logFcent_cabr__[k];
+						cTroe = -0.4-0.67*logFcent_cabr__[k];
 						sTroe = std::log10(Pr) + cTroe;
-						wF = std::pow(10., logFcent_cabr_[k]/(1. + boost::math::pow<2>(sTroe/(nTroe-0.14*sTroe))));
+						wF = std::pow(10., logFcent_cabr__[k]/(1. + boost::math::pow<2>(sTroe/(nTroe-0.14*sTroe))));
 						
 						break;
 					
 					case PhysicalConstants::REACTION_SRI_CABR:
 						xSRI = 1. / (1. + boost::math::pow<2>(std::log10(Pr)));
-						wF = std::pow(logFcent_cabr_[k], xSRI) * d_cabr_[k];
-						if(e_cabr_[k] != 0.)
-							wF *= std::pow(this->T_, e_cabr_[k]);
+						wF = std::pow(logFcent_cabr__[k], xSRI) * d_cabr__[k];
+						if(e_cabr__[k] != 0.)
+							wF *= std::pow(this->T_, e_cabr__[k]);
 						break;
 				}
 	
-				correction_cabr_[k] = (1./(1.+Pr)) * wF;
+				correction_cabr__[k] = (1./(1.+Pr)) * wF;
 			}
 		}
 	}
 
 	// Extended Pressure logarithmic interpolated reactions
-	void KineticsMap_CHEMKIN::ExtendedPressureLogReactions(const double cTot, const OpenSMOKEVectorDouble& c)
+	void KineticsMap_CHEMKIN::ExtendedPressureLogReactions(const double cTot, const double* c)
 	{
-		for (unsigned int k = 1; k <= number_of_extendedpressurelog_reactions_; k++)
+		for (unsigned int k = 0; k < number_of_extendedpressurelog_reactions_; k++)
 		{
-			const unsigned int j = indices_of_extendedpressurelog_reactions_[k];
-			kArrhenius_[j] = extendedpressurelog_reactions_[k-1].KineticConstant(this->T_, this->P_, cTot, c.GetHandle());
-			kArrheniusModified_[j] = kArrhenius_[j];
+			const unsigned int j = indices_of_extendedpressurelog_reactions__[k]-1;
+			kArrhenius__[j] = extendedpressurelog_reactions_[k].KineticConstant(this->T_, this->P_, cTot, c);
+			kArrheniusModified__[j] = kArrhenius__[j];
 		}
 	}
 
 	// Extended Falloff reactions
-	void KineticsMap_CHEMKIN::ExtendedFallOffReactions(const double cTot, const OpenSMOKEVectorDouble& c)
+	void KineticsMap_CHEMKIN::ExtendedFallOffReactions(const double cTot, const double* c)
 	{
-		for (unsigned int k = 1; k <= number_of_extendedfalloff_reactions_; k++)
+		for (unsigned int k = 0; k < number_of_extendedfalloff_reactions_; k++)
 		{
-			const unsigned int j = indices_of_extendedfalloff_reactions_[k];
-			kArrhenius_[j] = extendedfalloff_reactions_[k - 1].KineticConstant(this->T_, this->P_, cTot, c.GetHandle());
-			kArrheniusModified_[j] = kArrhenius_[j];
+			const unsigned int j = indices_of_extendedfalloff_reactions__[k]-1;
+			kArrhenius__[j] = extendedfalloff_reactions_[k].KineticConstant(this->T_, this->P_, cTot, c);
+			kArrheniusModified__[j] = kArrhenius__[j];
 		}
 	}
 	
-	void KineticsMap_CHEMKIN::ReactionRates(const OpenSMOKEVectorDouble& c)
+	void KineticsMap_CHEMKIN::ReactionRates(const double* c)
 	{
-		const double cTot = c.SumElements();
+		double cTot = 0.;
+		for(unsigned int i=0;i<this->number_of_species_;i++)
+			cTot += c[i];
+
 		ReactionRates(c, cTot);
 	}
 
-	void KineticsMap_CHEMKIN::ReactionRates(const OpenSMOKEVectorDouble& c, const double cTot)
+	void KineticsMap_CHEMKIN::ReactionRates(const double* c, const double cTot)
 	{
 		// 1. Kinetic constants
 		KineticConstants();
@@ -1640,18 +1701,18 @@ namespace OpenSMOKE
 		ThirdBodyReactions(cTot, c);
 
 		// 3. Correct the effective kinetic constants by three-body coefficients
-		for(unsigned int s=1;s<=number_of_thirdbody_reactions_;s++)
+		for(unsigned int s=0;s<number_of_thirdbody_reactions_;s++)
 		{
-			const unsigned int j=indices_of_thirdbody_reactions_[s];
-			kArrheniusModified_[j] *= Meff_[s];
+			const unsigned int j=indices_of_thirdbody_reactions__[s];
+			kArrheniusModified__[j-1] *= Meff__[s];
 		}
 
 		// 4. Correct the effective kinetic constants: Fall-off reactions
 		FallOffReactions(cTot, c);
-		for(unsigned int s=1;s<=number_of_falloff_reactions_;s++)
+		for(unsigned int s=0;s<number_of_falloff_reactions_;s++)
 		{
-			const unsigned int j=indices_of_falloff_reactions_[s];
-			kArrheniusModified_[j] *= correction_falloff_[s];
+			const unsigned int j=indices_of_falloff_reactions__[s];
+			kArrheniusModified__[j-1] *= correction_falloff__[s];
 		}
 
 		// 4.bis Extended fallExtendedFallOffReactionsoff reactions
@@ -1659,10 +1720,10 @@ namespace OpenSMOKE
 
 		// 5. Correct the effective kinetic constants: CABR reactions
 		ChemicallyActivatedBimolecularReactions(cTot, c);
-		for(unsigned int s=1;s<=number_of_cabr_reactions_;s++)
+		for(unsigned int s=0;s<number_of_cabr_reactions_;s++)
 		{
-			const unsigned int j=indices_of_cabr_reactions_[s];
-			kArrheniusModified_[j] *= correction_cabr_[s];
+			const unsigned int j=indices_of_cabr_reactions__[s];
+			kArrheniusModified__[j-1] *= correction_cabr__[s];
 		}
 
 		// Calculates the product of conenctrations (for forward and reverse reactions)
@@ -1670,44 +1731,48 @@ namespace OpenSMOKE
 		// in the kinetic scheme, not only for the reversible reactions. After calling the
 		// function reported below the value of reverseReactionRates_ vector for non reversible
 		// reactions is put equal to 1.
-		stoichiometry_->ProductOfConcentrations(forwardReactionRates_, reverseReactionRates_, c);
+		stoichiometry_->ProductOfConcentrations(forwardReactionRates__, reverseReactionRates__, c);
 
 		// Corrects the product of concentrations for reverse reaction by the 
 		// thermodynamic equilibrium constant
-		for(unsigned int k=1;k<=number_of_thermodynamic_reversible_reactions_;k++)
+		for(unsigned int k=0;k<number_of_thermodynamic_reversible_reactions_;k++)
 		{
-			unsigned int j = indices_of_thermodynamic_reversible_reactions_[k];
-			reverseReactionRates_[j] *= uKeq_[k];
+			unsigned int j = indices_of_thermodynamic_reversible_reactions__[k];
+			reverseReactionRates__[j-1] *= uKeq__[k];
 		}
 
 		// Corrects the product of concentrations for reverse reaction by the 
 		// explicit Arrhenius kinetic parameters (if provided)
-		for(unsigned int k=1;k<=number_of_explicitly_reversible_reactions_;k++)
+		for(unsigned int k=0;k<number_of_explicitly_reversible_reactions_;k++)
 		{
-			unsigned int j = indices_of_explicitly_reversible_reactions_[k];
-//			reverseReactionRates_[j] *= kArrhenius_reversible_[k]/kArrheniusModified_[j];
-			reverseReactionRates_[j] *= kArrhenius_reversible_[k]/kArrhenius_[j];
+			unsigned int j = indices_of_explicitly_reversible_reactions__[k];
+			reverseReactionRates__[j-1] *= kArrhenius_reversible__[k]/kArrhenius__[j-1];
 		}
 
 		// Calculates the net reaction rate
 		// Be careful: the netReactionRates_ vector must be multiplied by the effective 
 		// forward kinetic constant, to obtain the real reaction rates in [kmol/m3/s]
-		netReactionRates_ = forwardReactionRates_;
-		for(unsigned int k=1;k<=number_of_reversible_reactions_;k++)
+		netReactionRates__ = forwardReactionRates__;
+		for(unsigned int k=0;k<number_of_reversible_reactions_;k++)
 		{
-			unsigned int j = indices_of_reversible_reactions_[k];
-			netReactionRates_[j] -= reverseReactionRates_[j];
+			unsigned int j = indices_of_reversible_reactions__[k]-1;
+			netReactionRates__[j] -= reverseReactionRates__[j];
 		}
 
 		// Multiplies the net reaction rate by the effective kinetic constant (accounting for 
 		// third-body effects, fall-off, etc.). At the end of this function the netReactionRates_
 		// vector contains the net reaction rates of all the reactions in [kmol/m3/s]
-		ElementByElementProduct(netReactionRates_, kArrheniusModified_, &netReactionRates_);         
+		// TODO ElementByElementProduct(netReactionRates_, kArrheniusModified__, &netReactionRates_); 
+		for (unsigned int i = 0; i < netReactionRates__.size(); i++)
+			netReactionRates__[i] *= kArrheniusModified__[i];
 	}
 
-	void KineticsMap_CHEMKIN::DerivativesOfReactionRatesWithRespectToKineticParameters(const PhysicalConstants::sensitivity_type type, unsigned int jReaction, const OpenSMOKEVectorDouble& c, double& parameter)
+	void KineticsMap_CHEMKIN::DerivativesOfReactionRatesWithRespectToKineticParameters(const PhysicalConstants::sensitivity_type type, unsigned int jReaction, const double* c, double& parameter)
 	{
-		const double cTot = c.SumElements();
+		// Total concentration
+		double cTot = 0.;
+		for (unsigned int i = 0; i<this->number_of_species_; i++)
+			cTot += c[i];
 
 		// 1. Kinetic constants
 		KineticConstants();
@@ -1719,18 +1784,18 @@ namespace OpenSMOKE
 		ThirdBodyReactions(cTot, c);
 
 		// 3. Correct the effective kinetic constants by three-body coefficients
-		for(unsigned int s=1;s<=number_of_thirdbody_reactions_;s++)
+		for(unsigned int s=0;s<number_of_thirdbody_reactions_;s++)
 		{
-			const unsigned int j=indices_of_thirdbody_reactions_[s];
-			kArrheniusModified_[j] *= Meff_[s];
+			const unsigned int j=indices_of_thirdbody_reactions__[s];
+			kArrheniusModified__[j-1] *= Meff__[s];
 		}
 
 		// 4. Correct the effective kinetic constants: Fall-off reactions
 		FallOffReactions(cTot, c);
-		for(unsigned int s=1;s<=number_of_falloff_reactions_;s++)
+		for(unsigned int s=0;s<number_of_falloff_reactions_;s++)
 		{
-			const unsigned int j=indices_of_falloff_reactions_[s];
-			kArrheniusModified_[j] *= correction_falloff_[s];
+			const unsigned int j=indices_of_falloff_reactions__[s];
+			kArrheniusModified__[j-1] *= correction_falloff__[s];
 		}
 
 		// 4.bis Extended fallExtendedFallOffReactionsoff reactions
@@ -1738,59 +1803,59 @@ namespace OpenSMOKE
 
 		// 5. Correct the effective kinetic constants: CABR reactions
 		ChemicallyActivatedBimolecularReactions(cTot, c);
-		for(unsigned int s=1;s<=number_of_cabr_reactions_;s++)
+		for(unsigned int s=0;s<number_of_cabr_reactions_;s++)
 		{
-			const unsigned int j=indices_of_cabr_reactions_[s];
-			kArrheniusModified_[j] *= correction_cabr_[s];
+			const unsigned int j=indices_of_cabr_reactions__[s];
+			kArrheniusModified__[j-1] *= correction_cabr__[s];
 		}
 
 		if (type == PhysicalConstants::SENSITIVITY_KINETIC_CONSTANT)
 		{
-			parameter = kArrheniusModified_[jReaction];
-			kArrheniusModified_ = 0.;
-			kArrheniusModified_[jReaction] = 1.;
+			parameter = kArrheniusModified__[jReaction-1];
+			std::fill(kArrheniusModified__.begin(), kArrheniusModified__.end(), 0.);
+			kArrheniusModified__[jReaction-1] = 1.;
 		}
 		else if (type == PhysicalConstants::SENSITIVITY_FREQUENCY_FACTOR)
 		{
 			if (jReaction <= this->number_of_reactions_)
 			{
-				const double tmp = kArrheniusModified_[jReaction];
-				kArrheniusModified_ = 0.;
-				kArrheniusModified_[jReaction] = tmp;
-				parameter =  sign_lnA_[jReaction]*std::exp(lnA_[jReaction]);
+				const double tmp = kArrheniusModified__[jReaction-1];
+				std::fill(kArrheniusModified__.begin(), kArrheniusModified__.end(), 0.);
+				kArrheniusModified__[jReaction-1] = tmp;
+				parameter =  sign_lnA__[jReaction-1]*std::exp(lnA__[jReaction-1]);
 
-				if (type_of_reaction_[jReaction] == PhysicalConstants::REACTION_LINDEMANN_FALLOFF || 
-					type_of_reaction_[jReaction] == PhysicalConstants::REACTION_TROE_FALLOFF ||
-					type_of_reaction_[jReaction] == PhysicalConstants::REACTION_SRI_FALLOFF)
+				if (type_of_reaction__[jReaction-1] == PhysicalConstants::REACTION_LINDEMANN_FALLOFF || 
+					type_of_reaction__[jReaction-1] == PhysicalConstants::REACTION_TROE_FALLOFF ||
+					type_of_reaction__[jReaction-1] == PhysicalConstants::REACTION_SRI_FALLOFF)
 				{
-					unsigned int jFallOff = local_family_index_[jReaction];
-					double	kInf = std::exp(lnA_falloff_inf_[jFallOff] + Beta_falloff_inf_[jFallOff]*this->logT_ - E_over_R_falloff_inf_[jFallOff]*this->uT_);
+					unsigned int jFallOff = local_family_index__[jReaction-1];
+					double	kInf = std::exp(lnA_falloff_inf__[jFallOff-1] + Beta_falloff_inf__[jFallOff-1]*this->logT_ - E_over_R_falloff_inf__[jFallOff-1]*this->uT_);
 					double F, dF_over_dA0, dF_over_dAInf;
 					this->FallOffReactions(jFallOff, cTot, c, F, dF_over_dA0, dF_over_dAInf);
 
-					kArrheniusModified_[jReaction] = kArrheniusModified_[jReaction] / std::exp(lnA_[jReaction]) * (1.-kArrheniusModified_[jReaction]/kInf/F) +
-											 kArrheniusModified_[jReaction]/F*dF_over_dA0;			
+					kArrheniusModified__[jReaction-1] = kArrheniusModified__[jReaction-1] / std::exp(lnA__[jReaction-1]) * (1.-kArrheniusModified__[jReaction-1]/kInf/F) +
+														kArrheniusModified__[jReaction-1]/F*dF_over_dA0;			
 				}
-				else if (type_of_reaction_[jReaction] == PhysicalConstants::REACTION_LINDEMANN_CABR || 
-						 type_of_reaction_[jReaction] == PhysicalConstants::REACTION_TROE_CABR ||
-						 type_of_reaction_[jReaction] == PhysicalConstants::REACTION_SRI_CABR)
+				else if (type_of_reaction__[jReaction-1] == PhysicalConstants::REACTION_LINDEMANN_CABR || 
+						 type_of_reaction__[jReaction-1] == PhysicalConstants::REACTION_TROE_CABR ||
+						 type_of_reaction__[jReaction-1] == PhysicalConstants::REACTION_SRI_CABR)
 				{
-					unsigned int jCABR = local_family_index_[jReaction];
-					double	k0   = std::exp(lnA_[jReaction] + Beta_[jReaction]*this->logT_ - E_over_R_[jReaction]*this->uT_);
+					unsigned int jCABR = local_family_index__[jReaction-1];
+					double	k0   = std::exp(lnA__[jReaction-1] + Beta__[jReaction-1]*this->logT_ - E_over_R__[jReaction-1]*this->uT_);
 
 					double F, dF_over_dA0, dF_over_dAInf;
 					ChemicallyActivatedBimolecularReactions(jCABR, cTot, c, F, dF_over_dA0, dF_over_dAInf);
-					kArrheniusModified_[jReaction] = kArrheniusModified_[jReaction]*kArrheniusModified_[jReaction] / std::exp(lnA_[jReaction])/k0/F +
-											 kArrheniusModified_[jReaction]/F*dF_over_dA0;
+					kArrheniusModified__[jReaction-1] = kArrheniusModified__[jReaction-1]*kArrheniusModified__[jReaction-1] / std::exp(lnA__[jReaction-1])/k0/F +
+														kArrheniusModified__[jReaction-1]/F*dF_over_dA0;
 				}
-				else if (type_of_reaction_[jReaction] == PhysicalConstants::REACTION_CHEBYSHEV)
+				else if (type_of_reaction__[jReaction-1] == PhysicalConstants::REACTION_CHEBYSHEV)
 				{
-					parameter = kArrheniusModified_[jReaction];
-					kArrheniusModified_[jReaction] = 1.;
+					parameter = kArrheniusModified__[jReaction-1];
+					kArrheniusModified__[jReaction-1] = 1.;
 				}
 				else
 				{
-					kArrheniusModified_[jReaction] = kArrheniusModified_[jReaction] / (sign_lnA_[jReaction]*std::exp(lnA_[jReaction]));
+					kArrheniusModified__[jReaction-1] = kArrheniusModified__[jReaction-1] / (sign_lnA__[jReaction-1]*std::exp(lnA__[jReaction-1]));
 				}
 			}
 
@@ -1800,47 +1865,47 @@ namespace OpenSMOKE
 				if (jReaction <= this->number_of_reactions_ + number_of_falloff_reactions_)
 				{
 					unsigned int jFallOff = jReaction - this->number_of_reactions_;
-					unsigned int index_global = indices_of_falloff_reactions_[jFallOff];
-					const double tmp = kArrheniusModified_[index_global];
-					kArrheniusModified_ = 0.;
-					kArrheniusModified_[index_global] = tmp;
-					parameter =  std::exp(lnA_falloff_inf_[jFallOff]);
+					unsigned int index_global = indices_of_falloff_reactions__[jFallOff-1];
+					const double tmp = kArrheniusModified__[index_global-1];
+					std::fill(kArrheniusModified__.begin(), kArrheniusModified__.end(), 0.);
+					kArrheniusModified__[index_global-1] = tmp;
+					parameter =  std::exp(lnA_falloff_inf__[jFallOff-1]);
 
-					double	kInf = std::exp(lnA_falloff_inf_[jFallOff] + Beta_falloff_inf_[jFallOff]*this->logT_ - E_over_R_falloff_inf_[jFallOff]*this->uT_);
+					double	kInf = std::exp(lnA_falloff_inf__[jFallOff-1] + Beta_falloff_inf__[jFallOff-1]*this->logT_ - E_over_R_falloff_inf__[jFallOff-1]*this->uT_);
 					
 					double F = 0.;
 					double dF_over_dA0 = 0.; 
 					double dF_over_dAInf = 0.;
 					FallOffReactions(jFallOff, cTot, c, F, dF_over_dA0, dF_over_dAInf);
 
-					kArrheniusModified_[index_global] = kArrheniusModified_[index_global] / F * 
-														( kArrheniusModified_[index_global]/std::exp(lnA_falloff_inf_[jFallOff])/kInf + dF_over_dAInf);	
+					kArrheniusModified__[index_global-1] = kArrheniusModified__[index_global-1] / F * 
+														 ( kArrheniusModified__[index_global-1]/std::exp(lnA_falloff_inf__[jFallOff-1])/kInf + dF_over_dAInf);	
 
 					if (parameter == 0.) std::cout << "parameter " << jReaction - this->number_of_reactions_ << std::endl;
 					if (F == 0.) std::cout << "Falloff inv F " << jReaction - this->number_of_reactions_ << std::endl;
 					if (kInf == 0.) std::cout << "Falloff inv kInf " << jReaction - this->number_of_reactions_ << std::endl;
-					if (std::exp(lnA_falloff_inf_[jFallOff]) == 0.) std::cout << "Falloff inv exp " << jReaction - this->number_of_reactions_ << std::endl;
+					if (std::exp(lnA_falloff_inf__[jFallOff-1]) == 0.) std::cout << "Falloff inv exp " << jReaction - this->number_of_reactions_ << std::endl;
 
 				}
 				// CABR reactions
 				else if (jReaction <= this->number_of_reactions_ + number_of_falloff_reactions_ +  number_of_cabr_reactions_)
 				{
 					unsigned int jCABR = jReaction - this->number_of_reactions_ - number_of_falloff_reactions_;
-					unsigned int index_global = indices_of_cabr_reactions_[jCABR];
-					const double tmp = kArrheniusModified_[index_global];
-					kArrheniusModified_ = 0.;
-					kArrheniusModified_[index_global] = tmp;
-					parameter =  std::exp(lnA_falloff_inf_[jCABR]);
+					unsigned int index_global = indices_of_cabr_reactions__[jCABR-1];
+					const double tmp = kArrheniusModified__[index_global-1];
+					std::fill(kArrheniusModified__.begin(), kArrheniusModified__.end(), 0.);
+					kArrheniusModified__[index_global-1] = tmp;
+					parameter =  std::exp(lnA_falloff_inf__[jCABR-1]);
 
-					double	k0   = std::exp(lnA_[index_global] + Beta_[index_global]*this->logT_ - E_over_R_[index_global]*this->uT_);
+					double	k0   = std::exp(lnA__[index_global-1] + Beta__[index_global-1]*this->logT_ - E_over_R__[index_global-1]*this->uT_);
 
 					double F = 0.;
 					double dF_over_dA0 = 0.;
 					double dF_over_dAInf = 0.;
 					ChemicallyActivatedBimolecularReactions(jCABR, cTot, c, F, dF_over_dA0, dF_over_dAInf);
 					
-					kArrheniusModified_[index_global] = kArrheniusModified_[index_global] / F * 
-											    ( kArrheniusModified_[index_global]/std::exp(lnA_cabr_inf_[jCABR])/k0 + dF_over_dAInf);	
+					kArrheniusModified__[index_global-1] = kArrheniusModified__[index_global-1] / F * 
+														 ( kArrheniusModified__[index_global-1]/std::exp(lnA_cabr_inf__[jCABR-1])/k0 + dF_over_dAInf);	
 				}
 			}
 		}
@@ -1851,78 +1916,71 @@ namespace OpenSMOKE
 		// in the kinetic scheme, not only for the reversible reactions. After calling the
 		// function reported below the value of reverseReactionRates_ vector for non reversible
 		// reactions is put equal to 1.
-		stoichiometry_->ProductOfConcentrations(forwardReactionRates_, reverseReactionRates_, c);
+		stoichiometry_->ProductOfConcentrations(forwardReactionRates__, reverseReactionRates__, c);
 		
 		// Corrects the product of concentrations for reverse reaction by the 
 		// thermodynamic equilibrium constant
-		for(unsigned int k=1;k<=number_of_thermodynamic_reversible_reactions_;k++)
+		for(unsigned int k=0;k<number_of_thermodynamic_reversible_reactions_;k++)
 		{
-			unsigned int j = indices_of_thermodynamic_reversible_reactions_[k];
-			reverseReactionRates_[j] *= uKeq_[k];
+			unsigned int j = indices_of_thermodynamic_reversible_reactions__[k];
+			reverseReactionRates__[j-1] *= uKeq__[k];
 		}
 
-		// Corrects the product of concentrations for reverse reaction by the 
-		// explicit Arrhenius kinetic parameters (if provided)
-//		for(unsigned int k=1;k<=number_of_explicitly_reversible_reactions_;k++)
-//		{
-//			unsigned int j = indices_of_explicitly_reversible_reactions_[k];
-		//	reverseReactionRates_[j] *= kArrhenius_reversible_[k]/kArrheniusModified_[j];
-//			if (j==jReaction)
-//				reverseReactionRates_[j] *= kArrhenius_reversible_[k]/parameter;
-//			else
-//				reverseReactionRates_[j] = 0.;
-//		}
-
-		for(unsigned int k=1;k<=number_of_explicitly_reversible_reactions_;k++)
+		for(unsigned int k=0;k<number_of_explicitly_reversible_reactions_;k++)
 		{
-			unsigned int j = indices_of_explicitly_reversible_reactions_[k];
+			unsigned int j = indices_of_explicitly_reversible_reactions__[k];
 			if (j==jReaction)
-				reverseReactionRates_[j] *= kArrhenius_reversible_[k]/kArrhenius_[j];
+				reverseReactionRates__[j-1] *= kArrhenius_reversible__[k]/kArrhenius__[j-1];
 			else
-				reverseReactionRates_[j] = 0.;
+				reverseReactionRates__[j-1] = 0.;
 		}
 
 		// Calculates the net reaction rate
 		// Be careful: the netReactionRates_ vector must be multiplied by the effective 
 		// forward kinetic constant, to obtain the real reaction rates in [kmol/m3/s]
-		netReactionRates_ = forwardReactionRates_;
-		for(unsigned int k=1;k<=number_of_reversible_reactions_;k++)
+		netReactionRates__ = forwardReactionRates__;
+		for(unsigned int k=0;k<number_of_reversible_reactions_;k++)
 		{
-			unsigned int j = indices_of_reversible_reactions_[k];
-			netReactionRates_[j] -= reverseReactionRates_[j];
+			unsigned int j = indices_of_reversible_reactions__[k]-1;
+			netReactionRates__[j] -= reverseReactionRates__[j];
 		}
 
 		// Multiplies the net reaction rate by the effective kinetic constant (accounting for 
 		// third-body effects, fall-off, etc.). At the end of this function the netReactionRates_
 		// vector contains the net reaction rates of all the reactions in [kmol/m3/s]
-		ElementByElementProduct(netReactionRates_, kArrheniusModified_, &netReactionRates_);
+		// TODO ElementByElementProduct(netReactionRates_, kArrheniusModified__, &netReactionRates_);
+		for (unsigned int i = 0; i < netReactionRates__.size(); i++)
+			netReactionRates__[i] *= kArrheniusModified__[i];
 	}
 
-	void KineticsMap_CHEMKIN::FormationRates(OpenSMOKEVectorDouble* R)
+	void KineticsMap_CHEMKIN::FormationRates(double* R)
 	{
-		stoichiometry_->FormationRatesFromReactionRates(R, netReactionRates_);
+		stoichiometry_->FormationRatesFromReactionRates(R, netReactionRates__.data());
 	}
 
-	double KineticsMap_CHEMKIN::HeatRelease(const OpenSMOKEVectorDouble& R)
+	double KineticsMap_CHEMKIN::HeatRelease(const double* R)
 	{
-		return -Dot(R, thermodynamics_.species_h_over_RT()) * PhysicalConstants::R_J_kmol * this->T_;
+		return -Dot(this->number_of_species_, R, thermodynamics_.Species_H_over_RT().data()) * PhysicalConstants::R_J_kmol * this->T_;
 	}
 
-	void KineticsMap_CHEMKIN::SensitivityWithRespectKineticParameter(const PhysicalConstants::sensitivity_type type, const unsigned int k, const OpenSMOKEVectorDouble& c, OpenSMOKEVectorDouble* Jalfa, double& parameter)
-	{
-		DerivativesOfReactionRatesWithRespectToKineticParameters(type, k, c, parameter);
-		stoichiometry_->FormationRatesFromReactionRates(Jalfa, netReactionRates_);
-	}
-
-	void KineticsMap_CHEMKIN::SensitivityWithRespectKineticParameter(const PhysicalConstants::sensitivity_type type, const EnergyEquationType energy_type, const unsigned int k, const OpenSMOKEVectorDouble& c, const OpenSMOKEVectorDouble& mole_fractions, OpenSMOKEVectorDouble* Jalfa, double& JT, double& parameter)
+	void KineticsMap_CHEMKIN::SensitivityWithRespectKineticParameter(const PhysicalConstants::sensitivity_type type, const unsigned int k, const double* c, double* Jalfa, double& parameter)
 	{
 		DerivativesOfReactionRatesWithRespectToKineticParameters(type, k, c, parameter);
-		stoichiometry_->FormationRatesFromReactionRates(Jalfa, netReactionRates_);
+		stoichiometry_->FormationRatesFromReactionRates(Jalfa, netReactionRates__.data());
+	}
+
+	void KineticsMap_CHEMKIN::SensitivityWithRespectKineticParameter(const PhysicalConstants::sensitivity_type type, const EnergyEquationType energy_type, const unsigned int k, const double* c, const double* mole_fractions, double* Jalfa, double& JT, double& parameter)
+	{
+		DerivativesOfReactionRatesWithRespectToKineticParameters(type, k, c, parameter);
+		stoichiometry_->FormationRatesFromReactionRates(Jalfa, netReactionRates__.data());
 		
-		JT  = HeatRelease(*Jalfa);
+		JT  = HeatRelease(Jalfa);
 		if (energy_type == CONSTANT_VOLUME_SYSTEM)
 		{
-			double sumMoleFormationRates = (*Jalfa).SumElements();
+			double sumMoleFormationRates = 0.;
+			for(unsigned int i=0;i<this->number_of_species_;i++)
+				sumMoleFormationRates += Jalfa[i];
+
 			JT  += PhysicalConstants::R_J_kmol*this->T_*sumMoleFormationRates;
 		}	
 		if (energy_type == PLUGFLOW_SYSTEM)
@@ -1932,88 +1990,95 @@ namespace OpenSMOKE
 		}	
 	}
  
-	void KineticsMap_CHEMKIN::SensitivityWithRespectKineticParameter(const PhysicalConstants::sensitivity_type type, const EnergyEquationType energy_type, const unsigned int k, const OpenSMOKEVectorDouble& c, const OpenSMOKEVectorDouble& mole_fractions, OpenSMOKEVectorDouble* Jalfa, double& JT, double& Jrho, double& parameter)
+	void KineticsMap_CHEMKIN::SensitivityWithRespectKineticParameter(const PhysicalConstants::sensitivity_type type, const EnergyEquationType energy_type, const unsigned int k, const double* c, const double* mole_fractions, double* Jalfa, double& JT, double& Jrho, double& parameter)
 	{
 		DerivativesOfReactionRatesWithRespectToKineticParameters(type, k, c, parameter);
-		stoichiometry_->FormationRatesFromReactionRates(Jalfa, netReactionRates_);
+		stoichiometry_->FormationRatesFromReactionRates(Jalfa, netReactionRates__.data());
 		
-		double CpMixMolar;
-		thermodynamics_.cpMolar_Mixture_From_MoleFractions(CpMixMolar, mole_fractions);
+		const double CpMixMolar = thermodynamics_.cpMolar_Mixture_From_MoleFractions(mole_fractions);
 		
-		const double dQR_over_parameter = HeatRelease(*Jalfa);
-		double sumMoleFormationRates = (*Jalfa).SumElements();
+		const double dQR_over_parameter = HeatRelease(Jalfa);
+		
+		double sumMoleFormationRates = 0.;
+		for (unsigned int i = 0; i<this->number_of_species_; i++)
+			sumMoleFormationRates += Jalfa[i];
+
 		JT    =  dQR_over_parameter;
 		Jrho  = - (dQR_over_parameter/CpMixMolar + this->T_*sumMoleFormationRates);
 	}
 
 
 	// This version seems to be wrong
-	void KineticsMap_CHEMKIN::ProductionAndDestructionRatesGross(OpenSMOKEVectorDouble* P, OpenSMOKEVectorDouble* D)
+	void KineticsMap_CHEMKIN::ProductionAndDestructionRatesGross(double* P, double* D)
 	{
-		OpenSMOKEVectorDouble forward_(this->number_of_reactions_);
-		OpenSMOKEVectorDouble backward_(this->number_of_reactions_);
+		std::vector<double> forward_(this->number_of_reactions_);
+		std::vector<double> backward_(this->number_of_reactions_);
 
-		GetForwardReactionRates(&forward_);
-		GetBackwardReactionRates(&backward_);
+		GetForwardReactionRates(forward_.data());
+		GetBackwardReactionRates(backward_.data());
 
-		stoichiometry_->ProductionAndDestructionRatesFromReactionRatesGross(P, D, forward_, backward_);
+		stoichiometry_->ProductionAndDestructionRatesFromReactionRatesGross(P, D, forward_.data(), backward_.data());
 	}
 	
-	void KineticsMap_CHEMKIN::ProductionAndDestructionRates(OpenSMOKEVectorDouble* P, OpenSMOKEVectorDouble* D)
+	void KineticsMap_CHEMKIN::ProductionAndDestructionRates(double* P, double* D)
 	{
-		stoichiometry_->ProductionAndDestructionRatesFromReactionRates(P, D, netReactionRates_);
+		stoichiometry_->ProductionAndDestructionRatesFromReactionRates(P, D, netReactionRates__.data());
 	}
  
 	void KineticsMap_CHEMKIN::RateOfProductionAnalysis(const bool iNormalize) const
 	{
-		stoichiometry_->RateOfProductionAnalysis(netReactionRates_, iNormalize);
+		stoichiometry_->RateOfProductionAnalysis(netReactionRates__.data(), iNormalize);
 	}
 
 	void KineticsMap_CHEMKIN::RateOfProductionAnalysis(std::ostream& fout) const
 	{
-		stoichiometry_->RateOfProductionAnalysis(netReactionRates_, false);
+		stoichiometry_->RateOfProductionAnalysis(netReactionRates__.data(), false);
 		stoichiometry_->WriteRateOfProductionAnalysis(fout);
 	}
 
 	void KineticsMap_CHEMKIN::RateOfProductionAnalysis(ROPA_Data& ropa) const
 	{
-		stoichiometry_->RateOfProductionAnalysis(netReactionRates_, false);
+		stoichiometry_->RateOfProductionAnalysis(netReactionRates__.data(), false);
 		stoichiometry_->WriteRateOfProductionAnalysis(ropa);
 	}
 
-	void KineticsMap_CHEMKIN::RateOfProductionAnalysis(ROPA_Data& ropa, const OpenSMOKE::OpenSMOKEVectorDouble& rf, const OpenSMOKE::OpenSMOKEVectorDouble& rb) const
+	void KineticsMap_CHEMKIN::RateOfProductionAnalysis(ROPA_Data& ropa, const double* rf, const double* rb) const
 	{
 		stoichiometry_->RateOfProductionAnalysis(rf, rb);
 		stoichiometry_->WriteRateOfProductionAnalysis(ropa);
 	}
 
-	const OpenSMOKEVectorDouble& KineticsMap_CHEMKIN::GetReactionRates()
+	const std::vector<double>& KineticsMap_CHEMKIN::GiveMeReactionRates()
 	{
-		return netReactionRates_;
+		return netReactionRates__;
 	}
 
-	void KineticsMap_CHEMKIN::GetReactionRates(OpenSMOKEVectorDouble* r)
+	void KineticsMap_CHEMKIN::GiveMeReactionRates(double* r)
 	{
-		*r = netReactionRates_;
+		for(unsigned int i=0;i<netReactionRates__.size();i++)
+			r[i] = netReactionRates__[i];
 	}
 
-	void KineticsMap_CHEMKIN::GetForwardReactionRates(OpenSMOKEVectorDouble* r)
+	void KineticsMap_CHEMKIN::GetForwardReactionRates(double* r)
 	{
-		ElementByElementProduct(forwardReactionRates_, kArrheniusModified_, r);
+		// TODO ElementByElementProduct(forwardReactionRates_, kArrheniusModified__, r);
+
+		for (unsigned int i = 0; i < kArrheniusModified__.size(); i++)
+			r[i] = kArrheniusModified__[i]*forwardReactionRates__[i];
 	}
 
-	void KineticsMap_CHEMKIN::GetBackwardReactionRates(OpenSMOKEVectorDouble* r)
+	void KineticsMap_CHEMKIN::GetBackwardReactionRates(double* r)
 	{
 		*r = 0.;
-		for(unsigned int k=1;k<=number_of_reversible_reactions_;k++)
+		for(unsigned int k=0;k<number_of_reversible_reactions_;k++)
 		{
-			unsigned int j = indices_of_reversible_reactions_[k];
-			(*r)[j] = reverseReactionRates_[j]*kArrheniusModified_[j];
+			unsigned int j = indices_of_reversible_reactions__[k]-1;
+			r[j] = reverseReactionRates__[j]*kArrheniusModified__[j];
 		}
-		for(unsigned int k=1;k<=number_of_explicitly_reversible_reactions_;k++)
+		for(unsigned int k=0;k<number_of_explicitly_reversible_reactions_;k++)
 		{
-			unsigned int j = indices_of_explicitly_reversible_reactions_[k];
-			(*r)[j] = reverseReactionRates_[j]*kArrheniusModified_[j];
+			unsigned int j = indices_of_explicitly_reversible_reactions__[k]-1;
+			r[j] = reverseReactionRates__[j]*kArrheniusModified__[j];
 		}                
 	}
 
@@ -2025,12 +2090,12 @@ namespace OpenSMOKE
 		SetPressure(101325.);
 		ReactionEnthalpiesAndEntropies();
 		
-		fOut    << std::setw(14) << std::left << std::setprecision(3) << std::fixed << (reaction_h_over_RT_[k]-reaction_s_over_R_[k])*PhysicalConstants::R_kcal_mol*this->T_;	// [kcal/mol]
-		fOut    << std::setw(14) << std::left << std::setprecision(3) << std::fixed << reaction_h_over_RT_[k] *PhysicalConstants::R_kcal_mol*this->T_;;							// [kcal/mol]
-		fOut    << std::setw(14) << std::left << std::setprecision(3) << std::fixed << reaction_s_over_R_[k] *PhysicalConstants::R_cal_mol;;									// [cal/mol/K]
+		fOut    << std::setw(14) << std::left << std::setprecision(3) << std::fixed << (reaction_h_over_RT__[k-1]-reaction_s_over_R__[k-1])*PhysicalConstants::R_kcal_mol*this->T_;	// [kcal/mol]
+		fOut    << std::setw(14) << std::left << std::setprecision(3) << std::fixed << reaction_h_over_RT__[k-1] *PhysicalConstants::R_kcal_mol*this->T_;;							// [kcal/mol]
+		fOut    << std::setw(14) << std::left << std::setprecision(3) << std::fixed << reaction_s_over_R__[k-1] *PhysicalConstants::R_cal_mol;;									// [cal/mol/K]
 	}
 
-	void KineticsMap_CHEMKIN::WriteKineticData(std::ostream& fOut, const unsigned int k, OpenSMOKEVectorDouble& c_bath, const std::vector<double> list_of_temperatures, const double conversion_forward, const double conversion_backward)
+	void KineticsMap_CHEMKIN::WriteKineticData(std::ostream& fOut, const unsigned int k, const double* c_bath, const std::vector<double> list_of_temperatures, const double conversion_forward, const double conversion_backward)
 	{			
 		const double patm = 101325.;
 		SetPressure(patm);
@@ -2072,20 +2137,20 @@ namespace OpenSMOKE
 			fOut << "    " << std::setw(14) << std::left << std::setprecision(0) << std::fixed << temperatures[i];
 			
 			// Forward kinetic constant [kmol, m3, s]
-			fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << kArrheniusModified_[k];
+			fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << kArrheniusModified__[k-1];
 
 			// Equilibrium and Backward kinetic constant [kmol, m3, s]
-			if (isThermodynamicallyReversible_[k] != 0)
+			if (isThermodynamicallyReversible__[k-1] != 0)
 			{
-				const unsigned int j = isThermodynamicallyReversible_[k];
-				fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << 1./uKeq_[j];
-				fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << kArrheniusModified_[k]*uKeq_[j];
+				const unsigned int j = isThermodynamicallyReversible__[k-1];
+				fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << 1./uKeq__[j-1];
+				fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << kArrheniusModified__[k-1]*uKeq__[j-1];
 			}
-			else if (isExplicitlyReversible_[k] != 0)
+			else if (isExplicitlyReversible__[k-1] != 0)
 			{
-				const unsigned int j = isExplicitlyReversible_[k];
-				fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << kArrheniusModified_[k]/kArrhenius_reversible_[j];
-				fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << kArrhenius_reversible_[j];
+				const unsigned int j = isExplicitlyReversible__[k-1];
+				fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << kArrheniusModified__[k-1]/kArrhenius_reversible__[j-1];
+				fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << kArrhenius_reversible__[j-1];
 			}
 			else
 			{
@@ -2094,23 +2159,23 @@ namespace OpenSMOKE
 			}
 
 			// Thermodynamic data
-			fOut    << std::setw(14) << std::left << std::setprecision(3) << std::fixed << (reaction_h_over_RT_[k]-reaction_s_over_R_[k])*PhysicalConstants::R_kcal_mol*this->T_;	// [kcal/mol]
-			fOut    << std::setw(14) << std::left << std::setprecision(3) << std::fixed << reaction_h_over_RT_[k] *PhysicalConstants::R_kcal_mol*this->T_;;						// [kcal/mol]
-			fOut    << std::setw(14) << std::left << std::setprecision(3) << std::fixed << reaction_s_over_R_[k] *PhysicalConstants::R_cal_mol;;							// [cal/mol/K]
+			fOut    << std::setw(14) << std::left << std::setprecision(3) << std::fixed << (reaction_h_over_RT__[k-1]-reaction_s_over_R__[k-1])*PhysicalConstants::R_kcal_mol*this->T_;	// [kcal/mol]
+			fOut    << std::setw(14) << std::left << std::setprecision(3) << std::fixed << reaction_h_over_RT__[k-1] *PhysicalConstants::R_kcal_mol*this->T_;;						// [kcal/mol]
+			fOut    << std::setw(14) << std::left << std::setprecision(3) << std::fixed << reaction_s_over_R__[k-1] *PhysicalConstants::R_cal_mol;;							// [cal/mol/K]
 
 			// Forward kinetic constant [mol, cm3, s]
-			fOut    << std::setw(14) << std::left << std::setprecision(4) << std::scientific << kArrheniusModified_[k]*conversion_forward;
+			fOut    << std::setw(14) << std::left << std::setprecision(4) << std::scientific << kArrheniusModified__[k-1]*conversion_forward;
 
 			// Equilibrium and Backward kinetic constant [mol, cm3, s]
-			if (isThermodynamicallyReversible_[k] != 0)
+			if (isThermodynamicallyReversible__[k-1] != 0)
 			{
-				const unsigned int j = isThermodynamicallyReversible_[k];
-				fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << kArrheniusModified_[k]*uKeq_[j]*conversion_backward;
+				const unsigned int j = isThermodynamicallyReversible__[k-1];
+				fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << kArrheniusModified__[k-1]*uKeq__[j-1]*conversion_backward;
 			}
-			else if (isExplicitlyReversible_[k] != 0)
+			else if (isExplicitlyReversible__[k-1] != 0)
 			{
-				const unsigned int j = isExplicitlyReversible_[k];
-				fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << kArrhenius_reversible_[j]*conversion_backward;
+				const unsigned int j = isExplicitlyReversible__[k-1];
+				fOut << std::setw(14) << std::left << std::setprecision(3) << std::scientific << kArrhenius_reversible__[j-1]*conversion_backward;
 			}
 			else
 			{
@@ -2123,8 +2188,12 @@ namespace OpenSMOKE
 		fOut << std::endl;
 	}
 
-	void KineticsMap_CHEMKIN::WriteKineticData(std::ostream& fOut, const unsigned int k, const double T, const double P_Pa, OpenSMOKEVectorDouble& c)
+	void KineticsMap_CHEMKIN::WriteKineticData(std::ostream& fOut, const unsigned int k, const double T, const double P_Pa, const double* c)
 	{
+		double cTot = 0.;
+		for (unsigned int i = 0; i < this->number_of_species_; i++)
+			cTot += c[i];
+
 		SetPressure(P_Pa);
 		thermodynamics_.SetPressure(P_Pa);
 		SetTemperature(T);
@@ -2153,20 +2222,20 @@ namespace OpenSMOKE
 		fOut << std::setw(16) << std::left << k;
 
 		// Forward kinetic constant [kmol, m3, s]
-		fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << kArrheniusModified_[k];
+		fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << kArrheniusModified__[k-1];
 
 		// Equilibrium and Backward kinetic constant [kmol, m3, s]
-		if (isThermodynamicallyReversible_[k] != 0)
+		if (isThermodynamicallyReversible__[k-1] != 0)
 		{
-			const unsigned int j = isThermodynamicallyReversible_[k];
-			fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << 1. / uKeq_[j];
-			fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << kArrheniusModified_[k] * uKeq_[j];
+			const unsigned int j = isThermodynamicallyReversible__[k-1];
+			fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << 1. / uKeq__[j-1];
+			fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << kArrheniusModified__[k-1] * uKeq__[j-1];
 		}
-		else if (isExplicitlyReversible_[k] != 0)
+		else if (isExplicitlyReversible__[k-1] != 0)
 		{
-			const unsigned int j = isExplicitlyReversible_[k];
-			fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << kArrheniusModified_[k] / kArrhenius_reversible_[j];
-			fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << kArrhenius_reversible_[j];
+			const unsigned int j = isExplicitlyReversible__[k-1];
+			fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << kArrheniusModified__[k-1] / kArrhenius_reversible__[j-1];
+			fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << kArrhenius_reversible__[j-1];
 		}
 		else
 		{
@@ -2175,22 +2244,22 @@ namespace OpenSMOKE
 		}
 
 		// Thermodynamic data
-		fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << (reaction_h_over_RT_[k] - reaction_s_over_R_[k])*PhysicalConstants::R_kcal_mol*this->T_;	// [kcal/mol]
-		fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << reaction_h_over_RT_[k] * PhysicalConstants::R_kcal_mol*this->T_;;						// [kcal/mol]
-		fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << reaction_s_over_R_[k] * PhysicalConstants::R_kcal_mol;;							// [kcal/mol/K]
+		fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << (reaction_h_over_RT__[k-1] - reaction_s_over_R__[k-1])*PhysicalConstants::R_kcal_mol*this->T_;	// [kcal/mol]
+		fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << reaction_h_over_RT__[k-1] * PhysicalConstants::R_kcal_mol*this->T_;;						// [kcal/mol]
+		fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << reaction_s_over_R__[k-1] * PhysicalConstants::R_kcal_mol;;							// [kcal/mol/K]
 
 
-		if (type_of_reaction_[k] == PhysicalConstants::REACTION_LINDEMANN_FALLOFF ||
-			type_of_reaction_[k] == PhysicalConstants::REACTION_TROE_FALLOFF ||
-			type_of_reaction_[k] == PhysicalConstants::REACTION_SRI_FALLOFF)
+		if (type_of_reaction__[k-1] == PhysicalConstants::REACTION_LINDEMANN_FALLOFF ||
+			type_of_reaction__[k-1] == PhysicalConstants::REACTION_TROE_FALLOFF ||
+			type_of_reaction__[k-1] == PhysicalConstants::REACTION_SRI_FALLOFF)
 		{
-			unsigned int jFallOff = local_family_index_[k];
-			double	kInf = std::exp(lnA_falloff_inf_[jFallOff] + Beta_falloff_inf_[jFallOff] * this->logT_ - E_over_R_falloff_inf_[jFallOff] * this->uT_);
+			unsigned int jFallOff = local_family_index__[k-1];
+			double	kInf = std::exp(lnA_falloff_inf__[jFallOff-1] + Beta_falloff_inf__[jFallOff-1] * this->logT_ - E_over_R_falloff_inf__[jFallOff-1] * this->uT_);
 			
 			double F = 0.;
 			double dF_over_dA0 = 0.;
 			double dF_over_dAInf = 0.;
-			this->FallOffReactions(jFallOff, c.SumElements(), c, F, dF_over_dA0, dF_over_dAInf);
+			this->FallOffReactions(jFallOff, cTot, c, F, dF_over_dA0, dF_over_dAInf);
 
 			fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << kInf;
 			fOut << std::setw(16) << std::left << std::setprecision(6) << std::scientific << F;
@@ -2204,7 +2273,7 @@ namespace OpenSMOKE
 		fOut << std::endl;
 	}
 
-	void KineticsMap_CHEMKIN::FittedReverseKineticConstants(const OpenSMOKEVectorDouble& x_bath, const unsigned int nparameters, Eigen::MatrixXd& fittedKineticParameters, const bool only_reversible)
+	void KineticsMap_CHEMKIN::FittedReverseKineticConstants(const double* x_bath, const unsigned int nparameters, Eigen::MatrixXd& fittedKineticParameters, const bool only_reversible)
 	{			
 		unsigned int npoints = 11;
 		Eigen::VectorXd T(npoints);
@@ -2258,33 +2327,33 @@ namespace OpenSMOKE
 			Eigen::MatrixXd y(npoints, nr);
 			y.setConstant(0.);
 
-			OpenSMOKEVectorDouble c(x_bath.Size());
+			std::vector<double> c(this->number_of_species_);
 			for (unsigned int i = 1; i <= npoints; i++)
 			{
 				const double ctot = patm / PhysicalConstants::R_J_kmol / T(i - 1);
-				Product(ctot, x_bath, &c);
+				Prod(this->number_of_species_, ctot, x_bath, c.data());
 
 				SetTemperature(T(i - 1));
 				thermodynamics_.SetTemperature(T(i - 1));
 				ReactionEnthalpiesAndEntropies();
 				KineticConstants();
-				ReactionRates(c);
+				ReactionRates(c.data());
 
 				for (unsigned int k = 1; k <= this->number_of_reactions_; k++)
 				{
 					if (only_reversible == false)
 					{
-						double one_over_Keq = -reaction_s_over_R_[k] + reaction_h_over_RT_[k] - log_Patm_over_RT_ * changeOfMoles_[k];	
+						double one_over_Keq = -reaction_s_over_R__[k-1] + reaction_h_over_RT__[k-1] - log_Patm_over_RT_ * changeOfMoles__[k-1];	
 						one_over_Keq = std::exp(one_over_Keq);
 
-						y(i - 1, k - 1) = std::log(kArrheniusModified_[k]* one_over_Keq);
+						y(i - 1, k - 1) = std::log(kArrheniusModified__[k-1]* one_over_Keq);
 					}
 					else
 					{
-						if (isThermodynamicallyReversible_[k] != 0)
+						if (isThermodynamicallyReversible__[k-1] != 0)
 						{
-							const unsigned int j = isThermodynamicallyReversible_[k];
-							y(i - 1, j - 1) = std::log(kArrheniusModified_[k] * uKeq_[j]);
+							const unsigned int j = isThermodynamicallyReversible__[k-1];
+							y(i - 1, j - 1) = std::log(kArrheniusModified__[k-1] * uKeq__[j-1]);
 						}
 					}
 				}
@@ -2303,9 +2372,9 @@ namespace OpenSMOKE
 
 	void KineticsMap_CHEMKIN::FittedReverseKineticConstants(const unsigned int k, std::ostream& fOut, Eigen::MatrixXd& fittedKineticParameters)
 	{
-		if (isThermodynamicallyReversible_[k] != 0)
+		if (isThermodynamicallyReversible__[k-1] != 0)
 		{
-			const unsigned int j = isThermodynamicallyReversible_[k];
+			const unsigned int j = isThermodynamicallyReversible__[k-1];
 
 			fOut << std::setw(18) << std::right << std::scientific << std::setprecision(4) << std::exp(fittedKineticParameters(0, j-1));
 			if (fittedKineticParameters.rows() == 2)
@@ -2315,25 +2384,29 @@ namespace OpenSMOKE
 			fOut << std::setw(16) << std::right << std::fixed << std::setprecision(2) << fittedKineticParameters(1,j-1)/Conversions::J_from_kcal;
 			fOut << std::setw(5)  << "";
 		}
-		else if (isExplicitlyReversible_[k] != 0)
+		else if (isExplicitlyReversible__[k-1] != 0)
 		{
-			const unsigned int j = isExplicitlyReversible_[k];
+			const unsigned int j = isExplicitlyReversible__[k-1];
 				
-			fOut << std::setw(18) << std::right << std::scientific << std::setprecision(4) << std::exp(lnA_reversible_[j]);
-			fOut << std::setw(10) << std::right << std::fixed << std::setprecision(3) << Beta_reversible_[j];
-			fOut << std::setw(16) << std::right << std::fixed << std::setprecision(2) << E_over_R_reversible_[j];
+			fOut << std::setw(18) << std::right << std::scientific << std::setprecision(4) << std::exp(lnA_reversible__[j-1]);
+			fOut << std::setw(10) << std::right << std::fixed << std::setprecision(3) << Beta_reversible__[j-1];
+			fOut << std::setw(16) << std::right << std::fixed << std::setprecision(2) << E_over_R_reversible__[j-1];
 			fOut << std::setw(5)  << "";
 		}
 	}
 
-	void KineticsMap_CHEMKIN::DerivativesOfFormationRates(const OpenSMOKEVectorDouble& c, const OpenSMOKEVectorDouble& omega, OpenSMOKEMatrixDouble* dR_over_domega)
+	void KineticsMap_CHEMKIN::DerivativesOfFormationRates(const double* c, const double* omega, Eigen::MatrixXd* dR_over_domega)
 	{
-		OpenSMOKE::OpenSMOKEMatrixDouble dc_over_domega(this->number_of_species_, this->number_of_species_);
-		OpenSMOKE::OpenSMOKEMatrixDouble dR_over_dc(this->number_of_species_, this->number_of_species_);
+		Eigen::MatrixXd dc_over_domega(this->number_of_species_, this->number_of_species_);
+		Eigen::MatrixXd dR_over_dc(this->number_of_species_, this->number_of_species_);
 
-		double MW;
-		thermodynamics_.MolecularWeight_From_MassFractions(MW, omega);
-		double cTot = c.SumElements();
+		// Molecular weight [kg/kmol]
+		const double MW = thermodynamics_.MolecularWeight_From_MassFractions(omega);
+		
+		// Total concentration [kmol/m3]
+		double cTot = 0.;
+		for (unsigned int i = 0; i < this->number_of_species_; i++)
+			cTot += c[i];
 
 		thermodynamics_.DerivativesOfConcentrationsWithRespectToMassFractions(cTot, MW, omega, &dc_over_domega);
 		DerivativesOfFormationRates(c, &dR_over_dc);
@@ -2344,20 +2417,24 @@ namespace OpenSMOKE
 			{
 				double sum = 0.;
 				for(unsigned int j=1;j<=this->number_of_species_;j++)
-					sum += dR_over_dc[k][j] * dc_over_domega[j][i];
-				(*dR_over_domega)[k][i] = sum;
+					sum += dR_over_dc(k-1,j-1) * dc_over_domega(j-1,i-1);
+				(*dR_over_domega)(k-1,i-1) = sum;
 			}
 		}
 	}
 
-	void KineticsMap_CHEMKIN::Derivatives(const OpenSMOKEVectorDouble& c, const OpenSMOKEVectorDouble& omega, OpenSMOKEMatrixDouble* derivatives)
+	void KineticsMap_CHEMKIN::Derivatives(const double* c, const double* omega, Eigen::MatrixXd* derivatives)
 	{
-		OpenSMOKE::OpenSMOKEMatrixDouble dc_over_domega(this->number_of_species_, this->number_of_species_);
-		OpenSMOKE::OpenSMOKEMatrixDouble derivatives_over_dc(this->number_of_species_+1, this->number_of_species_+1);
+		Eigen::MatrixXd dc_over_domega(this->number_of_species_, this->number_of_species_);
+		Eigen::MatrixXd derivatives_over_dc(this->number_of_species_+1, this->number_of_species_+1);
 
-		double MW;
-		thermodynamics_.MolecularWeight_From_MassFractions(MW, omega);
-		double cTot = c.SumElements();
+		// Molecular weight [kg/kmol]
+		const double MW = thermodynamics_.MolecularWeight_From_MassFractions(omega);
+		
+		// Total concentration [kmol/m3]
+		double cTot = 0.;
+		for (unsigned int i = 0; i < this->number_of_species_; i++)
+			cTot += c[i];
 
 		thermodynamics_.DerivativesOfConcentrationsWithRespectToMassFractions(cTot, MW, omega, &dc_over_domega);
 		Derivatives(c, &derivatives_over_dc);
@@ -2368,8 +2445,8 @@ namespace OpenSMOKE
 			{
 				double sum = 0.;
 				for(unsigned int j=1;j<=this->number_of_species_;j++)
-					sum += derivatives_over_dc[k][j] * dc_over_domega[j][i];
-				(*derivatives)[k][i] = sum;
+					sum += derivatives_over_dc(k-1,j-1) * dc_over_domega(j-1,i-1);
+				(*derivatives)(k-1,i-1) = sum;
 			}
 		}
 
@@ -2377,33 +2454,36 @@ namespace OpenSMOKE
 		{
 			double sum = 0.;
 			for(unsigned int j=1;j<=this->number_of_species_;j++)
-				sum += derivatives_over_dc[this->number_of_species_+1][j] * dc_over_domega[j][i];
-			(*derivatives)[this->number_of_species_+1][i] = sum;
+				sum += derivatives_over_dc(this->number_of_species_,j-1) * dc_over_domega(j-1,i-1);
+			(*derivatives)(this->number_of_species_, i-1) = sum;
 		}
 
 		for(unsigned int i=1;i<=this->number_of_species_+1;i++)
-			(*derivatives)[i][this->number_of_species_+1] = derivatives_over_dc[i][this->number_of_species_+1];
+			(*derivatives)(i-1, this->number_of_species_) = derivatives_over_dc(i-1,this->number_of_species_);
 	}
 
-	void KineticsMap_CHEMKIN::DerivativesOfFormationRates(const OpenSMOKEVectorDouble& c, OpenSMOKEMatrixDouble* dR_over_dC)
+	void KineticsMap_CHEMKIN::DerivativesOfFormationRates(const double* c, Eigen::MatrixXd* dR_over_dC)
 	{
 		const double ZERO_DER = std::sqrt(OPENSMOKE_TINY_FLOAT);
 		const double ETA2 = std::sqrt(OPENSMOKE_MACH_EPS_DOUBLE);			
 		const double TOLR = 100. * OPENSMOKE_MACH_EPS_FLOAT;
 		const double TOLA = 1.e-10;
 		
-		OpenSMOKEVectorDouble c_plus = c;
+		OpenSMOKEVectorDouble c_plus(this->number_of_species_);
 		OpenSMOKEVectorDouble R_original(this->number_of_species_);
 		OpenSMOKEVectorDouble R_plus(this->number_of_species_);
 
+		for (unsigned int i = 0; i < this->number_of_species_; i++)
+			c_plus[i + 1] = c[i];
+
 		// Calculates centered values
 		ReactionRates(c);
-		FormationRates(&R_original);
+		FormationRates(R_original.GetHandle());
 
 		// derivata rispetto a ckd
 		for(unsigned int kd=1;kd<=this->number_of_species_;kd++)
 		{
-			if(c[kd] <= 1.e-100)
+			if(c[kd-1] <= 1.e-100)
 			{
 				double dc = 1.e-10 + 1.e-12 * c_plus[kd];
 				double udc = 3.e-8 * Max(c_plus[kd],1./dc);
@@ -2413,55 +2493,58 @@ namespace OpenSMOKE
 				c_plus[kd] += dc;
 				udc = 1./dc;
 
-				ReactionRates(c_plus);
-				FormationRates(&R_plus);
+				ReactionRates(c_plus.GetHandle());
+				FormationRates(R_plus.GetHandle());
 
 				for(unsigned int j=1;j<=this->number_of_species_;j++)
-					(*dR_over_dC)[j][kd] = (R_plus[j]-R_original[j]) * udc;
+					(*dR_over_dC)(j-1,kd-1) = (R_plus[j]-R_original[j]) * udc;
 
-				c_plus[kd] = c[kd];
+				c_plus[kd] = c[kd-1];
 			}
 			else
 			{
 				double hf = 1.e0;
-				double error_weight = 1./(TOLA+TOLR*std::fabs(c[kd]));
-				double hJ = ETA2 * std::fabs(std::max(c[kd], 1./error_weight));
+				double error_weight = 1./(TOLA+TOLR*std::fabs(c[kd-1]));
+				double hJ = ETA2 * std::fabs(std::max(c[kd-1], 1./error_weight));
 				double hJf = hf/error_weight;
 				hJ = std::max(hJ, hJf);
 				hJ = std::max(hJ, ZERO_DER);
 
 				// This is what is done by BzzMath
-				double dc = std::min(hJ, 1.e-3 + 1e-3*std::fabs(c[kd]));
+				double dc = std::min(hJ, 1.e-3 + 1e-3*std::fabs(c[kd-1]));
 
 				// Thisis what is done in the KPP
-				//double dc = TOLR*c[kd];
+				//double dc = TOLR*c[kd-1];
 
 				double udc = 1. / dc;
 				c_plus[kd] += dc;
 
-				ReactionRates(c_plus);
-				FormationRates(&R_plus);
+				ReactionRates(c_plus.GetHandle());
+				FormationRates(R_plus.GetHandle());
 
 				for(unsigned int j=1;j<=this->number_of_species_;j++)
-					(*dR_over_dC)[j][kd] = (R_plus[j]-R_original[j]) * udc;
+					(*dR_over_dC)(j-1,kd-1) = (R_plus[j]-R_original[j]) * udc;
 
-				c_plus[kd] = c[kd];
+				c_plus[kd] = c[kd-1];
 			}
 		}
 	}
 
-	void KineticsMap_CHEMKIN::Derivatives(const OpenSMOKEVectorDouble& c, OpenSMOKEMatrixDouble* derivatives, const bool constant_density)
+	void KineticsMap_CHEMKIN::Derivatives(const double* c, Eigen::MatrixXd* derivatives, const bool constant_density)
 	{
 		const double ZERO_DER = std::sqrt(OPENSMOKE_TINY_FLOAT);
 		const double ETA2 = std::sqrt(OPENSMOKE_MACH_EPS_DOUBLE);			
 		const double TOLR = 100. * OPENSMOKE_MACH_EPS_FLOAT;
 		const double TOLA = 1.e-10;
 	
-		OpenSMOKEVectorDouble c_plus = c;
+		double Q_original;
+		OpenSMOKEVectorDouble c_plus(this->number_of_species_);
 		OpenSMOKEVectorDouble R_original(this->number_of_species_);
 		OpenSMOKEVectorDouble R_plus(this->number_of_species_);
-		double Q_original;
 
+		for (unsigned int i = 0; i < this->number_of_species_; i++)
+			c_plus[i + 1] = c[i];
+		
 		SetTemperature(this->T_);
 		SetPressure(this->P_);
 		thermodynamics_.SetTemperature(this->T_);
@@ -2471,13 +2554,13 @@ namespace OpenSMOKE
 
 		// Calculates centered values
 		ReactionRates(c);
-		FormationRates(&R_original);
-		Q_original = HeatRelease(R_original);
+		FormationRates(R_original.GetHandle());
+		Q_original = HeatRelease(R_original.GetHandle());
 
 		// derivata rispetto a ckd
 		for(unsigned int kd=1;kd<=this->number_of_species_;kd++)
 		{
-			if(c[kd] <= 1.e-100)
+			if(c[kd-1] <= 1.e-100)
 			{
 				double dc = 1.e-10 + 1.e-12 * c_plus[kd];
 				double udc = 3.e-8 * std::max(c_plus[kd],1./dc);
@@ -2487,42 +2570,42 @@ namespace OpenSMOKE
 				c_plus[kd] += dc;
 				udc = 1./dc;
 
-				ReactionRates(c_plus);
-				FormationRates(&R_plus);
-				double Q_plus = HeatRelease(R_plus);
+				ReactionRates(c_plus.GetHandle());
+				FormationRates(R_plus.GetHandle());
+				double Q_plus = HeatRelease(R_plus.GetHandle());
 
 				for(unsigned int j=1;j<=this->number_of_species_;j++)
-					(*derivatives)[j][kd] = (R_plus[j]-R_original[j]) * udc;
-				(*derivatives)[this->number_of_species_+1][kd] = (Q_plus-Q_original) * udc;
+					(*derivatives)(j-1,kd-1) = (R_plus[j]-R_original[j]) * udc;
+				(*derivatives)(this->number_of_species_,kd-1) = (Q_plus-Q_original) * udc;
 
-				c_plus[kd] = c[kd];
+				c_plus[kd] = c[kd-1];
 			}
 			else
 			{
 				double hf = 1.e0;
-				double error_weight = 1./(TOLA+TOLR*std::fabs(c[kd]));
-				double hJ = ETA2 * std::fabs(std::max(c[kd], 1./error_weight));
+				double error_weight = 1./(TOLA+TOLR*std::fabs(c[kd-1]));
+				double hJ = ETA2 * std::fabs(std::max(c[kd-1], 1./error_weight));
 				double hJf = hf/error_weight;
 				hJ = std::max(hJ, hJf);
 				hJ = std::max(hJ, ZERO_DER);
 
 				// This is what is done by BzzMath
-				double dc = std::min(hJ, 1.e-3 + 1e-3*std::fabs(c[kd]));
+				double dc = std::min(hJ, 1.e-3 + 1e-3*std::fabs(c[kd-1]));
 
 				// Thisis what is done in the KPP
-				//double dc = TOLR*c[kd];
+				//double dc = TOLR*c[kd-1];
 				
 				double udc = 1. / dc;
 				c_plus[kd] += dc;
-				ReactionRates(c_plus);
-				FormationRates(&R_plus);
-				double Q_plus = HeatRelease(R_plus);
+				ReactionRates(c_plus.GetHandle());
+				FormationRates(R_plus.GetHandle());
+				double Q_plus = HeatRelease(R_plus.GetHandle());
 
 				for(unsigned int j=1;j<=this->number_of_species_;j++)
-					(*derivatives)[j][kd] = (R_plus[j]-R_original[j]) * udc;
-				(*derivatives)[this->number_of_species_+1][kd] = (Q_plus-Q_original) * udc;
+					(*derivatives)(j-1,kd-1) = (R_plus[j]-R_original[j]) * udc;
+				(*derivatives)(this->number_of_species_, kd-1) = (Q_plus-Q_original) * udc;
 
-				c_plus[kd] = c[kd];
+				c_plus[kd] = c[kd-1];
 			}
 		}
 
@@ -2537,15 +2620,15 @@ namespace OpenSMOKE
 			thermodynamics_.SetTemperature(T_plus);
 			thermodynamics_.SetPressure(this->P_);
 			
-                        KineticConstants();
+            KineticConstants();
 
 			ReactionRates(c);
-			FormationRates(&R_plus);
-			double Q_plus = HeatRelease(R_plus);
+			FormationRates(R_plus.GetHandle());
+			double Q_plus = HeatRelease(R_plus.GetHandle());
 
 			for(unsigned int j=1;j<=this->number_of_species_;j++)
-				(*derivatives)[j][this->number_of_species_+1] = (R_plus[j]-R_original[j]) * udT;
-			(*derivatives)[this->number_of_species_+1][this->number_of_species_+1] = (Q_plus-Q_original) * udT;
+				(*derivatives)(j-1, this->number_of_species_) = (R_plus[j]-R_original[j]) * udT;
+			(*derivatives)(this->number_of_species_, this->number_of_species_) = (Q_plus-Q_original) * udT;
 		}
 
 		// If density is constant, this correction has to be skipped
@@ -2561,48 +2644,48 @@ namespace OpenSMOKE
 			{
 				double sum = 0.;
 				for(unsigned int j=1;j<=this->number_of_species_;j++)
-					sum += c[j]/this->T_ * (*derivatives)[k][j];
-				(*derivatives)[k][index_T] -= sum;
+					sum += c[j-1]/this->T_ * (*derivatives)(k-1,j-1);
+				(*derivatives)(k-1,index_T-1) -= sum;
 			}
 		}
 	}
 
-	void KineticsMap_CHEMKIN::FallOffReactions(const unsigned int k, const double cTot, const OpenSMOKEVectorDouble& c,
-													double &F, double &dF_over_dA0, double &dF_over_dAInf)
+	void KineticsMap_CHEMKIN::FallOffReactions(	const unsigned int k, const double cTot, const double* c,
+												double &F, double &dF_over_dA0, double &dF_over_dAInf)
 	{
 		double M;
-		if (falloff_index_of_single_thirdbody_species_[k] == 0)
+		if (falloff_index_of_single_thirdbody_species__[k-1] == 0)
 		{
 			M = cTot;
-			for(int s=1;s<=falloff_indices_of_thirdbody_species_[k-1].Size();s++)
-				M += c[ falloff_indices_of_thirdbody_species_[k-1][s] ] * falloff_indices_of_thirdbody_efficiencies_[k-1][s];
+			for(unsigned int s=0;s<falloff_indices_of_thirdbody_species__[k-1].size();s++)
+				M += c[falloff_indices_of_thirdbody_species__[k-1][s]-1] * falloff_indices_of_thirdbody_efficiencies__[k-1][s];
 		}
 		else
 		{
 			const double epsilon = 1.e-16;
-			M = c[falloff_index_of_single_thirdbody_species_[k]] + epsilon;
+			M = c[falloff_index_of_single_thirdbody_species__[k-1]-1] + epsilon;
 		}
 			
-		const unsigned int j=indices_of_falloff_reactions_[k];
-		const double Pr = std::exp(lnA_[j] + Beta_[j]*this->logT_-E_over_R_[j]*this->uT_) * M / 
-						  std::exp(lnA_falloff_inf_[k] + Beta_falloff_inf_[k]*this->logT_-E_over_R_falloff_inf_[k]*this->uT_);
+		const unsigned int j=indices_of_falloff_reactions__[k-1];
+		const double Pr = std::exp(lnA__[j-1] + Beta__[j-1]*this->logT_-E_over_R__[j-1]*this->uT_) * M / 
+						  std::exp(lnA_falloff_inf__[k-1] + Beta_falloff_inf__[k-1]*this->logT_-E_over_R_falloff_inf__[k-1]*this->uT_);
 		
 		F = 1.;
 		double dF_over_dPr = 0.;
 		double nTroe, cTroe, sTroe, xSRI;
-		switch(falloff_reaction_type_[k])
+		switch(falloff_reaction_type__[k-1])
 		{
 			case PhysicalConstants::REACTION_TROE_FALLOFF:
 
-				nTroe = 0.75-1.27*logFcent_falloff_[k];
-				cTroe = -0.4-0.67*logFcent_falloff_[k];
+				nTroe = 0.75-1.27*logFcent_falloff__[k-1];
+				cTroe = -0.4-0.67*logFcent_falloff__[k-1];
 				sTroe = std::log10(Pr) + cTroe;
-				F = std::pow(10., logFcent_falloff_[k]/(1. + boost::math::pow<2>(sTroe/(nTroe-0.14*sTroe))));
+				F = std::pow(10., logFcent_falloff__[k-1]/(1. + boost::math::pow<2>(sTroe/(nTroe-0.14*sTroe))));
 
 				// Calculates the derivative 
 				if (Pr > 1.e-32)
 				{
-					const double a = logFcent_falloff_[k];
+					const double a = logFcent_falloff__[k-1];
 					const double LOG10 = std::log(10.);
 					const double LOGPR = std::log(Pr);
 
@@ -2621,75 +2704,75 @@ namespace OpenSMOKE
 				if (Pr > 1.e-32)
 				{
 					xSRI = 1. / (1. + boost::math::pow<2>(std::log10(Pr)));
-					F = std::pow(logFcent_falloff_[k], xSRI) * d_falloff_[k];
-					if (e_falloff_[k] != 0.)
-						F *= std::pow(this->T_, e_falloff_[k]);
+					F = std::pow(logFcent_falloff__[k-1], xSRI) * d_falloff__[k-1];
+					if (e_falloff__[k-1] != 0.)
+						F *= std::pow(this->T_, e_falloff__[k-1]);
 
 					const double eps = 0.01;
 					const double PrPlus = (1.+eps)*Pr;
 					const double xSRIPlus = 1. / (1. + boost::math::pow<2>(std::log10(PrPlus)));
-					double FPlus = std::pow(logFcent_falloff_[k], xSRIPlus) * d_falloff_[k];
-					if(e_falloff_[k] != 0.)
-						FPlus *= std::pow(this->T_, e_falloff_[k]);
+					double FPlus = std::pow(logFcent_falloff__[k-1], xSRIPlus) * d_falloff__[k-1];
+					if(e_falloff__[k-1] != 0.)
+						FPlus *= std::pow(this->T_, e_falloff__[k-1]);
 					dF_over_dPr = (FPlus-F)/(eps*Pr);
 				}
 				else
 				{
 					xSRI = 0.;
-					F = std::pow(logFcent_falloff_[k], xSRI) * d_falloff_[k];
-					if (e_falloff_[k] != 0.)
-						F *= std::pow(this->T_, e_falloff_[k]);
+					F = std::pow(logFcent_falloff__[k-1], xSRI) * d_falloff__[k-1];
+					if (e_falloff__[k-1] != 0.)
+						F *= std::pow(this->T_, e_falloff__[k-1]);
 					dF_over_dPr = 0.;
 				}
 
 				break;
 		}
 
-		dF_over_dA0   =  Pr/std::exp(lnA_[j]) * dF_over_dPr;
-		dF_over_dAInf = -Pr/std::exp(lnA_falloff_inf_[k]) * dF_over_dPr;
+		dF_over_dA0   =  Pr/std::exp(lnA__[j-1]) * dF_over_dPr;
+		dF_over_dAInf = -Pr/std::exp(lnA_falloff_inf__[k-1]) * dF_over_dPr;
 	}
 
-	void KineticsMap_CHEMKIN::ChemicallyActivatedBimolecularReactions(const unsigned int k, const double cTot, const OpenSMOKEVectorDouble& c,
-																		   double &F, double &dF_over_dA0, double &dF_over_dAInf)
+	void KineticsMap_CHEMKIN::ChemicallyActivatedBimolecularReactions(	const unsigned int k, const double cTot, const double* c,
+																		double &F, double &dF_over_dA0, double &dF_over_dAInf)
 	{
 		double M;
-		if (cabr_index_of_single_thirdbody_species_[k] == 0)
+		if (cabr_index_of_single_thirdbody_species__[k-1] == 0)
 		{
 			M = cTot;
-			for(int s=1;s<=cabr_indices_of_thirdbody_species_[k-1].Size();s++)
-				M += c[ cabr_indices_of_thirdbody_species_[k-1][s] ] * cabr_indices_of_thirdbody_efficiencies_[k-1][s];
+			for(unsigned int s=0;s<cabr_indices_of_thirdbody_species__[k-1].size();s++)
+				M += c[cabr_indices_of_thirdbody_species__[k-1][s]-1] * cabr_indices_of_thirdbody_efficiencies__[k-1][s];
 		}
 		else
 		{
 			const double epsilon = 1.e-16;
-			M = c[cabr_index_of_single_thirdbody_species_[k]] + epsilon;
+			M = c[cabr_index_of_single_thirdbody_species__[k-1]-1] + epsilon;
 		}
 			
-		const unsigned int j=indices_of_cabr_reactions_[k];
-		const double Pr = std::exp(lnA_[j] + Beta_[j]*this->logT_-E_over_R_[j]*this->uT_) * M / 
-						  std::exp(lnA_cabr_inf_[k] + Beta_cabr_inf_[k]*this->logT_-E_over_R_cabr_inf_[k]*this->uT_);
+		const unsigned int j=indices_of_cabr_reactions__[k-1];
+		const double Pr = std::exp(lnA__[j-1] + Beta__[j-1]*this->logT_-E_over_R__[j-1]*this->uT_) * M / 
+						  std::exp(lnA_cabr_inf__[k-1] + Beta_cabr_inf__[k-1]*this->logT_-E_over_R_cabr_inf__[k-1]*this->uT_);
 		
 		F = 1.;
 		double dF_over_dPr = 0.;
 		double nTroe, cTroe, sTroe, xSRI;
-		switch(cabr_reaction_type_[k])
+		switch(cabr_reaction_type__[k-1])
 		{
 			case PhysicalConstants::REACTION_TROE_CABR:
 
-				nTroe = 0.75-1.27*logFcent_cabr_[k];
-				cTroe = -0.4-0.67*logFcent_cabr_[k];
+				nTroe = 0.75-1.27*logFcent_cabr__[k-1];
+				cTroe = -0.4-0.67*logFcent_cabr__[k-1];
 				sTroe = std::log10(Pr) + cTroe;
-				F = std::pow(10., logFcent_cabr_[k]/(1. + boost::math::pow<2>(sTroe/(nTroe-0.14*sTroe))));
+				F = std::pow(10., logFcent_cabr__[k-1]/(1. + boost::math::pow<2>(sTroe/(nTroe-0.14*sTroe))));
 
 				// Calculates the derivative 
 				if (Pr > 1.e-32)
 				{
 					const double eps = 0.01;
 					const double PrPlus = (1.+eps)*Pr;
-					const double nTroePlus = 0.75-1.27*logFcent_cabr_[k];
-					const double cTroePlus = -0.4-0.67*logFcent_cabr_[k];
+					const double nTroePlus = 0.75-1.27*logFcent_cabr__[k-1];
+					const double cTroePlus = -0.4-0.67*logFcent_cabr__[k-1];
 					const double sTroePlus = std::log10(PrPlus) + cTroePlus;
-					const double FPlus = std::pow(10., logFcent_cabr_[k]/(1. + boost::math::pow<2>(sTroePlus/(nTroePlus-0.14*sTroePlus))));
+					const double FPlus = std::pow(10., logFcent_cabr__[k-1]/(1. + boost::math::pow<2>(sTroePlus/(nTroePlus-0.14*sTroePlus))));
 					dF_over_dPr = (FPlus-F)/(eps*Pr);
 				}
 
@@ -2698,9 +2781,9 @@ namespace OpenSMOKE
 			case PhysicalConstants::REACTION_SRI_CABR:
 
 				xSRI = 1. / (1. + boost::math::pow<2>(std::log10(Pr)));
-				F = std::pow(logFcent_cabr_[k], xSRI) * d_cabr_[k];
-				if(e_cabr_[k] != 0.)
-					F *= std::pow(this->T_, e_cabr_[k]);
+				F = std::pow(logFcent_cabr__[k-1], xSRI) * d_cabr__[k-1];
+				if(e_cabr__[k-1] != 0.)
+					F *= std::pow(this->T_, e_cabr__[k-1]);
 
 				// Calculates the derivative
 				if (Pr > 1.e-32)
@@ -2708,17 +2791,17 @@ namespace OpenSMOKE
 					const double eps = 0.01;
 					const double PrPlus = (1.+eps)*Pr;
 					const double xSRIPlus = 1. / (1. + boost::math::pow<2>(std::log10(PrPlus)));
-					double FPlus = std::pow(logFcent_cabr_[k], xSRIPlus) * d_cabr_[k];
-					if(e_cabr_[k] != 0.)
-						FPlus *= std::pow(this->T_, e_cabr_[k]);
+					double FPlus = std::pow(logFcent_cabr__[k-1], xSRIPlus) * d_cabr__[k-1];
+					if(e_cabr__[k-1] != 0.)
+						FPlus *= std::pow(this->T_, e_cabr__[k-1]);
 					dF_over_dPr = (FPlus-F)/(eps*Pr);
 				}
 
 				break;
 		}
 
-		dF_over_dA0 = Pr/std::exp(lnA_[j]) * dF_over_dPr;
-		dF_over_dAInf = -Pr/std::exp(lnA_falloff_inf_[k]) * dF_over_dPr;
+		dF_over_dA0 = Pr/std::exp(lnA__[j-1]) * dF_over_dPr;
+		dF_over_dAInf = -Pr/std::exp(lnA_falloff_inf__[k-1]) * dF_over_dPr;
 	}
 }
 
