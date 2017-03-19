@@ -79,7 +79,6 @@ namespace OpenSMOKE
              
 		this->names_ =  rhs.names_;
         this->MW_    =  rhs.MW_;
-        this->uMW_   =  rhs.uMW_;
 
         this->atomic_composition_ = rhs.atomic_composition_;
 		this->elements_ = rhs.elements_; 
@@ -141,7 +140,6 @@ namespace OpenSMOKE
 		TM = new double[this->nspecies_];
 
 		ChangeDimensions(this->nspecies_, &this->MW_, true);
-		ChangeDimensions(this->nspecies_, &this->uMW_, true);
 
 		ChangeDimensions(this->nspecies_, &species_cp_over_R_, true);
 		ChangeDimensions(this->nspecies_, &species_h_over_RT_, true);
@@ -246,7 +244,6 @@ namespace OpenSMOKE
 		}
 
 		this->MW_[k+1] = coefficients[17];
-		this->uMW_[k+1] = 1./coefficients[17];
 	}
  
 	void ThermodynamicsMap_CHEMKIN::ImportCoefficientsFromASCIIFile(std::ifstream& fInput)
@@ -323,7 +320,7 @@ namespace OpenSMOKE
 
 	inline void ThermodynamicsMap_CHEMKIN::MolecularWeight_From_MassFractions(double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y)
 	{
-		MW = 1./Dot(y,this->uMW_);
+		MW = 1./UDot(y,this->MW_);
 	}
 
 	inline void ThermodynamicsMap_CHEMKIN::MassFractions_From_MoleFractions(OpenSMOKE::OpenSMOKEVectorDouble& y, double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& x)
@@ -335,9 +332,9 @@ namespace OpenSMOKE
 	
 	inline void ThermodynamicsMap_CHEMKIN::MoleFractions_From_MassFractions(OpenSMOKE::OpenSMOKEVectorDouble& x, double& MW, const OpenSMOKE::OpenSMOKEVectorDouble& y)
 	{
-		MW = 1./Dot(y,this->uMW_);
+		MW = 1./UDot(y,this->MW_);
 		Product(MW, y, &x);
-		ElementByElementProduct(x,this->uMW_,&x);
+		ElementByElementDivision(x,this->MW_,&x);
 	}
 
 	inline void ThermodynamicsMap_CHEMKIN::cp_over_R()

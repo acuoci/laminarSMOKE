@@ -243,13 +243,11 @@ namespace OpenSMOKE
 		double P_;									//!< pressure [Pa]
 
 		OpenSMOKE::OpenSMOKEVectorDouble MW_;	//!< molecular weights of the species
-		OpenSMOKE::OpenSMOKEVectorDouble uMW_;	//!< reciprocal of molecular weights of the species
 
 		Eigen::MatrixXd atomic_composition_;	//!< atomic composition
 		std::vector<std::string> elements_;		//!< names of elements
 		
 		OpenSMOKE::OpenSMOKEVectorDouble mw_elements_;	//!< molecular weights of elements
-		OpenSMOKE::OpenSMOKEVectorDouble umw_elements_;	//!< reciprocal of molecular weights of elements
 	};
 }
 
