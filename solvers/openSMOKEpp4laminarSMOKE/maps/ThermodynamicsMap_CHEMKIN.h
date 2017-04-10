@@ -335,16 +335,16 @@ namespace OpenSMOKE
 		std::vector<double> species_g_over_RT__;
 		std::vector<double> species_s_over_R__;
 
-		double*	Cp_LT;	/**< correlation coefficients, specific heat, low temperature region */
-		double*	Cp_HT;	/**< correlation coefficients, specific heat, high temperature region */
-		double*	DH_LT;	/**< correlation coefficients, enthalpy, low temperature region */
-		double*	DH_HT;	/**< correlation coefficients, enthalpy, high temperature region */
-		double*	DS_LT;	/**< correlation coefficients, entropy, low temperature region */
-		double*	DS_HT;	/**< correlation coefficients, entropy, high temperature region */
+		std::vector<double>	Cp_LT;	/**< correlation coefficients, specific heat, low temperature region */
+		std::vector<double>	Cp_HT;	/**< correlation coefficients, specific heat, high temperature region */
+		std::vector<double>	DH_LT;	/**< correlation coefficients, enthalpy, low temperature region */
+		std::vector<double>	DH_HT;	/**< correlation coefficients, enthalpy, high temperature region */
+		std::vector<double>	DS_LT;	/**< correlation coefficients, entropy, low temperature region */
+		std::vector<double>	DS_HT;	/**< correlation coefficients, entropy, high temperature region */
 
-		double* TL;			/**< low  temperature limit */
-		double* TM;			/**< mean temperature limit */
-		double* TH;			/**< high temperature limit */
+		std::vector<double> TL;			/**< low  temperature limit */
+		std::vector<double> TM;			/**< mean temperature limit */
+		std::vector<double> TH;			/**< high temperature limit */
 
 		bool cp_must_be_recalculated_;
 		bool h_must_be_recalculated_;

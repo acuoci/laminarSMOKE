@@ -60,11 +60,6 @@ namespace OdeSMOKE
 		MethodGear();
 
 		/**
-		*@brief Default destructor
-		*/
-		~MethodGear();
-
-		/**
 		*@brief The Jacobian is calculated on a numerical basis
 		*/
 		void SetNumericalJacobian() { jacobianType_ = JACOBIAN_TYPE_NUMERICAL; }
@@ -183,12 +178,12 @@ namespace OdeSMOKE
 	protected:
 
 		// Parameters of the Gear methods
-		Eigen::VectorXd* r_;			//!< vector r characteristic of the method (there is a vector for each order which was coded, up to MAX_ORDER)
-		double* Ep_;					//!< error constant Ep (see Buzzi-Ferraris, eq. 29.163 and 29.204)
+		std::vector<Eigen::VectorXd> r_;			//!< vector r characteristic of the method (there is a vector for each order which was coded, up to MAX_ORDER)
+		Eigen::VectorXd Ep_;					//!< error constant Ep (see Buzzi-Ferraris, eq. 29.163 and 29.204)
 
 		// Internal vectors
-		Eigen::VectorXd* z_;			//!< z vectors z
-		Eigen::VectorXd* v_;			//!< v vectors v
+		std::vector<Eigen::VectorXd> z_;			//!< z vectors z
+		std::vector<Eigen::VectorXd> v_;			//!< v vectors v
 		Eigen::VectorXd b_;				//!< correction vector b
 		Eigen::VectorXd deltab_;		//!< correction vector for the correction vector b
 		Eigen::VectorXd y_;
@@ -201,7 +196,7 @@ namespace OdeSMOKE
 		// Parameter to choose the next order
 		double deltaAlfa1_;					//!< reduction of safety coefficient for the current order minus 1 (see Buzzi-Ferraris, eq. 29.187)
 		double deltaAlfa3_;					//!< reduction of safety coefficient for the current order plus 1 (see Buzzi-Ferraris, eq. 29.189)
-		double* alfa2_;						//!< safety coefficient for the current order (see Buzzi-Ferraris, eq. 29.188)
+		Eigen::VectorXd alfa2_;					//!< safety coefficient for the current order (see Buzzi-Ferraris, eq. 29.188)
 
 		// Policy about the order and the step size
 		OdeHStatus odeHStatus_;				//!< status of the step size (decreased, constant, or decreased)

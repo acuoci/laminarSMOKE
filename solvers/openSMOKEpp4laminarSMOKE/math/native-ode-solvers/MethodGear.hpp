@@ -62,16 +62,6 @@ namespace OdeSMOKE
 	}
 
 	template <typename ODESystemKernel>
-	MethodGear<ODESystemKernel>::~MethodGear()
-	{
-		delete[] r_;
-		delete[] Ep_;
-		delete[] z_;
-		delete[] v_;
-		delete[] alfa2_;
-	}
-
-	template <typename ODESystemKernel>
 	void MethodGear<ODESystemKernel>::ResetMethod()
 	{
 		// Kernel default values
@@ -126,17 +116,17 @@ namespace OdeSMOKE
 		// Safety coefficient for choosing the optimal new order
 		deltaAlfa1_ = DELTA_ALFA1;
 		deltaAlfa3_ = DELTA_ALFA3;
-		alfa2_ = new double[MAX_ORDER + 1];
+		alfa2_.resize(MAX_ORDER + 1);
 		for (unsigned int i = 0; i <= MAX_ORDER; i++)
-			alfa2_[i] = ALFA2;
+			alfa2_(i) = ALFA2;
 
 		// Initialize vector of error coefficients Ep (Buzzi-Ferraris, 29.204)
-		Ep_ = new double[MAX_ORDER + 1];
+		Ep_.resize(MAX_ORDER + 1);
 		for (unsigned int j = 0; j <= MAX_ORDER; j++)
-			Ep_[j] = Factorial(j);
+			Ep_(j) = Factorial(j);
 
 		// Allocating memory for vector r
-		r_ = new Eigen::VectorXd[MAX_ORDER + 1];
+		r_.resize(MAX_ORDER + 1);
 		for (unsigned int i = 0; i <= MAX_ORDER; i++)
 		{
 			r_[i].resize(MAX_ORDER);
@@ -170,8 +160,8 @@ namespace OdeSMOKE
 		}
 
 		// Allocating memory for vectors z and v
-		z_ = new Eigen::VectorXd[MAX_ORDER + 3];
-		v_ = new Eigen::VectorXd[MAX_ORDER + 3];
+		z_.resize(MAX_ORDER + 3);
+		v_.resize(MAX_ORDER + 3);
 		for (unsigned int i = 0; i <= MAX_ORDER + 2; i++)
 		{
 			z_[i].resize(this->ne_);
@@ -353,13 +343,13 @@ namespace OdeSMOKE
 		}
 
 		// The propensity to change the step size is decreased for the highest orders (4 and 5)
-		alfa2_[4] -= 0.01;
-		alfa2_[5] -= 0.02;
+		alfa2_(4) -= 0.01;
+		alfa2_(5) -= 0.02;
 
 		// Exclude 4th order if too many convergence failures were observed
-		if (alfa2_[4] < 0.)
+		if (alfa2_(4) < 0.)
 		{
-			alfa2_[4] = 0.;
+			alfa2_(4) = 0.;
 			maximum_order_ = 3;
 			if (p_ > 3)
 			{
@@ -369,9 +359,9 @@ namespace OdeSMOKE
 		}
 
 		// Exclude 5th order if too many convergence failures were observed
-		if (alfa2_[5] < 0.)
+		if (alfa2_(5) < 0.)
 		{
-			alfa2_[5] = 0.;
+			alfa2_(5) = 0.;
 			maximum_order_ = 4;
 			if (p_ > 4)
 			{
