@@ -38,16 +38,91 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#if   OPENFOAM_VERSION == 22
-	#include "pEqn.22.H"
-#elif OPENFOAM_VERSION == 23
-	#include "pEqn.23.H"
-#elif OPENFOAM_VERSION == 24
-	#include "pEqn.24.H"
-#elif OPENFOAM_VERSION == 30
-	#include "pEqn.3x.H"
-#elif OPENFOAM_VERSION == 40
-	#include "pEqn.4x.H"
-#else
-	Compilation_Error_You_Did_Not_Define_The_OPENFOAM_VERSION_Macro
-#endif
+{
+	#include "setRootCase.H"
+	#include "createTime.H"
+	#include "createMesh.H"
+	#include "createControl.H"
+
+	#include "readGravitationalAcceleration.H"
+	#include "createBasicFields.H"
+	#include "readOptions.H"
+	#include "readOptionsSteadyState.H"
+
+	linearModel linear_model(*thermodynamicsMapXML, *kineticsMapXML);
+	
+	#include "createGasFields.H"
+	#include "createChemicalFields.H"
+	#include "createLaminarSMOKEThermoClass.H"
+        
+	#include "createMRF.H"
+	#include "createFvOptions.H"
+	#include "initContinuityErrs.H"
+
+	#include "createRadiationModel.H"
+	#include "memoryAllocation.H"
+	#include "properties.H"
+	#include "createAdditionalFields.H"
+
+	dimensionedScalar initialMass = fvc::domainIntegrate(rho);
+
+    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+    Info<< "\nStarting time loop\n" << endl;
+
+    while (simple.loop())
+    {
+         Info<< "Time = " << runTime.timeName() << nl << endl;
+		
+	 double t0 = runTime.value() - runTime.deltaT().value();
+	 double tf = runTime.value();
+
+	 // Pressure-velocity SIMPLE corrector
+         {
+		if (momentumEquations == true)
+		{
+		    #include "UEqn.H"
+
+		    #include "updateProperties.H"
+		    #include "jacobianEvaluation.H"
+
+		    #include "fluxes.H"
+		    #include "YEqn.H"
+		    #include "TEqn.H" 
+		    if (simple.consistent())
+		    {
+		    	#include "pcEqn.4x.H"
+		    }
+		    else
+		    {
+		        #include "pEqn.H"
+		    }
+		}
+		else
+		{
+		    #include "updateProperties.H"
+		    #include "jacobianEvaluation.H"
+
+		    #include "fluxes.H"
+		    #include "YEqn.H"
+		    #include "TEqn.H" 
+		}
+	    
+		// Passive scalars
+	        #include "zMixEqn.H"
+		#include "tauEqn.H"
+         }	
+
+	 #include "localPostProcessing.H"
+				
+	 runTime.write();
+		
+         Info << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+              << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+              << nl << endl;
+    }
+
+    Info<< "End\n" << endl;
+
+    return 0;
+}

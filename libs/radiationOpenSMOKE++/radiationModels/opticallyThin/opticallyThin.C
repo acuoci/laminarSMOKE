@@ -219,6 +219,25 @@ Foam::tmp<Foam::volScalarField> Foam::radiation::opticallyThin::Rp() const
 
 Foam::tmp<Foam::DimensionedField<Foam::scalar, Foam::volMesh> > Foam::radiation::opticallyThin::Ru() const
 {
+    #if OPENFOAM_VERSION >= 40
+    tmp<volScalarField> Tenv4
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "Tenv4",
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+            ),
+            mesh_,
+            dimensionedScalar("Tenv4", dimensionSet(0, 0, 0, 4, 0), pow(ambientTemperature_,4.)),
+            extrapolatedCalculatedFvPatchVectorField::typeName
+        )
+    );
+    #else
     tmp<volScalarField> Tenv4
     (
         new volScalarField
@@ -236,10 +255,17 @@ Foam::tmp<Foam::DimensionedField<Foam::scalar, Foam::volMesh> > Foam::radiation:
             zeroGradientFvPatchVectorField::typeName
         )
     );
+    #endif
 
-    const DimensionedField<scalar, volMesh> E  = absorptionEmission_->ECont()().dimensionedInternalField();
-    const DimensionedField<scalar, volMesh> a  = absorptionEmission_->aCont()().dimensionedInternalField();
-    const DimensionedField<scalar, volMesh> T4 = Tenv4().dimensionedInternalField();
+    #if OPENFOAM_VERSION >= 40
+    	const DimensionedField<scalar, volMesh> E  = absorptionEmission_->ECont()()();
+    	const DimensionedField<scalar, volMesh> a  = absorptionEmission_->aCont()()();
+    	const DimensionedField<scalar, volMesh> T4 = Tenv4()();
+    #else
+   	const DimensionedField<scalar, volMesh> E  = absorptionEmission_->ECont()().dimensionedInternalField();
+    	const DimensionedField<scalar, volMesh> a  = absorptionEmission_->aCont()().dimensionedInternalField();
+    	const DimensionedField<scalar, volMesh> T4 = Tenv4().dimensionedInternalField();
+    #endif
 
     return 4.0*a*physicoChemical::sigma*T4 -4.0*E;
 }

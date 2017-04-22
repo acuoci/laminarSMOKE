@@ -488,23 +488,33 @@ Foam::tmp<Foam::volScalarField> Foam::radiation::fvDOM::Rp() const
     );
 }
 
+#if OPENFOAM_VERSION >= 40
+Foam::tmp<Foam::DimensionedField<Foam::scalar, Foam::volMesh> >
+Foam::radiation::fvDOM::Ru() const
+{
+    const DimensionedField<scalar, volMesh>& G = G_();
+    const DimensionedField<scalar, volMesh> E = absorptionEmission_->ECont()()();
 
+    // Only include continuous phase absorption
+    const DimensionedField<scalar, volMesh> a = absorptionEmission_->aCont()()();
+
+    return a*G - E;
+}
+#else
 Foam::tmp<Foam::DimensionedField<Foam::scalar, Foam::volMesh> >
 Foam::radiation::fvDOM::Ru() const
 {
 
-    const DimensionedField<scalar, volMesh>& G =
-        G_.dimensionedInternalField();
-
-    const DimensionedField<scalar, volMesh> E =
-        absorptionEmission_->ECont()().dimensionedInternalField();
+    const DimensionedField<scalar, volMesh>& G = G_.dimensionedInternalField();
+    const DimensionedField<scalar, volMesh> E = absorptionEmission_->ECont()().dimensionedInternalField();
 
     // Only include continuous phase absorption
-    const DimensionedField<scalar, volMesh> a =
-        absorptionEmission_->aCont()().dimensionedInternalField();
+    const DimensionedField<scalar, volMesh> a = absorptionEmission_->aCont()().dimensionedInternalField();
 
     return a*G - E;
 }
+#endif 
+
 
 
 void Foam::radiation::fvDOM::updateBlackBodyEmission()
@@ -523,6 +533,16 @@ void Foam::radiation::fvDOM::updateG()
     Qem_ = dimensionedScalar("zero", dimMass/pow3(dimTime), 0.0);
     Qin_ = dimensionedScalar("zero", dimMass/pow3(dimTime), 0.0);
 
+    #if OPENFOAM_VERSION >= 40
+    forAll(IRay_, rayI)
+    {
+        IRay_[rayI].addIntensity();
+        G_ += IRay_[rayI].I()*IRay_[rayI].omega();
+        Qr_.boundaryFieldRef() += IRay_[rayI].Qr().boundaryField();
+        Qem_.boundaryFieldRef() += IRay_[rayI].Qem().boundaryField();
+        Qin_.boundaryFieldRef() += IRay_[rayI].Qin().boundaryField();
+    }
+    #else
     forAll(IRay_, rayI)
     {
         IRay_[rayI].addIntensity();
@@ -531,6 +551,7 @@ void Foam::radiation::fvDOM::updateG()
         Qem_.boundaryField() += IRay_[rayI].Qem().boundaryField();
         Qin_.boundaryField() += IRay_[rayI].Qin().boundaryField();
     }
+    #endif 
 }
 
 

@@ -90,7 +90,7 @@
 		    #include "TEqn.H" 
 		    if (simple.consistent())
 		    {
-		    	#include "pcEqn.30.H"
+		    	#include "pcEqn.3x.H"
 		    }
 		    else
 		    {

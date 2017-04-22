@@ -38,16 +38,27 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#if   OPENFOAM_VERSION == 22
-	#include "pEqn.22.H"
-#elif OPENFOAM_VERSION == 23
-	#include "pEqn.23.H"
-#elif OPENFOAM_VERSION == 24
-	#include "pEqn.24.H"
-#elif OPENFOAM_VERSION == 30
-	#include "pEqn.3x.H"
-#elif OPENFOAM_VERSION == 40
-	#include "pEqn.4x.H"
-#else
-	Compilation_Error_You_Did_Not_Define_The_OPENFOAM_VERSION_Macro
-#endif
+	MRF.correctBoundaryVelocity(U);
+
+	tmp<fvVectorMatrix> tUEqn
+	(
+		fvm::div(phi, U)
+		+ MRF.DDt(rho, U)
+		- fvm::laplacian(mu, U)
+		- fvc::div(mu*dev2(fvc::grad(U)().T()))
+		==
+		rho*g
+		+ fvOptions(rho, U)
+	);
+	fvVectorMatrix& UEqn = tUEqn.ref();
+
+	UEqn.relax();
+
+	fvOptions.constrain(UEqn);
+
+	solve(UEqn == -fvc::grad(p));
+
+	fvOptions.correct(U);
+
+	Info << " Umin: " << min(U).value() << " Umax: " << max(U).value() << endl;
+

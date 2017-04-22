@@ -38,16 +38,134 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#if   OPENFOAM_VERSION == 22
-	#include "pEqn.22.H"
-#elif OPENFOAM_VERSION == 23
-	#include "pEqn.23.H"
-#elif OPENFOAM_VERSION == 24
-	#include "pEqn.24.H"
-#elif OPENFOAM_VERSION == 30
-	#include "pEqn.3x.H"
-#elif OPENFOAM_VERSION == 40
-	#include "pEqn.4x.H"
-#else
-	Compilation_Error_You_Did_Not_Define_The_OPENFOAM_VERSION_Macro
-#endif
+{
+	volScalarField rAU(1.0/UEqn.A());
+	volScalarField rAtU(1.0/(1.0/rAU - UEqn.H1()));
+	volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
+	tUEqn.clear();
+
+	bool closedVolume = false;
+
+	surfaceScalarField phiHbyA("phiHbyA", fvc::flux(rho*HbyA));
+	MRF.makeRelative(fvc::interpolate(rho), phiHbyA);
+
+	volScalarField rhorAtU("rhorAtU", rho*rAtU);
+
+	// Update the pressure BCs to ensure flux consistency
+	constrainPressure(p, rho, U, phiHbyA, rhorAtU, MRF);
+
+	if (simple.transonic())
+	{
+	    surfaceScalarField phid
+	    (
+		"phid",
+		(fvc::interpolate(psi)/fvc::interpolate(rho))*phiHbyA
+	    );
+
+	    phiHbyA +=
+		fvc::interpolate(rho*(rAtU - rAU))*fvc::snGrad(p)*mesh.magSf()
+	      - fvc::interpolate(p)*phid;
+
+	    HbyA -= (rAU - rAtU)*fvc::grad(p);
+
+	    while (simple.correctNonOrthogonal())
+	    {
+		fvScalarMatrix pEqn
+		(
+		    fvc::div(phiHbyA)
+		  + fvm::div(phid, p)
+		  - fvm::laplacian(rhorAtU, p)
+		 ==
+		    fvOptions(psi, p, rho.name())
+		);
+
+		// Relax the pressure equation to maintain diagonal dominance
+		pEqn.relax();
+
+		pEqn.setReference
+		(
+		    pressureControl.refCell(),
+		    pressureControl.refValue()
+		);
+
+		pEqn.solve();
+
+		if (simple.finalNonOrthogonalIter())
+		{
+		    phi = phiHbyA + pEqn.flux();
+		}
+	    }
+	}
+	else
+	{
+	    closedVolume = adjustPhi(phiHbyA, U, p);
+
+	    phiHbyA += fvc::interpolate(rho*(rAtU - rAU))*fvc::snGrad(p)*mesh.magSf();
+	    HbyA -= (rAU - rAtU)*fvc::grad(p);
+
+	    while (simple.correctNonOrthogonal())
+	    {
+		fvScalarMatrix pEqn
+		(
+		    fvc::div(phiHbyA)
+		  - fvm::laplacian(rhorAtU, p)
+		  ==
+		    fvOptions(psi, p, rho.name())
+		);
+
+		pEqn.setReference
+		(
+		    pressureControl.refCell(),
+		    pressureControl.refValue()
+		);
+
+		pEqn.solve();
+
+		if (simple.finalNonOrthogonalIter())
+		{
+		    phi = phiHbyA + pEqn.flux();
+		}
+	    }
+	}
+
+	// The incompressibe form of the continuity error check is appropriate for
+	// steady-state compressible also.
+	#include "continuityErrs.H"
+
+	// Explicitly relax pressure for momentum corrector
+	p.relax();
+
+	U = HbyA - rAtU*fvc::grad(p);
+	U.correctBoundaryConditions();
+	fvOptions.correct(U);
+
+	pressureControl.limit(p);
+
+	// For closed-volume cases adjust the pressure and density levels
+	// to obey overall mass continuity
+	if (closedVolume)
+	{
+	    p += (initialMass - fvc::domainIntegrate(psi*p))
+		/fvc::domainIntegrate(psi);
+	}
+
+	p.correctBoundaryConditions();
+
+	// Recalculate density from the relaxed pressure
+	//rho = thermo.rho();
+    	rho = Rho(p,psi);
+    	rho = max(rho, rhoMin);
+    	rho = min(rho, rhoMax);
+
+	if (!simple.transonic())
+	{
+	    rho.relax();
+	}
+
+	Info<< "rho max/min : " << max(rho).value() << " " << min(rho).value() << endl;
+
+	if (includeDpDt == true)
+	{
+		DpDt = fvc::div(surfaceScalarField("phiU", phi/fvc::interpolate(rho)), p);
+	}
+}

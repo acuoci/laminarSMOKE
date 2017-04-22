@@ -77,11 +77,19 @@ if (homogeneousReactions == true && (speciesEquations == true || energyEquation 
 				else
 					linear_model.reactionJacobianSparse( *thermodynamicsMapXML, *kineticsMapXML, y, pCells[celli], J, energyEquation, speciesEquations);
 
-				for(int i=0;i<NC+1;i++)
-					sourceImplicit[i].internalField()[celli] = J(i);
+				#if OPENFOAM_VERSION >= 40
+					for(int i=0;i<NC+1;i++)
+						sourceImplicit[i].ref()[celli] = J(i);
 			
-				for(int i=0;i<NC+1;i++)
-					sourceExplicit[i].internalField()[celli] = Source[i+1] - J(i)*y[i+1];
+					for(int i=0;i<NC+1;i++)
+						sourceExplicit[i].ref()[celli] = Source[i+1] - J(i)*y[i+1];
+				#else
+					for(int i=0;i<NC+1;i++)
+						sourceImplicit[i].internalField()[celli] = J(i);
+			
+					for(int i=0;i<NC+1;i++)
+						sourceExplicit[i].internalField()[celli] = Source[i+1] - J(i)*y[i+1];
+				#endif
 
 		//		if (TCells[celli] > 2200. && TCells[celli] < 2220.)
 		//		{
@@ -133,11 +141,19 @@ if (homogeneousReactions == true && (speciesEquations == true || energyEquation 
 					Jstore[celli] = J;
 				}
 
-				for(int i=0;i<NC+1;i++)
-					sourceImplicit[i].internalField()[celli] = Jstore[celli](i);
+				#if OPENFOAM_VERSION >= 40
+					for(int i=0;i<NC+1;i++)
+						sourceImplicit[i].ref()[celli] = Jstore[celli](i);
 			
-				for(int i=0;i<NC+1;i++)
-					sourceExplicit[i].internalField()[celli] = Source[i+1] - Jstore[celli](i)*y[i+1];
+					for(int i=0;i<NC+1;i++)
+						sourceExplicit[i].ref()[celli] = Source[i+1] - Jstore[celli](i)*y[i+1];
+				#else
+					for(int i=0;i<NC+1;i++)
+						sourceImplicit[i].internalField()[celli] = Jstore[celli](i);
+			
+					for(int i=0;i<NC+1;i++)
+						sourceExplicit[i].internalField()[celli] = Source[i+1] - Jstore[celli](i)*y[i+1];
+				#endif	
 			}
 		}
 		double tEnd = OpenSMOKE::OpenSMOKEGetCpuTime();
@@ -171,11 +187,19 @@ if (homogeneousReactions == true && (speciesEquations == true || energyEquation 
 
 				linear_model.reactionSourceTerms( *thermodynamicsMapXML, *kineticsMapXML, y, pCells[celli], Source );
 
-				for(int i=0;i<NC+1;i++)
-					sourceImplicit[i].internalField()[celli] = 0.;
+				#if OPENFOAM_VERSION >= 40
+					for(int i=0;i<NC+1;i++)
+						sourceImplicit[i].ref()[celli] = 0.;
 			
-				for(int i=0;i<NC+1;i++)
-					sourceExplicit[i].internalField()[celli] = Source[i+1];
+					for(int i=0;i<NC+1;i++)
+						sourceExplicit[i].ref()[celli] = Source[i+1];
+				#else
+					for(int i=0;i<NC+1;i++)
+						sourceImplicit[i].internalField()[celli] = 0.;
+			
+					for(int i=0;i<NC+1;i++)
+						sourceExplicit[i].internalField()[celli] = Source[i+1];
+				#endif	
 			}
 		}
 		double tEnd = OpenSMOKE::OpenSMOKEGetCpuTime();

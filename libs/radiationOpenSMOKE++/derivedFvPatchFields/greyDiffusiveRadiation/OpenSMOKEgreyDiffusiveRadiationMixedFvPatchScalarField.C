@@ -166,7 +166,11 @@ updateCoeffs()
 
     label rayId = -1;
     label lambdaId = -1;
+    #if OPENFOAM_VERSION >= 40
+    dom.setRayIdLambdaId(internalField().name(), rayId, lambdaId);
+    #else
     dom.setRayIdLambdaId(dimensionedInternalField().name(), rayId, lambdaId);
+    #endif
 
     const label patchI = patch().index();
 
@@ -188,12 +192,22 @@ updateCoeffs()
 
     const scalarField nAve(n & ray.dAve());
 
+    #if OPENFOAM_VERSION >= 40
+    ray.Qr().boundaryFieldRef()[patchI] += Iw*nAve;
+    #else
     ray.Qr().boundaryField()[patchI] += Iw*nAve;
+    #endif
 
     const scalarField temissivity = emissivity();
 
+    #if OPENFOAM_VERSION >= 40
+    scalarField& Qem = ray.Qem().boundaryFieldRef()[patchI];
+    scalarField& Qin = ray.Qin().boundaryFieldRef()[patchI];
+    #else
     scalarField& Qem = ray.Qem().boundaryField()[patchI];
     scalarField& Qin = ray.Qin().boundaryField()[patchI];
+    #endif
+
 
     const vector& myRayId = dom.IRay(rayId).d();
 

@@ -183,7 +183,12 @@ Foam::radiation::wideBandAbsorptionEmission::aCont(const label bandI) const
         )
     );
 
-    scalarField& a = ta().internalField();
+    #if OPENFOAM_VERSION >= 40
+    	scalarField& a = ta.ref().primitiveFieldRef();
+    #else
+	scalarField& a = ta().internalField();
+    #endif
+    
 
     forAll(a, i)
     {
@@ -255,6 +260,36 @@ Foam::radiation::wideBandAbsorptionEmission::ECont(const label bandI) const
         )
     );
 
+    #if OPENFOAM_VERSION >= 40
+    if (mesh().foundObject<volScalarField>("Qdot"))
+    {
+        const volScalarField& Qdot =
+            mesh().lookupObject<volScalarField>("Qdot");
+
+        if (Qdot.dimensions() == dimEnergy/dimTime)
+        {
+            E.ref().primitiveFieldRef() =
+                iEhrrCoeffs_[bandI]
+               *Qdot.primitiveField()
+               *(iBands_[bandI][1] - iBands_[bandI][0])
+               /totalWaveLength_
+               /mesh_.V();
+        }
+        else if (Qdot.dimensions() == dimEnergy/dimTime/dimVolume)
+        {
+            E.ref().primitiveFieldRef() =
+                iEhrrCoeffs_[bandI]
+               *Qdot.primitiveField()
+               *(iBands_[bandI][1] - iBands_[bandI][0])
+               /totalWaveLength_;
+        }
+        else
+        {
+            WarningInFunction
+                << "Incompatible dimensions for Qdot field" << endl;
+        }
+    }
+    #else
     if (mesh().foundObject<volScalarField>("dQ"))
     {
         const volScalarField& dQ = mesh().lookupObject<volScalarField>("dQ");
@@ -287,8 +322,9 @@ Foam::radiation::wideBandAbsorptionEmission::ECont(const label bandI) const
                 ") const"
             )
                 << "Incompatible dimensions for dQ field" << endl;
-        }
+        }    
     }
+    #endif
 
     return E;
 }
@@ -304,12 +340,21 @@ void Foam::radiation::wideBandAbsorptionEmission::correct
 
     for (label j=0; j<nBands_; j++)
     {
+	#if OPENFOAM_VERSION >= 40
+        aLambda[j].primitiveFieldRef() = this->a(j);
+
+        a.primitiveFieldRef() +=
+            aLambda[j].primitiveField()
+           *(iBands_[j][1] - iBands_[j][0])
+           /totalWaveLength_;
+	#else
         aLambda[j].internalField() = this->a(j);
 
         a.internalField() +=
             aLambda[j].internalField()
            *(iBands_[j][1] - iBands_[j][0])
            /totalWaveLength_;
+        #endif
     }
 
 }

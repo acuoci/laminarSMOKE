@@ -74,7 +74,7 @@
 	Info<< "Creating field kinetic energy K\n" << endl;
 	volScalarField K("K", 0.5*magSqr(U));
 
-	#if   OPENFOAM_VERSION == 30
+	#if   OPENFOAM_VERSION >= 30
 
 		#include "readhRef.H"
 		#include "gh.H"

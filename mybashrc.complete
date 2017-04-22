@@ -1,5 +1,5 @@
-#OpenFOAM VERSION (22, 23, 24, 30)
-export OPENFOAM_VERSION='-DOPENFOAM_VERSION=24'
+#OpenFOAM VERSION (22, 23, 24, 30, 40)
+export OPENFOAM_VERSION='-DOPENFOAM_VERSION=40'
 
 #Compulsory path
 export EIGEN_LIBRARY_PATH=/software/chimica2/libraries/eigen/eigen-3.3.3

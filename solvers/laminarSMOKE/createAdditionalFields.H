@@ -55,7 +55,12 @@ volScalarField rho
 
 #include "compressibleCreatePhi.H"
 
-#if   OPENFOAM_VERSION == 30
+#if   OPENFOAM_VERSION == 30 
+mesh.setFluxRequired(p.name());
+#endif
+
+#if   OPENFOAM_VERSION == 40 
+pressureControl pressureControl(p, rho, simple.dict());
 mesh.setFluxRequired(p.name());
 #endif
 

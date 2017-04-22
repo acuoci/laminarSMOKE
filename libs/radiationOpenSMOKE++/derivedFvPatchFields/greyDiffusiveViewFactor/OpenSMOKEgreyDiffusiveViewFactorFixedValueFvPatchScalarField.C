@@ -142,6 +142,17 @@ updateCoeffs()
     {
         scalar Q = gSum((*this)*patch().magSf());
 
+	#if OPENFOAM_VERSION >= 40
+        Info<< patch().boundaryMesh().mesh().name() << ':'
+            << patch().name() << ':'
+            << this->internalField().name() << " <- "
+            << " heat transfer rate:" << Q
+            << " wall radiative heat flux "
+            << " min:" << gMin(*this)
+            << " max:" << gMax(*this)
+            << " avg:" << gAverage(*this)
+            << endl;
+	#else
         Info<< patch().boundaryMesh().mesh().name() << ':'
             << patch().name() << ':'
             << this->dimensionedInternalField().name() << " <- "
@@ -151,6 +162,7 @@ updateCoeffs()
             << " max:" << gMax(*this)
             << " avg:" << gAverage(*this)
             << endl;
+	#endif
     }
 
     fixedValueFvPatchScalarField::updateCoeffs();

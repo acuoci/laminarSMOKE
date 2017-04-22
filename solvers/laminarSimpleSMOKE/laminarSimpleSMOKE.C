@@ -61,8 +61,13 @@
 #include "fvCFD.H"
 #include "multivariateScheme.H"
 #include "simpleControl.H"
-#include "fvIOoptionList.H"
 #include "interpolation.H"
+#if OPENFOAM_VERSION >= 40
+	#include "pressureControl.H"
+	#include "fvOptions.H"
+#else
+	#include "fvIOoptionList.H"
+#endif
 
 // Customized radiation model
 #include "OpenSMOKEradiationModel.H"
@@ -82,7 +87,9 @@
 
 int main(int argc, char *argv[])
 {
-	#if OPENFOAM_VERSION == 30
+	#if OPENFOAM_VERSION == 40
+		#include "laminarSimpleSMOKE.4x.H"
+	#elif OPENFOAM_VERSION == 30
 		#include "laminarSimpleSMOKE.3x.H"
 	#else
 		#include "laminarSimpleSMOKE.2x.H"

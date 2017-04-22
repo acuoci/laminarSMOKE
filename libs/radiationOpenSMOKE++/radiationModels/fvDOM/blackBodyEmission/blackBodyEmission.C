@@ -237,7 +237,12 @@ Foam::radiation::blackBodyEmission::EbDeltaLambdaT
                 dimless,
                 T1 - T2
             );
-            Eb()[i] = Eb()[i]*fLambdaDelta.value();
+		
+	    #if OPENFOAM_VERSION >= 40
+            Eb.ref()[i] = Eb()[i]*fLambdaDelta.value();
+	    #else
+	    Eb()[i] = Eb()[i]*fLambdaDelta.value();
+	    #endif
         }
         return Eb;
     }

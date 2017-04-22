@@ -247,9 +247,11 @@ void Foam::radiation::P1::calculate()
     {
         if (!G_.boundaryField()[patchi].coupled())
         {
-            Qr_.boundaryField()[patchi] =
-                -gamma.boundaryField()[patchi]
-                *G_.boundaryField()[patchi].snGrad();
+		#if OPENFOAM_VERSION >= 40
+    		Qr_.boundaryFieldRef()[patchi] = -gamma.boundaryField()[patchi]*G_.boundaryField()[patchi].snGrad();
+    		#else
+   	 	Qr_.boundaryField()[patchi] = -gamma.boundaryField()[patchi]*G_.boundaryField()[patchi].snGrad();
+    		#endif   
         }
     }
 }
@@ -279,12 +281,18 @@ Foam::tmp<Foam::volScalarField> Foam::radiation::P1::Rp() const
 Foam::tmp<Foam::DimensionedField<Foam::scalar, Foam::volMesh> >
 Foam::radiation::P1::Ru() const
 {
-    const DimensionedField<scalar, volMesh>& G =
-        G_.dimensionedInternalField();
-    const DimensionedField<scalar, volMesh> E =
-        absorptionEmission_->ECont()().dimensionedInternalField();
-    const DimensionedField<scalar, volMesh> a =
-        absorptionEmission_->aCont()().dimensionedInternalField();
+
+    #if OPENFOAM_VERSION >= 40
+    	const DimensionedField<scalar, volMesh>& G = G_();
+	    const DimensionedField<scalar, volMesh>  E = absorptionEmission_->ECont()()();
+	    const DimensionedField<scalar, volMesh>  a = absorptionEmission_->aCont()()();
+    #else
+   	 const DimensionedField<scalar, volMesh>& G = G_.dimensionedInternalField();
+   	 const DimensionedField<scalar, volMesh>  E = absorptionEmission_->ECont()().dimensionedInternalField();
+   	 const DimensionedField<scalar, volMesh>  a = absorptionEmission_->aCont()().dimensionedInternalField();
+    #endif
+
+
 
     return a*G - E;
 }
