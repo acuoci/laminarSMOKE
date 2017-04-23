@@ -38,16 +38,106 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#if   OPENFOAM_VERSION == 22
-	#include "pEqn.22.H"
-#elif OPENFOAM_VERSION == 23
-	#include "pEqn.23.H"
-#elif OPENFOAM_VERSION == 24
-	#include "pEqn.24.H"
-#elif OPENFOAM_VERSION == 30
-	#include "pEqn.3x.H"
-#elif OPENFOAM_VERSION == 40
-	#include "pEqn.4x.H"
-#else
-	Compilation_Error_You_Did_Not_Define_The_OPENFOAM_VERSION_Macro
-#endif
+{
+	#include "setRootCase.H"
+	#include "createTime.H"
+	#include "createMesh.H"
+	#include "createControl.H"
+	#include "createTimeControls.H"
+	#include "initContinuityErrs.H"
+	#include "createRDeltaT.H"
+
+	#include "readGravitationalAcceleration.H"
+	#include "createBasicFields.H"
+	#include "readOptions.H"
+	#include "createGasFields.H"
+	#include "createChemicalFields.H"
+	#include "createLaminarSMOKEThermoClass.H"
+	#include "createDRGFields.H"
+	#include "createMRF.H"
+
+	#include "createFvOptions.H"
+	#include "createRadiationModel.H"
+
+	#include "memoryAllocation.H"
+	#include "properties.H"
+	#include "createAdditionalFields.H"
+
+	if (!LTS)
+	{
+		#include "compressibleCourantNo.H"
+		#include "setInitialDeltaT.H"
+	}
+
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+	Info<< "\nStarting time loop\n" << endl;
+
+	while (runTime.run())
+	{
+		#include "readTimeControls.H"
+
+		if (LTS)
+		{
+		    #include "setRDeltaT.H"
+		}
+		else
+		{
+		    #include "compressibleCourantNo.H"
+		    #include "setDeltaT.H"
+		}
+
+
+		runTime++;
+		Info<< "Time = " << runTime.timeName() << nl << endl;
+
+		if (momentumEquations == false)
+		{		
+			if (strangAlgorithm == STRANG_MOMENTUM_TRANSPORT_REACTION)
+			{
+				#include "Policy_TransportReaction.H"
+			}
+			else if (strangAlgorithm == STRANG_MOMENTUM_REACTION_TRANSPORT)
+			{
+				#include "Policy_ReactionTransport.H"
+			}
+			else if (strangAlgorithm == STRANG_COMPACT)
+			{
+				#include "Policy_Compact.H"
+			}
+		}
+		else
+		{
+			if (strangAlgorithm == STRANG_MOMENTUM_TRANSPORT_REACTION)
+			{
+				#include "Policy_MomentumTransportReaction.H"
+			}
+			else if (strangAlgorithm == STRANG_MOMENTUM_REACTION_TRANSPORT)
+			{
+				#include "Policy_MomentumReactionTransport.H"
+			}
+			else if (strangAlgorithm == STRANG_COMPACT)
+			{
+				#include "Policy_MomentumCompact.H"
+			}		
+		}
+
+		// Passive scalars
+            	#include "zMixEqn.H"
+		#include "tauEqn.H"
+
+		// Local post processing
+		#include "localPostProcessing.H"
+	
+		runTime.write();
+
+		
+		Info 	<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+			<< "  ClockTime = " << runTime.elapsedClockTime() << " s"
+			<< nl << endl;
+	}
+
+	Info<< "End\n" << endl;
+
+	return 0;
+}

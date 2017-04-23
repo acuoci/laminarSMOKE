@@ -40,8 +40,14 @@
 
 {
 	//- Initial conditions
+	#if OPENFOAM_VERSION >= 40
+	scalarField& TCells = T.ref();
+	scalarField& QCells = Q.ref();
+	#else
 	scalarField& TCells = T.internalField();
 	scalarField& QCells = Q.internalField();
+	#endif
+
 	const scalarField& rhoCells = rho.internalField();
 	const scalarField& cpCells = cp.internalField();
 	const scalarField& vCells = mesh.V();
@@ -173,8 +179,13 @@
 				if (strangAlgorithm != STRANG_COMPACT)
 				{
 					// Assign mass fractions
+					#if OPENFOAM_VERSION >= 40
+					for(int i=0;i<NC;i++)
+						Y[i].ref()[celli] = yf(i);
+					#else
 					for(int i=0;i<NC;i++)
 						Y[i].internalField()[celli] = yf(i);
+					#endif
 
 					//- Allocating final values: temperature
 					if (energyEquation == true)
@@ -199,8 +210,13 @@
 						const double rhomix = thermodynamicPressure*mwmix/PhysicalConstants::R_J_kmol/yf(NC);
 				
 						// Assign source mass fractions
+						#if OPENFOAM_VERSION >= 40
+						for(int i=0;i<NC;i++)
+							RR[i].ref()[celli] = rhomix*(yf(i)-Y[i].internalField()[celli])/deltat;
+						#else
 						for(int i=0;i<NC;i++)
 							RR[i].internalField()[celli] = rhomix*(yf(i)-Y[i].internalField()[celli])/deltat;
+						#endif
 
 						//- Allocating source temperature
 						if (energyEquation == true)
@@ -209,8 +225,13 @@
 					else
 					{
 						// Assign source mass fractions
+						#if OPENFOAM_VERSION >= 40
+						for(int i=0;i<NC;i++)
+							RR[i].ref()[celli] = 0.;
+						#else
 						for(int i=0;i<NC;i++)
 							RR[i].internalField()[celli] = 0.;
+						#endif
 
 						//- Allocating source temperature
 						if (energyEquation == true)
@@ -346,8 +367,13 @@
 					if (strangAlgorithm != STRANG_COMPACT)
 					{
 						// Assign mass fractions
+						#if OPENFOAM_VERSION >= 40
+						for(int i=0;i<NC;i++)
+							Y[i].ref()[celli] = yf(i);
+						#else
 						for(int i=0;i<NC;i++)
 							Y[i].internalField()[celli] = yf(i);
+						#endif
 					}
 					else
 					{
@@ -368,9 +394,14 @@
 							const double rhomix = thermodynamicPressure*mwmix/PhysicalConstants::R_J_kmol/yf(NC);
 				
 							// Assign source mass fractions
+							#if OPENFOAM_VERSION >= 40
+							for(int i=0;i<NC;i++)
+								RR[i].ref()[celli] = rhomix*(yf(i)-Y[i].internalField()[celli])/deltat;
+							#else
 							for(int i=0;i<NC;i++)
 								RR[i].internalField()[celli] = rhomix*(yf(i)-Y[i].internalField()[celli])/deltat;
-
+							#endif
+							
 							//- Allocating source temperature
 							if (energyEquation == true)
 								RT[celli] = rhomix*cpmix*(batchReactorHomogeneousConstantVolume.GetTemperature()-TCells[celli])/deltat;
@@ -378,8 +409,13 @@
 						else
 						{
 							// Assign source mass fractions
+							#if OPENFOAM_VERSION >= 40
+							for(int i=0;i<NC;i++)
+								RR[i].ref()[celli] = 0.;
+							#else
 							for(int i=0;i<NC;i++)
 								RR[i].internalField()[celli] = 0.;
+							#endif
 
 							//- Allocating source temperature
 							if (energyEquation == true)
@@ -544,8 +580,13 @@
 					if (strangAlgorithm != STRANG_COMPACT)
 					{
 						// Assign mass fractions
+						#if OPENFOAM_VERSION >= 40
+						for(int i=0;i<NC;i++)
+							Y[i].ref()[celli] = yf[i+1];
+						#else
 						for(int i=0;i<NC;i++)
 							Y[i].internalField()[celli] = yf[i+1];
+						#endif
 
 						//- Allocating final values: temperature
 						if (energyEquation == true)
@@ -570,8 +611,14 @@
 							const double rhomix = thermodynamicPressure*mwmix/PhysicalConstants::R_J_kmol/yf[NC+1];
 				
 							// Assign source mass fractions
+							#if OPENFOAM_VERSION >= 40
+							for(int i=0;i<NC;i++)
+								RR[i].ref()[celli] = rhomix*(yf[i+1]-Y[i].internalField()[celli])/deltat;
+							#else
 							for(int i=0;i<NC;i++)
 								RR[i].internalField()[celli] = rhomix*(yf[i+1]-Y[i].internalField()[celli])/deltat;
+							#endif
+							
 
 							//- Allocating source temperature
 							if (energyEquation == true)
@@ -580,8 +627,13 @@
 						else
 						{
 							// Assign source mass fractions
+							#if OPENFOAM_VERSION >= 40
+							for(int i=0;i<NC;i++)
+								RR[i].ref()[celli] = 0.;
+							#else
 							for(int i=0;i<NC;i++)
 								RR[i].internalField()[celli] = 0.;
+							#endif
 
 							//- Allocating source temperature
 							if (energyEquation == true)
@@ -603,9 +655,15 @@
 						QCells[celli] = batchReactorHomogeneousConstantPressure.QR();
 						if (outputFormationRatesIndices.size() != 0)
 						{
+							#if OPENFOAM_VERSION >= 40
+							for (int i=0;i<outputFormationRatesIndices.size();i++)
+								FormationRates[i].ref()[celli] = batchReactorHomogeneousConstantPressure.R()[outputFormationRatesIndices[i]+1] *
+                                       	      		                                                   thermodynamicsMapXML->MW(outputFormationRatesIndices[i]);
+							#else
 							for (int i=0;i<outputFormationRatesIndices.size();i++)
 								FormationRates[i].internalField()[celli] = batchReactorHomogeneousConstantPressure.R()[outputFormationRatesIndices[i]+1] *
                                        	      		                                                   thermodynamicsMapXML->MW(outputFormationRatesIndices[i]);
+							#endif
 						}
 					}
 					else
@@ -613,9 +671,16 @@
 						QCells[celli] = batchReactorHomogeneousConstantVolume.QR();
 						if (outputFormationRatesIndices.size() != 0)
 						{
+							#if OPENFOAM_VERSION >= 40
+							for (int i=0;i<outputFormationRatesIndices.size();i++)
+								FormationRates[i].ref()[celli] = batchReactorHomogeneousConstantVolume.R()[outputFormationRatesIndices[i]+1] *
+                                           	                                                           thermodynamicsMapXML->MW(outputFormationRatesIndices[i]);
+							#else
 							for (int i=0;i<outputFormationRatesIndices.size();i++)
 								FormationRates[i].internalField()[celli] = batchReactorHomogeneousConstantVolume.R()[outputFormationRatesIndices[i]+1] *
                                            	                                                           thermodynamicsMapXML->MW(outputFormationRatesIndices[i]);
+							#endif
+
 						}
 					}
 				}

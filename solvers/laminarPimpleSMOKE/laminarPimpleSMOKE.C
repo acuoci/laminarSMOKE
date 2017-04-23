@@ -65,15 +65,22 @@
 #include "fvCFD.H"
 #include "multivariateScheme.H"
 #include "pimpleControl.H"
-#include "fvIOoptionList.H"
 #include "interpolation.H"
 
 // Customized radiation model
 #include "OpenSMOKEradiationModel.H"
 
-#if OPENFOAM_VERSION == 30
+#if OPENFOAM_VERSION <= 30
+#include "fvIOoptionList.H"
 #include "localEulerDdtScheme.H"
 #include "fvcSmooth.H"
+#endif
+
+#if OPENFOAM_VERSION >= 40
+#include "fvOptions.H"
+#include "localEulerDdtScheme.H"
+#include "fvcSmooth.H"
+#include "pressureControl.H"
 #endif
 
 // Additional include files
@@ -115,7 +122,9 @@ void SolveOpenSourceSolvers(OdeBatch& ode, const double t0, const double tf, con
 
 int main(int argc, char *argv[])
 {
-	#if OPENFOAM_VERSION == 30
+	#if OPENFOAM_VERSION == 40
+		#include "laminarPimpleSMOKE.4x.H"
+	#elif OPENFOAM_VERSION == 30
 		#include "laminarPimpleSMOKE.3x.H"
 	#else
 		#include "laminarPimpleSMOKE.2x.H"

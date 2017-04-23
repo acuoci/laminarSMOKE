@@ -50,5 +50,7 @@
 		#include "properties.H"
 	}
 
+	#if OPENFOAM_VERSION <= 30
 	rho = Rho(p,psi);
+	#endif
 }

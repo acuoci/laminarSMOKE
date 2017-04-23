@@ -39,8 +39,16 @@
 \*-----------------------------------------------------------------------*/
 
 {	
-	#include "rhoEqn.H"
+	#if OPENFOAM_VERSION >= 40
+		if (pimple.nCorrPIMPLE() <= 1)
+		{
+		    #include "rhoEqn.H"
+		}
+	#else
+		#include "rhoEqn.H"
+	#endif
 
+	// --- Pressure-velocity PIMPLE corrector loop
 	while (pimple.loop())
 	{
 		#include "UEqn.H"
@@ -59,9 +67,20 @@
 		// --- Pressure corrector loop
 		while (pimple.correct())
 		{
-			#include "pEqn.H"
+			#if OPENFOAM_VERSION >= 40
+			if (pimple.consistent())
+			{
+				#include "pcEqn.H"
+			}
+			else
+			#endif
+			{
+				#include "pEqn.H"
+			}
 		}
 	}
 
+	#if OPENFOAM_VERSION <= 30
 	rho = Rho(p,psi);
+	#endif
 }

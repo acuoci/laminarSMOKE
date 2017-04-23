@@ -50,5 +50,7 @@
 	#include "YEqn.H"
 	#include "TEqn.H"
 
+	#if OPENFOAM_VERSION <= 30
 	rho = Rho(p,psi);
+	#endif
 }
