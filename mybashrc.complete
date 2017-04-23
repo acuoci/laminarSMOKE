@@ -1,4 +1,5 @@
 #OpenFOAM VERSION (22, 23, 24, 30, 40)
+#OpenFOAM-dev is equivalent to 40
 export OPENFOAM_VERSION='-DOPENFOAM_VERSION=40'
 
 #Compulsory path
@@ -7,7 +8,7 @@ export BOOST_LIBRARY_PATH=/software/chimica2/libraries/boost/boost-1.60.0-gcc-4.
 export RAPIDXML_LIBRARY_PATH=/software/chimica2/libraries/rapidxml/rapidxml-1.13
 
 #Options: ISAT support
-export ISAT_SUPPORT='-DEDCSMOKE_USE_ISAT=1'
+export ISAT_SUPPORT='-DOPENSMOKE_USE_ISAT=1'
 export ISAT_INCLUDE=$HOME/Development/ExternalNumericalLibraries/ISATLib/ISATLib-1.1/src
 export ISAT_LIBS=-lISATLib4OpenFOAM
 

@@ -43,19 +43,19 @@ Three different options are available to compile the code, according to the leve
 
 1. Instructions to compile the Minimalist version
 -------------------------------------------------
-1. Open the `mybashrc.minimalist`, choose the version of OpenFOAM you are using (2.2, 2.3, 2.4, 3.0) and adjust the paths to the compulsory external libraries
+1. Open the `mybashrc.minimalist`, choose the version of OpenFOAM you are using (2.2, 2.3, 2.4, 3.0, 4.x, dev) and adjust the paths to the compulsory external libraries
 2. Type: `source mybashrc.minimalist`
 3. Go to Section 4
 
 2. Instructions to compile the Minimalist+MKL version
 -----------------------------------------------------
-1. Open the `mybashrc.minimalist.mkl`, choose the version of OpenFOAM you are using (2.2, 2.3, 2.4, 3.0) and adjust the paths to the compulsory external libraries and the paths to the Intel MKL library
+1. Open the `mybashrc.minimalist.mkl`, choose the version of OpenFOAM you are using (2.2, 2.3, 2.4, 3.0, 4.x, dev) and adjust the paths to the compulsory external libraries and the paths to the Intel MKL library
 2. Type: `source mybashrc.minimalist.mkl`
 3. Go to Section 4
 
 3. Instructions to compile the Complete version
 -----------------------------------------------------
-1. Open the `mybashrc.complete`, choose the version of OpenFOAM you are using (2.2, 2.3, 2.4, 3.0) and adjust the paths to the compulsory external libraries and the Intel MKL library. You can choose the additional external libraries you want to add to laminarSMOKE, by modifying the `EXTERNAL_ODE_SOLVERS` variable: in particular `1` means that the support is requested, while `0` means that no support is requested. Obviously, for each requested library, you need to provide the correct path.
+1. Open the `mybashrc.complete`, choose the version of OpenFOAM you are using (2.2, 2.3, 2.4, 3.0, 4.x, dev) and adjust the paths to the compulsory external libraries and the Intel MKL library. You can choose the additional external libraries you want to add to laminarSMOKE, by modifying the `EXTERNAL_ODE_SOLVERS` variable: in particular `1` means that the support is requested, while `0` means that no support is requested. Obviously, for each requested library, you need to provide the correct path.
 2. Type: `source mybashrc.complete`
 3. Go to Section 4
 
