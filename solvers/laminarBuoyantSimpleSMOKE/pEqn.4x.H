@@ -39,109 +39,73 @@
 \*-----------------------------------------------------------------------*/
 
 {
-    volScalarField rAU(1.0/UEqn().A());
-    volVectorField HbyA("HbyA", U);
-    HbyA = rAU*UEqn().H();
+    rho = Rho(p,psi);
+    rho.relax();
 
-    UEqn.clear();
+    volScalarField rAU("rAU", 1.0/UEqn.A());
+    surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rho*rAU));
+    volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p_rgh));
+    tUEqn.clear();
 
-    bool closedVolume = false;
+    surfaceScalarField phig(-rhorAUf*ghf*fvc::snGrad(rho)*mesh.magSf());
 
-    if (simple.transonic())
+    surfaceScalarField phiHbyA
+    (
+        "phiHbyA",
+        fvc::flux(rho*HbyA)
+    );
+
+    MRF.makeRelative(fvc::interpolate(rho), phiHbyA);
+
+    bool closedVolume = adjustPhi(phiHbyA, U, p_rgh);
+
+    phiHbyA += phig;
+
+    // Update the pressure BCs to ensure flux consistency
+    constrainPressure(p_rgh, rho, U, phiHbyA, rhorAUf, MRF);
+
+    while (simple.correctNonOrthogonal())
     {
-        surfaceScalarField phid
+        fvScalarMatrix p_rghEqn
         (
-            "phid",
-            fvc::interpolate(psi)
-           *(fvc::interpolate(HbyA) & mesh.Sf())
+            fvm::laplacian(rhorAUf, p_rgh) == fvc::div(phiHbyA)
         );
 
-        MRF.makeRelative(fvc::interpolate(psi), phid);
+        p_rghEqn.setReference(pRefCell, getRefCellValue(p_rgh, pRefCell));
+        p_rghEqn.solve();
 
-        while (simple.correctNonOrthogonal())
+        if (simple.finalNonOrthogonalIter())
         {
-            fvScalarMatrix pEqn
-            (
-                fvm::div(phid, p)
-              - fvm::laplacian(rho*rAU, p)
-              ==
-                fvOptions(psi, p, rho.name())
-            );
+            // Calculate the conservative fluxes
+            phi = phiHbyA - p_rghEqn.flux();
 
-            // Relax the pressure equation to ensure diagonal-dominance
-            pEqn.relax();
+            // Explicitly relax pressure for momentum corrector
+            p_rgh.relax();
 
-            pEqn.setReference(pRefCell, pRefValue);
-
-            pEqn.solve();
-
-            if (simple.finalNonOrthogonalIter())
-            {
-                phi == pEqn.flux();
-            }
-        }
-    }
-    else
-    {
-        surfaceScalarField phiHbyA
-        (
-            "phiHbyA",
-            fvc::interpolate(rho*HbyA) & mesh.Sf()
-        );
-
-        MRF.makeRelative(fvc::interpolate(rho), phiHbyA);
-
-        closedVolume = adjustPhi(phiHbyA, U, p);
-
-        while (simple.correctNonOrthogonal())
-        {
-            fvScalarMatrix pEqn
-            (
-                fvc::div(phiHbyA)
-              - fvm::laplacian(rho*rAU, p)
-              ==
-                fvOptions(psi, p, rho.name())
-            );
-
-            pEqn.setReference(pRefCell, pRefValue);
-
-            pEqn.solve();
-
-            if (simple.finalNonOrthogonalIter())
-            {
-                phi = phiHbyA + pEqn.flux();
-            }
+            // Correct the momentum source with the pressure gradient flux
+            // calculated from the relaxed pressure
+            U = HbyA + rAU*fvc::reconstruct((phig - p_rghEqn.flux())/rhorAUf);
+            U.correctBoundaryConditions();
+            fvOptions.correct(U);
         }
     }
 
+    #include "continuityErrs.H"
 
-    #include "incompressible/continuityErrs.H"
+    p = p_rgh + rho*gh;
 
-    // Explicitly relax pressure for momentum corrector
-    p.relax();
-
-    U = HbyA - rAU*fvc::grad(p);
-    U.correctBoundaryConditions();
-    fvOptions.correct(U);
-
-    // For closed-volume cases adjust the pressure and density levels
+    // For closed-volume cases adjust the pressure level
     // to obey overall mass continuity
     if (closedVolume)
     {
         p += (initialMass - fvc::domainIntegrate(psi*p))
             /fvc::domainIntegrate(psi);
+        p_rgh = p - rho*gh;
     }
 
     rho = Rho(p,psi);
-    rho = max(rho, rhoMin);
-    rho = min(rho, rhoMax);
-
-    if (!simple.transonic())
-    {
-        rho.relax();
-    }
-
-    Info<< "rho max/min : "
-        << max(rho).value() << " "
-        << min(rho).value() << endl;
+    rho.relax();
+    Info << "rho max/min : " << max(rho).value() << " " << min(rho).value()
+         << endl;
 }
+

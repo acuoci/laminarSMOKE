@@ -61,7 +61,11 @@
 #include "fvCFD.H"
 #include "multivariateScheme.H"
 #include "simpleControl.H"
+#if OPENFOAM_VERSION >= 40
+#include "fvOptions.H"
+#else
 #include "fvIOoptionList.H"
+#endif
 #include "interpolation.H"
 #include "fixedFluxPressureFvPatchScalarField.H"
 
@@ -88,7 +92,11 @@ int main(int argc, char *argv[])
 	#include "createMesh.H"
 	#include "readGravitationalAcceleration.H"
 
+	#if OPENFOAM_VERSION >= 40
+	#include "createControl.H"
+	#else
 	simpleControl simple(mesh);
+	#endif
 
 	#include "createBasicFields.H"
 	#include "readOptions.H"
@@ -99,7 +107,7 @@ int main(int argc, char *argv[])
 	#include "createGasFields.H"
 	#include "createChemicalFields.H"
 	#include "createLaminarSMOKEThermoClass.H"
-        #if OPENFOAM_VERSION == 30
+        #if OPENFOAM_VERSION >= 30
         #include "createMRF.H"
         #endif
 	#include "createFvOptions.H"
@@ -135,19 +143,8 @@ int main(int argc, char *argv[])
 		    #include "YEqn.H"
 		    #include "TEqn.H" 
 
-		    // Pressure equations
-		    #if OPENFOAM_VERSION == 30
-		    if (simple.consistent())
-		    {
-			#include "pcEqn.H"
-		    }
-		    else
-		    {
-			#include "pEqn.H"
-	            }
-		    #else
-			#include "pEqn.H"
-		    #endif
+		    // Pressure equation
+		    #include "pEqn.H"
 		}
 		else
 		{

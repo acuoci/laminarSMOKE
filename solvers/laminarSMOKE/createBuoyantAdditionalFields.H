@@ -76,30 +76,45 @@
 
 	#if   OPENFOAM_VERSION >= 40
 
-	#include "readhRef.H"
-	#include "gh.H"
-	#include "readpRef.H"
+		#include "readhRef.H"
+		#include "gh.H"
+		#if STEADYSTATE != 1
+		#include "readpRef.H"
+		#endif
 
-	volScalarField p_rgh
-	(
-	    IOobject
-	    (
-		"p_rgh",
-		runTime.timeName(),
-		mesh,
-		IOobject::MUST_READ,
-		IOobject::AUTO_WRITE
-	    ),
-	    mesh
-	);
+		volScalarField p_rgh
+		(
+		    IOobject
+		    (
+			"p_rgh",
+			runTime.timeName(),
+			mesh,
+			IOobject::MUST_READ,
+			IOobject::AUTO_WRITE
+		    ),
+		    mesh
+		);
 
-	mesh.setFluxRequired(p_rgh.name());
+		mesh.setFluxRequired(p_rgh.name());
 
-	// Force p_rgh to be consistent with p
-	p_rgh = p - rho*gh;
+		// Force p_rgh to be consistent with p
+		p_rgh = p - rho*gh;
 
-	#if STEADYSTATE == 1
-	#endif
+		#if STEADYSTATE == 1
+
+			label pRefCell = 0;
+			scalar pRefValue = 0.0;
+
+			setRefCell
+			(
+				p,
+				p_rgh,
+				simple.dict(),
+				pRefCell,
+				pRefValue
+			);
+
+		#endif
 
 	#elif   OPENFOAM_VERSION == 30
 
