@@ -59,7 +59,11 @@ Foam::depositionWallFvPatchScalarField::depositionWallFvPatchScalarField
 	epsilon() = 0.0;
 	omega0()  = 0.0;
 	rho0()    = 0.0;
-        nameInternal_ = dimensionedInternalField().name();
+	#if OPENFOAM_VERSION >= 40
+	nameInternal_ = internalField().name();
+	#else
+	nameInternal_ = dimensionedInternalField().name();
+	#endif
 }
 
 
@@ -85,7 +89,11 @@ Foam::depositionWallFvPatchScalarField::depositionWallFvPatchScalarField
     mixedUserDefinedFvPatchScalarField(p, iF)
 {
     // Name of field
+    #if OPENFOAM_VERSION >= 40
+    nameInternal_ = internalField().name();
+    #else
     nameInternal_ = dimensionedInternalField().name();
+    #endif
 
     // Set the nominal value
     omega0() = 0;
@@ -166,7 +174,11 @@ void Foam::depositionWallFvPatchScalarField::updateCoeffs()
     }
 
     // Name of field
+    #if OPENFOAM_VERSION >= 40
+    nameInternal_ = internalField().name();
+    #else
     nameInternal_ = dimensionedInternalField().name();
+    #endif
 
     // Theve variables are kept equal to 0
     omega0()  = 0.;

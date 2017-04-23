@@ -262,7 +262,11 @@ public:
             //- Evaluate the patch field
             virtual void evaluate
             (
-                const Pstream::commsTypes commsType=Pstream::blocking
+		#if OPENFOAM_VERSION >= 40
+		const Pstream::commsTypes commsType =Pstream::commsTypes::blocking
+		#else
+                const Pstream::commsTypes commsType = Pstream::blocking
+		#endif
             );
 
             //- Return the matrix diagonal coefficients corresponding to the

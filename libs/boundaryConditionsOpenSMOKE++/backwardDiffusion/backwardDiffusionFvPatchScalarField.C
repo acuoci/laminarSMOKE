@@ -59,7 +59,12 @@ Foam::backwardDiffusionFvPatchScalarField::backwardDiffusionFvPatchScalarField
 	omega0()  = 0.0;
 	rho0()    = 0.0;
         epsilon() = 0.0;
+	#if OPENFOAM_VERSION >= 40
+	nameInternal_ = internalField().name();
+	#else
         nameInternal_ = dimensionedInternalField().name();
+	#endif
+        
 }
 
 
@@ -85,8 +90,12 @@ Foam::backwardDiffusionFvPatchScalarField::backwardDiffusionFvPatchScalarField
     mixedUserDefinedFvPatchScalarField(p, iF)
 {
     // Name of field
+    #if OPENFOAM_VERSION >= 40
+    nameInternal_ = internalField().name();
+    #else
     nameInternal_ = dimensionedInternalField().name();
-
+    #endif
+    
     // Set the nominal value
     omega0() = scalarField("omega0", dict, p.size());
     rho0()   = scalarField("rho0", dict, p.size());
@@ -178,7 +187,12 @@ void Foam::backwardDiffusionFvPatchScalarField::updateCoeffs()
     const volScalarField& rho = db().lookupObject<volScalarField>("rho");
     eta() = rho0() / rho.boundaryField()[patchi];
 
+    #if OPENFOAM_VERSION >= 40
+    nameInternal_ = internalField().name();
+    #else
     nameInternal_ = dimensionedInternalField().name();
+    #endif
+
     bool soretEffect  = db().foundObject<volScalarField>("gas_Dsoret_" + nameInternal_);
 
     // Calculating epsilon
@@ -194,7 +208,11 @@ void Foam::backwardDiffusionFvPatchScalarField::updateCoeffs()
     }
 
     // Calculating beta
+    #if OPENFOAM_VERSION >= 40
+    nameInternal_ = internalField().name();
+    #else
     nameInternal_ = dimensionedInternalField().name();
+    #endif
     const volScalarField& Dmix = db().lookupObject<volScalarField>("gas_Dmix_" + nameInternal_);
     beta() = Dmix.boundaryField()[patchi]*this->patch().deltaCoeffs();
 
