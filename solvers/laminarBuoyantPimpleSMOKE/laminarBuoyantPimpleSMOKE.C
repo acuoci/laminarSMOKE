@@ -65,7 +65,12 @@
 #include "fvCFD.H"
 #include "multivariateScheme.H"
 #include "pimpleControl.H"
+#if OPENFOAM_VERSION == 40
+#include "fvOptions.H"
+#else
 #include "fvIOoptionList.H"
+#endif
+
 #include "interpolation.H"
 #include "fixedFluxPressureFvPatchScalarField.H"
 
@@ -111,7 +116,9 @@ void SolveOpenSourceSolvers(OdeBatch& ode, const double t0, const double tf, con
 
 int main(int argc, char *argv[])
 {
-	#if OPENFOAM_VERSION == 30
+	#if OPENFOAM_VERSION == 40
+		#include "laminarPimpleSMOKE.4x.H"
+	#elif OPENFOAM_VERSION == 30
 		#include "laminarPimpleSMOKE.3x.H"
 	#else
 		#include "laminarPimpleSMOKE.2x.H"

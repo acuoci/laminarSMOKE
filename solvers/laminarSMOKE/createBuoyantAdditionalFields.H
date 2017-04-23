@@ -74,7 +74,34 @@
 	Info<< "Creating field kinetic energy K\n" << endl;
 	volScalarField K("K", 0.5*magSqr(U));
 
-	#if   OPENFOAM_VERSION >= 30
+	#if   OPENFOAM_VERSION >= 40
+
+	#include "readhRef.H"
+	#include "gh.H"
+	#include "readpRef.H"
+
+	volScalarField p_rgh
+	(
+	    IOobject
+	    (
+		"p_rgh",
+		runTime.timeName(),
+		mesh,
+		IOobject::MUST_READ,
+		IOobject::AUTO_WRITE
+	    ),
+	    mesh
+	);
+
+	mesh.setFluxRequired(p_rgh.name());
+
+	// Force p_rgh to be consistent with p
+	p_rgh = p - rho*gh;
+
+	#if STEADYSTATE == 1
+	#endif
+
+	#elif   OPENFOAM_VERSION == 30
 
 		#include "readhRef.H"
 		#include "gh.H"
