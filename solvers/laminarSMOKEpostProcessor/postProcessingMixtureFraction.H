@@ -150,8 +150,14 @@ if (reconstructMixtureFraction == true)
 	
 
 		const scalarField& TCells = T.internalField();
-		      scalarField& zMix_recCells = zMix_rec.internalField();
-		      scalarField& phi_recCells = phi_rec.internalField();
+		#if OPENFOAM_VERSION >= 40
+		scalarField& zMix_recCells = zMix_rec.ref();
+		scalarField& phi_recCells = phi_rec.ref();
+		#else
+		scalarField& zMix_recCells = zMix_rec.internalField();
+		scalarField& phi_recCells = phi_rec.internalField();
+		#endif
+		      
 
 		forAll(TCells, celli)
 		{	
@@ -166,10 +172,16 @@ if (reconstructMixtureFraction == true)
 
 		forAll(T.boundaryField(), patchi)
 		{
+			#if OPENFOAM_VERSION >= 40
+			fvPatchScalarField& pT = T.boundaryFieldRef()[patchi];
+			fvPatchScalarField& pzMix_rec = zMix_rec.boundaryFieldRef()[patchi];
+			fvPatchScalarField& pphi_rec = phi_rec.boundaryFieldRef()[patchi];
+			#else
 			fvPatchScalarField& pT = T.boundaryField()[patchi];
 			fvPatchScalarField& pzMix_rec = zMix_rec.boundaryField()[patchi];
 			fvPatchScalarField& pphi_rec = phi_rec.boundaryField()[patchi];
-	
+			#endif
+
 			forAll(pT, facei)
 			{
 				// Extract the mass fractions

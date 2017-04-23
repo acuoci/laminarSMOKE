@@ -59,7 +59,12 @@ volScalarField h
 
 	const scalarField& TCells = T.internalField();
 	const scalarField& pCells = p.internalField();
-	      scalarField& rhoCells = rho.internalField();
+	#if OPENFOAM_VERSION >= 40
+	scalarField& rhoCells = rho.ref();
+	#else
+	scalarField& rhoCells = rho.internalField();
+	#endif
+	      
 
 	forAll(TCells, celli)
 	{
@@ -70,8 +75,12 @@ volScalarField h
 	{
 		const fvPatchScalarField& pT  = T.boundaryField()[patchi];
 		const fvPatchScalarField& pp  = p.boundaryField()[patchi];
-		      fvPatchScalarField& ph  = h.boundaryField()[patchi];
-
+		#if OPENFOAM_VERSION >= 40
+		fvPatchScalarField& ph  = h.boundaryFieldRef()[patchi];
+		#else
+		fvPatchScalarField& ph  = h.boundaryField()[patchi];
+		#endif
+		      
 		forAll(ph, facei)
 		{
 			thermodynamicsMapXML->SetPressure(pp[facei]);

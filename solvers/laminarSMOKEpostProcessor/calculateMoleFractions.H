@@ -59,13 +59,24 @@ if (calculateMoleFractions == true)
 		// Convert to mole fractions
 		thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), mw, y.GetHandle());
 
+		#if OPENFOAM_VERSION >= 40
+		for(unsigned int i=0;i<ns;i++)
+			X[i].ref()[celli] = x[i+1];
+		#else
 		for(unsigned int i=0;i<ns;i++)
 			X[i].internalField()[celli] = x[i+1];
+		#endif
+		
 	}
 
 	forAll(T.boundaryField(), patchi)
 	{
+		#if OPENFOAM_VERSION >= 40
+		fvPatchScalarField& pT = T.boundaryFieldRef()[patchi];
+		#else
 		fvPatchScalarField& pT = T.boundaryField()[patchi];
+		#endif
+		
 
 		forAll(pT, facei)
 		{
@@ -78,8 +89,13 @@ if (calculateMoleFractions == true)
 			// Convert to mole fractions
 			thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), mw, y.GetHandle());
 
+			#if OPENFOAM_VERSION >= 40
+			for(unsigned int i=1;i<=ns;i++)
+				X[i-1].boundaryFieldRef()[patchi][facei] = x[i];
+			#else
 			for(unsigned int i=1;i<=ns;i++)
 				X[i-1].boundaryField()[patchi][facei] = x[i];
+			#endif	
 		}
 	}
 

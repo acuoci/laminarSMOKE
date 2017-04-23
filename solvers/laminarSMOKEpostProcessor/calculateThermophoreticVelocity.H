@@ -77,9 +77,14 @@ if (calculateThermophoreticVelocity == true)
 
 		const scalarField& TCells = T.internalField();
 		const scalarField& pCells = p.internalField();
-		      scalarField& rhoCells = rho.internalField();
-		      scalarField& muCells = mu.internalField();
-
+		#if OPENFOAM_VERSION >= 40
+		scalarField& rhoCells = rho.ref();
+		scalarField& muCells = mu.ref();
+		#else
+		scalarField& rhoCells = rho.internalField();
+		scalarField& muCells = mu.internalField();
+		#endif
+		      
 		forAll(TCells, celli)
 		{	
 			double mw;
@@ -116,8 +121,13 @@ if (calculateThermophoreticVelocity == true)
 		{
 			const fvPatchScalarField& pT  = T.boundaryField()[patchi];
 			const fvPatchScalarField& pp  = p.boundaryField()[patchi];
-			      fvPatchScalarField& prho  = rho.boundaryField()[patchi];
-			      fvPatchScalarField& pmu   = mu.boundaryField()[patchi];
+			#if OPENFOAM_VERSION >= 40
+			fvPatchScalarField& prho  = rho.boundaryFieldRef()[patchi];
+			fvPatchScalarField& pmu   = mu.boundaryFieldRef()[patchi];
+			#else
+			fvPatchScalarField& prho  = rho.boundaryField()[patchi];
+			fvPatchScalarField& pmu   = mu.boundaryField()[patchi];
+			#endif
 
 			forAll(pT, facei)
 			{

@@ -85,7 +85,11 @@ if (calculateLocalStrainRate == true)
 	{
 		const scalarField& zMixCells = zMix.internalField();
 		const scalarField& mag_grad_z_uncorrectedCells = mag_grad_z_uncorrected.internalField();
-	              scalarField& strain_rateCells = strain_rate.internalField();
+		#if OPENFOAM_VERSION >= 40
+		scalarField& strain_rateCells = strain_rate.ref();
+		#else
+		scalarField& strain_rateCells = strain_rate.internalField();
+		#endif      
 
 		forAll(zMixCells, celli)
 		{	

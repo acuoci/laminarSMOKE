@@ -61,8 +61,12 @@ if (calculateEquivalenceRatio == true)
 
 	const scalarField& TCells = T.internalField();
 	const scalarField& pCells = p.internalField();
-	      scalarField& equivalenceratioCells = equivalenceratio.internalField();
-
+	#if OPENFOAM_VERSION >= 40
+	scalarField& equivalenceratioCells = equivalenceratio.ref();
+	#else
+	scalarField& equivalenceratioCells = equivalenceratio.internalField();
+	#endif
+	      
 	const std::vector<std::string> fuel_names(2); fuel_names[0] = "C2H2"; fuel_names[1] = "N2";
 	const std::vector<std::string> ox_names(2); ox_names[0] = "O2"; ox_names[1] = "N2";
 	const std::vector<double> fuel_moles(2); fuel_moles[0] = 0.25; fuel_moles[1] = 0.75;
@@ -73,8 +77,6 @@ if (calculateEquivalenceRatio == true)
 	std::vector<double> moles_st(ns);
 	moles_st = thermodynamicsMapXML->GetMoleFractionsFromEquivalenceRatio(1.,fuel_names, fuel_moles, ox_names,ox_moles );
 
-	
-	
 	forAll(TCells, celli)
 	{	
 		double mw;
@@ -102,9 +104,12 @@ if (calculateEquivalenceRatio == true)
 	{
 		const fvPatchScalarField& pT  = T.boundaryField()[patchi];
 		const fvPatchScalarField& pp  = p.boundaryField()[patchi];
-		      fvPatchScalarField& pequivalenceratio  = equivalenceratio.boundaryField()[patchi];
-
-
+		#if OPENFOAM_VERSION >= 40
+		fvPatchScalarField& pequivalenceratio  = equivalenceratio.boundaryFieldRef()[patchi];
+		#else
+		fvPatchScalarField& pequivalenceratio  = equivalenceratio.boundaryField()[patchi];
+		#endif
+		      
 		forAll(pT, facei)
 		{
 			double mw;

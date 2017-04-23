@@ -399,6 +399,32 @@ if (postProcessingPolimiSoot == true)
 	const scalarField& TCells = T.internalField();
 	const scalarField& pCells = p.internalField();
 
+	#if OPENFOAM_VERSION >= 40
+	scalarField& soot_fv_largeCells = soot_fv_large.ref();
+	scalarField& soot_fv_smallCells = soot_fv_small.ref();
+	scalarField& soot_rho_largeCells = soot_rho_large.ref();
+	scalarField& soot_rho_smallCells = soot_rho_small.ref();
+	scalarField& soot_N_largeCells = soot_N_large.ref();
+	scalarField& soot_N_smallCells = soot_N_small.ref();
+	scalarField& soot_x_largeCells = soot_x_large.ref();
+	scalarField& soot_x_smallCells = soot_x_small.ref();
+	scalarField& soot_omega_largeCells = soot_omega_large.ref();
+	scalarField& soot_omega_smallCells = soot_omega_small.ref();
+	scalarField& soot_h_over_c_largeCells = soot_h_over_c_large.ref();
+	scalarField& soot_h_over_c_smallCells = soot_h_over_c_small.ref();
+	scalarField& soot_o_over_c_largeCells = soot_o_over_c_large.ref();
+	scalarField& soot_o_over_c_smallCells = soot_o_over_c_small.ref();
+	scalarField& soot_o_over_h_largeCells = soot_o_over_h_large.ref();
+	scalarField& soot_o_over_h_smallCells = soot_o_over_h_small.ref();
+	scalarField& soot_omega_precursorsCells = soot_omega_precursors.ref();
+	scalarField& soot_x_precursorsCells = soot_x_precursors.ref();
+
+	scalarField& soot_R_largeCells = soot_R_large.ref();
+	scalarField& soot_R_smallCells = soot_R_small.ref();
+	scalarField& pah_R_1_2Cells = pah_R_1_2.ref();
+	scalarField& pah_R_3_4Cells = pah_R_3_4.ref();
+	scalarField& pah_R_more_4Cells = pah_R_more_4.ref();
+	#else
 	scalarField& soot_fv_largeCells = soot_fv_large.internalField();
 	scalarField& soot_fv_smallCells = soot_fv_small.internalField();
 	scalarField& soot_rho_largeCells = soot_rho_large.internalField();
@@ -423,6 +449,7 @@ if (postProcessingPolimiSoot == true)
 	scalarField& pah_R_1_2Cells = pah_R_1_2.internalField();
 	scalarField& pah_R_3_4Cells = pah_R_3_4.internalField();
 	scalarField& pah_R_more_4Cells = pah_R_more_4.internalField();
+	#endif
 
 	// Total volume
 	double Vtot = 0.;
@@ -543,7 +570,11 @@ if (postProcessingPolimiSoot == true)
 					sum += r[soot_classes_reader.reaction_indices(i)[j]];
 				}
 			
-				sootClasses[i].internalField()[celli] = sum;	
+				#if OPENFOAM_VERSION >= 40
+				sootClasses[i].ref()[celli] = sum;
+				#else
+				sootClasses[i].internalField()[celli] = sum;
+				#endif	
 				sootClassesIntegrals[i] += sum*mesh.V()[celli];	
 			}
 		}
@@ -555,6 +586,32 @@ if (postProcessingPolimiSoot == true)
 		const fvPatchScalarField& pT  = T.boundaryField()[patchi];
 		const fvPatchScalarField& pp  = p.boundaryField()[patchi];
 		
+		#if OPENFOAM_VERSION >= 40
+		fvPatchScalarField& psoot_fv_large = soot_fv_large.boundaryFieldRef()[patchi];
+		fvPatchScalarField& psoot_fv_small = soot_fv_small.boundaryFieldRef()[patchi];
+		fvPatchScalarField& psoot_rho_large = soot_rho_large.boundaryFieldRef()[patchi];
+		fvPatchScalarField& psoot_rho_small = soot_rho_small.boundaryFieldRef()[patchi];
+		fvPatchScalarField& psoot_N_large = soot_N_large.boundaryFieldRef()[patchi];
+		fvPatchScalarField& psoot_N_small = soot_N_small.boundaryFieldRef()[patchi];
+		fvPatchScalarField& psoot_omega_large = soot_omega_large.boundaryFieldRef()[patchi];
+		fvPatchScalarField& psoot_omega_small = soot_omega_small.boundaryFieldRef()[patchi];
+		fvPatchScalarField& psoot_x_large = soot_x_large.boundaryFieldRef()[patchi];
+		fvPatchScalarField& psoot_x_small = soot_x_small.boundaryFieldRef()[patchi];
+		fvPatchScalarField& psoot_h_over_c_large = soot_h_over_c_large.boundaryFieldRef()[patchi];
+		fvPatchScalarField& psoot_h_over_c_small = soot_h_over_c_small.boundaryFieldRef()[patchi];
+		fvPatchScalarField& psoot_o_over_c_large = soot_o_over_c_large.boundaryFieldRef()[patchi];
+		fvPatchScalarField& psoot_o_over_c_small = soot_o_over_c_small.boundaryFieldRef()[patchi];
+		fvPatchScalarField& psoot_o_over_h_large = soot_o_over_h_large.boundaryFieldRef()[patchi];
+		fvPatchScalarField& psoot_o_over_h_small = soot_o_over_h_small.boundaryFieldRef()[patchi];
+		fvPatchScalarField& psoot_x_precursors = soot_x_precursors.boundaryFieldRef()[patchi];
+		fvPatchScalarField& psoot_omega_precursors = soot_omega_precursors.boundaryFieldRef()[patchi];
+
+		fvPatchScalarField& psoot_R_large = soot_R_large.boundaryFieldRef()[patchi];
+		fvPatchScalarField& psoot_R_small = soot_R_small.boundaryFieldRef()[patchi];
+		fvPatchScalarField& ppah_R_1_2 = pah_R_1_2.boundaryFieldRef()[patchi];
+		fvPatchScalarField& ppah_R_3_4 = pah_R_3_4.boundaryFieldRef()[patchi];
+		fvPatchScalarField& ppah_R_more_4 = pah_R_more_4.boundaryFieldRef()[patchi];
+		#else
 		fvPatchScalarField& psoot_fv_large = soot_fv_large.boundaryField()[patchi];
 		fvPatchScalarField& psoot_fv_small = soot_fv_small.boundaryField()[patchi];
 		fvPatchScalarField& psoot_rho_large = soot_rho_large.boundaryField()[patchi];
@@ -579,7 +636,7 @@ if (postProcessingPolimiSoot == true)
 		fvPatchScalarField& ppah_R_1_2 = pah_R_1_2.boundaryField()[patchi];
 		fvPatchScalarField& ppah_R_3_4 = pah_R_3_4.boundaryField()[patchi];
 		fvPatchScalarField& ppah_R_more_4 = pah_R_more_4.boundaryField()[patchi];
-
+		#endif
 
 		forAll(pT, facei)
 		{
@@ -664,7 +721,11 @@ if (postProcessingPolimiSoot == true)
 						sum += r[soot_classes_reader.reaction_indices(i)[j]];
 					}
 
-					sootClasses[i].boundaryField()[patchi][facei] = sum;		
+					#if OPENFOAM_VERSION >= 40
+					sootClasses[i].boundaryFieldRef()[patchi][facei] = sum;
+					#else
+					sootClasses[i].boundaryField()[patchi][facei] = sum;
+					#endif				
 				}
 			}
 		}

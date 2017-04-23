@@ -61,8 +61,12 @@ volScalarField rho
 
 	const scalarField& TCells = T.internalField();
 	const scalarField& pCells = p.internalField();
-	      scalarField& rhoCells = rho.internalField();
-
+	#if OPENFOAM_VERSION >= 40
+	scalarField& rhoCells = rho.ref();
+	#else
+	scalarField& rhoCells = rho.internalField();
+	#endif
+	      
 	forAll(TCells, celli)
 	{	
 		double mw;
@@ -94,9 +98,12 @@ volScalarField rho
 	{
 		const fvPatchScalarField& pT  = T.boundaryField()[patchi];
 		const fvPatchScalarField& pp  = p.boundaryField()[patchi];
-		      fvPatchScalarField& prho  = rho.boundaryField()[patchi];
-
-
+		#if OPENFOAM_VERSION >= 40
+		fvPatchScalarField& prho  = rho.boundaryFieldRef()[patchi];
+		#else
+		fvPatchScalarField& prho  = rho.boundaryField()[patchi];
+		#endif
+		      
 		forAll(pT, facei)
 		{
 			double mw;

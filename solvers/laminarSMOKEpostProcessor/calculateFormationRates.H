@@ -99,7 +99,11 @@ if (outputFormationRatesIndices.size() > 0)
 		for (int j=0;j<outputFormationRatesIndices.size();j++)
 		{
 			const int index = outputFormationRatesIndices(j)+1;
+			#if OPENFOAM_VERSION >= 40
+			FormationRates[j].ref()[celli] = thermodynamicsMapXML->MW(index-1)*R[index];
+			#else
 			FormationRates[j].internalField()[celli] = thermodynamicsMapXML->MW(index-1)*R[index];
+			#endif  	
 		}
 	}
 
@@ -107,8 +111,8 @@ if (outputFormationRatesIndices.size() > 0)
 	// Boundaries
 	forAll(T.boundaryField(), patchi)
 	{
-		fvPatchScalarField& pp = p.boundaryField()[patchi];
-		fvPatchScalarField& pT = T.boundaryField()[patchi];
+		const fvPatchScalarField& pp = p.boundaryField()[patchi];
+		const fvPatchScalarField& pT = T.boundaryField()[patchi];
 
 		forAll(pT, facei)
 		{
@@ -135,7 +139,11 @@ if (outputFormationRatesIndices.size() > 0)
 			for (int j=0;j<outputFormationRatesIndices.size();j++)
 			{
 				const int index = outputFormationRatesIndices(j)+1;
+				#if OPENFOAM_VERSION >= 40
+				FormationRates[j].boundaryFieldRef()[patchi][facei] = thermodynamicsMapXML->MW(index-1)*R[index];
+				#else
 				FormationRates[j].boundaryField()[patchi][facei] = thermodynamicsMapXML->MW(index-1)*R[index];
+				#endif  	
 			}
 		}
 	}

@@ -62,14 +62,19 @@ if (calculateConcentrations == true)
 
 		double cTot = pCells[celli]/PhysicalConstants::R_J_kmol/TCells[celli];
 
+		#if OPENFOAM_VERSION >= 40
+		for(unsigned int i=0;i<ns;i++)
+			C[i].ref()[celli] = cTot*x[i+1];
+		#else
 		for(unsigned int i=0;i<ns;i++)
 			C[i].internalField()[celli] = cTot*x[i+1];
+		#endif	
 	}
 
 	forAll(T.boundaryField(), patchi)
 	{
-		fvPatchScalarField& pp = p.boundaryField()[patchi];
-		fvPatchScalarField& pT = T.boundaryField()[patchi];
+		const fvPatchScalarField& pp = p.boundaryField()[patchi];
+		const fvPatchScalarField& pT = T.boundaryField()[patchi];
 		
 		forAll(pT, facei)
 		{
@@ -84,8 +89,14 @@ if (calculateConcentrations == true)
 
 			double cTot = pp[facei]/PhysicalConstants::R_J_kmol/pT[facei];
 
+			#if OPENFOAM_VERSION >= 40
+			for(unsigned int i=1;i<=ns;i++)
+				C[i-1].boundaryFieldRef()[patchi][facei] = cTot*x[i];
+			#else
 			for(unsigned int i=1;i<=ns;i++)
 				C[i-1].boundaryField()[patchi][facei] = cTot*x[i];
+			#endif	
+			
 		}
 	}
 

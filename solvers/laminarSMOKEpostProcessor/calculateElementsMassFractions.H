@@ -87,10 +87,18 @@ volScalarField omega_C
 
 	const scalarField& TCells = T.internalField();
 	const scalarField& pCells = p.internalField();
-	      scalarField& rhoCells = rho.internalField();
-	      scalarField& omega_CCells = omega_C.internalField();
-	      scalarField& omega_HCells = omega_H.internalField();
-	      scalarField& omega_OCells = omega_O.internalField();
+	#if OPENFOAM_VERSION >= 40
+	scalarField& rhoCells = rho.ref();
+	scalarField& omega_CCells = omega_C.ref();
+	scalarField& omega_HCells = omega_H.ref();
+	scalarField& omega_OCells = omega_O.ref();
+	#else
+	scalarField& rhoCells = rho.internalField();
+	scalarField& omega_CCells = omega_C.internalField();
+	scalarField& omega_HCells = omega_H.internalField();
+	scalarField& omega_OCells = omega_O.internalField();
+	#endif
+
 
 	const unsigned int jC = thermodynamicsMapXML->IndexOfElementWithoutError("C");
 	const unsigned int jO = thermodynamicsMapXML->IndexOfElementWithoutError("O");
@@ -126,10 +134,16 @@ volScalarField omega_C
 	const fvPatchList& patches = mesh.boundary();
         forAll(patches, patchi)
 	{
+		#if OPENFOAM_VERSION >= 40
+		fvPatchScalarField& pomega_O  = omega_O.boundaryFieldRef()[patchi];
+		fvPatchScalarField& pomega_H  = omega_H.boundaryFieldRef()[patchi];
+		fvPatchScalarField& pomega_C  = omega_C.boundaryFieldRef()[patchi];
+		#else
 		fvPatchScalarField& pomega_O  = omega_O.boundaryField()[patchi];
 		fvPatchScalarField& pomega_H  = omega_H.boundaryField()[patchi];
 		fvPatchScalarField& pomega_C  = omega_C.boundaryField()[patchi];
-
+		#endif
+		
 		forAll(pomega_H, facei)
 		{
 			pomega_H[facei] = 0.;
