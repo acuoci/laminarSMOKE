@@ -1,5 +1,6 @@
 EXE_INC = \
      $(OPENFOAM_VERSION) \
+     $(DEVVERSION) \
     -I$(OPENSMOKE_LIBRARY_PATH) \
     -I$(BOOST_LIBRARY_PATH)/include \
     -I$(EIGEN_LIBRARY_PATH) \

@@ -2,6 +2,9 @@
 #OpenFOAM-dev is equivalent to 40
 export OPENFOAM_VERSION='-DOPENFOAM_VERSION=40'
 
+#If OpenFOAM dev version is used, this must be equal to 1
+export DEVVERSION='-DDEVVERSION=0'
+
 #Compulsory path
 export EIGEN_LIBRARY_PATH=/software/chimica2/libraries/eigen/eigen-3.3.3
 export BOOST_LIBRARY_PATH=/software/chimica2/libraries/boost/boost-1.64.0-gcc-6.3.0
