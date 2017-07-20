@@ -58,7 +58,7 @@ Foam::IOobject Foam::radiation::OpenSMOKEradiationModel::createIOobject
     );
 
     #if DEVVERSION == 1
-    if (io.typeHeaderOk<volScalarField>(true))
+    if (io.typeHeaderOk<IOdictionary>(true))
     #else
     if (io.headerOk())
     #endif

@@ -46,7 +46,7 @@ Foam::radiation::OpenSMOKEradiationModel::New
 
     word modelType("none");
     #if DEVVERSION == 1
-    if (radIO.typeHeaderOk<volScalarField>(true))
+    if (radIO.typeHeaderOk<IOdictionary>(true))
     #else
     if (radIO.headerOk())
     #endif
