@@ -56,17 +56,17 @@
 	// Select time step
 	if (homogeneousReactions == true)
 	{
+		#if OPENFOAM_VERSION >= 40
 		if (LTS)
 		{
 			const volScalarField& rDeltaT = trDeltaT.ref();
-			dimensionedScalar maxIntegrationTime("maxIntegrationTime", dimensionSet(0,0,1,0,0,0,0), scalar(0.001)); 
+			dimensionedScalar maxIntegrationTime("maxIntegrationTime", dimensionSet(0,0,1,0,0,0,0), scalar(0.01)); 
 			DeltaT = min(1.0/rDeltaT, maxIntegrationTime);
 		}
 		else
+		#endif
 		{
-		//	dimensionedScalar maxIntegrationTime("deltat", dimensionSet(0,0,1,0,0,0,0), scalar(0.001)); 
 			DeltaT = mesh.time().deltaT();
-			
 		}
 	}
 	

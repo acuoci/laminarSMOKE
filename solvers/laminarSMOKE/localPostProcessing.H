@@ -171,8 +171,13 @@ if (iPolimiSoot == true)
 
 					const double DmixReference = Dmix[physicalSootDiffusivityReferenceIndex].internalField()[celli];
 
+					#if OPENFOAM_VERSION >= 40
 					scalarField& muCells  =  mu.ref();
 					scalarField& MWmixCells = MWmix.ref();
+					#else
+					scalarField& muCells  =  mu.internalField();
+					scalarField& MWmixCells = MWmix.internalField();
+					#endif
 
 					std::ofstream fOut("Test.out", std::ios::out);
 					fOut.setf(std::ios::scientific);

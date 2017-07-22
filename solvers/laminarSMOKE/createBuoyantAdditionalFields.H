@@ -83,7 +83,11 @@
 		),
 		mesh,
 		dimensionedScalar("one", dimTime, 0),
+		#if OPENFOAM_VERSION >= 40
 		extrapolatedCalculatedFvPatchScalarField::typeName
+		#else
+		zeroGradientFvPatchScalarField::typeName
+		#endif
 	);
 
 	#endif
