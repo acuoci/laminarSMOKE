@@ -51,6 +51,25 @@
 	const scalarField& rhoCells = rho.internalField();
 	const scalarField& cpCells = cp.internalField();
 	const scalarField& vCells = mesh.V();
+	const scalarField& DeltaTCells = DeltaT.internalField();
+
+	// Select time step
+	if (homogeneousReactions == true)
+	{
+		if (LTS)
+		{
+			const volScalarField& rDeltaT = trDeltaT.ref();
+			dimensionedScalar maxIntegrationTime("maxIntegrationTime", dimensionSet(0,0,1,0,0,0,0), scalar(0.001)); 
+			DeltaT = min(1.0/rDeltaT, maxIntegrationTime);
+		}
+		else
+		{
+		//	dimensionedScalar maxIntegrationTime("deltat", dimensionSet(0,0,1,0,0,0,0), scalar(0.001)); 
+			DeltaT = mesh.time().deltaT();
+			
+		}
+	}
+	
 
 	if (homogeneousReactions == true && odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_OPENSMOKE)
 	{
@@ -116,7 +135,7 @@
 							}
 						
 							// Solve
-							OdeSMOKE::OdeStatus status = odeSolverConstantPressure().Solve(tf);
+							OdeSMOKE::OdeStatus status = odeSolverConstantPressure().Solve(t0+DeltaTCells[celli]);
 							odeSolverConstantPressure().Solution(yf);
 
 							if (status == -6)	// Time step too small
@@ -126,6 +145,8 @@
 								for(unsigned int i=0;i<NC;i++)
 								 	Info << " * " << thermodynamicsMapXML->NamesOfSpecies()[i] << ": " << y0(i) << endl;
 							}
+
+							QCells[celli] = batchReactorHomogeneousConstantPressure.QR();
 						}
 						else
 						{
@@ -153,7 +174,7 @@
 							}
 						
 							// Solve
-							OdeSMOKE::OdeStatus status = odeSolverConstantVolume().Solve(tf);
+							OdeSMOKE::OdeStatus status = odeSolverConstantVolume().Solve(t0+DeltaTCells[celli]);
 							odeSolverConstantVolume().Solution(yf);
 
 							if (status == -6)	// Time step too small
@@ -163,6 +184,8 @@
 								for(unsigned int i=0;i<NC;i++)
 								 	Info << " * " << thermodynamicsMapXML->NamesOfSpecies()[i] << ": " << y0(i) << endl;
 							}
+
+							QCells[celli] = batchReactorHomogeneousConstantVolume.QR();
 						}
 					}
 				}
@@ -246,28 +269,38 @@
 
 				// Output
 				if (runTime.outputTime())
-				{/*
+				{
 					if (constPressureBatchReactor == true)
 					{
-						QCells[celli] = batchReactorHomogeneousConstantPressure.QR();
 						if (outputFormationRatesIndices.size() != 0)
 						{
+							#if OPENFOAM_VERSION >= 40
+							for (int i=0;i<outputFormationRatesIndices.size();i++)
+								FormationRates[i].ref()[celli] = batchReactorHomogeneousConstantPressure.R()[outputFormationRatesIndices[i]+1] *
+                                       	      		                                                   thermodynamicsMapXML->MW(outputFormationRatesIndices[i]);
+							#else
 							for (int i=0;i<outputFormationRatesIndices.size();i++)
 								FormationRates[i].internalField()[celli] = batchReactorHomogeneousConstantPressure.R()[outputFormationRatesIndices[i]+1] *
-	                               	      		                                                   thermodynamicsMapXML->MW(outputFormationRatesIndices[i]);
+                                       	      		                                                   thermodynamicsMapXML->MW(outputFormationRatesIndices[i]);
+							#endif
 						}
 					}
 					else
 					{
-						QCells[celli] = batchReactorHomogeneousConstantVolume.QR();
 						if (outputFormationRatesIndices.size() != 0)
 						{
+							#if OPENFOAM_VERSION >= 40
+							for (int i=0;i<outputFormationRatesIndices.size();i++)
+								FormationRates[i].ref()[celli] = batchReactorHomogeneousConstantVolume.R()[outputFormationRatesIndices[i]+1] *
+                                           	                                                           thermodynamicsMapXML->MW(outputFormationRatesIndices[i]);
+							#else
 							for (int i=0;i<outputFormationRatesIndices.size();i++)
 								FormationRates[i].internalField()[celli] = batchReactorHomogeneousConstantVolume.R()[outputFormationRatesIndices[i]+1] *
-	                                   	                                                           thermodynamicsMapXML->MW(outputFormationRatesIndices[i]);
+                                           	                                                           thermodynamicsMapXML->MW(outputFormationRatesIndices[i]);
+							#endif
+
 						}
 					}
-				*/
 				}
 			}
 			double tEnd = OpenSMOKE::OpenSMOKEGetCpuTime();
@@ -322,12 +355,14 @@
 							}
 						
 							// Solve
-							odeSolverConstantPressure.Solve(tf);
+							odeSolverConstantPressure.Solve(t0+DeltaTCells[celli]);
 
 							// Recover solution
 							odeSolverConstantPressure.Solution(yf.data());
 							if (energyEquation == true)
 								TCells[celli] = batchReactorHomogeneousConstantPressure.GetTemperature();
+
+							QCells[celli] = batchReactorHomogeneousConstantPressure.QR();
 						}
 						else
 						{
@@ -350,19 +385,20 @@
 							}
 						
 							// Solve
-							odeSolverConstantVolume.Solve(tf);
+							odeSolverConstantVolume.Solve(t0+DeltaTCells[celli]);
 
 							// Recover solution
 							odeSolverConstantVolume.Solution(yf.data());
 							if (energyEquation == true && strangAlgorithm != STRANG_COMPACT)
 								TCells[celli] = batchReactorHomogeneousConstantVolume.GetTemperature();
+	
+							QCells[celli] = batchReactorHomogeneousConstantVolume.QR();
 						}
 					}
 			
 					// Check mass fractions
 					normalizeMassFractions(yf.data(), celli, massFractionsTol, NC);
 
-					
 
 					if (strangAlgorithm != STRANG_COMPACT)
 					{
@@ -469,51 +505,53 @@
 							{
 								#if OPENSMOKE_USE_DVODE == 1
 								typedef OpenSMOKE::OpenSMOKE_DVODE<OpenSMOKE::BatchReactorHomogeneousConstantPressure_ODE_DVODE> Solver;
-								SolveOpenSourceSolvers<Solver>(dvodeSolverConstantPressure, t0, tf, y0, yf, odeParameterBatchReactorHomogeneous);
+								SolveOpenSourceSolvers<Solver>(dvodeSolverConstantPressure, t0, t0+DeltaTCells[celli], y0, yf, odeParameterBatchReactorHomogeneous);
 								#endif
 							}
 							else if (odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_DLSODE)
 							{
 								#if OPENSMOKE_USE_ODEPACK == 1
 								typedef OpenSMOKE::OpenSMOKE_DLSODE<OpenSMOKE::BatchReactorHomogeneousConstantPressure_ODE_DLSODE> Solver;
-								SolveOpenSourceSolvers<Solver>(dlsodeSolverConstantPressure, t0, tf, y0, yf, odeParameterBatchReactorHomogeneous);					
+								SolveOpenSourceSolvers<Solver>(dlsodeSolverConstantPressure, t0, t0+DeltaTCells[celli], y0, yf, odeParameterBatchReactorHomogeneous);					
 								#endif
 							}
 							else if (odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_DLSODA)
 							{
 								#if OPENSMOKE_USE_ODEPACK == 1
 								typedef OpenSMOKE::OpenSMOKE_DLSODA<OpenSMOKE::BatchReactorHomogeneousConstantPressure_ODE_DLSODA> Solver;
-								SolveOpenSourceSolvers<Solver>(dlsodaSolverConstantPressure, t0, tf, y0, yf, odeParameterBatchReactorHomogeneous);							
+								SolveOpenSourceSolvers<Solver>(dlsodaSolverConstantPressure, t0, t0+DeltaTCells[celli], y0, yf, odeParameterBatchReactorHomogeneous);							
 								#endif							
 							}
 							else if (odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_DASPK)
 							{
 								#if OPENSMOKE_USE_DASPK == 1
 								typedef OpenSMOKE::OpenSMOKE_DASPK<OpenSMOKE::BatchReactorHomogeneousConstantPressure_ODE_DASPK> Solver;
-								SolveOpenSourceSolvers<Solver>(daspkSolverConstantPressure, t0, tf, y0, yf, odeParameterBatchReactorHomogeneous);								
+								SolveOpenSourceSolvers<Solver>(daspkSolverConstantPressure, t0, t0+DeltaTCells[celli], y0, yf, odeParameterBatchReactorHomogeneous);								
 								#endif							
 							}
 							else if (odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_RADAU5)
 							{
 								#if OPENSMOKE_USE_RADAU == 1
 								typedef OpenSMOKE::OpenSMOKE_RADAU<OpenSMOKE::BatchReactorHomogeneousConstantPressure_ODE_RADAU5> Solver;
-								SolveOpenSourceSolvers<Solver>(radauSolverConstantPressure, t0, tf, y0, yf, odeParameterBatchReactorHomogeneous);						
+								SolveOpenSourceSolvers<Solver>(radauSolverConstantPressure, t0, t0+DeltaTCells[celli], y0, yf, odeParameterBatchReactorHomogeneous);						
 								#endif							
 							}			
 							else if (odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_MEBDF)
 							{
 								#if OPENSMOKE_USE_MEBDF == 1
 								typedef OpenSMOKE::OpenSMOKE_MEBDF<OpenSMOKE::BatchReactorHomogeneousConstantPressure_ODE_MEBDF> Solver;
-								SolveOpenSourceSolvers<Solver>(mebdfSolverConstantPressure, t0, tf, y0, yf, odeParameterBatchReactorHomogeneous);							
+								SolveOpenSourceSolvers<Solver>(mebdfSolverConstantPressure, t0, t0+DeltaTCells[celli], y0, yf, odeParameterBatchReactorHomogeneous);							
 								#endif							
 							}	
 							else if (odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_CVODE)
 							{
 								#if OPENSMOKE_USE_SUNDIALS == 1
 								typedef OpenSMOKE::OpenSMOKE_CVODE_Sundials<OpenSMOKE::BatchReactorHomogeneousConstantPressure_ODE_CVODE> Solver;
-								SolveOpenSourceSolvers<Solver>(cvodeSolverConstantPressure, t0, tf, y0, yf, odeParameterBatchReactorHomogeneous);							
+								SolveOpenSourceSolvers<Solver>(cvodeSolverConstantPressure, t0, t0+DeltaTCells[celli], y0, yf, odeParameterBatchReactorHomogeneous);							
 								#endif							
-							}																							
+							}	
+
+							QCells[celli] = batchReactorHomogeneousConstantPressure.QR();																						
 						}
 						else
 						{
@@ -526,51 +564,53 @@
 							{
 								#if OPENSMOKE_USE_DVODE == 1
 								typedef OpenSMOKE::OpenSMOKE_DVODE<OpenSMOKE::BatchReactorHomogeneousConstantVolume_ODE_DVODE> Solver;
-								SolveOpenSourceSolvers<Solver>(dvodeSolverConstantVolume, t0, tf, y0, yf, odeParameterBatchReactorHomogeneous);
+								SolveOpenSourceSolvers<Solver>(dvodeSolverConstantVolume, t0, t0+DeltaTCells[celli], y0, yf, odeParameterBatchReactorHomogeneous);
 								#endif
 							}
 							else if (odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_DLSODE)
 							{
 								#if OPENSMOKE_USE_ODEPACK == 1
 								typedef OpenSMOKE::OpenSMOKE_DLSODE<OpenSMOKE::BatchReactorHomogeneousConstantVolume_ODE_DLSODE> Solver;
-								SolveOpenSourceSolvers<Solver>(dlsodeSolverConstantVolume, t0, tf, y0, yf, odeParameterBatchReactorHomogeneous);					
+								SolveOpenSourceSolvers<Solver>(dlsodeSolverConstantVolume, t0, t0+DeltaTCells[celli], y0, yf, odeParameterBatchReactorHomogeneous);					
 								#endif
 							}
 							else if (odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_DLSODA)
 							{
 								#if OPENSMOKE_USE_ODEPACK == 1
 								typedef OpenSMOKE::OpenSMOKE_DLSODA<OpenSMOKE::BatchReactorHomogeneousConstantVolume_ODE_DLSODA> Solver;
-								SolveOpenSourceSolvers<Solver>(dlsodaSolverConstantVolume, t0, tf, y0, yf, odeParameterBatchReactorHomogeneous);							
+								SolveOpenSourceSolvers<Solver>(dlsodaSolverConstantVolume, t0, t0+DeltaTCells[celli], y0, yf, odeParameterBatchReactorHomogeneous);							
 								#endif							
 							}
 							else if (odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_DASPK)
 							{
 								#if OPENSMOKE_USE_DASPK == 1
 								typedef OpenSMOKE::OpenSMOKE_DASPK<OpenSMOKE::BatchReactorHomogeneousConstantVolume_ODE_DASPK> Solver;
-								SolveOpenSourceSolvers<Solver>(daspkSolverConstantVolume, t0, tf, y0, yf, odeParameterBatchReactorHomogeneous);								
+								SolveOpenSourceSolvers<Solver>(daspkSolverConstantVolume, t0, t0+DeltaTCells[celli], y0, yf, odeParameterBatchReactorHomogeneous);								
 								#endif							
 							}
 							else if (odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_RADAU5)
 							{
 								#if OPENSMOKE_USE_RADAU == 1
 								typedef OpenSMOKE::OpenSMOKE_RADAU<OpenSMOKE::BatchReactorHomogeneousConstantVolume_ODE_RADAU5> Solver;
-								SolveOpenSourceSolvers<Solver>(radauSolverConstantVolume, t0, tf, y0, yf, odeParameterBatchReactorHomogeneous);						
+								SolveOpenSourceSolvers<Solver>(radauSolverConstantVolume, t0, t0+DeltaTCells[celli], y0, yf, odeParameterBatchReactorHomogeneous);						
 								#endif							
 							}			
 							else if (odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_MEBDF)
 							{
 								#if OPENSMOKE_USE_MEBDF == 1
 								typedef OpenSMOKE::OpenSMOKE_MEBDF<OpenSMOKE::BatchReactorHomogeneousConstantVolume_ODE_MEBDF> Solver;
-								SolveOpenSourceSolvers<Solver>(mebdfSolverConstantVolume, t0, tf, y0, yf, odeParameterBatchReactorHomogeneous);							
+								SolveOpenSourceSolvers<Solver>(mebdfSolverConstantVolume, t0, t0+DeltaTCells[celli], y0, yf, odeParameterBatchReactorHomogeneous);							
 								#endif							
 							}	
 							else if (odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_CVODE)
 							{
 								#if OPENSMOKE_USE_SUNDIALS == 1
 								typedef OpenSMOKE::OpenSMOKE_CVODE_Sundials<OpenSMOKE::BatchReactorHomogeneousConstantVolume_ODE_CVODE> Solver;
-								SolveOpenSourceSolvers<Solver>(cvodeSolverConstantVolume, t0, tf, y0, yf, odeParameterBatchReactorHomogeneous);							
+								SolveOpenSourceSolvers<Solver>(cvodeSolverConstantVolume, t0, t0+DeltaTCells[celli], y0, yf, odeParameterBatchReactorHomogeneous);							
 								#endif							
 							}		
+
+							QCells[celli] = batchReactorHomogeneousConstantVolume.QR();
 						}
 					}
 				
@@ -652,7 +692,6 @@
 				{
 					if (constPressureBatchReactor == true)
 					{
-						QCells[celli] = batchReactorHomogeneousConstantPressure.QR();
 						if (outputFormationRatesIndices.size() != 0)
 						{
 							#if OPENFOAM_VERSION >= 40
@@ -668,7 +707,6 @@
 					}
 					else
 					{
-						QCells[celli] = batchReactorHomogeneousConstantVolume.QR();
 						if (outputFormationRatesIndices.size() != 0)
 						{
 							#if OPENFOAM_VERSION >= 40
