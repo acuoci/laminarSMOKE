@@ -53,7 +53,6 @@ maxCo           0.1;
 
 libs (
       "libOpenFOAM.so"
-      "libsimpleSwakFunctionObjects.so"
       "libswakFunctionObjects.so"
       "libgroovyBC.so"
      );
