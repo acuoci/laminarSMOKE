@@ -43,8 +43,8 @@ boundaryField
         U               U;
         phi             phi;
         rho             rho;
-        psi             none;
-        gamma           0;
+        psi             psi;
+        gamma           1;
         value           $internalField;
     }
     burnerwall
