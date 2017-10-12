@@ -65,7 +65,7 @@
 #include "fvCFD.H"
 #include "multivariateScheme.H"
 #include "pimpleControl.H"
-#if OPENFOAM_VERSION == 40
+#if OPENFOAM_VERSION >= 40
 #include "fvOptions.H"
 #include "localEulerDdtScheme.H"
 #include "fvcSmooth.H"

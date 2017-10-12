@@ -80,7 +80,9 @@
 #include "fvOptions.H"
 #include "localEulerDdtScheme.H"
 #include "fvcSmooth.H"
-#include "pressureControl.H"
+#if DEVVERSION == 1
+	#include "pressureControl.H"
+#endif
 #endif
 
 // Additional include files
@@ -122,7 +124,7 @@ void SolveOpenSourceSolvers(OdeBatch& ode, const double t0, const double tf, con
 
 int main(int argc, char *argv[])
 {
-	#if OPENFOAM_VERSION == 40
+	#if OPENFOAM_VERSION >= 40
 		#include "laminarPimpleSMOKE.4x.H"
 	#elif OPENFOAM_VERSION == 30
 		#include "laminarPimpleSMOKE.3x.H"
