@@ -21,18 +21,21 @@ Compulsory libraries
 - Eigen (http://eigen.tuxfamily.org/index.php?title=Main_Page)
 - RapidXML (http://rapidxml.sourceforge.net/)
 - Boost C++ (http://www.boost.org/)
-- OpenSMOKE++ (provided with the current verion of laminarSMOKE)
+- OpenSMOKE++ (provided with the current version of laminarSMOKE)
 
 Optional libraries
 ------------------
 - Intel MKL (https://software.intel.com/en-us/intel-mkl)
-- ISATLib (mauro.bracconi@polimi.it)
 - ODEPACK (http://computation.llnl.gov/casc/odepack/odepack_home.html)
 - DVODE (http://computation.llnl.gov/casc/odepack/odepack_home.html)
 - DASPK (http://www.engineering.ucsb.edu/~cse/software.html)
 - Sundials (http://computation.llnl.gov/casc/sundials/main.html)
 - MEBDF (http://wwwf.imperial.ac.uk/~jcash/IVP_software/readme.html)
 - RADAU (http://www.unige.ch/~hairer/software.html)
+
+Optional libraries (under testing)
+----------------------------------
+- ISATLib (mauro.bracconi@polimi.it)
 
 Compilation
 -----------
@@ -59,7 +62,7 @@ Three different options are available to compile the code, according to the leve
 2. Type: `source mybashrc.complete`
 3. Go to Section 4
 
-4. Compile the solvers
+4. Compile the libraries
 -----------------------------------------------------
 1. Compile the user-defined boundary condition library: from the `libs/boundaryConditionsOpenSMOKE++` folder type `wmake`
 2. Compile the customized radiation library: from the `libs/radiationOpenSMOKE++` folder type `wmake`
@@ -72,9 +75,23 @@ Three different options are available to compile the code, according to the leve
 3. Compile the unsteady (accounting for buoyancy) solver: from the `solver/laminarBuoyantPimpleSMOKE` folder type `wmake`
 4. Compile the unsteady solver: from the `solver/laminarPimpleSMOKE` folder type `wmake`
 5. Compile the post-processor: from the `solver/laminarSMOKEpostProcessor` folder type `wmake`
+6. Go to Section 6
+
+6. Compile the CHEMKIN Pre-Processor
+-----------------------------------------------------
+1. Compile the CHEMKIN Pre-Processor utility: from the `solvers/openSMOKEppCHEMKINPreProcessor` folder type `wmake`
+
+Preprocessing of CHEMKIN files
+-----------------------------------------------------
+In order to run a simulation with laminarSMOKE, a CHEMKIN mechanism (kinetics, thermodynamic and transport properties) has to be pre-processed using the `openSMOKEppCHEMKINPreProcessor` utility (see Section 6 above). 
+An example of pre-processing is available in the `run/kinetic-mechanisms/POLIMI_H2O_1412` folder. In particular, here you can find the three files corresponding to the CHEMKIN input (kinetics, thermodynamics and transport properties) and an additional `input.dic` file, containing the instructions for the `openSMOKEppCHEMKINPreProcessor`.
+1. Go to the `run/kinetic-mechanisms/POLIMI_H2O_1412`
+2. Type `openSMOKEppCHEMKINPreProcessor`
+3. If everything works correctly, a `kinetics-POLIMI_H2O_1412` folder will be created, including the preprocessed CHEMKIN files (in XML folder). This is the folder which has to be supplied to the `laminarSMOKE` solver.
+4. For your convenience the `run/kinetic-mechanisms` folder already contains three pre-processed mechanisms.
 
 Run your first case
--------------------
+-----------------------------------------------------
 The folder `run/tutorials/ToroFlames/F3/` contains a simple test case (laminar coflow diffusion flame fed with hydrogen).
 
 1. Unsteady simulation: Open the `laminarBuoyantPimpleSMOKE-Global` folder, build the mesh using the `blockMesh` utility, and run the case using the `laminarBuoyantPimpleSMOKE` solver. Even if you are interested in steady state conditions, we strongly suggest to always start with unsteady calculations to create a reasonable first-guess solution for the application of the steady state solver. In this case, you can stop the unsteady simulation after 50 ms of physical time.
