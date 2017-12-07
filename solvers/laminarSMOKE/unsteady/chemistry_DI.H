@@ -43,9 +43,11 @@
 	#if OPENFOAM_VERSION >= 40
 	scalarField& TCells = T.ref();
 	scalarField& QCells = Q.ref();
+	scalarField& cpuChemistryCells = cpuChemistry.ref();
 	#else
 	scalarField& TCells = T.internalField();
 	scalarField& QCells = Q.internalField();
+	scalarField& cpuChemistryCells = cpuChemistry.internalField();
 	#endif
 
 	const scalarField& rhoCells = rho.internalField();
@@ -70,6 +72,8 @@
 			double tStart = OpenSMOKE::OpenSMOKEGetCpuTime();
 			forAll(TCells, celli)
 			{
+				double tStartLocal = OpenSMOKE::OpenSMOKEGetCpuTime();
+
 				//- Solving for celli:	
 				if (TCells[celli] > direct_integration_minimum_temperature_for_chemistry)
 				{
@@ -239,6 +243,9 @@
 					}
 				}
 
+				double tEndLocal = OpenSMOKE::OpenSMOKEGetCpuTime();
+				cpuChemistryCells[celli] = (tEndLocal-tStartLocal)*1000.;
+
 				if (counter%(int(0.20*mesh.nCells())+1) == 0)
 					Info <<"   Accomplished: " << counter << "/" << mesh.nCells() << endl;
 
@@ -294,6 +301,8 @@
 			double tStart = OpenSMOKE::OpenSMOKEGetCpuTime();
 			forAll(TCells, celli)
 			{
+				double tStartLocal = OpenSMOKE::OpenSMOKEGetCpuTime();
+
 				//- Solving for celli:	
 				if (TCells[celli] > direct_integration_minimum_temperature_for_chemistry)
 				{
@@ -423,6 +432,9 @@
 						}
 					}
 				}
+				
+				double tEndLocal = OpenSMOKE::OpenSMOKEGetCpuTime();
+				cpuChemistryCells[celli] = (tEndLocal-tStartLocal)*1000.;
 
 				if (counter%(int(0.20*mesh.nCells())+1) == 0)
 					Info <<"   Accomplished: " << counter << "/" << mesh.nCells() << endl;
@@ -450,6 +462,8 @@
 			double tStart = OpenSMOKE::OpenSMOKEGetCpuTime();
 			forAll(TCells, celli)
 			{
+				double tStartLocal = OpenSMOKE::OpenSMOKEGetCpuTime();
+
 				//- Solving for celli:	
 				if (TCells[celli] > direct_integration_minimum_temperature_for_chemistry)
 				{				
@@ -641,6 +655,10 @@
 						}
 					}
 				}
+
+				double tEndLocal = OpenSMOKE::OpenSMOKEGetCpuTime();
+				
+				cpuChemistryCells[celli] = (tEndLocal-tStartLocal)*1000.;
 
 				if (counter%(int(0.20*mesh.nCells())+1) == 0)
 					Info <<"   Accomplished: " << counter << "/" << mesh.nCells() << endl;

@@ -682,4 +682,24 @@ if (sootOnTheFlyFill == true)
 	);
 }
 
+volScalarField cpuChemistry
+(
+        IOobject
+        (
+                "cpuChemistry",
+                runTime.timeName(),
+                mesh,
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("dummy", dimensionSet(0, 0, 0, 0, 0), 0.),
+        #if OPENFOAM_VERSION >= 40
+        extrapolatedCalculatedFvPatchScalarField::typeName
+        #else
+        zeroGradientFvPatchScalarField::typeName
+        #endif
+);
+
+
 #include "createFluxes.H"
