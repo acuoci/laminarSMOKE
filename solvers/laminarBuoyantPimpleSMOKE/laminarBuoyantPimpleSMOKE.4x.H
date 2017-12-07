@@ -43,6 +43,7 @@
 	#include "createTime.H"
 	#include "createMesh.H"
 	#include "createControl.H"
+	#include "createRDeltaT.H"
 
 	#include "readGravitationalAcceleration.H"
 	#include "createBasicFields.H"
@@ -61,8 +62,12 @@
 
 	#include "initContinuityErrs.H"
     	#include "createTimeControls.H"
-   	#include "compressibleCourantNo.H"
-    	#include "setInitialDeltaT.H"
+
+	if (!LTS)
+	{
+		#include "compressibleCourantNo.H"
+		#include "setInitialDeltaT.H"
+	}
 
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -71,8 +76,16 @@
 	while (runTime.run())
 	{
 		#include "readTimeControls.H"
-		#include "compressibleCourantNo.H"
-		#include "setDeltaT.H"
+
+		if (LTS)
+		{
+		    #include "setRDeltaT.H"
+		}
+		else
+		{
+			#include "compressibleCourantNo.H"
+			#include "setDeltaT.H"
+		}
 
 		runTime++;
 		Info<< "Time = " << runTime.timeName() << nl << endl;

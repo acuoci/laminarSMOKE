@@ -3,6 +3,7 @@ EXE_INC = \
     -w \
     $(MKL_SUPPORT) \
     $(ISAT_SUPPORT) \
+    $(DEVVERSION) \
     $(EXTERNAL_ODE_SOLVERS) \
     -I../laminarSMOKE \
     -I../laminarSMOKE/unsteady \

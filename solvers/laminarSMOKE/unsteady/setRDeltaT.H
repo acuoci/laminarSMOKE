@@ -38,9 +38,8 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-/*
 {
-    volScalarField& rDeltaT = trDeltaT();
+    volScalarField& rDeltaT = trDeltaT.ref();
 
     const dictionary& pimpleDict = pimple.dict();
 
@@ -59,13 +58,16 @@
     // Damping coefficient (1-0)
     scalar rDeltaTDampingCoeff
     (
-        pimpleDict.lookupOrDefault<scalar>("rDeltaTDampingCoeff", 1)
+        pimpleDict.lookupOrDefault<scalar>("rDeltaTDampingCoeff", 1.0)
     );
 
     // Maximum change in cell temperature per iteration
     // (relative to previous value)
     scalar alphaTemp(pimpleDict.lookupOrDefault("alphaTemp", 0.05));
 
+    // Maximum change in cell concentration per iteration
+    // (relative to reference value)
+    scalar alphaY(pimpleDict.lookupOrDefault("alphaY", 1.0));
 
     Info<< "Time scales min/max:" << endl;
 
@@ -74,44 +76,102 @@
 
     // Flow time scale
     {
-        rDeltaT.dimensionedInternalField() =
+        rDeltaT.ref() =
         (
-            fvc::surfaceSum(mag(phi))().dimensionedInternalField()
-           /((2*maxCo)*mesh.V()*rho.dimensionedInternalField())
+            fvc::surfaceSum(mag(phi))()()
+           /((2*maxCo)*mesh.V()*rho())
         );
 
         // Limit the largest time scale
         rDeltaT.max(1/maxDeltaT);
 
         Info<< "    Flow        = "
-            << gMin(1/rDeltaT.internalField()) << ", "
-            << gMax(1/rDeltaT.internalField()) << endl;
+            << 1/gMax(rDeltaT.primitiveField()) << ", "
+            << 1/gMin(rDeltaT.primitiveField()) << endl;
     }
 
-    // Reaction source time scale
-    if (alphaTemp < 1.0)
+    // Heat release rate time scale
+    if (alphaTemp < 1)
     {
-        volScalarField::DimensionedInternalField rDeltaTT
+        volScalarField::Internal rDeltaTT
         (
-            mag(reaction->Sh())/(alphaTemp*rho*thermo.Cp()*T)
+            mag(Q)/(alphaTemp*rho*cp*T)
         );
 
-        Info<< "    Temperature = "
-            << gMin(1/(rDeltaTT.field() + VSMALL)) << ", "
-            << gMax(1/(rDeltaTT.field() + VSMALL)) << endl;
+        Info << "    Temperature = "
+             << 1/(gMax(rDeltaTT.field()) + VSMALL) << ", "
+             << 1/(gMin(rDeltaTT.field()) + VSMALL) << endl;
 
-        rDeltaT.dimensionedInternalField() = max
+        rDeltaT.ref() = max(rDeltaT(), rDeltaTT);
+    }
+
+    // Reaction rate time scale
+    if (alphaY < 1)
+    {
+        dictionary Yref(pimpleDict.subDict("Yref"));
+
+        volScalarField::Internal rDeltaTY
         (
-            rDeltaT.dimensionedInternalField(),
-            rDeltaTT
+            IOobject
+            (
+                "rDeltaTY",
+                runTime.timeName(),
+                mesh
+            ),
+            mesh,
+            dimensionedScalar("rDeltaTY", rDeltaT.dimensions(), 0)
         );
+
+        bool foundY = false;
+
+// TODO
+/*
+        forAll(Y, i)
+        {
+            if (i != inertIndex)
+            {
+                volScalarField& Yi = Y[i];
+
+                if (Yref.found(Yi.name()))
+                {
+                    foundY = true;
+                    scalar Yrefi = readScalar(Yref.lookup(Yi.name()));
+
+                    rDeltaTY.field() = max
+                    (
+                        mag
+                        (
+                            reaction->R(Yi)().source()
+                           /((Yrefi*alphaY)*(rho*mesh.V()))
+                        ),
+                        rDeltaTY
+                    );
+                }
+            }
+        }
+
+        if (foundY)
+        {
+            Info << "    Composition = "
+                 << 1/(gMax(rDeltaTY.field()) + VSMALL) << ", "
+                 << 1/(gMin(rDeltaTY.field()) + VSMALL) << endl;
+
+            rDeltaT.ref() = max(rDeltaT(), rDeltaTY);
+        }
+        else
+        {
+            IOWarningIn(args.executable().c_str(), Yref)
+                << "Cannot find any active species in Yref " << Yref
+                << endl;
+        }
+*/
     }
 
     // Update tho boundary values of the reciprocal time-step
     rDeltaT.correctBoundaryConditions();
 
     // Spatially smooth the time scale field
-    if (rDeltaTSmoothingCoeff < 1.0)
+    if (rDeltaTSmoothingCoeff < 1)
     {
         fvc::smooth(rDeltaT, rDeltaTSmoothingCoeff);
     }
@@ -121,7 +181,7 @@
     // - only increase at a fraction of old time scale
     if
     (
-        rDeltaTDampingCoeff < 1.0
+        rDeltaTDampingCoeff < 1
      && runTime.timeIndex() > runTime.startTimeIndex() + 1
     )
     {
@@ -132,10 +192,12 @@
         );
     }
 
+    // Update tho boundary values of the reciprocal time-step
+    rDeltaT.correctBoundaryConditions();
+
     Info<< "    Overall     = "
-        << gMin(1/rDeltaT.internalField())
-        << ", " << gMax(1/rDeltaT.internalField()) << endl;
+        << 1/gMax(rDeltaT.primitiveField())
+        << ", " << 1/gMin(rDeltaT.primitiveField()) << endl;
 }
-*/
 
 // ************************************************************************* //

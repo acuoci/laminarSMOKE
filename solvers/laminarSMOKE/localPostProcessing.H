@@ -161,6 +161,46 @@ if (iPolimiSoot == true)
 			R_pah_1_2Cells[celli]    = pah12RingsFormationRates(sootAnalyzer, R);
 			R_pah_3_4Cells[celli]    = pah34RingsFormationRates(sootAnalyzer, R);
 			R_pah_more_4Cells[celli] = pahMoreThan4RingsFormationRates(sootAnalyzer, R);
+
+			// Start test diffusion coefficients
+			bool debug = false;
+			if (debug == true)
+			{
+				if ( 	soot_fv_largeCells[celli] > 0.1e-6 )
+				{
+
+					const double DmixReference = Dmix[physicalSootDiffusivityReferenceIndex].internalField()[celli];
+
+					#if OPENFOAM_VERSION >= 40
+					scalarField& muCells  =  mu.ref();
+					scalarField& MWmixCells = MWmix.ref();
+					#else
+					scalarField& muCells  =  mu.internalField();
+					scalarField& MWmixCells = MWmix.internalField();
+					#endif
+
+					std::ofstream fOut("Test.out", std::ios::out);
+					fOut.setf(std::ios::scientific);
+					fOut << TCells[celli] << std::endl;
+					fOut << muCells[celli] << std::endl;
+					fOut << MWmixCells[celli] << std::endl;
+					fOut << soot_fv_largeCells[celli] << std::endl;
+
+					for(int i=0;i<physicalSootDiffusivityCorrectionIndex.size();i++)
+					{
+						const unsigned int jj = physicalSootDiffusivityCorrectionIndex[i];
+						fOut 	<< i << " " << jj << " " << thermodynamicsMapXML->NamesOfSpecies()[jj] 
+							<< " " << thermodynamicsMapXML->MW(jj) << " " 
+							<< physicalSootDiffusivityCorrection[i] << " " 
+							<< Dmix[jj].internalField()[celli] << " "
+							<< DmixReference*physicalSootDiffusivityCorrection[i] << std::endl;
+					}
+					fOut.close();
+
+					getchar();
+				}
+			}
+			// End test diffusion coefficients
 		}
 
 		forAll(T.boundaryField(), patchi)

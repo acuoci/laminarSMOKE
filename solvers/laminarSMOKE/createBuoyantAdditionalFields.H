@@ -56,6 +56,7 @@
 	#include "compressibleCreatePhi.H"
 
 	#if STEADYSTATE != 1
+
 	Info<< "Creating field DpDt\n" << endl;
 	volScalarField DpDt
 	(
@@ -68,6 +69,27 @@
 		mesh,
 		dimensionedScalar("DpDt", p.dimensions()/dimTime, 0)
 	);
+
+	Info<< "Creating DeltaT field" << endl;
+	volScalarField DeltaT
+	(
+		IOobject
+		(
+			"DeltaT",
+			runTime.timeName(),
+			mesh,
+			IOobject::NO_READ,
+			IOobject::AUTO_WRITE
+		),
+		mesh,
+		dimensionedScalar("one", dimTime, 0),
+		#if OPENFOAM_VERSION >= 40
+		extrapolatedCalculatedFvPatchScalarField::typeName
+		#else
+		zeroGradientFvPatchScalarField::typeName
+		#endif
+	);
+
 	#endif
 
 	// Kinetic energy

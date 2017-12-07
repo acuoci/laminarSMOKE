@@ -57,7 +57,11 @@ Foam::IOobject Foam::radiation::OpenSMOKEradiationModel::createIOobject
         IOobject::NO_WRITE
     );
 
+    #if DEVVERSION == 1
+    if (io.typeHeaderOk<IOdictionary>(true))
+    #else
     if (io.headerOk())
+    #endif
     {
         io.readOpt() = IOobject::MUST_READ_IF_MODIFIED;
         return io;

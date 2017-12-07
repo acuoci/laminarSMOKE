@@ -29,7 +29,12 @@ namespace Foam
 		IOobject::NO_WRITE
 	    );
 
+	    // check if field exists and can be read
+            #if DEVVERSION == 1
+	    if (io.typeHeaderOk<volScalarField>(true))
+	    #else
 	    if (io.headerOk())
+	    #endif
 	    {
 		io.readOpt() = IOobject::NO_READ;
 		return io;

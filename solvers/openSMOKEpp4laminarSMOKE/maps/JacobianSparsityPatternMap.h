@@ -69,7 +69,7 @@ namespace OpenSMOKE
 
 		void SetEpsilon(const double epsilon);
 
-		void epsilon() const { return epsilon_; }
+		double epsilon() const { return epsilon_; }
                 
 		void RecognizeJacobianSparsityPattern(std::vector<unsigned int>& row, std::vector<unsigned int>& col);
 		

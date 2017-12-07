@@ -63,7 +63,9 @@
 #include "simpleControl.H"
 #include "interpolation.H"
 #if OPENFOAM_VERSION >= 40
-	#include "pressureControl.H"
+	#if DEVVERSION == 1
+		#include "pressureControl.H"
+	#endif
 	#include "fvOptions.H"
 #else
 	#include "fvIOoptionList.H"
@@ -87,7 +89,7 @@
 
 int main(int argc, char *argv[])
 {
-	#if OPENFOAM_VERSION == 40
+	#if OPENFOAM_VERSION >= 40
 		#include "laminarSimpleSMOKE.4x.H"
 	#elif OPENFOAM_VERSION == 30
 		#include "laminarSimpleSMOKE.3x.H"

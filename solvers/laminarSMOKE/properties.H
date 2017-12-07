@@ -133,6 +133,7 @@
 				#if OPENFOAM_VERSION >= 40
 				for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 					Dmix[i].ref()[celli] = Dmixvector[i+1];
+
 				#else
 				for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 					Dmix[i].internalField()[celli] = Dmixvector[i+1];

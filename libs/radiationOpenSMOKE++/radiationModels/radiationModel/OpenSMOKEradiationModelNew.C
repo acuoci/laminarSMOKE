@@ -45,7 +45,11 @@ Foam::radiation::OpenSMOKEradiationModel::New
     );
 
     word modelType("none");
+    #if DEVVERSION == 1
+    if (radIO.typeHeaderOk<IOdictionary>(true))
+    #else
     if (radIO.headerOk())
+    #endif
     {
         IOdictionary(radIO).lookup("radiationModel") >> modelType;
     }

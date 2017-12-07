@@ -136,7 +136,9 @@ U.correctBoundaryConditions();
 fvOptions.correct(U);
 K = 0.5*magSqr(U);
 
+#if DEVVERSION == 1
 pressureControl.limit(p);
+#endif
 p.correctBoundaryConditions();
 rho = Rho(p,psi);
 
