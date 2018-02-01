@@ -82,9 +82,14 @@ namespace OpenSMOKE
 		double KineticConstant(const double T, const double P);
 
 		/**
+		*@brief Evaluates the kinetic constant
+		*/
+		void FitttingArrheniusLaw(std::ostream& fOutput);
+
+		/**
 		*@brief Writes on a file the data about the Chebyshev Polynomial 
 		*/
-                void WriteStatus(std::ostream& fOutput) const;
+        void WriteStatus(std::ostream& fOutput) const;
 		
 		/**
 		*@brief Writes on a file the data about the Chebyshev Polynomial (compatibility with previous version of OpenSMOKE)

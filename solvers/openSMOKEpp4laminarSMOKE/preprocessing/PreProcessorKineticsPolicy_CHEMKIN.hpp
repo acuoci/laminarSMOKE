@@ -635,9 +635,9 @@ namespace OpenSMOKE
 		thermodynamics.WriteElementTableOnASCIIFile(fOutput);
 
 		fOutput << "---------------------------------------------------------------------------------------" << std::endl;
-		fOutput << "                                  CHEMICAL REACTIONS                                 " << std::endl;
+		fOutput << "                                  CHEMICAL REACTIONS                                   " << std::endl;
 		fOutput << std::endl;
-		fOutput << "                         Units: [kmol, m3, s] and [cal/mol]                          " << std::endl;
+		fOutput << "                          Units: [mol, cm3, s] and [cal/mol]                           " << std::endl;
 		fOutput << "---------------------------------------------------------------------------------------" << std::endl;
 		fOutput << std::endl;
 		fOutput << std::endl;

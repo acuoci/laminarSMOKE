@@ -24,6 +24,10 @@
 #include <boost/date_time.hpp>
 #include "boost/date_time/gregorian/gregorian.hpp"
 
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#endif
+
 #if OPENSMOKE_USE_MKL == 1
 	#include <mkl.h>
 #elif OPENSMOKE_USE_OPENBLAS == 1
@@ -242,7 +246,7 @@ namespace OpenSMOKE
 	void OpenOutputFileXML(std::ofstream &fXML, const boost::filesystem::path output_file_xml)
 	{
 		if (!fXML.is_open())
-			fXML.open(output_file_xml.string().c_str(), std::ios::out);
+			fXML.open(output_file_xml.c_str(), std::ios::out);
 
 		if (!fXML.is_open())
 		{
@@ -254,7 +258,7 @@ namespace OpenSMOKE
 	void OpenOutputFileASCII(std::ofstream &fASCII, const boost::filesystem::path output_file_ascii)
 	{
 		if (!fASCII.is_open())
-			fASCII.open(output_file_ascii.string().c_str(), std::ios::out);
+			fASCII.open(output_file_ascii.c_str(), std::ios::out);
 
 		if (!fASCII.is_open())
 		{
@@ -268,7 +272,7 @@ namespace OpenSMOKE
 	void OpenOutputFileASCII_Append(std::ofstream &fASCII, const boost::filesystem::path output_file_ascii)
 	{
 		if (!fASCII.is_open())
-			fASCII.open(output_file_ascii.string().c_str(), std::ios::out | std::ios::app);
+			fASCII.open(output_file_ascii.c_str(), std::ios::out | std::ios::app);
 
 		if (!fASCII.is_open())
 		{
@@ -353,7 +357,7 @@ namespace OpenSMOKE
 			FatalErrorMessage(message);
 		}
 
-		fASCII.open(input_file_ascii.string().c_str(), std::ios::in);
+		fASCII.open(input_file_ascii.c_str(), std::ios::in);
 
 		if (!fASCII.is_open())
 		{
@@ -731,7 +735,7 @@ namespace OpenSMOKE
 
 	unsigned int NumberOfLinesInFile(const boost::filesystem::path& path)
 	{
-		std::ifstream file(path.string().c_str());
+		std::ifstream file(path.c_str());
 
 		return static_cast<unsigned int>(std::count(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>(), '\n'));
 	}

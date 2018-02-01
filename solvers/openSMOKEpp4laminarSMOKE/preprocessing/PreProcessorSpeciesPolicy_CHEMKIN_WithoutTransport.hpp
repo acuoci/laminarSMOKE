@@ -593,6 +593,17 @@ namespace OpenSMOKE
 		std::ofstream fOutput;
 		fOutput.open(file_name.c_str(), std::ios::out);
 
+		// Print table
+		fOutput << "-----------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
+		fOutput << "Name                              MW       Cp@298K        H@298K        G@298K        S@298K      Cp@1000K       H@1000K       G@1000K       S@1000K " << std::endl;
+	    fOutput << "                           [kg/kmol]   [cal/mol/K]    [kcal/mol]    [kcal/mol]   [cal/mol/K]   [cal/mol/K]    [kcal/mol]    [kcal/mol]   [cal/mol/K] " << std::endl;
+		fOutput << "-----------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
+		for (unsigned int i = 0; i<NC; i++)
+			species_[i].ThermodynamicsStatus(fOutput);
+		fOutput << "-----------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
+		fOutput << std::endl;
+
+		// Print individual species
 		std::vector<double> T(12);
 		T[0]=300.;	T[1]=600.;
 		for(unsigned int i=2;i<12;i++)

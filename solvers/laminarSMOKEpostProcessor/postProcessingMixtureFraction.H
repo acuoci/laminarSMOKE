@@ -138,7 +138,7 @@ if (reconstructMixtureFraction == true)
 					masses_st[j] = y[j+1];
 			}
 
-			const double zst = thermodynamicsMapXML->GetMixtureFractionFromMassFractions(masses_st, fuel_names, mass_fuel, oxidizer_names, mass_oxidizer);
+			const double zst = thermodynamicsMapXML->GetMixtureFractionFromMassFractions(masses_st.data(), fuel_names, mass_fuel, oxidizer_names, mass_oxidizer);
 			r = (1.-zst)/zst;
 
 			std::cout << " * Stoichiometric z:         " << zst << std::endl;
@@ -166,7 +166,7 @@ if (reconstructMixtureFraction == true)
 				y_stl[i] = Y[i].internalField()[celli];
 
 			// Reconstruct mixture fraction
-			zMix_recCells[celli] = std::min ( thermodynamicsMapXML->GetMixtureFractionFromMassFractions(y_stl, fuel_names, mass_fuel,oxidizer_names, mass_oxidizer), 1.);
+			zMix_recCells[celli] = std::min ( thermodynamicsMapXML->GetMixtureFractionFromMassFractions(y_stl.data(), fuel_names, mass_fuel,oxidizer_names, mass_oxidizer), 1.);
 			phi_recCells[celli]  = std::min ( zMix_recCells[celli]*r / ( (1.-zMix_recCells[celli]) + 1.e-16), 100.);
 		}
 
@@ -189,7 +189,7 @@ if (reconstructMixtureFraction == true)
 					y_stl[i] = Y[i].boundaryField()[patchi][facei];
 
 				// Reconstruct mixture fraction
-				pzMix_rec[facei] = std::min ( thermodynamicsMapXML->GetMixtureFractionFromMassFractions(y_stl, fuel_names, mass_fuel,oxidizer_names, mass_oxidizer), 1.);
+				pzMix_rec[facei] = std::min ( thermodynamicsMapXML->GetMixtureFractionFromMassFractions(y_stl.data(), fuel_names, mass_fuel,oxidizer_names, mass_oxidizer), 1.);
 				pphi_rec[facei] = std::min ( pzMix_rec[facei]*r / ( (1.-pzMix_rec[facei]) + 1.e-16), 100.);
 			}
 		}

@@ -83,6 +83,23 @@ namespace OpenSMOKE
 			}
 		}
 
+		// Reorder
+		{
+			unsigned current_index = 0;
+			std::vector<std::string> target_elements = { "C", "H", "O", "N" };
+
+			for (unsigned int k = 0; k < target_elements.size(); k++)
+			{
+				for (unsigned int j = 0; j < element_names_list_.size(); j++)
+					if (element_names_list_[j] == target_elements[k])
+					{
+						std::iter_swap(element_names_list_.begin() + current_index, element_names_list_.begin() + j);
+						current_index++;
+						break;
+					}
+			}
+		}
+
 		// Recover atomic weights
 		element_weights_list_.resize(element_names_list_.size());
 		element_weights_list_.setZero();

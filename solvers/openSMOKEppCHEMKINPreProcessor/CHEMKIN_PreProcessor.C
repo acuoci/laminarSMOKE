@@ -193,6 +193,11 @@ int main(int argc, char** argv)
 		dictionaries(main_dictionary_name_).ReadBool("@ReverseFitting", write_fitted_kinetic_constants_);
 
 	// Fitting the reverse kinetic constants
+	bool write_fitted_chebyshev_polynomials_ = false;
+	if (dictionaries(main_dictionary_name_).CheckOption("@ChebyshevFitting") == true)
+		dictionaries(main_dictionary_name_).ReadBool("@ChebyshevFitting", write_fitted_chebyshev_polynomials_);
+
+	// Fitting the reverse kinetic constants
 	bool write_reaction_tables_ = false;
 	if (dictionaries(main_dictionary_name_).CheckOption("@ReactionTables") == true)
 		dictionaries(main_dictionary_name_).ReadBool("@ReactionTables", write_reaction_tables_);
@@ -213,6 +218,32 @@ int main(int argc, char** argv)
 			else
 			{
 				std::cerr << "Fatal error: " << "Wrong temperature units in @ReactionTablesListOfTemperatures option" << std::endl;
+				return OPENSMOKE_FATAL_ERROR_EXIT;
+			}
+		}
+	}
+
+	// Fitting the reverse kinetic constants
+	bool write_collision_rate_analysis_ = false;
+	if (dictionaries(main_dictionary_name_).CheckOption("@CollisionRateAnalysis") == true)
+		dictionaries(main_dictionary_name_).ReadBool("@CollisionRateAnalysis", write_collision_rate_analysis_);
+
+	// Fitting the reverse kinetic constants
+	std::vector<double> collision_rate_analysis_list_temperatures_;
+	if (dictionaries(main_dictionary_name_).CheckOption("@CollisionRateAnalysisListOfTemperatures") == true)
+	{
+		std::vector<std::string> list_temperatures;
+		dictionaries(main_dictionary_name_).ReadOption("@CollisionRateAnalysisListOfTemperatures", list_temperatures);
+		const unsigned int n = list_temperatures.size() - 1;
+		const std::string units = list_temperatures[n];
+
+		for (unsigned int i = 0; i < n; i++)
+		{
+			if (units == "K")		collision_rate_analysis_list_temperatures_.push_back(boost::lexical_cast<double>(list_temperatures[i]));
+			else if (units == "C")	collision_rate_analysis_list_temperatures_.push_back(boost::lexical_cast<double>(list_temperatures[i]) + 273.15);
+			else
+			{
+				std::cerr << "Fatal error: " << "Wrong temperature units in @CollisionRateAnalysisListOfTemperatures option" << std::endl;
 				return OPENSMOKE_FATAL_ERROR_EXIT;
 			}
 		}
@@ -610,7 +641,8 @@ int main(int argc, char** argv)
 		if (write_fitted_kinetic_constants_ == true ||
 			write_reaction_tables_ == true ||
 			write_reaction_strings_ == true ||
-			sparsity_pattern_analysis_ == true)
+			sparsity_pattern_analysis_ == true ||
+			write_fitted_kinetic_constants_ == true)
 		{
 			rapidxml::xml_document<> doc;
 			std::vector<char> xml_string;
@@ -634,10 +666,24 @@ int main(int argc, char** argv)
 				boost::filesystem::path file_ascii_fitted_kinetics_ = path_output / "Reaction_FittedKinetics.out";
 				analyzer.WriteFittedInverseKineticConstantsOnASCIIFile(file_ascii_fitted_kinetics_.string());
 			}
+			if (write_fitted_chebyshev_polynomials_ == true)
+			{
+				boost::filesystem::path file_ascii_fitted_kinetics_ = path_output / "Reaction_FittedChebyshev.out";
+				analyzer.WriteFittedChebyshevOnASCIIFile(file_ascii_fitted_kinetics_.string());
+			}
 			if (sparsity_pattern_analysis_ == true)
 			{
 				boost::filesystem::path file_ascii_fitted_kinetics_ = path_output / "SparsityPattern.out";
 				analyzer.SparsityPatternAnalysis(file_ascii_fitted_kinetics_.string());
+			}
+
+			if (preprocess_transport_data_ == true && write_collision_rate_analysis_ == true)
+			{
+				OpenSMOKE::TransportPropertiesMap_CHEMKIN* transportMapXML;
+				transportMapXML = new OpenSMOKE::TransportPropertiesMap_CHEMKIN(doc);
+
+				boost::filesystem::path file_ascii_reaction_tables_ = path_output / "CollisionRates.out";
+				analyzer.WriteCollisionRatesOnASCIIFile(*transportMapXML, file_ascii_reaction_tables_.string(), collision_rate_analysis_list_temperatures_);
 			}
 
 			if (write_reaction_strings_ == true)

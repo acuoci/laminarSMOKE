@@ -36,6 +36,8 @@ namespace OpenSMOKE
 
 		y0Sundials_ = NULL;
 		cvode_mem_ = NULL;
+		A = NULL;
+		LS = NULL;
 
 		this->odeSystem_ = odeSystem;
 	}
@@ -138,32 +140,62 @@ namespace OpenSMOKE
 			{
 				if (this->mUpper_ == 0 && this->mLower_ == 0)
 				{
-//					std::cout << "CVODE Solver: Dense Jacobian (without Lapack)..." << std::endl;
-					flag = CVDense(cvode_mem_, this->n_);
-					if (check_flag(&flag, std::string("CVDense"), 1)) exit(-1);
+					// std::cout << "CVODE Solver: Dense Jacobian (without Lapack)..." << std::endl;
+
+					/* Create dense SUNMatrix for use in linear solves */
+					A = SUNDenseMatrix(this->n_, this->n_);
+					if (check_flag((void *)A, std::string("SUNDenseMatrix"), 0)) exit(-1);
+					
+					/* Create SUNDenseLinearSolver solver object for use by CVode */
+					LS = SUNDenseLinearSolver(ySundials_, A);
+					if (check_flag((void *)LS, std::string("SUNDenseLinearSolver"), 0)) exit(-1);
 				}
 				else
 				{
-//					std::cout << "CVODE Solver: Band Jacobian (without Lapack)..." << std::endl;
-					flag = CVBand(cvode_mem_, this->n_, this->mUpper_, this->mLower_);
-					if (check_flag(&flag, std::string("CVBand"), 1)) exit(-1);
+					// std::cout << "CVODE Solver: Band Jacobian (without Lapack)..." << std::endl;
+
+					/* Create banded SUNMatrix for use in linear solves -- since this will be factored,
+					set the storage bandwidth to be the sum of upper and lower bandwidths */
+					A = SUNBandMatrix(this->n_, this->mUpper_, this->mLower_, (this->mUpper_+this->mLower_) );
+					if (check_flag((void *)A, std::string("SUNBandMatrix"), 0)) exit(-1);
+
+					/* Create banded SUNLinearSolver object for use by CVode */
+					LS = SUNBandLinearSolver(ySundials_, A);
+					if (check_flag((void *)LS, std::string("SUNBandLinearSolver"), 0)) exit(-1);
 				}
 			}
 			else
 			{
 				if (this->mUpper_ == 0 && this->mLower_ == 0)
 				{
-//					std::cout << "CVODE Solver: Dense Jacobian (with Lapack)..." << std::endl;
-					flag = CVLapackDense(cvode_mem_, this->n_);
-					if (check_flag(&flag, std::string("CVLapackDense"), 1)) exit(-1);
+					// std::cout << "CVODE Solver: Dense Jacobian (with Lapack)..." << std::endl;
+
+					/* Create dense SUNMatrix for use in linear solves */
+					A = SUNDenseMatrix(this->n_, this->n_);
+					if (check_flag((void *)A, std::string("SUNDenseMatrix"), 0)) exit(-1);
+
+					/* Create SUNLapackDense solver object for use by CVode */
+					LS = SUNLapackDense(ySundials_, A);
+					if (check_flag((void *)LS, std::string("SUNLapackDense"), 0)) exit(-1);
 				}
 				else
 				{
-//					std::cout << "CVODE Solver: Band Jacobian (with Lapack)..." << std::endl;
-					flag = CVLapackBand(cvode_mem_, this->n_, this->mUpper_, this->mLower_);
-					if (check_flag(&flag, std::string("CVLapackBand"), 1)) exit(-1);
+					// std::cout << "CVODE Solver: Band Jacobian (with Lapack)..." << std::endl;
+
+					/* Create banded SUNMatrix for use in linear solves -- since this will be factored,
+					set the storage bandwidth to be the sum of upper and lower bandwidths */
+					A = SUNBandMatrix(this->n_, this->mUpper_, this->mLower_, (this->mUpper_ + this->mLower_));
+					if (check_flag((void *)A, std::string("SUNBandMatrix"), 0)) exit(-1);
+
+					/* Create banded SUNLapackBand solver object for use by CVode */
+					LS = SUNLapackBand(ySundials_, A);
+					if (check_flag((void *)LS, std::string("SUNLapackBand"), 0)) exit(-1);
 				}
 			}
+
+			/* Call CVDlsSetLinearSolver to attach the matrix and linear solver to CVode */
+			flag = CVDlsSetLinearSolver(cvode_mem_, LS, A);
+			if (check_flag(&flag, std::string("CVDlsSetLinearSolver"), 1)) exit(-1);
 		}
 		else
 		{
@@ -317,6 +349,8 @@ namespace OpenSMOKE
 
 		/* Free integrator memory */
 		CVodeFree(&cvode_mem_);
+		SUNLinSolFree(LS);
+		SUNMatDestroy(A);
 
 		delete[] this->y0_;
 		delete[] this->y_;

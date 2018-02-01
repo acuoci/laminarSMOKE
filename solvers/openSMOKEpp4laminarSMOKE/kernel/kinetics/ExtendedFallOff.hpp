@@ -77,8 +77,8 @@ namespace OpenSMOKE
 
 		// Conversion factors
 		             conversion_A0_   = boost::lexical_cast<double>(coefficients[coefficients.size() - 1][0]);
-		const double conversion_AInf = boost::lexical_cast<double>(coefficients[coefficients.size() - 1][1]);
-		const double conversion_E    = boost::lexical_cast<double>(coefficients[coefficients.size() - 1][2]);
+		             conversion_AInf_ = boost::lexical_cast<double>(coefficients[coefficients.size() - 1][1]);
+		const double conversion_E     = boost::lexical_cast<double>(coefficients[coefficients.size() - 1][2]);
 
 		// Conversion factors
 		AInf_ = boost::lexical_cast<double>(coefficients[coefficients.size() - 2][0]);
@@ -158,7 +158,7 @@ namespace OpenSMOKE
 		}
 
 		// Conversions
-		AInf_ *= conversion_AInf;
+		AInf_ *= conversion_AInf_;
 		EInf_over_R_ *= conversion_E / PhysicalConstants::R_J_kmol;
 		for (unsigned int k = 0; k < species_.size(); k++)
 		{
@@ -266,7 +266,7 @@ namespace OpenSMOKE
 	{
 		fOutput << std::setw(9) << " ";
 		fOutput << std::setw(9) << std::left << "kInf:";
-		fOutput << std::scientific << std::setprecision(6) << std::right << AInf_ << "\t";
+		fOutput << std::scientific << std::setprecision(6) << std::right << AInf_/conversion_AInf_ << "\t";
 		fOutput << std::setw(8) << std::setprecision(2) << std::fixed << std::right << BetaInf_;
 		fOutput << std::setw(14) << std::setprecision(2) << std::fixed << std::right << EInf_over_R_ * PhysicalConstants::R_J_kmol / Conversions::J_from_kcal << std::endl;
 
@@ -281,7 +281,7 @@ namespace OpenSMOKE
 		{
 			fOutput << std::setw(12) << " ";
 			fOutput << std::setw(9) << std::left << "k0:";
-			fOutput << std::scientific << std::setprecision(6) << std::right << A0_[index] << "\t";
+			fOutput << std::scientific << std::setprecision(6) << std::right << A0_[index]/conversion_A0_ << "\t";
 			fOutput << std::setw(8) << std::setprecision(2) << std::fixed << std::right << Beta0_[index];
 			fOutput << std::setw(14) << std::setprecision(2) << std::fixed << std::right << E0_over_R_[index]*PhysicalConstants::R_J_kmol / Conversions::J_from_kcal << std::endl;
 		}

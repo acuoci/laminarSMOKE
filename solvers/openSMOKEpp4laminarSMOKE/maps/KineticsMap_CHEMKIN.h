@@ -16,7 +16,7 @@
 |                                                                         |
 |   This file is part of OpenSMOKE++ framework.                           |
 |                                                                         |
-|	License                                                               |
+|	License                                                           |
 |                                                                         |
 |   Copyright(C) 2014, 2013, 2012  Alberto Cuoci                          |
 |   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
@@ -40,6 +40,7 @@
 #include "math/OpenSMOKEClass.hpp"
 #include "math/OpenSMOKEVector.h"
 #include "KineticsMap.h"
+#include "TransportPropertiesMap_CHEMKIN.h"
 #include "StoichiometricMap.h"
 #include "JacobianSparsityPatternMap.h"
 #include "rapidxml.hpp"
@@ -52,10 +53,10 @@ namespace OpenSMOKE
 
 	//!  A class to efficiently evaluate the reaction and formation rates, to be used in production codes
 	/*!
-		 This class provides the tools to calculate in a very efficient way the reaction rates and the
-		 formation rates. In order to ensure a good efficiency a map is created to store all the data
-		 depending on the temperature. Inthis way they are recalculated only if strictly needed, i.e. only
-		 if the temperature changes
+	This class provides the tools to calculate in a very efficient way the reaction rates and the
+	formation rates. In order to ensure a good efficiency a map is created to store all the data
+	depending on the temperature. Inthis way they are recalculated only if strictly needed, i.e. only
+	if the temperature changes
 	*/
 
 	class KineticsMap_CHEMKIN : public KineticsMap
@@ -66,7 +67,7 @@ namespace OpenSMOKE
 		/**
 		*@brief Creates a thermodynamic map for the evaluation of thermodynamic properties (obsolete, TOREMOVE)
 		*@param thermo the thermodynamic map
-		*@param nSpecies number of species 
+		*@param nSpecies number of species
 		*@param nPoints number op points in the map (for a scalar map the number of oints is 1)
 		*/
 		KineticsMap_CHEMKIN(ThermodynamicsMap_CHEMKIN& thermo, const unsigned int nSpecies, const unsigned int nPoints = 1);
@@ -74,48 +75,51 @@ namespace OpenSMOKE
 		/**
 		*@brief Creates a thermodynamic map for the evaluation of thermodynamic properties
 		*@param thermo the thermodynamic map
-		*@param doc xml file  
+		*@param doc xml file
 		*@param nPoints number op points in the map (for a scalar map the number of oints is 1)
 		*/
 		KineticsMap_CHEMKIN(ThermodynamicsMap_CHEMKIN& thermo, rapidxml::xml_document<>& doc, const unsigned int nPoints = 1);
-                
-                /**
+
+		/**
 		*@brief Creates a thermodynamic map for the evaluation of thermodynamic properties
 		*@param thermo the thermodynamic map
-		*@param doc xml file  
-                *@param verbose activate output
+		*@param doc xml file
+		*@param verbose activate output
 		*@param nPoints number op points in the map (for a scalar map the number of oints is 1)
 		*/
 		KineticsMap_CHEMKIN(ThermodynamicsMap_CHEMKIN& thermo, rapidxml::xml_document<>& doc, bool verbose, const unsigned int nPoints = 1);
 
-                /**
+		/**
 		*@brief Copy constructor
-                *       IMPORTANT: Please consider that the thermodynamic map to which the current kinetic map (this) is linked, is
-                *       still the same thermodynamic map to which the rhs map is linked! If you want to link the current 
-                *       kinetic map to a different thermodynamic map you should use a different copy constructor (see below)
+		*       IMPORTANT: Please consider that the thermodynamic map to which the current kinetic map (this) is linked, is
+		*       still the same thermodynamic map to which the rhs map is linked! If you want to link the current
+		*       kinetic map to a different thermodynamic map you should use a different copy constructor (see below)
 		*@param rhs the object to be copied in the current object
 		*/
-                KineticsMap_CHEMKIN( const KineticsMap_CHEMKIN& rhs );
-                
-                /**
+		KineticsMap_CHEMKIN(const KineticsMap_CHEMKIN& rhs);
+
+		/**
 		*@brief Copy constructor
-                *       IMPORTANT: no checks are done about the consistency between the thermodynamic map linked to the kinetic map
-                *       (rhs.thermodynamics_) and the provided map (thermo). It is up to the user to be sure about the consistency.
+		*       IMPORTANT: no checks are done about the consistency between the thermodynamic map linked to the kinetic map
+		*       (rhs.thermodynamics_) and the provided map (thermo). It is up to the user to be sure about the consistency.
 		*@param rhs the object to be copied in the current object
 		*/
-                KineticsMap_CHEMKIN( const KineticsMap_CHEMKIN& rhs, ThermodynamicsMap_CHEMKIN& thermo );
-                		
+		KineticsMap_CHEMKIN(const KineticsMap_CHEMKIN& rhs, ThermodynamicsMap_CHEMKIN& thermo);
+
 		/**
 		*@brief Default destructor
 		*/
 		~KineticsMap_CHEMKIN();
 
+		/**
+		*@brief Return the thermodynamics map associated to the current kinetics map
+		*/
 		ThermodynamicsMap_CHEMKIN& thermodynamics() const { return thermodynamics_; }
 
 		/**
 		*@brief Sets the verbose output
 		*/
-		void SetVerboseOutput(const bool verbose_output)		{ verbose_output_ = verbose_output; }
+		void SetVerboseOutput(const bool verbose_output) { verbose_output_ = verbose_output; }
 
 		/**
 		*@brief Set the temperature at which the properties have to be evaluated
@@ -127,7 +131,7 @@ namespace OpenSMOKE
 		*@brief Set the pressure at which the properties have to be evaluated
 		*@param P the pressure value in Pa
 		*/
-		virtual void SetPressure(const double& P);		
+		virtual void SetPressure(const double& P);
 
 		/**
 		*@brief Returns the names of the species
@@ -145,46 +149,38 @@ namespace OpenSMOKE
 		virtual void ImportSpeciesFromXMLFile(rapidxml::xml_document<>& doc);
 
 		/**
-		*@brief Calculates the kinetic constants of the reverse reactions
-		*/
-		void FittedReverseKineticConstants(const double* x_bath, const unsigned int nparameters, Eigen::MatrixXd& fittedKineticParameters, const bool only_reversible);
-
-		/**
-		*@brief Calculates the kinetic constants of the reverse reactions
-		*/
-		void FittedReverseKineticConstants(const unsigned int k, std::ostream& fOut, Eigen::MatrixXd& fittedKineticParameters);
-
-		/**
-		*@brief Write the data for the reaction tables
-		*/
-		void WriteKineticData(std::ostream& fOut, const unsigned int k, const double* c_bath, const std::vector<double> list_of_temperatures, const double conversion_forward=1., const double conversion_backward=1.);
-		
-		/**
-		*@brief Write the data for the reaction tables
-		*/
-		void WriteKineticData(std::ostream& fOut, const unsigned int k, const double T, const double P_Pa, const double* c);
-
-		/**
-		*@brief Write the data for the reaction tables
-		*/
-		void WriteKineticData(std::ostream& fOut, const unsigned int k);
-
-		/**
-		*@brief Calculates the formation rates for all the species in the kinetic mechanism
+		*@brief Calculates the formation rates for all the species in the kinetic mechanism (in kmol/m3/s)
 		*/
 		void FormationRates(double* R);
 
 		/**
-		*@brief Calculates the heat release
+		*@brief Calculates the heat release on the basis of formation rates
+		*@param R formation rates of species (in kmol/m3/s)
+		*returns the heat release rate (in J/m3/s)
 		*/
 		double HeatRelease(const double* R);
 
 		/**
 		*@brief Calculates the production and the destruction rates for all the species in the kinetic mechanism [kmol/m3/s]
+		*       The contributions are calculated on the basis of net reaction rates
 		*/
 		void ProductionAndDestructionRates(double* P, double* D);
-        void ProductionAndDestructionRatesGross(double* P, double* D);
 
+		/**
+		*@brief Calculates the production and the destruction rates for all the species in the kinetic mechanism [kmol/m3/s]
+		*       The contributions are calculated on the basis of separate forward and backward reaction rates
+		*/
+		void ProductionAndDestructionRatesGross(double* P, double* D);
+
+		/**
+		*@brief Returns the net reaction rates (in kmol/m3/s)
+		*/
+		const std::vector<double>& GiveMeReactionRates();
+
+		/**
+		*@brief Return the net reaction rates (in kmol/m3/s)
+		*/
+		void GiveMeReactionRates(double* r);
 
 		/**
 		*@brief Returns the forward reaction rates for all the reactions in the kinetic scheme [kmol/m3/s]
@@ -193,18 +189,20 @@ namespace OpenSMOKE
 
 		/**
 		*@brief Returns the backward reaction rates for all the reactions in the kinetic scheme [kmol/m3/s]
-		        If a reaction is irreversible, it returns zero
+		If a reaction is irreversible, it returns zero
 		*/
 		void GetBackwardReactionRates(double* r);
 
 		/**
 		*@brief Calculates the reaction rates for all the reactions in the kinetic scheme
+		*@param c concentrations of species (in kmol/m3)
 		*/
 		void ReactionRates(const double* c);
-		void DerivativesOfReactionRatesWithRespectToKineticParameters(const PhysicalConstants::sensitivity_type type, unsigned int jReaction, const double* c, double& parameter);
 
 		/**
-		*@brief Calculates the reaction rates for all the reactions in the kinetic scheme 
+		*@brief Calculates the reaction rates for all the reactions in the kinetic scheme (if total concentration is available)
+		*@param c concentrations of species (in kmol/m3)
+		*@param cTot total concentration (in kmol/m3)
 		*/
 		void ReactionRates(const double* c, const double cTot);
 
@@ -224,77 +222,13 @@ namespace OpenSMOKE
 		void KineticConstants();
 
 		/**
-		*@brief Return the net reaction rates in [kmol/m3/s]
-		*/
-		const std::vector<double>& GiveMeReactionRates();
-
-		/**
-		*@brief Return the net reaction rates in [kmol/m3/s]
-		*/
-		void GiveMeReactionRates(double* r);
-
-		void RateOfProductionAnalysis(const bool iNormalize) const;
-
-		void RateOfProductionAnalysis(std::ostream& fout) const;
-		void RateOfProductionAnalysis(ROPA_Data& ropa) const;
-		void RateOfProductionAnalysis(ROPA_Data& ropa, const double* rf, const double* rb) const;
-
-
-		const std::vector<double>& KArrheniusModified() const { return kArrheniusModified__; }
-		const std::vector<double>& KArrhenius() const { return kArrhenius__; }
-
-		void SensitivityWithRespectKineticParameter(const PhysicalConstants::sensitivity_type type, const unsigned int k, const double* c, double* Jalfa, double& parameter);
-		void SensitivityWithRespectKineticParameter(const PhysicalConstants::sensitivity_type type, const EnergyEquationType energy_type, const unsigned int k, const double* c, const double* mole_fractions, double* Jalfa, double& JT, double& parameter);
-		void SensitivityWithRespectKineticParameter(const PhysicalConstants::sensitivity_type type, const EnergyEquationType energy_type, const unsigned int k, const double* c, const double* mole_fractions, double* Jalfa, double& JT, double& Jrho, double& parameter);
-
-
-		void DerivativesOfFormationRates(const double* c, Eigen::MatrixXd* dR_over_dC);
-		void DerivativesOfFormationRates(const double* c, const double* omega, Eigen::MatrixXd* dR_over_domega);
-
-		void Derivatives(const double* c, Eigen::MatrixXd* derivatives, const bool constant_density = false);
-		void Derivatives(const double* c, const double* omega, Eigen::MatrixXd* derivatives);
-
-		unsigned int NumberOfReversibleReactions() const { return number_of_reversible_reactions_; }
-
-		unsigned int NumberOfThirdBodyReactions() const { return number_of_thirdbody_reactions_; }
-
-		unsigned int NumberOfFallOffReactions() const { return number_of_falloff_reactions_; }
-
-		unsigned int NumberOfCABRReactions() const { return number_of_cabr_reactions_; }
-
-		StoichiometricMap& stoichiometry() { return *stoichiometry_; }
-
-		const std::vector<unsigned int>& IndicesOfThirdbodyReactions() const { return indices_of_thirdbody_reactions__; };
-		const std::vector< std::vector<unsigned int> >& IndicesOfThirdbodySpecies() const { return indices_of_thirdbody_species__; };
-		const std::vector<unsigned int>& IndicesOfFalloffReactions() const { return indices_of_falloff_reactions__; };
-		const std::vector<unsigned int>& IndicesOfCabrReactions() const { return indices_of_cabr_reactions__; };
-
-		const std::vector<unsigned int>& IsThermodynamicallyReversible() const { return isThermodynamicallyReversible__; };
-		const std::vector<unsigned int>& IsExplicitlyReversible() const { return isExplicitlyReversible__; };
-
-		std::vector<double>& NetReactionRates() { return netReactionRates__; }
-
-		std::vector<double>& M() { return Meff__; }
-
-		const std::vector< std::vector<double> >&	IndicesOfThirdbodyEfficiencies() const { return indices_of_thirdbody_efficiencies__; }
-
-		void WeakThirdBodyConcentrationEfficiencies(std::vector<unsigned int>& reaction, std::vector<unsigned int>& species);
-		void WeakFallOffConcentrationEfficiencies(std::vector<unsigned int>& reaction, std::vector<unsigned int>& species);
-		void WeakCABRConcentrationEfficiencies(std::vector<unsigned int>& reaction, std::vector<unsigned int>& species);
-		void StrongConcentrationEfficiencies(std::vector<unsigned int>& reaction);
-
-		double FallOffReactionsCorrection(const unsigned int local_k, const double cTot, const double* c);
-
-		JacobianSparsityPatternMap<KineticsMap_CHEMKIN>* jacobian_sparsity_pattern_map() { return jacobian_sparsity_pattern_map_; };
-
-		/**
 		*@brief Return the frequency factor of a single reaction [kmol, m, s]
 		*@param j index of reaction (starting from zero)
 		*/
-		double A(const unsigned int j) { return sign_lnA__[j]*std::exp(lnA__[j]); }
+		double A(const unsigned int j) { return sign_lnA__[j] * std::exp(lnA__[j]); }
 
 		/**
-		*@brief Return the temperature exponent a single reaction 
+		*@brief Return the temperature exponent a single reaction
 		*@param j index of reaction (starting from zero)
 		*/
 		double Beta(const unsigned int j) { return Beta__[j]; }
@@ -304,7 +238,188 @@ namespace OpenSMOKE
 		*@param j index of reaction (starting from zero)
 		*/
 		double E_over_R(const unsigned int j) { return E_over_R__[j]; }
-		
+
+		/**
+		*@brief Returns the total number of reversible reactions
+		*/
+		unsigned int NumberOfReversibleReactions() const { return number_of_reversible_reactions_; }
+
+		/**
+		*@brief For each reaction returns 1 if thermodynamically reversible, 0 otherwise
+		*/
+		const std::vector<unsigned int>& IsThermodynamicallyReversible() const { return isThermodynamicallyReversible__; };
+
+		/**
+		*@brief For each reaction returns 1 if explicitly reversible, 0 otherwise
+		*/
+		const std::vector<unsigned int>& IsExplicitlyReversible() const { return isExplicitlyReversible__; };
+
+		/**
+		*@brief Returns the total number of reactions with third body effects
+		*/
+		unsigned int NumberOfThirdBodyReactions() const { return number_of_thirdbody_reactions_; }
+
+		/**
+		*@brief Returns the indices of reactions with third-body effects
+		*/
+		const std::vector<unsigned int>& IndicesOfThirdbodyReactions() const { return indices_of_thirdbody_reactions__; };
+
+		/**
+		*@brief Returns the indices of of third body species for each third body reaction
+		*/
+		const std::vector< std::vector<unsigned int> >& IndicesOfThirdbodySpecies() const { return indices_of_thirdbody_species__; };
+
+		/**
+		*@brief Returns the efficiencies of of third body species for each third body reaction
+		*/
+		const std::vector< std::vector<double> >&	IndicesOfThirdbodyEfficiencies() const { return indices_of_thirdbody_efficiencies__; }
+
+		/**
+		*@brief Return the third-body global efficiency for each third-body reaction
+		*/
+		std::vector<double>& M() { return Meff__; }
+
+		/**
+		*@brief Returns the total number of fall off reactions
+		*/
+		unsigned int NumberOfFallOffReactions() const { return number_of_falloff_reactions_; }
+
+		/**
+		*@brief Returns the indices of fall-off reactions
+		*/
+		const std::vector<unsigned int>& IndicesOfFalloffReactions() const { return indices_of_falloff_reactions__; };
+
+		/**
+		*@brief Returns the total number of Chemically Activated Bimolecular Reactions (CABR)
+		*/
+		unsigned int NumberOfCABRReactions() const { return number_of_cabr_reactions_; }
+
+		/**
+		*@brief Returns the indices of Chemically Activated Bimolecular Reactions (CABR)
+		*/
+		const std::vector<unsigned int>& IndicesOfCabrReactions() const { return indices_of_cabr_reactions__; };
+
+		/**
+		*@brief Returns the modified Arrhenius kinetic constants (in kmol, m, s)
+		*/
+		const std::vector<double>& KArrheniusModified() const { return kArrheniusModified__; }
+
+		/**
+		*@brief Returns the Arrhenius kinetic constants (in kmol, m, s)
+		*/
+		const std::vector<double>& KArrhenius() const { return kArrhenius__; }
+
+		/**
+		*@brief Returns the net reaction rates (in kmol/m3/s) for each reaction
+		*/
+		std::vector<double>& NetReactionRates() { return netReactionRates__; }
+
+		/**
+		*@brief Returns the correction due to fall-off effects for a given fall-off reaction
+		*@param local_k index of reaction (among the fall-off reactions)
+		*@param cTot total concentration (in kmol/m3)
+		*@param concentrations of species (in kmol/m3)
+		*returns the fall-off correction
+		*/
+		double FallOffReactionsCorrection(const unsigned int local_k, const double cTot, const double* c);
+
+
+		const std::vector<unsigned int>& FallOffIndexOfSingleThirdbodySpecies() const { return falloff_index_of_single_thirdbody_species__;  }
+		const std::vector< std::vector<unsigned int> >& FallOffIndicesOfThirdbodySpecies() const { return falloff_indices_of_thirdbody_species__; }
+
+		ChebyshevPolynomialRateExpression& chebyshev_reactions(const unsigned int j) const { return chebyshev_reactions_[j];  }
+		unsigned int number_of_chebyshev_reactions() const { return number_of_chebyshev_reactions_;  }
+		const std::vector<unsigned int>& indices_of_chebyshev_reactions() const { return indices_of_chebyshev_reactions__; }
+	
+	public:
+
+		/**
+		*@brief Calculates the derivatives of formation rates with respect to concentrations
+		*@param c current concentrations (in kmol/m3)
+		*@param dR_over_dC the calculated derivatives (in 1/s) of formation rates with respect to concentrations
+		*/
+		void DerivativesOfFormationRates(const double* c, Eigen::MatrixXd* dR_over_dC);
+
+		/**
+		*@brief Calculates the derivatives of formation rates with respect to mass fractions
+		*@param c current concentrations (in kmol/m3)
+		*@param omega current mass fractions
+		*@param dR_over_domega the calculated derivatives (in kmol/m3/s) of formation rates with respect to mass fractions
+		*/
+		void DerivativesOfFormationRates(const double* c, const double* omega, Eigen::MatrixXd* dR_over_domega);
+
+		/**
+		*@brief Returns the stoichiometric map
+		*/
+		StoichiometricMap& stoichiometry() { return *stoichiometry_; }
+
+		/**
+		*@brief Returns the sparsity pattern of Jacobian matrix
+		*/
+		JacobianSparsityPatternMap<KineticsMap_CHEMKIN>* jacobian_sparsity_pattern_map() { return jacobian_sparsity_pattern_map_; };
+
+	public:
+
+		/**
+		*@brief Calculates the kinetic constants of the reverse reactions
+		*/
+		void FittedReverseKineticConstants(const double* x_bath, const unsigned int nparameters, Eigen::MatrixXd& fittedKineticParameters, const bool only_reversible);
+
+		/**
+		*@brief Calculates the kinetic constants of the reverse reactions
+		*/
+		void FittedReverseKineticConstants(const unsigned int k, std::ostream& fOut, Eigen::MatrixXd& fittedKineticParameters);
+
+		/**
+		*@brief Write the data for the reaction tables
+		*/
+		void WriteKineticData(std::ostream& fOut, const unsigned int k, const double* c_bath, const std::vector<double> list_of_temperatures, const double conversion_forward = 1., const double conversion_backward = 1.);
+
+		/**
+		*@brief Write the data for the reaction tables
+		*/
+		void WriteKineticData(std::ostream& fOut, const unsigned int k, const double T, const double P_Pa, const double* c);
+
+		/**
+		*@brief Write the data for the reaction tables
+		*/
+		void WriteKineticData(std::ostream& fOut, const unsigned int k);
+
+		/**
+		*@brief Write collision rate constants for bimolecular reactions
+		*@param transport map describing the transport properties
+		*@param fOut output stream where to write the results of the analysis
+		*@param reaction_names list of reaction strings (for a better output)
+		*@param list_of_temperatures list of temperatures (in K) at which the analysis is carried out
+		*/
+		void WriteCollisionRateConstantForBimolecularReactions(
+			TransportPropertiesMap_CHEMKIN& transport, 
+			std::ostream& fOut, const std::vector<std::string>& reaction_names,
+			const std::vector<double>& list_of_temperatures);
+
+
+	public:	// Functions for builing the sparsity patterns
+
+		void WeakThirdBodyConcentrationEfficiencies(std::vector<unsigned int>& reaction, std::vector<unsigned int>& species);
+		void WeakFallOffConcentrationEfficiencies(std::vector<unsigned int>& reaction, std::vector<unsigned int>& species);
+		void WeakCABRConcentrationEfficiencies(std::vector<unsigned int>& reaction, std::vector<unsigned int>& species);
+		void StrongConcentrationEfficiencies(std::vector<unsigned int>& reaction);
+
+
+	public:	// Rate of Production Analysis (ROPA) utilities
+
+		void RateOfProductionAnalysis(const bool iNormalize) const;
+		void RateOfProductionAnalysis(std::ostream& fout) const;
+		void RateOfProductionAnalysis(ROPA_Data& ropa) const;
+		void RateOfProductionAnalysis(ROPA_Data& ropa, const double* rf, const double* rb) const;
+
+
+	public:	// Sensitivity Analysis (SA) utilities
+
+		void DerivativesOfReactionRatesWithRespectToKineticParameters(const PhysicalConstants::sensitivity_type type, unsigned int jReaction, const double* c, double& parameter);
+		void SensitivityWithRespectKineticParameter(const PhysicalConstants::sensitivity_type type, const unsigned int k, const double* c, double* Jalfa, double& parameter);
+		void SensitivityWithRespectKineticParameter(const PhysicalConstants::sensitivity_type type, const EnergyEquationType energy_type, const unsigned int k, const double* c, const double* mole_fractions, double* Jalfa, double& JT, double& parameter);
+		void SensitivityWithRespectKineticParameter(const PhysicalConstants::sensitivity_type type, const EnergyEquationType energy_type, const unsigned int k, const double* c, const double* mole_fractions, double* Jalfa, double& JT, double& Jrho, double& parameter);
 
 	private:
 
@@ -322,7 +437,7 @@ namespace OpenSMOKE
 		*@brief Calculates the corrections for the cabr reactions
 		*/
 		void ChemicallyActivatedBimolecularReactions(const double cTot, const double* c);
-             
+
 		/**
 		*@brief Calculates the kinetic constants for extended pressure log reactions
 		*/
@@ -333,40 +448,44 @@ namespace OpenSMOKE
 		*/
 		void ExtendedFallOffReactions(const double cTot, const double* c);
 
-        /**
+		/**
 		*@brief Copies the data from another kinetic map (used by copy constructors)
 		*/
-        void CopyFromMap( const KineticsMap_CHEMKIN& rhs );
-                
-        // TODO
-        void FallOffReactions(const unsigned int k, const double cTot, const double* c, double &F, double &dF_over_dA0, double &dF_over_dAInf);
-		void ChemicallyActivatedBimolecularReactions(const unsigned int k, const double cTot, const double* c, double &F, double &dF_over_dA0, double &dF_over_dAInf);
+		void CopyFromMap(const KineticsMap_CHEMKIN& rhs);
 
 	private:
 
-		ThermodynamicsMap_CHEMKIN& thermodynamics_;		//!< reference to the thermodynamics
+		// TODO
+		void FallOffReactions(const unsigned int k, const double cTot, const double* c, double &F, double &dF_over_dA0, double &dF_over_dAInf);
+		void ChemicallyActivatedBimolecularReactions(const unsigned int k, const double cTot, const double* c, double &F, double &dF_over_dA0, double &dF_over_dAInf);
+		void Derivatives(const double* c, Eigen::MatrixXd* derivatives, const bool constant_density = false);
+		void Derivatives(const double* c, const double* omega, Eigen::MatrixXd* derivatives);
 
-		std::vector<unsigned int> indices_of_irreversible_reactions__;				//!< indices of irreversible reactions
-		std::vector<unsigned int> indices_of_reversible_reactions__;				//!< indices of reversible reactions
+	private:
+
+		ThermodynamicsMap_CHEMKIN& thermodynamics_;					//!< reference to the thermodynamics
+
+		std::vector<unsigned int> indices_of_irreversible_reactions__;			//!< indices of irreversible reactions
+		std::vector<unsigned int> indices_of_reversible_reactions__;			//!< indices of reversible reactions
 		std::vector<unsigned int> indices_of_thermodynamic_reversible_reactions__;	//!< indices of reversible (thermodynamic) reactions
 		std::vector<unsigned int> indices_of_explicitly_reversible_reactions__;		//!< indices of reversible (explicit) reactions
-		std::vector<unsigned int> indices_of_thirdbody_reactions__;					//!< indices of three-body reactions
-		std::vector<unsigned int> indices_of_falloff_reactions__;					//!< indices of falloff reactions
-		std::vector<unsigned int> indices_of_extendedfalloff_reactions__;					//!< indices of extended falloff reactions
-		std::vector<unsigned int> indices_of_cabr_reactions__;						//!< indices of cabr reactions
-		std::vector<unsigned int> indices_of_chebyshev_reactions__;					//!< indices of chebyshev reactions
-		std::vector<unsigned int> indices_of_pressurelog_reactions__;				//!< indices of pressurelog (PLOG) reactions
+		std::vector<unsigned int> indices_of_thirdbody_reactions__;			//!< indices of three-body reactions
+		std::vector<unsigned int> indices_of_falloff_reactions__;			//!< indices of falloff reactions
+		std::vector<unsigned int> indices_of_extendedfalloff_reactions__;		//!< indices of extended falloff reactions
+		std::vector<unsigned int> indices_of_cabr_reactions__;				//!< indices of cabr reactions
+		std::vector<unsigned int> indices_of_chebyshev_reactions__;			//!< indices of chebyshev reactions
+		std::vector<unsigned int> indices_of_pressurelog_reactions__;			//!< indices of pressurelog (PLOG) reactions
 		std::vector<unsigned int> indices_of_extendedpressurelog_reactions__;		//!< indices of extended pressurelog (EXTPLOG) reactions
-		std::vector<unsigned int> indices_of_fit1_reactions__;						//!< indices of FIT1 reactions
-		std::vector<unsigned int> indices_of_janevlanger_reactions__;				//!< indices of JAN reactions
-		std::vector<unsigned int> indices_of_landauteller_reactions__;				//!< indices of LT reactions
+		std::vector<unsigned int> indices_of_fit1_reactions__;				//!< indices of FIT1 reactions
+		std::vector<unsigned int> indices_of_janevlanger_reactions__;			//!< indices of JAN reactions
+		std::vector<unsigned int> indices_of_landauteller_reactions__;			//!< indices of LT reactions
 
-		std::vector<unsigned int> indices_of_falloff_lindemann_reactions__;			//!< indices of falloff (Lindemann) reactions
-		std::vector<unsigned int> indices_of_cabr_lindemann_reactions__;				//!< indices of cabr (Lindemann) reactions
-		std::vector<unsigned int> indices_of_falloff_troe_reactions__;				//!< indices of falloff (Troe) reactions
-		std::vector<unsigned int> indices_of_cabr_troe_reactions__;					//!< indices of cabr (Troe) reactions
-		std::vector<unsigned int> indices_of_falloff_sri_reactions__;				//!< indices of falloff (SRI) reactions
-		std::vector<unsigned int> indices_of_cabr_sri_reactions__;					//!< indices of cabr (Troe) reactions
+		std::vector<unsigned int> indices_of_falloff_lindemann_reactions__;		//!< indices of falloff (Lindemann) reactions
+		std::vector<unsigned int> indices_of_cabr_lindemann_reactions__;		//!< indices of cabr (Lindemann) reactions
+		std::vector<unsigned int> indices_of_falloff_troe_reactions__;			//!< indices of falloff (Troe) reactions
+		std::vector<unsigned int> indices_of_cabr_troe_reactions__;			//!< indices of cabr (Troe) reactions
+		std::vector<unsigned int> indices_of_falloff_sri_reactions__;			//!< indices of falloff (SRI) reactions
+		std::vector<unsigned int> indices_of_cabr_sri_reactions__;			//!< indices of cabr (Troe) reactions
 
 		unsigned int number_of_irreversible_reactions_;
 		unsigned int number_of_reversible_reactions_;
@@ -392,27 +511,27 @@ namespace OpenSMOKE
 
 		bool verbose_output_;
 
-		std::vector<double> lnA__;							//!< frequency factors (log)
-		std::vector<double> Beta__;							//!< temperature exponents
-		std::vector<double> E_over_R__;						//!< activation temperatures
-		std::vector<int> negative_lnA__;					//!< list of reactions with negative frequency factor (1-index based)
-		std::vector<int> sign_lnA__;						//!< sign of frequency factors of reactions (+1 or -1)
+		std::vector<double> lnA__;				//!< frequency factors (log)
+		std::vector<double> Beta__;				//!< temperature exponents
+		std::vector<double> E_over_R__;				//!< activation temperatures
+		std::vector<int> negative_lnA__;			//!< list of reactions with negative frequency factor (1-index based)
+		std::vector<int> sign_lnA__;				//!< sign of frequency factors of reactions (+1 or -1)
 
-		std::vector<double> lnA_reversible__;				//!< frequency factors (log) for explicitly reversible reactions
-		std::vector<double> Beta_reversible__;				//!< temperature exponents for explicitly reversible reactions
-		std::vector<double> E_over_R_reversible__;			//!< activation temperatures for explicitly reversible reactions
+		std::vector<double> lnA_reversible__;			//!< frequency factors (log) for explicitly reversible reactions
+		std::vector<double> Beta_reversible__;			//!< temperature exponents for explicitly reversible reactions
+		std::vector<double> E_over_R_reversible__;		//!< activation temperatures for explicitly reversible reactions
 
 		std::vector<double> Meff__;																//!< threebody efficiencies
-		std::vector< std::vector<unsigned int> >		indices_of_thirdbody_species__;			//!< indices of threebody species
-		std::vector< std::vector<double> >				indices_of_thirdbody_efficiencies__;	//!< efficiencies of threebody species
+		std::vector< std::vector<unsigned int> >		indices_of_thirdbody_species__;		//!< indices of threebody species
+		std::vector< std::vector<double> >			indices_of_thirdbody_efficiencies__;	//!< efficiencies of threebody species
 
 		std::vector<double> lnA_falloff_inf__;			//!< frequency factors (log) for falloff reactions
 		std::vector<double> Beta_falloff_inf__;			//!< temperature exponents for falloff reactions
 		std::vector<double> E_over_R_falloff_inf__;		//!< activation temperatures for falloff reactions
 
-		std::vector< std::vector<unsigned int> >			falloff_indices_of_thirdbody_species__;
-		std::vector< std::vector<double> >					falloff_indices_of_thirdbody_efficiencies__;
-		std::vector<unsigned int>							falloff_index_of_single_thirdbody_species__;
+		std::vector< std::vector<unsigned int> >	falloff_indices_of_thirdbody_species__;
+		std::vector< std::vector<double> >		falloff_indices_of_thirdbody_efficiencies__;
+		std::vector<unsigned int>			falloff_index_of_single_thirdbody_species__;
 
 		VectorReactionTags falloff_reaction_type__;
 		std::vector<double>  a_falloff__;
@@ -422,13 +541,13 @@ namespace OpenSMOKE
 		std::vector<double>  e_falloff__;
 		std::vector<double>  logFcent_falloff__;
 
-		std::vector<double> lnA_cabr_inf__;					//!< frequency factors (log) for cabr reactions
-		std::vector<double> Beta_cabr_inf__;				//!< temperature exponents for cabr reactions
-		std::vector<double> E_over_R_cabr_inf__;			//!< activation temperatures for cabr reactions
+		std::vector<double> lnA_cabr_inf__;		//!< frequency factors (log) for cabr reactions
+		std::vector<double> Beta_cabr_inf__;		//!< temperature exponents for cabr reactions
+		std::vector<double> E_over_R_cabr_inf__;	//!< activation temperatures for cabr reactions
 
 		std::vector< std::vector<unsigned int> >	cabr_indices_of_thirdbody_species__;
-		std::vector< std::vector<double> >          cabr_indices_of_thirdbody_efficiencies__;
-		std::vector<unsigned int>                   cabr_index_of_single_thirdbody_species__;
+		std::vector< std::vector<double> >          	cabr_indices_of_thirdbody_efficiencies__;
+		std::vector<unsigned int>                   	cabr_index_of_single_thirdbody_species__;
 
 		VectorReactionTags cabr_reaction_type__;
 		std::vector<double>  a_cabr__;
@@ -445,7 +564,7 @@ namespace OpenSMOKE
 		bool arrhenius_kinetic_constants_must_be_recalculated_;
 		bool nonconventional_kinetic_constants_must_be_recalculated_;
 		bool reaction_h_and_s_must_be_recalculated_;
-        bool isJacobianSparsityMapAvailable_;
+		bool isJacobianSparsityMapAvailable_;
 
 		std::vector<double> reaction_s_over_R__;
 		std::vector<double> reaction_h_over_RT__;
@@ -466,17 +585,16 @@ namespace OpenSMOKE
 		std::vector<double> correction_falloff__;						//!< correction factors for the falloff reactions
 		std::vector<double> correction_cabr__;							//!< correction factors for the cabr reactions
 
-		ChebyshevPolynomialRateExpression* chebyshev_reactions_;						//!< pointer to the list of Chebyshev reactions
-		PressureLogarithmicRateExpression* pressurelog_reactions_;						//!< pointer to the list of PLOG reactions
+		ChebyshevPolynomialRateExpression* chebyshev_reactions_;				//!< pointer to the list of Chebyshev reactions
+		PressureLogarithmicRateExpression* pressurelog_reactions_;				//!< pointer to the list of PLOG reactions
 		ExtendedPressureLogarithmicRateExpression* extendedpressurelog_reactions_;		//!< pointer to the list of PLOGMX/PLOGSP reactions
-		ExtendedFallOff* extendedfalloff_reactions_;									//!< pointer to the list of extended falloff reactions
+		ExtendedFallOff* extendedfalloff_reactions_;						//!< pointer to the list of extended falloff reactions
 
 		std::vector<unsigned int> isThermodynamicallyReversible__;		//!< vector containing the local index of thermodynamically reversible reactions
 		std::vector<unsigned int> isExplicitlyReversible__;			//!< vector containing the local index of explicitly reversible reactions
 
 		VectorReactionTags type_of_reaction__;
 		std::vector<unsigned int> local_family_index__;
-
 
 		JacobianSparsityPatternMap<KineticsMap_CHEMKIN>* jacobian_sparsity_pattern_map_;
 	};

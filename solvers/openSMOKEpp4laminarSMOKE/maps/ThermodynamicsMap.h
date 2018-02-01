@@ -16,7 +16,7 @@
 |                                                                         |
 |   This file is part of OpenSMOKE++ framework.                           |
 |                                                                         |
-|	License                                                               |
+|	License                                                           |
 |                                                                         |
 |   Copyright(C) 2014, 2013, 2012  Alberto Cuoci                          |
 |   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
@@ -41,12 +41,12 @@ namespace OpenSMOKE
 {
 	//!  A virtual class to provide a common interface to thermodynamic maps
 	/*!
-			This virtual class provides a common interface to thermodynamic maps
+	This virtual class provides a common interface to thermodynamic maps
 	*/
 
 	class ThermodynamicsMap
 	{
-	
+
 	public:
 
 		/**
@@ -67,13 +67,13 @@ namespace OpenSMOKE
 		/**
 		* @brief returns the molecular weights of a species [kg/kmol]
 		*/
-		const double MW(const unsigned int i) const { return MW__[i];}
+		double MW(const unsigned int i) const { return MW__[i]; }
 
 		/**
 		* @brief Sets the temperature (in K)
 		*/
 		virtual void SetTemperature(const double& T) = 0;
-	
+
 		/**
 		* @brief Sets the pressure (in Pa)
 		*/
@@ -168,16 +168,16 @@ namespace OpenSMOKE
 		* @brief Calculates the mixture averaged free Gibbs' energies of the species from the mole fractions
 		*/
 		virtual void gMolar_Species_MixtureAveraged_From_MoleFractions(double* g_species, const double* x) = 0;
-		
+
 		/**
 		* @brief Calculates the mixture averaged molar Helmoltz's free energies of the species from the mole fractions
-		*/		
+		*/
 		virtual void aMolar_Species_MixtureAveraged_From_MoleFractions(double* a_species, const double* x) = 0;
 
 		/**
 		* @brief returns the normalized reaction enthalpies for the species
-		*/	
-		virtual const std::vector<double>& Species_H_over_RT()  = 0;
+		*/
+		virtual const std::vector<double>& Species_H_over_RT() = 0;
 
 		/**
 		* @brief returns the normalized reaction entropies for the species
@@ -191,48 +191,73 @@ namespace OpenSMOKE
 
 		/**
 		* @brief returns the index (1-based) of the species with the requested name
-		         if the species is not present, a fatal error will be reported
+		if the species is not present, a fatal error will be reported
 		*/
 		unsigned int IndexOfSpecies(const std::string name) const;
 
 		/**
 		* @brief returns the index (1-based) of the species with the requested name
-		         if the species is not present, the returned index is equal to 0
+		if the species is not present, the returned index is equal to 0
 		*/
 		unsigned int IndexOfSpeciesWithoutError(const std::string name) const;
 
 		/**
 		* @brief returns the index (1-based) of the element with the requested name
-		         if the element is not present, a fatal error will be reported
+		if the element is not present, a fatal error will be reported
 		*/
 		unsigned int IndexOfElement(const std::string name) const;
 
 		/**
 		* @brief returns the index (1-based) of the element with the requested name
-		         if the element is not present, the returned index is equal to 0
+		if the element is not present, the returned index is equal to 0
 		*/
 		unsigned int IndexOfElementWithoutError(const std::string name) const;
-
 
 		/**
 		*@brief Import elements from a file in XML format
 		*/
 		void ImportElementsFromXMLFile(rapidxml::xml_document<>& doc);
 
-		double GetMixtureFractionFromMassFractions(
-		const std::vector<double>& mass,
-		const std::vector<std::string>& fuel_names, 	const std::vector<double>& mass_fuel,
-		const std::vector<std::string>& oxidizer_names,	const std::vector<double>& mass_oxidizer);
+		/**
+		*@brief Calculates the mixture fraction for a given composition
+		*@param mass current mass fractions
+		*@param fuel_names names of species of fuel stream
+		*@param mass_fuel mass fractions of species in the fuel stream
+		*@param oxidizer_names names of species of oxidizer stream
+		*@param mass_oxidizer mass fractions of species of oxidizer stream
+		*@returns the mixture fraction
+		*/
+		double GetMixtureFractionFromMassFractions(const double* mass,
+			const std::vector<std::string>& fuel_names,
+			const std::vector<double>& mass_fuel,
+			const std::vector<std::string>& oxidizer_names,
+			const std::vector<double>& mass_oxidizer);
 
-		std::vector<double> GetMoleFractionsFromEquivalenceRatio( const double equivalence_ratio,
-						const std::vector<std::string>& fuel_names, const std::vector<double>& moles_fuel,
-						const std::vector<std::string>& oxidizer_names,	const std::vector<double>& moles_oxidizer );
+		/**
+		*@brief Calculates the composition (mole fractions) for a given equivalence ratio
+		*@param equivalence_ratio current equivalence ratio
+		*@param fuel_names names of species of fuel stream
+		*@param moles_fuel mole fractions of species in the fuel stream
+		*@param oxidizer_names names of species of oxidizer stream
+		*@param moles_oxidizer mole fractions of species of oxidizer stream
+		*@returns the calculated mole fractions
+		*/
+		std::vector<double> GetMoleFractionsFromEquivalenceRatio(const double equivalence_ratio,
+			const std::vector<std::string>& fuel_names,
+			const std::vector<double>& moles_fuel,
+			const std::vector<std::string>& oxidizer_names,
+			const std::vector<double>& moles_oxidizer);
 
-		double GetLocalEquivalenceRatio( 	const std::vector<double>& moles, const std::vector<double>& moles_st,
-							const std::vector<std::string>& fuel_names);
-
-		// Provisional
-		//virtual void Test(const int nLoops, const double& T, int* index) = 0;
+		/**
+		*@brief Calculates the equivalence ratio for a given composition
+		*@param moles current mole fractions
+		*@param moles_st mole fractions at stoichiometric conditions
+		*@param fuel_names names of species in the fuel stream
+		*@returns the equivalence ratio
+		*/
+		double GetLocalEquivalenceRatio(const std::vector<double>& moles,
+			const std::vector<double>& moles_st,
+			const std::vector<std::string>& fuel_names);
 
 	protected:
 

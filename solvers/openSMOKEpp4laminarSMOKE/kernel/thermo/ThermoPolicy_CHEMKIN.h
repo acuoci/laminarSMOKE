@@ -115,6 +115,11 @@ namespace OpenSMOKE
 		*@brief Reports some useful information
 		*/
 		void ThermodynamicsStatus(std::ostream& fOut, const std::vector<double>& T) const;
+
+		/**
+		*@brief Reports some useful information
+		*/
+		void ThermodynamicsStatus(std::ostream& fOut) const;
 	
 		/**
 		*@brief Writes the thermodynamic data on a binary file

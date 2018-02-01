@@ -39,13 +39,18 @@
 
 #include "math/external-ode-solvers/OpenSMOKE_OdeSystemSolver.h"
 
-#include <cvode/cvode.h>             /* prototypes for CVODE fcts., consts. */
-#include <nvector/nvector_serial.h>  /* serial N_Vector types, fcts., macros */
-#include <cvode/cvode_dense.h>       /* prototype for CVDense */
-#include <cvode/cvode_band.h>        /* prototype for CVBand */
-#include <cvode/cvode_lapack.h>      /* prototype for CVDense */
-#include <sundials/sundials_dense.h> /* definitions DlsMat DENSE_ELEM */
-#include <sundials/sundials_types.h> /* definition of type realtype */
+#include <cvode/cvode.h>						/* prototypes for CVODE fcts., consts. */
+#include <sunmatrix/sunmatrix_dense.h>			/* access to dense SUNMatrix            */
+#include <sunlinsol/sunlinsol_lapackdense.h>	/* access to dense SUNLinearSolver      */
+#include <cvode/cvode_direct.h>                 /* access to CVDls interface            */
+#include <nvector/nvector_serial.h>				/* serial N_Vector types, fcts., macros */
+
+#include <sunlinsol/sunlinsol_dense.h>		    /* prototype for CVDense */
+#include <sunlinsol/sunlinsol_band.h>			/* prototype for CVBand */
+#include <sunlinsol/sunlinsol_lapackdense.h>    /* prototype for CVDense */
+#include <sunlinsol/sunlinsol_lapackband.h>     /* prototype for CVBand */
+#include <sundials/sundials_dense.h>			/* definitions DlsMat DENSE_ELEM */
+#include <sundials/sundials_types.h>			/* definition of type realtype */
 
 namespace OpenSMOKE
 {
@@ -92,6 +97,9 @@ namespace OpenSMOKE
 
 		bool firstCall_; 
 		bool iUseLapack_;
+
+		SUNMatrix A;
+		SUNLinearSolver LS;
 
 	private:
 

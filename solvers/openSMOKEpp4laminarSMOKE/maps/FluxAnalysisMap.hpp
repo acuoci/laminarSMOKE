@@ -40,6 +40,27 @@
 
 namespace OpenSMOKE
 {
+	FluxAnalysisMap::FluxAnalysisMap(	OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMapXML,
+										OpenSMOKE::KineticsMap_CHEMKIN& kineticsMapXML) :
+		thermodynamicsMapXML_(thermodynamicsMapXML), 
+		kineticsMapXML_(kineticsMapXML)
+	{
+		NC = thermodynamicsMapXML_.NumberOfSpecies();
+		NR = kineticsMapXML_.NumberOfReactions();
+
+		max_width_ = 5;
+		max_depth_ = 3;
+		min_percentage_threshold_ = 0.01;
+		normal_thickness_ = false;
+		normal_tags_ = true;
+		destruction_analysis_ = true;
+		logarithmic_thickness_ = true;
+		global_important_indices_.resize(NC);
+		global_important_normal_fluxes_.resize(NC);
+		global_important_fluxes_.resize(NC);
+		global_relative_thickness_.resize(NC);
+	}
+
 	void FluxAnalysisMap::AnalyzeNetFluxes(	const unsigned int index_j,
 													std::vector<unsigned int>& important_indices,
 													std::vector<double>& important_normal_fluxes,

@@ -188,7 +188,7 @@ namespace OpenSMOKE
 	}
 
 	double 	ThermodynamicsMap::GetMixtureFractionFromMassFractions(
-		const std::vector<double>& mass,
+		const double* mass,
 		const std::vector<std::string>& fuel_names, 	const std::vector<double>& mass_fuel,
 		const std::vector<std::string>& oxidizer_names,	const std::vector<double>& mass_oxidizer)
 	{

@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------*\
+/*-----------------------------------------------------------------------*\
 |    ___                   ____  __  __  ___  _  _______                  |
 |   / _ \ _ __   ___ _ __ / ___||  \/  |/ _ \| |/ / ____| _     _         |
 |  | | | | '_ \ / _ \ '_ \\___ \| |\/| | | | | ' /|  _| _| |_ _| |_       |
@@ -89,7 +89,6 @@ namespace OpenSMOKE
 		*@brief Sets the verbose output
 		*/
 		void SetVerboseOutput(const bool verbose_output) { verbose_output_ = verbose_output; }
-
 
 		/**
 		*@brief Set the temperature at which the properties have to be evaluated
@@ -255,28 +254,34 @@ namespace OpenSMOKE
 		virtual void ImportSpeciesFromXMLFile(rapidxml::xml_document<>& doc);
 
 		/**
-		*@brief TODO (This is just a test subroutine!)
+		*@brief Calculates the derivatives of concentrations of species (in kmol/m3)
+		*       with respect to mass fractions of species.
+		*@param cTot mixture total concentration (in kmol/m3)
+		*@param MW mixture molecular weight (in kg/kmol)
+		*@param omega mass fractions
+		*@param MW mixture molecular weight (in kg/kmol)
+		*@param calculated derivatives of species with respect to mass fractions (in kmol/m3)
 		*/
-		void Test(const int nLoops, const double& T, int* index);
-
-		/**
-		*@brief Calculates the normalized specific heats for the species
-		*/
-		inline void cp_over_R();
-
 		void DerivativesOfConcentrationsWithRespectToMassFractions(const double cTot, const double MW, const double* omega, Eigen::MatrixXd* dc_over_omega);
 
-
+		/**
+		*@brief Returns the matrix describing the elemental composition of every species
+		*@returns the matrix of elemental composition (NSxNE, where NS is the number of species and NE the number of elements)
+		*/
 		const Eigen::MatrixXd& atomic_composition() const { return this->atomic_composition_; }
-		const std::vector<std::string>& elements() const { return this->elements_; }
 
+		/**
+		*@brief Returns the list of names of elements
+		*@returns the list of names of elements
+		*/
+		const std::vector<std::string>& elements() const { return this->elements_; }
 
 		/**
 		*@brief Calculates the temperature from the molar enthalpy
-		*@param H molar enthalpy in J/kmol
-		*@param P_Pa pressure in Pascal
-		*@param x molar fraction
-		*@param TFirstGuess first guess for the temperature
+		*@param H molar enthalpy (in J/kmol)
+		*@param P_Pa pressure (in Pa)
+		*@param x molar fractions
+		*@param TFirstGuess first guess for the temperature (in K)
 		*/
 		double GetTemperatureFromEnthalpyAndMoleFractions(const double H, const double P_Pa, const double* x, const double TFirstGuess);
 
@@ -285,21 +290,44 @@ namespace OpenSMOKE
 		*/
 		void CopyFromMap(const ThermodynamicsMap_CHEMKIN& rhs);
 
-		bool FindTheRightInterval(	const double H, const double* x, const double TFirstGuess,
-									double& TA, double&TB, double& HA, double& HB,
-									const double Diff_Temperature );
-
-		double Brent(const double H, const double P_Pa, const double* x, const double x1, const double x2, const double tol);
-		double Ridder(const double H, const double P_Pa, const double* x, const double x1, const double x2, const double xacc);
-		double NewtonRaphson(const double H, const double P_Pa, const double* x, const double x1, const double x2, const double xacc);
-
-		double Function(const double H, const double P_Pa, const double* x, const double T);
-		void Function(const double H, const double P_Pa, const double* x, const double T, double& f, double& df);
-
+		/**
+		*@brief Return the raw NASA low-temperature coefficients of a single species
+		*@param i index of species
+		*@param coefficients raw NASA low-temperature coefficients (vector of 7 elements)
+		*/
 		void NASA_LowT(const unsigned int i, double* coefficients) const;
+
+		/**
+		*@brief Return the raw NASA high-temperature coefficients of a single species
+		*@param i index of species
+		*@param coefficients raw NASA high-temperature coefficients (vector of 7 elements)
+		*/
 		void NASA_HighT(const unsigned int i, double* coefficients) const;
+
+		/**
+		*@brief Return the NASA coefficients (low- and high-temperature) of a single species
+		*       A vector of 15 elements is returned:
+		*       intermediate temperature (1), low-T coefficients (7), high-T coefficients (7)
+		*@param i index of species
+		*@param coefficients raw NASA coefficients (15 elements, see above)
+		*/
 		void NASA_Coefficients(const unsigned int i, double* coefficients) const;
+
+		/**
+		*@brief Return the raw NASA coefficients (low- and high-temperature) of all the species
+		*       For each species a vector of 15 elements is returned:
+		*       intermediate temperature (1), low-T coefficients (7), high-T coefficients (7)
+		*@param coefficients raw NASA coefficients (15*N elements, where N is the total number of species)
+		*/
 		void NASA_Coefficients(double* coefficients) const;
+
+
+	protected:
+
+		/**
+		*@brief TODO (This is just a test subroutine!)
+		*/
+		void Test(const int nLoops, const double& T, int* index);
 
 	protected:
 
@@ -328,6 +356,49 @@ namespace OpenSMOKE
 		*/
 		inline void g_over_RT();
 
+		/**
+		*@brief Calculates the normalized specific heats for the species
+		*/
+		inline void cp_over_R();
+
+		/**
+		*@brief Calculation of temperature from enthalpy:
+		*       selection of temperature interval where objective function chenge sign
+		*/
+		bool FindTheRightInterval(const double H, const double* x, const double TFirstGuess,
+			double& TA, double&TB, double& HA, double& HB,
+			const double Diff_Temperature);
+
+		/**
+		*@brief Calculation of temperature from enthalpy:
+		*       Brent algorithm
+		*/
+		double Brent(const double H, const double P_Pa, const double* x, const double x1, const double x2, const double tol);
+
+		/**
+		*@brief Calculation of temperature from enthalpy:
+		*       Ridder algorithm
+		*/
+		double Ridder(const double H, const double P_Pa, const double* x, const double x1, const double x2, const double xacc);
+
+		/**
+		*@brief Calculation of temperature from enthalpy:
+		*       Newton-Raphson algorithm
+		*/
+		double NewtonRaphson(const double H, const double P_Pa, const double* x, const double x1, const double x2, const double xacc);
+
+		/**
+		*@brief Calculation of temperature from enthalpy:
+		*       objective function (without derivative)
+		*/
+		double Function(const double H, const double P_Pa, const double* x, const double T);
+
+		/**
+		*@brief Calculation of temperature from enthalpy:
+		*       objective function (with derivative)
+		*/
+		void Function(const double H, const double P_Pa, const double* x, const double T, double& f, double& df);
+
 	private:
 
 		std::vector<double> species_cp_over_R__;
@@ -335,20 +406,20 @@ namespace OpenSMOKE
 		std::vector<double> species_g_over_RT__;
 		std::vector<double> species_s_over_R__;
 
-		std::vector<double>	Cp_LT;	/**< correlation coefficients, specific heat, low temperature region */
-		std::vector<double>	Cp_HT;	/**< correlation coefficients, specific heat, high temperature region */
-		std::vector<double>	DH_LT;	/**< correlation coefficients, enthalpy, low temperature region */
-		std::vector<double>	DH_HT;	/**< correlation coefficients, enthalpy, high temperature region */
-		std::vector<double>	DS_LT;	/**< correlation coefficients, entropy, low temperature region */
-		std::vector<double>	DS_HT;	/**< correlation coefficients, entropy, high temperature region */
+		double*	Cp_LT;	/**< correlation coefficients, specific heat, low temperature region */
+		double*	Cp_HT;	/**< correlation coefficients, specific heat, high temperature region */
+		double*	DH_LT;	/**< correlation coefficients, enthalpy, low temperature region */
+		double*	DH_HT;	/**< correlation coefficients, enthalpy, high temperature region */
+		double*	DS_LT;	/**< correlation coefficients, entropy, low temperature region */
+		double*	DS_HT;	/**< correlation coefficients, entropy, high temperature region */
 
-		std::vector<double> TL;			/**< low  temperature limit */
-		std::vector<double> TM;			/**< mean temperature limit */
-		std::vector<double> TH;			/**< high temperature limit */
+		double*	TL;			/**< low  temperature limit */
+		double*	TM;			/**< mean temperature limit */
+		double*	TH;			/**< high temperature limit */
 
-		bool cp_must_be_recalculated_;
-		bool h_must_be_recalculated_;
-		bool s_must_be_recalculated_;
+		bool cp_must_be_recalculated_;		/**< true if cp of species have to be recalculated */
+		bool h_must_be_recalculated_;		/**< true if h of species have to be recalculated */
+		bool s_must_be_recalculated_;		/**< true if s of species have to be recalculated */
 
 		bool verbose_output_;			/**< Print video info  */
 	};

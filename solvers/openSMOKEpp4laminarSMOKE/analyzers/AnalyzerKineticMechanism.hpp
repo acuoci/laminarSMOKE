@@ -142,9 +142,9 @@ namespace OpenSMOKE
 		// Details (every reaction, even if not reversible)
 		{
 			fOutput << "---------------------------------------------------------------------------------------" << std::endl;
-			fOutput << "                                  CHEMICAL REACTIONS                                 " << std::endl;
+			fOutput << "                                  CHEMICAL REACTIONS                                   " << std::endl;
 			fOutput << std::endl;
-			fOutput << "                         Units: [kmol, m3, s] and [cal/mol]                          " << std::endl;
+			fOutput << "                          Units: [mol, cm3, s] and [cal/mol]                           " << std::endl;
 			fOutput << "---------------------------------------------------------------------------------------" << std::endl;
 			fOutput << std::endl;
 			fOutput << std::endl;
@@ -246,6 +246,43 @@ namespace OpenSMOKE
 			}
 		}
 
+		fOutput.close();
+		return true;
+	}
+
+	template<typename Kinetics_PreProcessor, typename Kinetics_Map>
+	bool AnalyzerKineticMechanism<Kinetics_PreProcessor, Kinetics_Map>::WriteFittedChebyshevOnASCIIFile(const std::string& file_name) const
+	{
+		std::cout << " * Fitting the Chebishev reactions..." << std::endl;
+
+		std::ofstream fOutput;
+		fOutput.open(file_name.c_str(), std::ios::out);
+		fOutput.setf(std::ios::scientific);
+
+		fOutput << "---------------------------------------------------------------------------------------" << std::endl;
+		fOutput << "                             CHEBYSHEV CHEMICAL REACTIONS                              " << std::endl;
+		fOutput << std::endl;
+		fOutput << "                       Units: [atm], [mol, cm3, s] and [cal/mol]                       " << std::endl;
+		fOutput << "---------------------------------------------------------------------------------------" << std::endl;
+		fOutput << std::endl;
+		fOutput << std::endl;
+
+		for (unsigned int j = 0; j < kinetics_map_.number_of_chebyshev_reactions(); j++)
+		{
+			unsigned int index_reaction = kinetics_map_.indices_of_chebyshev_reactions()[j];
+			std::string reaction_string;
+			kinetics_preprocessor_.reactions()[index_reaction-1].GetReactionString(kinetics_map_.NamesOfSpecies(), reaction_string);
+			boost::erase_all(reaction_string, " ");
+
+			fOutput << "---------------------------------------------------------------------------------------" << std::endl;
+			if (reaction_string.size() < 80)	fOutput << std::left << std::setw(80) << reaction_string;
+			else                                fOutput << std::left << std::setw(80) << reaction_string.substr(0, 76) << "...";
+			fOutput << std::endl;
+			fOutput << "---------------------------------------------------------------------------------------" << std::endl;
+
+			kinetics_map_.chebyshev_reactions(j).FitttingArrheniusLaw(fOutput);
+		}
+		
 		fOutput.close();
 		return true;
 	}

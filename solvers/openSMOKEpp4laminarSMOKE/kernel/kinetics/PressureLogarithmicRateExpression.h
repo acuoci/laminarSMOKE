@@ -93,7 +93,7 @@ namespace OpenSMOKE
 		/**
 		*@brief Writes a short summary on file
 		*/	
-		void WriteShortSummaryOnASCIIFile(std::ostream& fOutput) const;
+		void WriteShortSummaryOnASCIIFile(std::ostream& fOutput, const double conversion_factor_A) const;
                 
         private:
             

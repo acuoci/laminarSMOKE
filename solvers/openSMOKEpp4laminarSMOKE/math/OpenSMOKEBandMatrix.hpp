@@ -72,7 +72,7 @@ namespace OpenSMOKE
 	#endif
  
 	template<typename T>
-	void bandGBTRS(T **a, const int n, const int smu, const int ml, const int *p, T *b);
+	int bandGBTRS(T **a, const int n, const int smu, const int ml, const int *p, T *b);
 
         template<typename T>
         int bandGBTRF(T **a, const int n, const int mu, const int ml, const int smu, int *p);
@@ -319,7 +319,7 @@ namespace OpenSMOKE
 				std::cout << " (8) Pivot[0]:      " << p[0] << std::endl;
 			}
 
-			OpenSMOKE::FatalErrorMessage("Factorizing the banded linear system: LAPACKE_dgbtrf failed");
+			// OpenSMOKE::FatalErrorMessage("Factorizing the banded linear system: LAPACKE_dgbtrf failed");
 		}
 
 		#else
@@ -334,7 +334,7 @@ namespace OpenSMOKE
 	}
 
 	template<typename T>
-	void OpenSMOKEBandMatrix<T>::Solve(T *b)
+	int OpenSMOKEBandMatrix<T>::Solve(T *b)
 	{
 		#if (OPENSMOKE_USE_MKL == 1 || OPENSMOKE_USE_OPENBLAS == 1)
 
@@ -357,18 +357,20 @@ namespace OpenSMOKE
 				std::cout << " (10) b[0]:         " << b[0] << std::endl;
 				std::cout << " (11) Size:         " << M << std::endl;
 
-				OpenSMOKE::FatalErrorMessage("Solving the banded linear system: LAPACKE_dgbtrs failed");
+				// OpenSMOKE::FatalErrorMessage("Solving the banded linear system: LAPACKE_dgbtrs failed");
 			}
 
 		#else
 			
-			bandGBTRS(cols, M, s_mu, ml, p, b);
+		const int ier = bandGBTRS(cols, M, s_mu, ml, p, b);
 
 		#endif
+
+		return ier;
 	}
 
 	template<typename T>
-	void OpenSMOKEBandMatrix<T>::Solve(const int nrhs, T *b)
+	int OpenSMOKEBandMatrix<T>::Solve(const int nrhs, T *b)
 	{
 		#if (OPENSMOKE_USE_MKL == 1 || OPENSMOKE_USE_OPENBLAS == 1)
 
@@ -390,21 +392,23 @@ namespace OpenSMOKE
 			std::cout << " (10) b[0]:         " << b[0] << std::endl;
 			std::cout << " (11) Size:         " << M << std::endl;
 
-			OpenSMOKE::FatalErrorMessage("Solving the banded linear system: LAPACKE_dgbtrs failed");
+			//OpenSMOKE::FatalErrorMessage("Solving the banded linear system: LAPACKE_dgbtrs failed");
 		}
 
 		#else
 
 		OpenSMOKE::FatalErrorMessage("Solution of multiple rhs with banded structure requires MKL or OpenBlas");
-		bandGBTRS(cols, M, s_mu, ml, p, b);
+		const int ier = bandGBTRS(cols, M, s_mu, ml, p, b);
 
 		#endif
+
+		return ier;
 	}
 
 	// This function must be checked!
 	// Please do not use it
 	template<typename T>
-	void OpenSMOKEBandMatrix<T>::FactorizeAndSolve(T *b)
+	int OpenSMOKEBandMatrix<T>::FactorizeAndSolve(T *b)
 	{
 		/*
 		#if (OPENSMOKE_USE_MKL == 1 || OPENSMOKE_USE_OPENBLAS == 1)
@@ -459,10 +463,11 @@ namespace OpenSMOKE
 		#endif
 		*/
 
+		const int ier = -1;
 		OpenSMOKE::FatalErrorMessage("Factorizing and solving the banded linear system: bandGBTRS(cols, M, s_mu, ml, p, b) not implemented");
-	}
 
-	
+		return ier;
+	}
 
 	template<typename T>
 	OpenSMOKEBandMatrix<T>* NewBandMat(const int N, const int mu, const int ml, const int smu)
@@ -744,7 +749,7 @@ namespace OpenSMOKE
 
 	// Solution 
 	template<typename T>
-	void bandGBTRS(T **a, const int n, const int smu, const int ml, const int *p, T *b)
+	int bandGBTRS(T **a, const int n, const int smu, const int ml, const int *p, T *b)
 	{
 		const int ZERO = 0;
 		int k, l, i, first_row_k, last_row_k;
@@ -775,5 +780,7 @@ namespace OpenSMOKE
 			for (i = first_row_k; i <= k - 1; i++)
 				b[i] += mult*diag_k[i - k];
 		}
+		
+		return 0;
 	}
 }

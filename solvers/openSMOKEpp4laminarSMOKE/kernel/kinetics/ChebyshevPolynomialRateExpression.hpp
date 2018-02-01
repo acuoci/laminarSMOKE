@@ -189,4 +189,153 @@ namespace OpenSMOKE
 		return std::cos( double(n-1)*std::acos(x) );
 	}
 
+	void ChebyshevPolynomialRateExpression::FitttingArrheniusLaw(std::ostream& fOutput)
+	{
+		// Write on file
+		{
+			fOutput << "Temperature limits [K]:  " << Tmin << " " << Tmax << std::endl;
+			fOutput << "Pressure limits [atm]:   " << Pmin / 101325. << " " << Pmax / 101325. << std::endl;
+			fOutput << std::endl;
+
+			fOutput << "Matrix of coefficients: " << N << " x " << M << std::endl;
+			for (unsigned int n = 0; n < N; n++)
+			{
+				for (unsigned int m = 0; m < M; m++)
+					fOutput << std::setw(16) << std::scientific << std::setprecision(6) << std::right << a(n, m);
+				fOutput << std::endl;
+			}
+			fOutput << std::endl;
+		}
+
+		const unsigned int nT = 20;
+		const unsigned int nP = 10;
+		std::vector<double> list_T(nT);
+		std::vector<double> P(nP);
+		std::vector<double> logP(nP);
+
+		// List of temperatures
+		const double delta_T = (Tmax - Tmin - 40) / static_cast<double>(nT - 1);
+		for (unsigned int i = 0; i < nT; i++)
+			list_T[i] = (Tmin + 20) + i * delta_T;
+
+		// List of pressures
+		const double logPmin = std::log(Pmin);
+		const double logPmax = std::log(Pmax);
+		const double delta_logP = (logPmax - logPmin) / static_cast<double>(nP - 1);
+		for (unsigned int i = 0; i < nP; i++)
+			logP[i] = logPmin + i * delta_logP;
+
+		P[0] = Pmin * 1.01;
+		for (unsigned int i = 1; i < nP - 1; i++)
+			P[i] = std::exp(logP[i]);
+		P[nP - 1] = Pmax * 0.999;
+
+		auto const it = std::lower_bound(logP.begin(), logP.end(), std::log(101325.));
+		if (it != logP.end())
+		{
+			logP[std::distance(logP.begin(), it)] = std::log(101325.);
+			P[std::distance(logP.begin(), it)] = 101325.;
+		}
+
+		// Two-parameter Arrhenius law
+		{
+			const unsigned int nparameters = 2;
+			Eigen::Matrix2d XTX;
+			Eigen::MatrixXd X(nT, nparameters);
+			Eigen::MatrixXd XT(nparameters, nT);
+
+			for (unsigned int i = 0; i < nT; i++)
+			{
+				X(i, 0) = 1.;
+				X(i, 1) = 1. / list_T[i];
+			}
+			XT = X.transpose();
+			XTX = XT * X;
+
+			std::vector<double> A(nP);
+			std::vector<double> E(nP);
+			Eigen::VectorXd Y(nT);
+			Eigen::VectorXd parameters(nparameters);
+			for (unsigned int i = 0; i < nP; i++)
+			{
+				std::vector<double> list_k(nT);
+				Eigen::VectorXd y(nT);
+				for (unsigned int j = 0; j < nT; j++)
+				{
+					list_k[j] = KineticConstant(list_T[j], P[i]) / conversion;	// [mol, cm, s]
+					y(j) = std::log(list_k[j]);
+				}
+
+				Y = XT * y;
+				parameters = XTX.fullPivLu().solve(Y);
+
+				A[i] = std::exp(parameters(0));						// [mol, cm, s]
+				E[i] = -parameters(1)*PhysicalConstants::R_cal_mol;	// [cal/mol]
+			}
+
+			// Write in CHEMKIN format
+			for (unsigned int i = 0; i < P.size(); i++)
+			{
+				fOutput << "PLOG / ";
+				fOutput << std::setw(12) << std::scientific << std::setprecision(4) << std::right << std::exp(logP[i]) / 101325.;
+				fOutput << std::setw(12) << std::scientific << std::setprecision(4) << std::right << A[i];
+				fOutput << std::setw(7) << std::right << std::left << std::setprecision(2) << std::fixed << std::right << 0;
+				fOutput << std::setw(12) << std::right << std::left << std::setprecision(2) << std::fixed << std::right << E[i];
+				fOutput << " /" << std::endl;
+			}
+			fOutput << std::endl;
+		}
+
+		// Three-parameter Arrhenius law
+		{
+			const unsigned int nparameters = 3;
+			Eigen::Matrix3d XTX;
+			Eigen::MatrixXd X(nT, nparameters);
+			Eigen::MatrixXd XT(nparameters, nT);
+
+			for (unsigned int i = 0; i < nT; i++)
+			{
+				X(i, 0) = 1.;
+				X(i, 1) = 1. / list_T[i];
+				X(i, 2) = std::log(list_T[i]);
+			}
+			XT = X.transpose();
+			XTX = XT * X;
+
+			std::vector<double> A(nP);
+			std::vector<double> E(nP);
+			std::vector<double> Beta(nP);
+			Eigen::VectorXd Y(nT);
+			Eigen::VectorXd parameters(nparameters);
+			for (unsigned int i = 0; i < nP; i++)
+			{
+				std::vector<double> list_k(nT);
+				Eigen::VectorXd y(nT);
+				for (unsigned int j = 0; j < nT; j++)
+				{
+					list_k[j] = KineticConstant(list_T[j], P[i]) / conversion;	// [mol, cm, s]
+					y(j) = std::log(list_k[j]);
+				}
+
+				Y = XT * y;
+				parameters = XTX.fullPivLu().solve(Y);
+
+				A[i] = std::exp(parameters(0));						// [mol, cm, s]
+				E[i] = -parameters(1)*PhysicalConstants::R_cal_mol;	// [cal/mol]
+				Beta[i] = parameters(2);							// [-]
+			}
+
+			// Write in CHEMKIN format
+			for (unsigned int i = 0; i < nP; i++)
+			{
+				fOutput << "PLOG / ";
+				fOutput << std::setw(12) << std::scientific << std::setprecision(4) << std::right << std::exp(logP[i]) / 101325.;
+				fOutput << std::setw(12) << std::scientific << std::setprecision(4) << std::right << A[i];
+				fOutput << std::setw(7) << std::right << std::left << std::setprecision(2) << std::fixed << std::right << Beta[i];
+				fOutput << std::setw(12) << std::right << std::left << std::setprecision(2) << std::fixed << std::right << E[i];
+				fOutput << " /" << std::endl;
+			}
+			fOutput << std::endl;
+		}
+	}
 }

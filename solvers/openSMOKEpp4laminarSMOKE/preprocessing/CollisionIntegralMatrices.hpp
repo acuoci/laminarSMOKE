@@ -333,7 +333,7 @@ namespace OpenSMOKE
 		double *dk = deltakStar.GetHandle();
 		double *ok = omega22k.GetHandle();
 
-		for (unsigned int k = 1; k <= TkStar.Size(); k++)
+		for (int k = 1; k <= TkStar.Size(); k++)
 		{
 			if (*dk < -0.00001)
 				std::cout << "Warning: Viscosity-Conductivity collision integral undefined (1) - Species: " << names[k] << std::endl;

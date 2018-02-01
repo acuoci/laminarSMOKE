@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------*\
+/*-----------------------------------------------------------------------*\
 |    ___                   ____  __  __  ___  _  _______                  |
 |   / _ \ _ __   ___ _ __ / ___||  \/  |/ _ \| |/ / ____| _     _         |
 |  | | | | '_ \ / _ \ '_ \\___ \| |\/| | | | | ' /|  _| _| |_ _| |_       |
@@ -16,7 +16,7 @@
 |                                                                         |
 |   This file is part of OpenSMOKE++ framework.                           |
 |                                                                         |
-|	License                                                               |
+|	License                                                           |
 |                                                                         |
 |   Copyright(C) 2014, 2013, 2012  Alberto Cuoci                          |
 |   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
@@ -41,12 +41,9 @@
 
 namespace OpenSMOKE
 {
-	//!  A class containing the data about the stoichiometry and the reaction orders
+	//!  A class for managing the Jacobian matrix in sparse formulation
 	/*!
-		 This class provides the tools to manage the stoichiometry and the reaction orders of all the 
-		 reactions included in the kinetic scheme. This class is specifically conceived in order to perform 
-		 the calculations as fast as possible. To reach this goal the kinetic data are stored in a
-		 format which is not so easy to manage and to understand.
+	This class provides the tools to manage the Jacobian matrix in sparse formulation
 	*/
 
 	template<typename map>
@@ -57,7 +54,7 @@ namespace OpenSMOKE
 
 		/**
 		*@brief Default constructor
-		*@param nspecies number of species 
+		*@param nspecies number of species
 		*@param nreactions number of reactions
 		*/
 		JacobianSparsityPatternMap(map& kinetics_map);
@@ -67,20 +64,56 @@ namespace OpenSMOKE
 		*/
 		~JacobianSparsityPatternMap();
 
-		void SetEpsilon(const double epsilon);
-
-		double epsilon() const { return epsilon_; }
-                
+		/**
+		*@brief Returns the sparsity pattern as a couple o vectors containing
+		*       the indices (rows and colums) of non-zero elements
+		*/
 		void RecognizeJacobianSparsityPattern(std::vector<unsigned int>& row, std::vector<unsigned int>& col);
-		
+
+		/**
+		*@brief Returns the Jacobian matrix (sparse), given the current operating conditions
+		*@param omega current mass fractions
+		*@param T current temperature (in K)
+		*@param P_Pa current pressure (in Pa)
+		*@returns the Jacobian matrix
+		*/
 		void Jacobian(const double* omega, const double T, const double P_Pa, Eigen::SparseMatrix<double> &J);
 
+		/**
+		*@brief Returns only the diagonal elements of the Jacobian matrix (sparse), given the current operating conditions
+		*@param omega current mass fractions
+		*@param T current temperature (in K)
+		*@param P_Pa current pressure (in Pa)
+		*@returns the diagonal elements of the Jacobian matrix
+		*/
 		void Jacobian(const double* omega, const double T, const double P_Pa, Eigen::VectorXd &Jdiagonal);
 
-
+		/**
+		*@brief Returns the Jacobian matrix
+		*/
 		Eigen::SparseMatrix<double>* jacobian_matrix() { return jacobian_matrix_; }
+
+		/**
+		*@brief Returns the matrix of derivatives of forward reaction rates with respect to mass fractions
+		*/
 		Eigen::SparseMatrix<double>* drf_over_domega() { return drf_over_domega_; }
+
+		/**
+		*@brief Returns the matrix of derivatives of backward reaction rates with respect to mass fractions
+		*/
 		Eigen::SparseMatrix<double>* drb_over_domega() { return drb_over_domega_; }
+
+		/**
+		*@brief Sets epsilon, i.e. the minimum mass fraction of species
+		*       needed to numerically calculate the Jacobian (default 1e-15)
+		*/
+		void SetEpsilon(const double epsilon);
+
+		/**
+		*@brief Returns epsilon, i.e. the minimum mass fraction of species
+		*       needed to numerically calculate the Jacobian (default 1e-15)
+		*/
+		double epsilon() const { return epsilon_; }
 
 	private:
 

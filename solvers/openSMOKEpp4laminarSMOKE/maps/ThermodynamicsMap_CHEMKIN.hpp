@@ -116,28 +116,28 @@ namespace OpenSMOKE
 	{
 		this->names_.clear();		
 		this->elements_.clear();		
-	//	delete[] Cp_LT;	
-	//	delete[] Cp_HT;
-	//	delete[] DH_LT;
-	//	delete[] DH_HT;
-	//	delete[] DS_LT;
-	//	delete[] DS_HT;
-	//	delete[] TL;	
-	//	delete[] TH;
-	//	delete[] TM;
+		delete[] Cp_LT;	
+		delete[] Cp_HT;
+		delete[] DH_LT;
+		delete[] DH_HT;
+		delete[] DS_LT;
+		delete[] DS_HT;
+		delete[] TL;	
+		delete[] TH;
+		delete[] TM;
 	}
 
 	void ThermodynamicsMap_CHEMKIN::MemoryAllocation()
 	{
-		Cp_LT.resize(5*this->nspecies_);	
-		Cp_HT.resize(5*this->nspecies_);
-		DH_LT.resize(6*this->nspecies_);
-		DH_HT.resize(6*this->nspecies_);
-		DS_LT.resize(6*this->nspecies_);
-		DS_HT.resize(6*this->nspecies_);
-		TL.resize(this->nspecies_);	
-		TH.resize(this->nspecies_);
-		TM.resize(this->nspecies_);
+		Cp_LT = new double[5*this->nspecies_];	
+		Cp_HT = new double[5*this->nspecies_];
+		DH_LT = new double[6*this->nspecies_];
+		DH_HT = new double[6*this->nspecies_];
+		DS_LT = new double[6*this->nspecies_];
+		DS_HT = new double[6*this->nspecies_];
+		TL = new double[this->nspecies_];	
+		TH = new double[this->nspecies_];
+		TM = new double[this->nspecies_];
 
 		this->MW__.resize(this->nspecies_);
 

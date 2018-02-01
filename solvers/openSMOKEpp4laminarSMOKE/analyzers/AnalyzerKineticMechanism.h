@@ -83,6 +83,13 @@ namespace OpenSMOKE
 		bool WriteFittedInverseKineticConstantsOnASCIIFile(const std::string& file_name) const;
 
 		/**
+		* This function analyzes the Chebyshev reactions (if any) and tries to write the kinetic constant
+		using the Arrhenius' law, by performing a linear regression analysis on the given T and P ranges
+		* @param file_name the name of the file where the fitted kinetic constants will be written
+		*/
+		bool WriteFittedChebyshevOnASCIIFile(const std::string& file_name) const;
+
+		/**
 		* This function writes on a file the results of the collision rate analysis carried
 		  out on all the bimolecular reactions to recognize unfeasible reactions
 		* @param transport map containing the description of transport properties

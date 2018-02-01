@@ -2188,6 +2188,530 @@ namespace OpenSMOKE
 		fOut << std::endl;
 	}
 
+	void KineticsMap_CHEMKIN::WriteCollisionRateConstantForBimolecularReactions(
+		TransportPropertiesMap_CHEMKIN& transport, 
+		std::ostream& fOut, 
+		const std::vector<std::string>& reaction_names,
+		const std::vector<double>& list_of_temperatures)
+	{
+		// Find bimolecular direct reactions
+		Eigen::VectorXd sum_forward;
+		Eigen::VectorXd sum_backward;
+		stoichiometry_->GetSumOfStoichiometricCoefficientsOfReactants(sum_forward);
+		stoichiometry_->GetSumOfStoichiometricCoefficientsOfProducts(sum_backward);
+
+		// Select only forward bimolecular reactions
+		std::vector<unsigned int> indices_forward;
+		for (int i = 0; i < sum_forward.size(); i++)
+			if (sum_forward[i] == 2.)
+			{
+				std::vector<unsigned int>::iterator location;
+				location = std::find(indices_of_thirdbody_reactions__.begin(), indices_of_thirdbody_reactions__.end(), i+1);
+				if (location == indices_of_thirdbody_reactions__.end())
+					indices_forward.push_back(i);
+			}
+
+		// Select only backward bimolecular reactions if reversible
+		std::vector<unsigned int> indices_backward;
+		for (int i = 0; i < sum_backward.size(); i++)
+			if (sum_backward[i] == 2.)
+			{
+				if (isExplicitlyReversible__[i] != 0)
+				{
+					std::vector<unsigned int>::iterator location;
+					location = std::find(indices_of_thirdbody_reactions__.begin(), indices_of_thirdbody_reactions__.end(), i + 1);
+					if (location == indices_of_thirdbody_reactions__.end())
+						indices_backward.push_back(i);
+				}
+				//if (isThermodynamicallyReversible__[i] != 0 && stoichiometry_->ChangeOfMoles()[i]==0.)	// original version (Oct 2017)
+				if (isThermodynamicallyReversible__[i] != 0)	// Hai Wang version (private communication, Nov 2017)
+				{
+					std::vector<unsigned int>::iterator location;
+					location = std::find(indices_of_thirdbody_reactions__.begin(), indices_of_thirdbody_reactions__.end(), i + 1);
+					if (location == indices_of_thirdbody_reactions__.end())
+						indices_backward.push_back(i);
+				}
+			}
+
+		std::vector<std::vector<unsigned int>> indices_species_forward(indices_forward.size());
+		for (int k = 0; k<stoichiometry_->stoichiometric_matrix_reactants().outerSize(); ++k)
+		{
+			for (Eigen::SparseMatrix<double>::InnerIterator it(stoichiometry_->stoichiometric_matrix_reactants(), k); it; ++it)
+			{
+				std::vector<unsigned int>::iterator location;
+				location = std::find(indices_forward.begin(), indices_forward.end(), it.row());
+
+				if (location != indices_forward.end())
+					indices_species_forward[location - indices_forward.begin()].push_back(it.col());
+			}
+		}
+
+		std::vector<std::vector<unsigned int>> indices_species_backward(indices_backward.size());
+		for (int k = 0; k<stoichiometry_->stoichiometric_matrix_products().outerSize(); ++k)
+		{
+			for (Eigen::SparseMatrix<double>::InnerIterator it(stoichiometry_->stoichiometric_matrix_products(), k); it; ++it)
+			{
+				std::vector<unsigned int>::iterator location;
+				location = std::find(indices_backward.begin(), indices_backward.end(), it.row());
+
+				if (location != indices_backward.end())
+					indices_species_backward[location - indices_backward.begin()].push_back(it.col());
+			}
+		}
+
+		// Check and adjust (forward)
+		for (unsigned int i = 0; i < indices_forward.size(); i++)
+		{
+			if (indices_species_forward[i].size() != 2)
+			{
+				if (indices_species_forward[i].size() == 1)
+					indices_species_forward[i].push_back(indices_species_forward[i][0]);
+				else
+				{
+					std::cout << "Rate of collision analysis for bimolecular reactions" << std::endl;
+					std::cout << "Analyzing forward reaction #" << indices_forward[i] + 1 << std::endl;
+					OpenSMOKE::FatalErrorMessage("The reaction was expected to be bimolecular");
+				}
+			}
+		}
+
+		// Check and adjust (backward)
+		for (unsigned int i = 0; i < indices_backward.size(); i++)
+		{
+			if (indices_species_backward[i].size() != 2)
+			{
+				if (indices_species_backward[i].size() == 1)
+					indices_species_backward[i].push_back(indices_species_backward[i][0]);
+				else
+				{
+					std::cout << "Rate of collision analysis for bimolecular reactions" << std::endl;
+					std::cout << "Analyzing backward reaction #" << indices_backward[i] + 1 << std::endl;
+					OpenSMOKE::FatalErrorMessage("The reaction was expected to be bimolecular");
+				}
+			}
+		}
+
+		const double P = 1e12;	// [Pa] super-high pressure for fall-off reactions
+		Eigen::VectorXd c(thermodynamics_.NumberOfSpecies());
+		this->SetPressure(P);
+		thermodynamics_.SetPressure(P);
+
+		unsigned int ni = 23;
+		std::vector<double> temperatures(ni);
+		temperatures[0] = 300.;
+		for (unsigned int k = 1; k < ni; k++)
+			temperatures[k] = temperatures[k-1] + 100.;
+
+		if (list_of_temperatures.size() != 0)
+		{
+			ni = list_of_temperatures.size();
+			temperatures = list_of_temperatures;
+		}
+
+		Eigen::MatrixXd kForward(indices_forward.size(), ni);
+		Eigen::MatrixXd kCollisionForward(indices_forward.size(), ni);
+		Eigen::MatrixXd kStarForward(indices_forward.size(),ni);
+		Eigen::MatrixXd kBackward(indices_backward.size(), ni);
+		Eigen::MatrixXd kCollisionBackward(indices_backward.size(),ni);
+		Eigen::MatrixXd kStarBackward(indices_backward.size(),ni);
+		for (unsigned int k = 0; k < ni; k++)
+		{
+			const double T = temperatures[k];
+			const double cTot = P / PhysicalConstants::R_J_kmol / T;
+			c.setConstant(cTot / double(thermodynamics_.NumberOfSpecies()));
+
+			this->SetTemperature(T);
+			thermodynamics_.SetTemperature(T);
+
+			this->ReactionEnthalpiesAndEntropies();
+			this->KineticConstants();
+			this->ReactionRates(c.data());
+
+			// Forward kinetic constants
+			for (unsigned int i = 0; i < indices_forward.size(); i++)
+			{
+				kForward(i, k) = kArrheniusModified__[indices_forward[i]];
+				kCollisionForward(i, k) = transport.kCollision(indices_species_forward[i][0], indices_species_forward[i][1], T);
+				kStarForward(i, k) = kForward(i, k) / kCollisionForward(i, k);
+			}
+
+			// Backward kinetic constants
+			for (unsigned int i = 0; i < indices_backward.size(); i++)
+			{
+				kCollisionBackward(i, k) = transport.kCollision(indices_species_backward[i][0], indices_species_backward[i][1], T);
+
+				if (isThermodynamicallyReversible__[indices_backward[i]] != 0)
+				{
+					const unsigned int j = isThermodynamicallyReversible__[indices_backward[i]] - 1;
+					kBackward(i, k) = (kArrheniusModified__[indices_backward[i]] * uKeq__[j]);
+					kStarBackward(i, k) = kBackward(i, k) / kCollisionBackward(i, k);
+				}
+				else if (isExplicitlyReversible__[indices_backward[i]] != 0)
+				{
+					const unsigned int j = isExplicitlyReversible__[indices_backward[i]] - 1;
+					kBackward(i, k) = kArrhenius_reversible__[j];
+					kStarBackward(i, k) = kBackward(i, k) / kCollisionBackward(i, k);
+				}
+			}
+		}
+
+		// General data
+		{
+			fOut << "----------------------------------------------------------------" << std::endl;
+			fOut << " General data                                                   " << std::endl;
+			fOut << "----------------------------------------------------------------" << std::endl;
+			fOut << "Bimolecular reactions (total):    " << indices_forward.size() + indices_backward.size() << std::endl;
+			fOut << "Bimolecular reactions (forward):  " << indices_forward.size() << std::endl;
+			fOut << "Bimolecular reactions (backward): " << indices_backward.size() << std::endl;
+			fOut << "----------------------------------------------------------------" << std::endl;
+			fOut << std::endl;
+		}
+
+		// List of unfeasible reactions
+		Eigen::VectorXi unfeasible_forward_reactions(indices_forward.size());
+		Eigen::VectorXi unfeasible_backward_reactions(indices_backward.size());
+		{
+			unfeasible_forward_reactions.setZero();
+			for (unsigned int i = 0; i < indices_forward.size(); i++)
+				for (unsigned int k = 0; k < ni; k++)
+					if (kStarForward(i, k) >= 1.)	unfeasible_forward_reactions(i)++;
+
+			unfeasible_backward_reactions.setZero();
+			for (unsigned int i = 0; i < indices_backward.size(); i++)
+				for (unsigned int k = 0; k < ni; k++)
+					if (kStarBackward(i, k) >= 1.)	unfeasible_backward_reactions(i)++;
+
+			fOut << "-----------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
+			fOut << std::setw(11) << std::left << "Forward";
+			fOut << std::setw(11) << std::left << "Violations";
+			fOut << std::setw(11) << std::left << "Max";
+			fOut << std::setw(80) << std::left << "Reaction";
+			fOut << std::setw(11) << std::left << "T>=300K";
+			fOut << std::setw(11) << std::left << "T>=500K";
+			fOut << std::setw(11) << std::left << "T>=700K";
+			fOut << std::setw(11) << std::left << "T>=1000K";
+			fOut << std::endl;
+			fOut << "-----------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
+			for (unsigned int i = 0; i < indices_forward.size(); i++)
+				if (unfeasible_forward_reactions(i) > 0)
+				{
+					fOut << std::setw(11) << std::left << std::fixed << indices_forward[i] + 1;
+					fOut << std::setw(11) << std::left << std::fixed << unfeasible_forward_reactions(i);
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << kStarForward.row(i).maxCoeff();
+					fOut << std::setw(80) << std::left << reaction_names[indices_forward[i]];
+
+					double kStar300  = 0.;
+					double kStar500 = 0.;
+					double kStar700 = 0.;
+					double kStar1000 = 0.;
+					for (unsigned int k = 0; k < ni; k++)
+					{
+						if (temperatures[k] >= 300.)
+							if (kStarForward(i, k) > kStar300)	kStar300 = kStarForward(i, k);
+						if (temperatures[k] >= 500.)
+							if (kStarForward(i, k) > kStar500)	kStar500 = kStarForward(i, k);
+						if (temperatures[k] >= 700.)
+							if (kStarForward(i, k) > kStar700)	kStar700 = kStarForward(i, k);
+						if (temperatures[k] >= 1000.)
+							if (kStarForward(i, k) > kStar1000)	kStar1000 = kStarForward(i, k);
+					}
+					
+					if (kStar300>1.)	fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << kStar300;
+					else                fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << "*";
+					if (kStar500>1.)	fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << kStar500;
+					else                fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << "*";
+					if (kStar700>1.)	fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << kStar700;
+					else                fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << "*";
+					if (kStar1000>1.)	fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << kStar1000;
+					else                fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << "*";
+
+					fOut << std::endl;
+				}
+			fOut << "-----------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
+			fOut << std::endl;
+
+			fOut << "-----------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
+			fOut << std::setw(11) << std::left << "Backward";
+			fOut << std::setw(11) << std::left << "Violations";
+			fOut << std::setw(11) << std::left << "Max";
+			fOut << std::setw(80) << std::left << "Reaction";
+			fOut << std::setw(11) << std::left << "T>=300K";
+			fOut << std::setw(11) << std::left << "T>=500K";
+			fOut << std::setw(11) << std::left << "T>=700K";
+			fOut << std::setw(11) << std::left << "T>=1000K";
+			fOut << std::endl;
+			fOut << "-----------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
+			for (unsigned int i = 0; i < indices_backward.size(); i++)
+				if (unfeasible_backward_reactions(i) > 0)
+				{
+					fOut << std::setw(11) << std::left << std::fixed << indices_backward[i] + 1;
+					fOut << std::setw(11) << std::left << std::fixed << unfeasible_backward_reactions(i);
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << kStarBackward.row(i).maxCoeff();
+					fOut << std::setw(80) << std::left << reaction_names[indices_backward[i]];
+
+					double kStar300 = 0.;
+					double kStar500 = 0.;
+					double kStar700 = 0.;
+					double kStar1000 = 0.;
+					for (unsigned int k = 0; k < ni; k++)
+					{
+						if (temperatures[k] >= 300.)
+							if (kStarForward(i, k) > kStar300)	kStar300 = kStarBackward(i, k);
+						if (temperatures[k] >= 500.)
+							if (kStarForward(i, k) > kStar500)	kStar500 = kStarBackward(i, k);
+						if (temperatures[k] >= 700.)
+							if (kStarForward(i, k) > kStar700)	kStar700 = kStarBackward(i, k);
+						if (temperatures[k] >= 1000.)
+							if (kStarForward(i, k) > kStar1000)	kStar1000 = kStarBackward(i, k);
+					}
+
+					if (kStar300>1.)	fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << kStar300;
+					else                fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << "*";
+					if (kStar500>1.)	fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << kStar500;
+					else                fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << "*";
+					if (kStar700>1.)	fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << kStar700;
+					else                fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << "*";
+					if (kStar1000>1.)	fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << kStar1000;
+					else                fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << "*";
+
+					fOut << std::endl;
+				}
+			fOut << "-----------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
+			fOut << std::endl;
+		}
+
+		// Analysis of violations
+		{
+			Eigen::VectorXi violations_forward(ni);
+			violations_forward.setZero();
+			for (unsigned int i = 0; i < indices_forward.size(); i++)
+				for (unsigned int k = 0; k < ni; k++)
+					if (kStarForward(i, k) >= 1.)	violations_forward(k)++;
+
+			Eigen::VectorXi violations_backward(ni);
+			violations_backward.setZero();
+			for (unsigned int i = 0; i < indices_backward.size(); i++)
+				for (unsigned int k = 0; k < ni; k++)
+					if (kStarBackward(i, k) >= 1.)	violations_backward(k)++;
+
+			fOut << std::string(275, '-') << std::endl;
+			fOut << std::setw(11) << std::left << "Violations";
+			fOut << std::setw(11) << std::left << "Total";
+			for (unsigned int k = 0; k < ni; k++)
+				fOut << std::setw(11) << std::left << std::setprecision(0) << std::fixed << temperatures[k];
+			fOut << std::endl;
+			fOut << std::string(275, '-') << std::endl;
+
+			fOut << std::setw(11) << std::left << "Forward";
+			fOut << std::setw(11) << std::left << std::fixed << violations_forward.sum();
+			for (unsigned int k = 0; k < ni; k++)
+				fOut << std::setw(11) << std::left << std::fixed << violations_forward(k);
+			fOut << std::endl;
+
+			fOut << std::setw(11) << std::left << "Backward";
+			fOut << std::setw(11) << std::left << std::fixed << violations_backward.sum();
+			for (unsigned int k = 0; k < ni; k++)
+				fOut << std::setw(11) << std::left << std::fixed << violations_backward(k);
+			fOut << std::endl;
+
+			fOut << std::setw(11) << std::left << "Total";
+			fOut << std::setw(11) << std::left << std::fixed << violations_forward.sum() + violations_backward.sum();
+			for (unsigned int k = 0; k < ni; k++)
+				fOut << std::setw(11) << std::left << std::fixed << violations_forward(k) + violations_backward(k);
+			fOut << std::endl;
+
+			fOut << std::endl;
+		}
+
+		// Details about unfeasible reactions
+		{
+			for (unsigned int i = 0; i < indices_forward.size(); i++)
+				if (unfeasible_forward_reactions(i) > 0)
+				{
+					fOut << std::string(100, '-') << std::endl;
+					fOut << "Forward reaction: " << indices_forward[i] + 1 << std::endl;
+					fOut << std::string(100, '-') << std::endl;
+					fOut << "Stoichiometry:    " << reaction_names[indices_forward[i]] << std::endl;
+					fOut << std::endl;
+
+					const unsigned int i1 = indices_species_forward[i][0];
+					const unsigned int i2 = indices_species_forward[i][1];
+
+					fOut << std::setw(20) << std::left << "Species";
+					fOut << std::setw(11) << std::left << "mass[kg]";
+					fOut << std::setw(11) << std::left << "sigma[A]";
+					fOut << std::setw(11) << std::left << "eps/kb[K]";
+					fOut << std::endl;
+					fOut << std::string(55, '-') << std::endl;
+
+					fOut << std::setw(20) << std::left << std::fixed << thermodynamics_.NamesOfSpecies()[i1];
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << transport.mu()[i1];
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << transport.sigma()[i1]*1.e10;
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << transport.epsilon_over_kb()[i1];
+					fOut << std::endl;
+
+					fOut << std::setw(20) << std::left << std::fixed << thermodynamics_.NamesOfSpecies()[i2];
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << transport.mu()[i2];
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << transport.sigma()[i2]*1.e10;
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << transport.epsilon_over_kb()[i2];
+					fOut << std::endl;
+
+					fOut << std::setw(20) << std::left << std::fixed << "Mean";
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << (transport.mu()[i1] * transport.mu()[i2])/(transport.mu()[i1] + transport.mu()[i2]);
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << 0.5*(transport.sigma()[i1]+transport.sigma()[i2])*1.e10;
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << std::sqrt(transport.epsilon_over_kb()[i1]*transport.epsilon_over_kb()[i2]);
+					fOut << std::endl;
+					fOut << std::string(55, '-') << std::endl;
+					fOut << std::endl;
+
+					fOut << std::setw(10) << std::left << std::fixed << "T[K]";
+					fOut << std::setw(11) << std::left << std::fixed << "TStar[-]";
+					fOut << std::setw(13) << std::left << std::fixed << "Omega11*[-]";
+					fOut << std::setw(15) << std::left << std::fixed << "k[m3/kmol/s]";
+					fOut << std::setw(16) << std::left << std::fixed << "kCol[m3/kmol/s]";
+					fOut << std::setw(11) << std::left << std::fixed << "k*[-]";
+					fOut << std::endl;
+					fOut << std::string(75, '-') << std::endl;
+
+					const double eps_over_kb = std::sqrt(transport.epsilon_over_kb()[i1] * transport.epsilon_over_kb()[i2]);
+					for (unsigned int j = 0; j < ni; j++)
+					{
+						const double T = temperatures[j];
+						const double TStar = T / eps_over_kb;
+						const double Omega11Star = transport.Omega11(TStar);
+
+						fOut << std::setw(10) << std::left << std::setprecision(0) << std::fixed << T;
+						fOut << std::setw(11) << std::left << std::setprecision(3) << std::scientific << TStar;
+						fOut << std::setw(13) << std::left << std::setprecision(3) << std::scientific << Omega11Star;
+						fOut << std::setw(15) << std::left << std::setprecision(3) << std::scientific << kForward(i, j);
+						fOut << std::setw(16) << std::left << std::setprecision(3) << std::scientific << kCollisionForward(i, j);
+						fOut << std::setw(11) << std::left << std::setprecision(3) << std::scientific << kForward(i, j)/kCollisionForward(i, j);
+						fOut << std::endl;
+					}
+					fOut << std::string(75, '-') << std::endl;
+					fOut << std::endl;
+				}
+
+			for (unsigned int i = 0; i < indices_backward.size(); i++)
+				if (unfeasible_backward_reactions(i) > 0)
+				{
+					fOut << std::string(100, '-') << std::endl;
+					fOut << "Backward reaction: " << indices_backward[i] + 1 << std::endl;
+					fOut << std::string(100, '-') << std::endl;
+					fOut << "Stoichiometry:    " << reaction_names[indices_backward[i]] << std::endl;
+					fOut << std::endl;
+
+					const unsigned int i1 = indices_species_backward[i][0];
+					const unsigned int i2 = indices_species_backward[i][1];
+
+					fOut << std::setw(20) << std::left << "Species";
+					fOut << std::setw(11) << std::left << "mass[kg]";
+					fOut << std::setw(11) << std::left << "sigma[A]";
+					fOut << std::setw(11) << std::left << "eps/kb[K]";
+					fOut << std::endl;
+					fOut << std::string(55, '-') << std::endl;
+
+					fOut << std::setw(20) << std::left << std::fixed << thermodynamics_.NamesOfSpecies()[i1];
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << transport.mu()[i1];
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << transport.sigma()[i1] * 1.e10;
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << transport.epsilon_over_kb()[i1];
+					fOut << std::endl;
+
+					fOut << std::setw(20) << std::left << std::fixed << thermodynamics_.NamesOfSpecies()[i2];
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << transport.mu()[i2];
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << transport.sigma()[i2] * 1.e10;
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << transport.epsilon_over_kb()[i2];
+					fOut << std::endl;
+
+					fOut << std::setw(20) << std::left << std::fixed << "Mean";
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << (transport.mu()[i1] * transport.mu()[i2]) / (transport.mu()[i1] + transport.mu()[i2]);
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << 0.5*(transport.sigma()[i1] + transport.sigma()[i2])*1.e10;
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << std::sqrt(transport.epsilon_over_kb()[i1] * transport.epsilon_over_kb()[i2]);
+					fOut << std::endl;
+					fOut << std::string(55, '-') << std::endl;
+					fOut << std::endl;
+
+					fOut << std::setw(10) << std::left << std::fixed << "T[K]";
+					fOut << std::setw(11) << std::left << std::fixed << "TStar[-]";
+					fOut << std::setw(13) << std::left << std::fixed << "Omega11*[-]";
+					fOut << std::setw(15) << std::left << std::fixed << "k[m3/kmol/s]";
+					fOut << std::setw(16) << std::left << std::fixed << "kCol[m3/kmol/s]";
+					fOut << std::setw(11) << std::left << std::fixed << "k*[-]";
+					fOut << std::endl;
+					fOut << std::string(75, '-') << std::endl;
+
+					const double eps_over_kb = std::sqrt(transport.epsilon_over_kb()[i1] * transport.epsilon_over_kb()[i2]);
+					for (unsigned int j = 0; j < ni; j++)
+					{
+						const double T = temperatures[j];
+						const double TStar = T / eps_over_kb;
+						const double Omega11Star = transport.Omega11(TStar);
+
+						fOut << std::setw(10) << std::left << std::setprecision(0) << std::fixed << T;
+						fOut << std::setw(11) << std::left << std::setprecision(3) << std::scientific << TStar;
+						fOut << std::setw(13) << std::left << std::setprecision(3) << std::scientific << Omega11Star;
+						fOut << std::setw(15) << std::left << std::setprecision(3) << std::scientific << kBackward(i, j);
+						fOut << std::setw(16) << std::left << std::setprecision(3) << std::scientific << kCollisionBackward(i, j);
+						fOut << std::setw(11) << std::left << std::setprecision(3) << std::scientific << kBackward(i, j) / kCollisionBackward(i, j);
+						fOut << std::endl;
+					}
+					fOut << std::string(75, '-') << std::endl;
+					fOut << std::endl;
+				}
+		}
+
+		// Complete matrices
+		{
+			fOut << std::string(275, '-') << std::endl;
+			fOut << std::setw(11) << std::left << "Reaction";
+			fOut << std::setw(11) << std::left << "Max";
+			for (unsigned int k = 0; k < ni; k++)
+				fOut << std::setw(11) << std::left << std::setprecision(0) << std::fixed << temperatures[k];
+			fOut << std::endl;
+			fOut << std::string(275, '-') << std::endl;
+
+			fOut << std::setw(11) << std::left << std::fixed << "Max";
+			fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << kStarForward.maxCoeff();
+			for (unsigned int k = 0; k < ni; k++)
+				fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << kStarForward.col(k).maxCoeff();
+			fOut << std::endl;
+			for (unsigned int i = 0; i < indices_forward.size(); i++)
+			{
+				fOut << std::setw(11) << std::left << std::fixed << indices_forward[i] + 1;
+				fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << kStarForward.row(i).maxCoeff();
+				for (unsigned int k = 0; k < ni; k++)
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << kStarForward(i, k);
+				fOut << std::endl;
+			}
+			fOut << std::string(275, '-') << std::endl;
+			fOut << std::endl;
+
+			fOut << std::string(275, '-') << std::endl;
+			fOut << std::setw(11) << std::left << "Reaction";
+			fOut << std::setw(11) << std::left << "Max";
+			for (unsigned int k = 0; k < ni; k++)
+				fOut << std::setw(11) << std::left << std::setprecision(0) << std::fixed << temperatures[k];
+			fOut << std::endl;
+			fOut << std::string(275, '-') << std::endl;
+
+			fOut << std::setw(11) << std::left << std::fixed << "Max";
+			fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << kStarBackward.maxCoeff();
+			for (unsigned int k = 0; k < ni; k++)
+				fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << kStarBackward.col(k).maxCoeff();
+			fOut << std::endl;
+			for (unsigned int i = 0; i < indices_backward.size(); i++)
+			{
+				fOut << std::setw(11) << std::left << std::fixed << indices_backward[i] + 1;
+				fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << kStarBackward.row(i).maxCoeff();
+				for (unsigned int k = 0; k < ni; k++)
+					fOut << std::setw(11) << std::left << std::setprecision(2) << std::scientific << kStarBackward(i, k);
+				fOut << std::endl;
+			}
+			fOut << std::string(275, '-') << std::endl;
+			fOut << std::endl;
+		}
+	}
+
 	void KineticsMap_CHEMKIN::WriteKineticData(std::ostream& fOut, const unsigned int k, const double T, const double P_Pa, const double* c)
 	{
 		double cTot = 0.;

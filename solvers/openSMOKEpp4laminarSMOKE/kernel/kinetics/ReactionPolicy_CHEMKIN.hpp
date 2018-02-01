@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------*\
+/*-----------------------------------------------------------------------*\
 |    ___                   ____  __  __  ___  _  _______                  |
 |   / _ \ _ __   ___ _ __ / ___||  \/  |/ _ \| |/ / ____| _     _         |
 |  | | | | '_ \ / _ \ '_ \\___ \| |\/| | | | | ' /|  _| _| |_ _| |_       |
@@ -1628,7 +1628,7 @@ namespace OpenSMOKE
                 {
                     if(k % 4 == 0)
                         reaction_data << " PLOG /  ";
-                    reaction_data << std::showpoint << std::setw(12) << std::left << plog_coefficients_[k];
+                    reaction_data << std::showpoint << std::setw(16) << std::scientific << std::left << plog_coefficients_[k];
                     
                     if((k+1) % 4 == 0 || k == plog_coefficients_.size() - 3)
                         reaction_data << "/" << std::endl;
@@ -2057,21 +2057,39 @@ namespace OpenSMOKE
 
 		// Pressure dependent reactions
 		if (tag_reaction_ == PhysicalConstants::REACTION_LINDEMANN_FALLOFF || tag_reaction_ == PhysicalConstants::REACTION_TROE_FALLOFF ||
-			tag_reaction_ == PhysicalConstants::REACTION_SRI_FALLOFF || tag_reaction_ == PhysicalConstants::REACTION_LINDEMANN_CABR || 
-			tag_reaction_ == PhysicalConstants::REACTION_TROE_CABR || tag_reaction_ == PhysicalConstants::REACTION_SRI_CABR)	
+			tag_reaction_ == PhysicalConstants::REACTION_SRI_FALLOFF || tag_reaction_ == PhysicalConstants::REACTION_LINDEMANN_CABR ||
+			tag_reaction_ == PhysicalConstants::REACTION_TROE_CABR || tag_reaction_ == PhysicalConstants::REACTION_SRI_CABR)
 		{
+			double conversion_factor_A = 1.;
+			double conversion_factor_AInf = 1.;
+
+			if (tag_reaction_ == PhysicalConstants::REACTION_LINDEMANN_FALLOFF || tag_reaction_ == PhysicalConstants::REACTION_TROE_FALLOFF ||
+				tag_reaction_ == PhysicalConstants::REACTION_SRI_FALLOFF)
+			{
+				conversion_factor_A = std::pow(1.e3, -sumLambdaReactants_);
+				conversion_factor_AInf = std::pow(1.e3, 1. - sumLambdaReactants_);
+			}
+
+			if (tag_reaction_ == PhysicalConstants::REACTION_LINDEMANN_CABR || tag_reaction_ == PhysicalConstants::REACTION_TROE_CABR || 
+				tag_reaction_ == PhysicalConstants::REACTION_SRI_CABR)
+			{
+				conversion_factor_A = std::pow(1.e3, 1. - sumLambdaReactants_);
+				conversion_factor_AInf = std::pow(1.e3, 2. - sumLambdaReactants_);
+			}
+		
+
 			fOut << std::setw(9) << " ";
 			fOut << TagASCII() << std::endl;
 		
 			fOut << std::setw(9) << " ";
 			fOut << std::setw(9) << std::left << "k0:";
-			fOut << std::scientific << std::setprecision(6) << std::right << A_ << "\t";
+			fOut << std::scientific << std::setprecision(6) << std::right << A_/conversion_factor_A << "\t";
 			fOut << std::setw(8)    << std::setprecision(2) << std::fixed << std::right << beta_;
 			fOut << std::setw(14)	  << std::setprecision(2) << std::fixed << std::right << E_/Conversions::J_from_kcal   << std::endl;
 
 			fOut << std::setw(9) << " ";
 			fOut << std::setw(9) << std::left << "kInf:";
-			fOut << std::scientific << std::setprecision(6) << std::right << AInf_	<< "\t"; 
+			fOut << std::scientific << std::setprecision(6) << std::right << AInf_/conversion_factor_AInf << "\t";
 			fOut << std::setw(8)    << std::setprecision(2) << std::fixed << std::right << betaInf_;
 			fOut << std::setw(14)   << std::setprecision(2) << std::fixed << std::right << EInf_/Conversions::J_from_kcal << std::endl;
 		}
@@ -2081,25 +2099,29 @@ namespace OpenSMOKE
 		}
 		else	// Conventional reactions
 		{
+			const double conversion_factor_A = std::pow(1.e3, 1. - sumLambdaReactants_);
+
 			fOut << std::setw(9)  << " ";
 			fOut << std::setw(9)  << std::left << "k:";
-			fOut << std::scientific	<< std::setprecision(6) << std::right << A_ << "\t";
+			fOut << std::scientific	<< std::setprecision(6) << std::right << A_/conversion_factor_A << "\t";
 			fOut << std::setw(8) << std::setprecision(2) << std::fixed << std::right << beta_;
 			fOut << std::setw(14) << std::setprecision(2) << std::fixed << std::right << E_/Conversions::J_from_kcal << std::endl;
 
 			if (reverse_parameters.size() > 0)
 			{
+				const double conversion_factor_Arev = std::pow(1.e3, 1. - sumLambdaProducts_);
+
 				fOut << std::setw(9) << " ";
 				fOut << std::setw(9) << std::left << "kRev:";
 				if (reverse_parameters.size() == 3)
 				{
-					fOut << std::scientific << std::setprecision(6) << std::right << std::exp(reverse_parameters(0)) << "\t";
+					fOut << std::scientific << std::setprecision(6) << std::right << std::exp(reverse_parameters(0))/conversion_factor_Arev << "\t";
 					fOut << std::setw(8) << std::setprecision(2) << std::fixed << std::right << reverse_parameters(2);
 					fOut << std::setw(14) << std::setprecision(2) << std::fixed << std::right << reverse_parameters(1)/Conversions::J_from_kcal << std::endl;
 				}
 				else if(reverse_parameters.size() == 2)
 				{
-					fOut << std::scientific << std::setprecision(6) << std::right << std::exp(reverse_parameters(0)) << "\t";
+					fOut << std::scientific << std::setprecision(6) << std::right << std::exp(reverse_parameters(0))/conversion_factor_Arev << "\t";
 					fOut << std::setw(8) << std::setprecision(2) << std::fixed << std::right << 0.;
 					fOut << std::setw(14) << std::setprecision(2) << std::fixed << std::right << reverse_parameters(1)/Conversions::J_from_kcal << std::endl;
 				}
@@ -2171,6 +2193,7 @@ namespace OpenSMOKE
 		// Chebyshev Polynomials
 		if (iChebyshev_ == true)
 		{	
+			// No conversion to be applied, because already in [mol, cm3, s]
 			OpenSMOKE::ChebyshevPolynomialRateExpression chebyshev;
 			chebyshev.Setup(chebyshev_coefficients_, chebyshev_pressure_limits_, chebyshev_temperature_limits_);
 			chebyshev.WriteShortSummaryOnASCIIFile(fOut);	
@@ -2179,14 +2202,16 @@ namespace OpenSMOKE
 		// Logarithmic-Pressure Dependence
 		if (iPlog_ == true)
 		{	
+			const double conversion_factor_A = std::pow(1.e3, 1. - sumLambdaReactants_);
 			OpenSMOKE::PressureLogarithmicRateExpression pressureLogarithmic;
 			pressureLogarithmic.Setup(plog_coefficients_);
-			pressureLogarithmic.WriteShortSummaryOnASCIIFile(fOut);
+			pressureLogarithmic.WriteShortSummaryOnASCIIFile(fOut, conversion_factor_A);
 		}
 
 		// Logarithmic-Pressure Dependence
 		if (iExtPlog_ == true)
 		{
+			// Conversion is managed internally
 			OpenSMOKE::ExtendedPressureLogarithmicRateExpression extendedPressureLogarithmic;
 			extendedPressureLogarithmic.Setup(extendedplog_coefficients_);
 			extendedPressureLogarithmic.WriteShortSummaryOnASCIIFile(fOut);
@@ -2195,6 +2220,7 @@ namespace OpenSMOKE
 		// Extended-Falloff Reactions
 		if (iExtLow_ == true)
 		{
+			// Conversion is managed internally
 			OpenSMOKE::ExtendedFallOff extendedFallOffReaction;
 			extendedFallOffReaction.Setup(extendedfalloff_coefficients_);
 			extendedFallOffReaction.WriteShortSummaryOnASCIIFile(fOut);
@@ -2223,11 +2249,13 @@ namespace OpenSMOKE
 		// Reverse Rate
 		if (iExplicitlyReversible_ == true)
 		{
+			const double conversion_factor_Arev = std::pow(1.e3, 1. - sumLambdaProducts_);
+
 			fOut << std::setw(9) << " ";
 			fOut << "This reaction has the explicit reverse reaction: ";
 			fOut << std::setw(9)  << " ";
 			fOut << std::setw(9)  << std::left << "krev:";
-			fOut << std::scientific	<< std::setprecision(6) << std::right << ARev_ << "\t";
+			fOut << std::scientific	<< std::setprecision(6) << std::right << ARev_/conversion_factor_Arev << "\t";
 			fOut << std::setw(8) << std::setprecision(2) << std::fixed << std::right << betaRev_;
 			fOut << std::setw(14) << std::setprecision(2) << std::fixed << std::right << ERev_/Conversions::J_from_kcal << std::endl;
 		}

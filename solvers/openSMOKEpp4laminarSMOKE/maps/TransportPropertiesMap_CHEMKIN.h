@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------*\
+/*-----------------------------------------------------------------------*\
 |    ___                   ____  __  __  ___  _  _______                  |
 |   / _ \ _ __   ___ _ __ / ___||  \/  |/ _ \| |/ / ____| _     _         |
 |  | | | | '_ \ / _ \ '_ \\___ \| |\/| | | | | ' /|  _| _| |_ _| |_       |
@@ -44,10 +44,10 @@ namespace OpenSMOKE
 {
 	//!  A class to efficiently evaluate the transport properties
 	/*!
-		 This class provides the tools to calculate in a very efficient way the transport properties.
-		 In order to ensure a good efficiency a map is created to store all the data
-		 depending on the temperature. In this way they are recalculated only if strictly needed, i.e. only
-		 if the temperature changes.
+	This class provides the tools to calculate in a very efficient way the transport properties.
+	In order to ensure a good efficiency a map is created to store all the data
+	depending on the temperature. In this way they are recalculated only if strictly needed, i.e. only
+	if the temperature changes.
 	*/
 
 	class TransportPropertiesMap_CHEMKIN : public TransportPropertiesMap
@@ -65,19 +65,19 @@ namespace OpenSMOKE
 		*@param doc file in XML format
 		*/
 		TransportPropertiesMap_CHEMKIN(rapidxml::xml_document<>& doc);
-                
-        /**
+
+		/**
 		*@brief Copy constructor
 		*@param rhs the object to be copied in the current object
 		*/
-        TransportPropertiesMap_CHEMKIN( const TransportPropertiesMap_CHEMKIN& rhs );
-                
-        /**
+		TransportPropertiesMap_CHEMKIN(const TransportPropertiesMap_CHEMKIN& rhs);
+
+		/**
 		*@brief Default destructor
 		*/
 		~TransportPropertiesMap_CHEMKIN();
-                
-        /**
+
+		/**
 		*@brief Set the temperature at which the properties have to be evaluated
 		*@param T the temperature value in K
 		*/
@@ -87,7 +87,7 @@ namespace OpenSMOKE
 		*@brief Set the pressure at which the properties have to be evaluated
 		*@param P the pressure value in Pa
 		*/
-		virtual void SetPressure(const double& P);		
+		virtual void SetPressure(const double& P);
 
 		/**
 		*@brief Sets the transport coefficient for the requested species
@@ -100,6 +100,12 @@ namespace OpenSMOKE
 		virtual void ImportCoefficientsFromASCIIFile(std::istream& fInput);
 
 		/**
+		*@brief Import the coefficients from a file in ASCII format (obsolete, TOREMOVE)
+		*@param fInput input stream
+		*/
+		virtual void ImportLennardJonesCoefficientsFromASCIIFile(std::istream& fInput);
+
+		/**
 		*@brief Import the coefficients from a file in XML format
 		*/
 		virtual void ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc);
@@ -108,11 +114,48 @@ namespace OpenSMOKE
 		*@brief Import the species bundling coefficients from a file in XML format
 		*/
 		virtual void ImportSpeciesBundlingFromXMLFile(rapidxml::xml_document<>& doc, const double epsilon);
-		
+
 		/**
 		*@brief Import the species from a file in XML format
-		*/	
+		*/
 		virtual void ImportSpeciesFromXMLFile(rapidxml::xml_document<>& doc);
+
+		/**
+		*@brief Import the viscosity model from a file in XML format
+		*/
+		virtual void ImportViscosityModelFromXMLFile(rapidxml::xml_document<>& doc);
+
+		/**
+		*@brief Returns the reduced collision integral Omega11* according to
+		        the regression fit reported in Chen et al., Comb. and Flame 186, p. 208 (2017)
+		*@param TStar reduced temperature (dimensionless) calculated as TStar=kb*T/eps
+		*/
+		double Omega11(const double TStar);
+
+		/**
+		*@brief Returns the reduced collision integral Omega11* according to
+		        a 2D interpolation table
+		*@param TStar reduced temperature (dimensionless) calculated as TStar=kb*T/eps
+		*@param DStar reduced dipole moment (see CHEMKIN Theory Guide)
+		*/
+		double Omega11(const double TStar, const double DStar);
+
+		/**
+		*@brief Returns the mass (in kg) of species (0-based index)
+		*/
+		const std::vector<double>& mu() const { return mu_; }
+
+		/**
+		*@brief Returns the collision diameters (in m) of species (0-based index)
+		*/
+		const std::vector<double>& sigma() const { return sigma_; }
+
+		/**
+		*@brief Returns the scaled well depths (in K) of species (0-based index)
+		*/
+		const std::vector<double>& epsilon_over_kb() const { return epsilon_over_kb_; }
+
+	protected:
 
 		/**
 		*@brief TODO (This is just a test subroutine!)
@@ -148,42 +191,45 @@ namespace OpenSMOKE
 
 		/**
 		*@brief Combines the planck mean absorption coefficients of relevant species, according to their mole fractions
-		        Returns the Planck mean absorption coefficient of the mixture in [1/m]
+		Returns the Planck mean absorption coefficient of the mixture in [1/m]
 		*/
 		virtual double kPlanckMix(const double* moleFractions);
 
 		/**
-		*@brief Calculates the thermal conductivities for all the species 
+		*@brief Calculates the thermal conductivities for all the species
 		*/
 		inline virtual void lambda();
 
 		/**
-		*@brief Calculates the dynamic viscosities for all the species 
+		*@brief Calculates the dynamic viscosities for all the species
 		*/
 		inline virtual void eta();
 
 		/**
-		*@brief Calculates the mass diffusion coefficients for all the species 
+		*@brief Calculates the mass diffusion coefficients for all the species
 		*/
 		inline virtual void gamma();
- 
+
 		/**
 		*@brief Calculates the mass diffusion coefficients for all the species using the bundling algorithm
 		*/
 		inline virtual void bundling_gamma();
-		
-
 
 		/**
-		*@brief Calculates the thermal diffusion coefficients for all the species 
+		*@brief Calculates the thermal diffusion coefficients for all the species
 		*/
 		inline virtual void teta();
 
 		/**
 		*@brief Return the vector of species (1-index based) for which the Soret effect is active
 		*/
-		const std::vector<unsigned int>& iThermalDiffusionRatios() const { return iThermalDiffusionRatios_; } 
-		
+		const std::vector<unsigned int>& iThermalDiffusionRatios() const { return iThermalDiffusionRatios_; }
+
+		/**
+		*@brief Calculates the collision rate constant for bimolecular reactions [m3/kmol/s]
+		*/
+		double kCollision(const unsigned int i, const unsigned int k, const double T);
+
 	private:
 
 		/**
@@ -195,19 +241,19 @@ namespace OpenSMOKE
 		*@brief Precalculates useful data
 		*/
 		void CompleteInitialization();
-                
-        /**
+
+		/**
 		*@brief Copies the data from another transport map (used by copy constructors)
 		*/
-        void CopyFromMap( const TransportPropertiesMap_CHEMKIN& rhs );
-                
+		void CopyFromMap(const TransportPropertiesMap_CHEMKIN& rhs);
+
 	private:
 
 		PhysicalConstants::OpenSMOKE_GasMixture_Viscosity_Model viscosity_model;
 
-		double* M;						//!< molecular weights
+		double* M;				//!< molecular weights
 		double* fittingLambda;			//!< fitting coefficients for the thermal conductivities
-		double* fittingEta;				//!< fitting coefficients for the dynamic viscosities
+		double* fittingEta;			//!< fitting coefficients for the dynamic viscosities
 		double* fittingTeta;			//!< fitting coefficients for the thermal diffusion coefficients
 		double* fittingGamma;			//!< fitting coefficients for the mass diffusion coefficients
 
@@ -215,8 +261,8 @@ namespace OpenSMOKE
 		double* phi_eta_sup;			//!< auxiliary vector for the dynamic viscosity calculation
 		double* phi_eta_inf;			//!< auxiliary vector for the dynamic viscosity calculation
 
-		double* sqrtEta;				//!< auxiliary vector for the dynamic viscosity calculation
-		double* usqrtEta;				//!< auxiliary vector for the dynamic viscosity calculation
+		double* sqrtEta;			//!< auxiliary vector for the dynamic viscosity calculation
+		double* usqrtEta;			//!< auxiliary vector for the dynamic viscosity calculation
 		Eigen::VectorXd sumK;			//!< auxiliary vector for the dynamic viscosity calculation
 
 		double* sqrtMWRatio_inf;		//!< auxiliary vector for the dynamic viscosity calculation
@@ -224,20 +270,20 @@ namespace OpenSMOKE
 
 		double* sqrtMW;				//!< auxiliary vector for the dynamic viscosity calculation
 
-		double* sum_diffusion_coefficients;		//!< auxiliary vector used for the calculation of the mass diffusion coefficients
-		double* x_corrected;					//!< auxiliary vector used for the calculation of the mass diffusion coefficients
-	
-        unsigned int count_species_thermal_diffusion_ratios_;   //!< number of species for which the thermal diffusion coefficients are evaluated 
+		double* sum_diffusion_coefficients;	//!< auxiliary vector used for the calculation of the mass diffusion coefficients
+		double* x_corrected;			//!< auxiliary vector used for the calculation of the mass diffusion coefficients
+
+		unsigned int count_species_thermal_diffusion_ratios_;   //!< number of species for which the thermal diffusion coefficients are evaluated 
 		std::vector<unsigned int> iThermalDiffusionRatios_;	//!< indices of species tracked for the thermal diffusion coefficients
 
 		static const double threshold_;
 		double sum_threshold_;
-                
-        bool temperature_lambda_must_be_recalculated_;
-        bool temperature_eta_must_be_recalculated_;
-        bool temperature_gamma_must_be_recalculated_;
-        bool temperature_teta_must_be_recalculated_;
-        bool pressure_gamma_must_be_recalculated_;
+
+		bool temperature_lambda_must_be_recalculated_;
+		bool temperature_eta_must_be_recalculated_;
+		bool temperature_gamma_must_be_recalculated_;
+		bool temperature_teta_must_be_recalculated_;
+		bool pressure_gamma_must_be_recalculated_;
 
 		// Indices of relevant species (1-based)
 		unsigned int index_H2O_;
@@ -245,7 +291,7 @@ namespace OpenSMOKE
 		unsigned int index_CH4_;
 		unsigned int index_CO2_;
 
-		// TODO (bundling)
+		// Bundling
 		unsigned int bundling_number_groups_;
 		std::vector<unsigned int> bundling_reference_species_;
 		std::vector< std::vector<unsigned int> > bundling_groups_;
@@ -257,6 +303,13 @@ namespace OpenSMOKE
 		double* bundling_fittingGamma_;
 		double* bundling_gammaSpecies_;
 		double* bundling_gammaSpeciesSelfDiffusion_;
+
+		// Lennard-Jones parameters
+		bool is_lennard_jones_available_ = false;	//!< true if the Lennard-Jones coefficients are available
+		std::vector<double> mu_;					//!< species masses (in kg)
+		std::vector<double> sigma_;					//!< species collision diameters (in m)
+		std::vector<double> epsilon_over_kb_;		//!< species scaled well depths (in K)
+
 	};
 }
 

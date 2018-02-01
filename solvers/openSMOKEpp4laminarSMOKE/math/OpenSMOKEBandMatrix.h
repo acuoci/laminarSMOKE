@@ -130,20 +130,20 @@ namespace OpenSMOKE
 		*@brief Solves the linear system (only after LU factorization)
 		*@param b rhs of linear system
 		*/
-		void Solve(T *b);
+		int Solve(T *b);
 
 		/**
 		*@brief Solves the linear system (only after LU factorization)
 		*@param nrhs number of right hand sides
 		*@param b rhs of linear system
 		*/
-		void Solve(const int nrhs, T *b);
+		int Solve(const int nrhs, T *b);
 
 		/**
 		*@brief Factorizes and solves the linear system - Please, do not use it: it is still under testing
 		*@param b rhs of linear system
 		*/
-		void FactorizeAndSolve(T *b);
+		int FactorizeAndSolve(T *b);
 
 		/**
 		*@brief Prints the matrix on the screen (for diagnostic purposes)

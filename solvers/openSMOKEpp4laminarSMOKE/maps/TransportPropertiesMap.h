@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------*\
+/*-----------------------------------------------------------------------*\
 |    ___                   ____  __  __  ___  _  _______                  |
 |   / _ \ _ __   ___ _ __ / ___||  \/  |/ _ \| |/ / ____| _     _         |
 |  | | | | '_ \ / _ \ '_ \\___ \| |\/| | | | | ' /|  _| _| |_ _| |_       |
@@ -16,7 +16,7 @@
 |                                                                         |
 |   This file is part of OpenSMOKE++ framework.                           |
 |                                                                         |
-|	License                                                               |
+|	License                                                           |
 |                                                                         |
 |   Copyright(C) 2014, 2013, 2012  Alberto Cuoci                          |
 |   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
@@ -41,33 +41,33 @@ namespace OpenSMOKE
 {
 	//!  A struct to store common data for transport properties maps
 	/*!
-		 This struct provides the tools o store common data for transport properties maps.
+	This struct provides the tools o store common data for transport properties maps.
 	*/
 
 	struct TransportPropertiesMapBaseClass
-	{	
-		protected:
+	{
+	protected:
 
-			unsigned int nspecies_;
+		unsigned int nspecies_;
 
-			Eigen::VectorXd lambdaSpecies_;
-			Eigen::VectorXd etaSpecies_;
-			Eigen::VectorXd gammaSpecies_;
-			Eigen::VectorXd tetaSpecies_;
+		Eigen::VectorXd lambdaSpecies_;
+		Eigen::VectorXd etaSpecies_;
+		Eigen::VectorXd gammaSpecies_;
+		Eigen::VectorXd tetaSpecies_;
 	};
 
 
 	//!  A virtual class to provide a common interface to transport properties maps
 	/*!
-		 This virtual class provides a common interface to transport properties maps
+	This virtual class provides a common interface to transport properties maps
 	*/
 
 	class TransportPropertiesMap : public TransportPropertiesMapBaseClass
 	{
-	
+
 	public:
-            
-        /**
+
+		/**
 		* Sets the temperature (in K)
 		*/
 		virtual void SetTemperature(const double& T) = 0;
@@ -81,20 +81,20 @@ namespace OpenSMOKE
 		*@brief Calculates the thermal conductivity of a mixture from the mole fractions
 		*/
 		double ThermalConductivity(const double* moleFractions);
-		
+
 		/**
 		*@brief Calculates the dynamic viscosity of a mixture from the mole fractions
-		*/		
+		*/
 		double DynamicViscosity(const double* moleFractions);
 
 		/**
 		*@brief Calculates the mass diffusion coefficients (mixture averaged formulation) of a mixture from the mole fractions
 		*/
-		void MassDiffusionCoefficients(double* gammamix, const double* moleFractions, const bool bundling=false);
-		
+		void MassDiffusionCoefficients(double* gammamix, const double* moleFractions, const bool bundling = false);
+
 		/**
 		*@brief Calculates the thermal diffusion coefficients (mixture averaged formulation) of a mixture from the mole fractions
-		*/		
+		*/
 		void ThermalDiffusionRatios(double* tetamix, const double* moleFractions);
 
 		/**
@@ -110,7 +110,10 @@ namespace OpenSMOKE
 		/**
 		*@brief Returns true if the species bundling for calculation of mass diffusion coefficients is activated
 		*/
-		bool is_species_bundling() const { return species_bundling_;  }
+		bool is_species_bundling() const { return species_bundling_; }
+
+
+	protected:
 
 		/**
 		*@brief TODO
@@ -118,7 +121,7 @@ namespace OpenSMOKE
 		virtual void Test(const int nLoops, const double& T, int* index) = 0;
 
 	protected:
-		
+
 		/**
 		*@brief Combines the species thermal conductivities to calculate the mixture thermal conductivity
 		*/
@@ -150,17 +153,17 @@ namespace OpenSMOKE
 		virtual double kPlanckMix(const double* moleFractions) = 0;
 
 		/**
-		*@brief Calculates the thermal conductivities for all the species 
+		*@brief Calculates the thermal conductivities for all the species
 		*/
 		virtual void lambda() = 0;
 
 		/**
-		*@brief Calculates the dynamic viscosities for all the species 
+		*@brief Calculates the dynamic viscosities for all the species
 		*/
 		virtual void eta() = 0;
 
 		/**
-		*@brief Calculates the mass diffusion coefficients for all the species 
+		*@brief Calculates the mass diffusion coefficients for all the species
 		*/
 		virtual void gamma() = 0;
 
@@ -170,19 +173,19 @@ namespace OpenSMOKE
 		virtual void bundling_gamma() = 0;
 
 		/**
-		*@brief Calculates the thermal diffusion coefficients for all the species 
+		*@brief Calculates the thermal diffusion coefficients for all the species
 		*/
 		virtual void teta() = 0;
-                
-        protected:
-            
-        double T_;							//!< temperature [K]
-		double P_;							//!< pressure [Pa]
 
-		double T_old_;						//!< temperature [K] (previous value)
-		double P_old_;						//!< pressure [Pa] (previous value)
+	protected:
 
-		bool species_bundling_;				//!< bundling of species for calculation of mass diffusion coefficients
+		double T_;			//!< temperature [K]
+		double P_;			//!< pressure [Pa]
+
+		double T_old_;			//!< temperature [K] (previous value)
+		double P_old_;			//!< pressure [Pa] (previous value)
+
+		bool species_bundling_;		//!< bundling of species for calculation of mass diffusion coefficients
 	};
 }
 

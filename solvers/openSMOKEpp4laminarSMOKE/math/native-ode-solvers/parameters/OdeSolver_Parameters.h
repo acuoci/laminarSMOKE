@@ -34,8 +34,8 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#ifndef OpenSMOKE_ODE_Parameters_H
-#define	OpenSMOKE_ODE_Parameters_H
+#ifndef OpenSMOKE_OdeSolver_Parameters_H
+#define	OpenSMOKE_OdeSolver_Parameters_H
 
 #include <string>
 #include <vector>
@@ -319,5 +319,5 @@ namespace OdeSMOKE
 
 #include "OdeSolver_Parameters.hpp"
 
-#endif	/* OdeSolver_Parameters_H */
+#endif	/* OpenSMOKE_OdeSolver_Parameters_H */
 

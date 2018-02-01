@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------*\
+/*-----------------------------------------------------------------------*\
 |    ___                   ____  __  __  ___  _  _______                  |
 |   / _ \ _ __   ___ _ __ / ___||  \/  |/ _ \| |/ / ____| _     _         |
 |  | | | | '_ \ / _ \ '_ \\___ \| |\/| | | | | ' /|  _| _| |_ _| |_       |
@@ -16,7 +16,7 @@
 |                                                                         |
 |   This file is part of OpenSMOKE++ framework.                           |
 |                                                                         |
-|	License                                                               |
+|	License                                                           |
 |                                                                         |
 |   Copyright(C) 2014, 2013, 2012  Alberto Cuoci                          |
 |   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
@@ -36,6 +36,7 @@
 
 #include "math/OpenSMOKEUtilities.h"
 #include "TransportPropertiesMap_CHEMKIN.h"
+#include "preprocessing/CollisionIntegralMatrices.hpp"
 
 #if OPENSMOKE_USE_MKL == 1
 #include "mkl.h"
@@ -43,7 +44,7 @@
 
 namespace OpenSMOKE
 {
-	const double TransportPropertiesMap_CHEMKIN::threshold_ = 1.e-14;
+	const double TransportPropertiesMap_CHEMKIN::threshold_ = 1.e-12;
 
 	TransportPropertiesMap_CHEMKIN::TransportPropertiesMap_CHEMKIN(const unsigned int nSpecies)
 	{
@@ -58,6 +59,7 @@ namespace OpenSMOKE
 		this->T_old_ = this->P_old_ = 0.;
 
 		this->species_bundling_ = false;
+		is_lennard_jones_available_ = false;
 
 		MemoryAllocation();
 	}
@@ -75,6 +77,7 @@ namespace OpenSMOKE
 		this->species_bundling_ = false;
 
 		ImportSpeciesFromXMLFile(doc);
+		ImportViscosityModelFromXMLFile(doc);
 		MemoryAllocation();
 		ImportCoefficientsFromXMLFile(doc);
 	}
@@ -234,8 +237,9 @@ namespace OpenSMOKE
 
 	void TransportPropertiesMap_CHEMKIN::MemoryAllocation()
 	{
-		//		viscosity_model = PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_HERNING;
-		viscosity_model = PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_WILKE;
+		// viscosity_model = PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_HERNING;
+		// viscosity_model = PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_MATHUR_SAXENA;
+		// viscosity_model = PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_WILKE; (default)
 
 		sum_threshold_ = 1. + threshold_*double(this->nspecies_);
 
@@ -398,12 +402,28 @@ namespace OpenSMOKE
 		CompleteInitialization();
 	}
 
+	void TransportPropertiesMap_CHEMKIN::ImportLennardJonesCoefficientsFromASCIIFile(std::istream& fInput)
+	{
+		is_lennard_jones_available_ = true;
+		mu_.resize(this->nspecies_);
+		sigma_.resize(this->nspecies_);
+		epsilon_over_kb_.resize(this->nspecies_);
+
+		for (unsigned int j = 0; j < this->nspecies_; j++)
+		{
+			fInput >> mu_[j];					// [kg]
+			fInput >> sigma_[j];				// [m]
+			fInput >> epsilon_over_kb_[j];		// [K]
+		}
+	}
+
 	void TransportPropertiesMap_CHEMKIN::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)
 	{
 		std::cout << " * Reading transport properties from XML file..." << std::endl;
 
 		rapidxml::xml_node<>* opensmoke_node = doc.first_node("opensmoke");
 
+		// Transport coefficients (from fitting)
 		rapidxml::xml_node<>* transport_node = opensmoke_node->first_node("Transport");
 		if (transport_node != 0)
 		{
@@ -420,6 +440,17 @@ namespace OpenSMOKE
 		}
 		else
 			ErrorMessage("TransportPropertiesMap_CHEMKIN::ImportCoefficientsFromXMLFile", "Transport tag was not found!");
+
+		// Lennard-Jones parametes (not stricly needed)
+		rapidxml::xml_node<>* lennard_jones_node = opensmoke_node->first_node("Lennard-Jones");
+		if (lennard_jones_node != 0)
+		{
+			std::stringstream fInput;
+			fInput << lennard_jones_node->value();
+			ImportLennardJonesCoefficientsFromASCIIFile(fInput);
+		}
+		else
+			ErrorMessage("TransportPropertiesMap_CHEMKIN::ImportLennardJonesCoefficientsFromASCIIFile", "Lennard-Jones coefficients unavailable!");
 	}
 
 	unsigned int index_from_mtrix_to_vector(const unsigned int n, const unsigned int i, const unsigned int j)
@@ -597,6 +628,25 @@ namespace OpenSMOKE
 		catch (...)
 		{
 			ErrorMessage("TransportPropertiesMap_CHEMKIN::ImportSpeciesFromXMLFile", "Error in reading the list of species.");
+		}
+	}
+
+	void TransportPropertiesMap_CHEMKIN::ImportViscosityModelFromXMLFile(rapidxml::xml_document<>& doc)
+	{
+		viscosity_model = PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_WILKE;
+
+		rapidxml::xml_node<>* opensmoke_node = doc.first_node("opensmoke");
+		rapidxml::xml_node<>* viscosity_model_node = opensmoke_node->first_node("ViscosityModel");
+		if (viscosity_model_node != 0)
+		{
+			const std::string dummy = boost::trim_copy(std::string(viscosity_model_node->value()));
+			
+			std::cout << " * User-defined viscosity model: " << dummy << std::endl;
+
+			if (dummy == "Wilke")			viscosity_model = PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_WILKE;
+			else if (dummy == "Herning")		viscosity_model = PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_HERNING;
+			else if (dummy == "MathurSaxena")	viscosity_model = PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_MATHUR_SAXENA;
+			else ErrorMessage("TransportPropertiesMap_CHEMKIN::ImportViscosityModelFromXMLFile", "Error in reading the viscosity model.");
 		}
 	}
 
@@ -966,6 +1016,15 @@ namespace OpenSMOKE
 
 			return etamix;
 		}
+		// Mathur and Saxena
+		// Molecular Physics 52:569 (1967)
+		else if (viscosity_model == PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_MATHUR_SAXENA)
+		{
+			const double sum1 = Dot(this->nspecies_, moleFractions, this->etaSpecies_.data());
+			const double sum2 = UDot(this->nspecies_, moleFractions, this->etaSpecies_.data());
+			const double etamix = 0.50 * (sum1 + 1. / sum2);
+			return etamix;
+		}
 	
 		return 0.;
 	}
@@ -1096,6 +1155,29 @@ namespace OpenSMOKE
 		const double kPlanck = (as_H2O + as_CO2 + as_CO + as_CH4) * (this->P_ / 1.e5);	// [1/m]
 
 		return kPlanck;
+	}
+
+	double TransportPropertiesMap_CHEMKIN::kCollision(const unsigned int i, const unsigned int j, const double T)
+	{
+		const double sigma = 0.50*(sigma_[i] + sigma_[j]);
+		const double epsilon_over_kb = std::sqrt(epsilon_over_kb_[i]*epsilon_over_kb_[j]);
+		const double mu = mu_[i]*mu_[j]/(mu_[i] + mu_[j]);
+		const double TStar = T / epsilon_over_kb;
+
+		return	PhysicalConstants::alphaCollision *
+				(sigma*sigma)*Omega11(TStar)*std::sqrt(T/mu);
+	}
+
+	double TransportPropertiesMap_CHEMKIN::Omega11(const double TStar)
+	{
+		return	1.16145*std::pow(TStar, -0.14874) +
+				0.52487*std::exp(-0.7732*TStar) +
+				2.16178*std::exp(-2.437887*TStar);
+	}
+
+	double TransportPropertiesMap_CHEMKIN::Omega11(const double TStar, const double DStar)
+	{
+		return OpenSMOKE::CollisionIntegral11(TStar, DStar);
 	}
 
 	void TransportPropertiesMap_CHEMKIN::Test(const int nLoops, const double& T, int* index)

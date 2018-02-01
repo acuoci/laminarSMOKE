@@ -153,7 +153,8 @@ namespace OpenSMOKE
 			std::vector<std::string> species_;		//!< list of bath species
 			std::vector<int> species_indices_;		//!< indices of bath species (0-based) (-1 means mixture)
 			
-			double conversion_A0_;					//!< conversion factor from the CHEMKIN units to the SI units
+			double conversion_A0_;							//!< conversion factor from the CHEMKIN units to the SI units
+			double conversion_AInf_;						//!< conversion factor from the CHEMKIN units to the SI units
 
 			double AInf_;									//!< high pressure frequency factor [kmol,m3,s]
 			double BetaInf_;								//!< high pressure temperature exponent

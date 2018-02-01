@@ -139,6 +139,14 @@ protected:
 															"@Kinetics",
 															"none") );
 
+		AddKeyWord( OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@ChebyshevFitting", 
+															OpenSMOKE::SINGLE_BOOL, 
+															"For each Chebysheve reaction the corresponding kinetic constant is fitted assuming the Arrhenius' law", 
+															false,
+															"none",
+															"@Kinetics",
+															"none") );
+
 		AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@SparsityPatternAnalysis",
 															OpenSMOKE::SINGLE_BOOL,
 															"The analysis of sparsity pattern of kinetic mechanism is automatically performed after the pre-processing",

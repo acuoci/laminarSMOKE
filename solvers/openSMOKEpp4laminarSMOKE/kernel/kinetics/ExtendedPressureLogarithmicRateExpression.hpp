@@ -231,7 +231,7 @@ namespace OpenSMOKE
 			fOutput << std::setw(9)									<< " "; 
 			fOutput << std::scientific << j+1						<< "\t";
 			fOutput << std::scientific << std::setprecision(6) << std::right << p_[index][j]/101325.     << "\t";
-			fOutput << std::scientific << std::setprecision(6) << std::right << std::exp(lnA_[index][j]) << "\t";
+			fOutput << std::scientific << std::setprecision(6) << std::right << std::exp(lnA_[index][j])/conversion_A_ << "\t";
 			fOutput << std::setw(8) << std::setprecision(2) << std::fixed << std::right << Beta_[index][j];
 			fOutput << std::setw(14) << std::setprecision(2) << std::fixed << std::right << E_over_R_[index][j] * PhysicalConstants::R_J_kmol / Conversions::J_from_kcal << std::endl;
 		}

@@ -144,7 +144,7 @@ namespace OpenSMOKE
 			fOutput << E_over_R_[j] * PhysicalConstants::R_J_kmol/Conversions::J_from_kcal << std::endl;
 	}
 
-	void PressureLogarithmicRateExpression::WriteShortSummaryOnASCIIFile(std::ostream& fOutput) const
+	void PressureLogarithmicRateExpression::WriteShortSummaryOnASCIIFile(std::ostream& fOutput, const double conversion_factor_A) const
 	{
 		fOutput << std::setw(9) << " "; 
 		fOutput << "Pressure Logarithmic Interpolation" << std::endl;
@@ -153,7 +153,7 @@ namespace OpenSMOKE
 			fOutput << std::setw(9)		<< " "; 
 			fOutput << j+1				<< "\t";
 			fOutput << std::scientific << std::setprecision(6) << std::right << p_[j] / 101325. << "\t";
-			fOutput << std::scientific << std::setprecision(6) << std::right << std::exp(lnA_[j]) << "\t";
+			fOutput << std::scientific << std::setprecision(6) << std::right << std::exp(lnA_[j])/conversion_factor_A << "\t";
 			fOutput << std::setw(8) << std::setprecision(2) << std::fixed << std::right << Beta_[j];
 			fOutput << std::setw(14) << std::setprecision(2) << std::fixed << std::right << E_over_R_[j] * PhysicalConstants::R_J_kmol / Conversions::J_from_kcal << std::endl;
 		}

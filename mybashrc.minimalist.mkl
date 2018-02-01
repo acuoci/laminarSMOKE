@@ -3,11 +3,11 @@
 export OPENFOAM_VERSION='-DOPENFOAM_VERSION=40'
 
 #If OpenFOAM dev version is used, this must be equal to 1
-export DEVVERSION='-DDEVVERSION=0'
+export DEVVERSION='-DDEVVERSION=1'
 
 #Compulsory path
-export EIGEN_LIBRARY_PATH=/software/chimica2/libraries/eigen/eigen-3.3.3
-export BOOST_LIBRARY_PATH=/software/chimica2/libraries/boost/boost-1.64.0-gcc-6.3.0
+export EIGEN_LIBRARY_PATH=/software/chimica2/libraries/eigen/eigen-3.3.4
+export BOOST_LIBRARY_PATH=/software/chimica2/libraries/boost/boost-1.65.1-gcc-6.3.0
 export RAPIDXML_LIBRARY_PATH=/software/chimica2/libraries/rapidxml/rapidxml-1.13
 
 #Options: ISAT support
@@ -20,7 +20,7 @@ export MKL_SUPPORT='-DOPENSMOKE_USE_MKL=1'
 export EXTERNAL_ODE_SOLVERS=
 
 ##Only if the OPENSMOKE_USE_MKL is turned on
-export MKL_PATH=/marconi/prod/opt/compilers/intel/pe-xe-2017/binary/mkl/
+export MKL_PATH=/home/chimica2/cuoci/intel/compilers_and_libraries/linux/mkl/
 export MKL_LIBS='-Wl,--start-group $(MKL_PATH)/lib/intel64/libmkl_intel_lp64.a $(MKL_PATH)/lib/intel64/libmkl_core.a $(MKL_PATH)/lib/intel64/libmkl_sequential.a -Wl,--end-group -lpthread -lm'
 
 #Optional external ODE solvers

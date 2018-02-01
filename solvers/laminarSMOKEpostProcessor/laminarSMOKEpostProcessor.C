@@ -205,17 +205,19 @@ int main(int argc, char *argv[])
 	bool calculateLocalStrainRate = false;
 	bool calculateMoleFractions = false;
 	bool calculateConcentrations = false;
-	bool reconstructMixtureFraction = false;
+	
+	
 	bool xmlProbeLocations = false;
 	bool exportDisks = false;
+	bool exportSPARC = false;
 
+	bool reconstructMixtureFraction = false;
 	std::vector<std::string> 	fuel_names;
 	std::vector<std::string> 	oxidizer_names;
 	std::vector<double> 		mass_fuel;
 	std::vector<double> 		mass_oxidizer;
 
 	List<vector> pnts_xml;
-
 	bool postProcessingPolimiSoot = false;
 	List<word> polimiSootBoundaries;
 	std::vector<int> soot_precursors_indices;
@@ -247,15 +249,19 @@ int main(int argc, char *argv[])
 		
 		calculateMoleFractions = Switch(postProcessingDictionary.lookup(word("moleFractions")));
 		calculateConcentrations = Switch(postProcessingDictionary.lookup(word("concentrations")));
-		calculateThermophoreticVelocity = Switch(postProcessingDictionary.lookup(word("thermophoreticVelocity")));
-		calculateRatesAcrossBoundaries = Switch(postProcessingDictionary.lookup(word("flowRates")));
-		calculateLocalStrainRate = Switch(postProcessingDictionary.lookup(word("localStrainRate")));
 
-		reconstructMixtureFraction = Switch(postProcessingDictionary.lookup(word("reconstructMixtureFraction")));
-		postProcessingPolimiSoot = Switch(postProcessingDictionary.lookup(word("soot")));
-		xmlProbeLocations = Switch(postProcessingDictionary.lookup(word("xmlProbeLocations")));
+		calculateThermophoreticVelocity = Switch(postProcessingDictionary.lookupOrDefault(word("thermophoreticVelocity"), word("off")));
+		calculateRatesAcrossBoundaries = Switch(postProcessingDictionary.lookupOrDefault(word("flowRates"), word("off")));
+		calculateLocalStrainRate = Switch(postProcessingDictionary.lookupOrDefault(word("localStrainRate"), word("off")));
 
-		exportDisks = Switch(postProcessingDictionary.lookup(word("exportDisks")));
+		reconstructMixtureFraction = Switch(postProcessingDictionary.lookupOrDefault(word("reconstructMixtureFraction"), word("off")));
+
+		postProcessingPolimiSoot = Switch(postProcessingDictionary.lookupOrDefault(word("soot"), word("off")));
+		xmlProbeLocations = Switch(postProcessingDictionary.lookupOrDefault(word("xmlProbeLocations"), word("off")));
+
+		exportDisks = Switch(postProcessingDictionary.lookupOrDefault(word("exportDisks"), word("off")));
+
+		exportSPARC = Switch(postProcessingDictionary.lookupOrDefault(word("exportSPARC"), word("off")));
 
 		if (xmlProbeLocations == true)
 		{
@@ -370,6 +376,9 @@ int main(int argc, char *argv[])
 		#include "compressibleCreatePhi.H"
 		#include "calculateEnthalpy.H"
 		#include "calculateElementsMassFractions.H"
+
+		// Export fields for SPARC
+		#include "exportSPARC.H"
 
 		// Calculation of rates
 		#include "calculateMassFlowRates.H"
