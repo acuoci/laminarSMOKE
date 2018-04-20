@@ -112,6 +112,7 @@ scalar thermodynamicPressure = 101325.;
 label zMixDmixIndex = inertIndex;
 scalar direct_integration_minimum_temperature_for_chemistry = 200.;
 Switch mwCorrectionInDiffusionFluxes = false;
+Switch diskSourceTerms = false;
 
 const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel");
 {
@@ -125,6 +126,7 @@ const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel
 	iMassDiffusionInEnergyEquation = Switch(physicalModelDictionary.lookup(word("massDiffusionInEnergyEquation")));
 	direct_integration_minimum_temperature_for_chemistry  = readScalar(physicalModelDictionary.lookup("minTemperature4Chemistry"));
 	mwCorrectionInDiffusionFluxes = Switch(physicalModelDictionary.lookupOrDefault(word("mwCorrectionInDiffusionFluxes"), word("on")));
+	diskSourceTerms = Switch(physicalModelDictionary.lookupOrDefault(word("diskSourceTerms"), word("off")));
 
 	// Info
 	Info << "Molecular weight correction in diffusion fluxes: " << mwCorrectionInDiffusionFluxes << endl;
@@ -361,6 +363,9 @@ std::vector<int> physicalSootDiffusivityCorrectionIndex;
 		}
 	}
 } 
+
+// Disks preprocessing
+#include "preprocessDisks.H"
 
 // Soot post-processing
 OpenSMOKE::PolimiSoot_Analyzer* sootAnalyzer;

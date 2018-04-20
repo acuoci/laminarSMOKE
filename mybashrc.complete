@@ -30,5 +30,5 @@ export DASPK_LIBS=/software/chimica2/libraries/daspk/daspk-gcc-6.3.0/lib/libDASP
 export ODEPACK_LIBS=/software/chimica2/libraries/odepack/odepack-gcc-6.3.0/lib/libODEPACK_LAPACK_intel_64bit.a
 export LINPACK_LIBS=/software/chimica2/libraries/linpack/linpack-gcc-6.3.0/lib/libLINPACK_intel_64bit.a
 export SUNDIALS_PATH=/software/chimica2/libraries/sundials/sundials-3.1.0-opensmoke++/serial-gcc-6.3.0/
-export SUNDIALS_LIBS='$(SUNDIALS_PATH)/lib/libsundials_cvode.a $(SUNDIALS_PATH)/lib/libsundials_nvecserial.a $(SUNDIALS_PATH)/lib/libsundials_sunlinsolband.a $(SUNDIALS_PATH)/lib/libsundials_sunlinsoldense.a $(SUNDIALS_PATH)/lib/libsundials_sunlinsollapackband.a $(SUNDIALS_PATH)/lib/libsundials_sunlinsollapackdense.a'
+export SUNDIALS_LIBS='-L$(SUNDIALS_PATH)/lib/ -lsundials_cvode -lsundials_nvecserial -lsundials_sunlinsolband -lsundials_sunlinsoldense -lsundials_sunlinsollapackband -lsundials_sunlinsollapackdense'
 

@@ -206,4 +206,20 @@ if (homogeneousReactions == true && (speciesEquations == true || energyEquation 
 
 		Info << "done in " << tEnd - tStart << " s  (" << (tEnd-tStart)/double(mesh.nCells())*1000. << " ms per cell)" << endl;	
 	}
+
+	if (diskSourceTerms == true && diskPreprocess == false)
+	{
+		Info<< "Source terms from disks evaluation... " << endl;
+
+		double tStart = OpenSMOKE::OpenSMOKEGetCpuTime();	
+		{
+			const unsigned int NC = thermodynamicsMapXML->NumberOfSpecies();
+
+			for(int i=0;i<NC;i++)
+				sourceExplicit[i] += sourceFromDisk[i];
+		}
+		double tEnd = OpenSMOKE::OpenSMOKEGetCpuTime();
+
+		Info << "done in " << tEnd - tStart << " s  (" << (tEnd-tStart)/double(mesh.nCells())*1000. << " ms per cell)" << endl;	
+	}
 }
