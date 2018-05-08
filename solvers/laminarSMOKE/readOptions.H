@@ -327,8 +327,8 @@ std::vector<int> physicalSootDiffusivityCorrectionIndex;
 
 	if (physicalSootDiffusivity == true)
 	{
-		//scalar physicalSootDiffusivityExponent = readScalar(polimiSootDictionary.lookup("exponent"));
-		scalar physicalSootDiffusivityExponent = -0.681;
+		scalar physicalSootDiffusivityExponent = polimiSootDictionary.lookupOrDefault("exponent", -0.681);
+		scalar physicalSootDiffusivityCorrectionAdditional  = polimiSootDictionary.lookupOrDefault("physicalSootDiffusivityCorrectionFactor", 1.0);
 		label physicalSootDiffusivityIndex = readLabel(polimiSootDictionary.lookup("physicalSootDiffusivityIndex"));
 
 		for(unsigned int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
@@ -354,7 +354,13 @@ std::vector<int> physicalSootDiffusivityCorrectionIndex;
 					count++;
 					double MWratio = std::min(	thermodynamicsMapXML->MW(i)/thermodynamicsMapXML->MW(physicalSootDiffusivityReferenceIndex), 
 									std::pow(2., double(physicalSootDiffusivityIndex)) );
-					physicalSootDiffusivityCorrection.push_back( std::pow(MWratio, physicalSootDiffusivityExponent) );
+
+					if (thermodynamicsMapXML->MW(i)/thermodynamicsMapXML->MW(physicalSootDiffusivityReferenceIndex) < 10.)
+						physicalSootDiffusivityCorrection.push_back( std::pow(MWratio, physicalSootDiffusivityExponent)  );
+					else	// For BINs>=BIN5 additional reduction factor
+						physicalSootDiffusivityCorrection.push_back( std::pow(MWratio, physicalSootDiffusivityExponent)*physicalSootDiffusivityCorrectionAdditional );
+						
+
 					physicalSootDiffusivityCorrectionIndex.push_back(i);
 			
 					Info << "Physical diffusion coefficient: " << thermodynamicsMapXML->NamesOfSpecies()[i] << " : " << physicalSootDiffusivityCorrection[count] << endl;
