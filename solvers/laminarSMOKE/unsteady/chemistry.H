@@ -46,13 +46,23 @@ if(isatCheck == true)
 else
 {
 	if (drg_analysis == false)
-		#include "chemistry_DI.H"
+	{
+		if(virtual_chemistry == false)
+			#include "chemistry_DI.H"
+		else
+			#include "virtual-chemistry/chemistry_virtual.H"
+	}
 	else
 		#include "chemistry_DRG.H"
 }
 #else
 	if (drg_analysis == false)
-		#include "chemistry_DI.H"
+	{
+		if(virtual_chemistry == false)
+			#include "chemistry_DI.H"
+		else
+			#include "virtual-chemistry/chemistry_virtual.H"
+	}	
 	else
 		#include "chemistry_DRG.H"
 #endif

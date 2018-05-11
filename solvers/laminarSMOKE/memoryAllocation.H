@@ -51,6 +51,9 @@ OpenSMOKE::OpenSMOKEVectorDouble omega(thermodynamicsMapXML->NumberOfSpecies());
 BatchReactorHomogeneousConstantPressure batchReactorHomogeneousConstantPressure(*thermodynamicsMapXML, *kineticsMapXML);
 BatchReactorHomogeneousConstantVolume   batchReactorHomogeneousConstantVolume(*thermodynamicsMapXML, *kineticsMapXML);
 
+// Batch reactor homogeneous (virtual chemistry)
+BatchReactorHomogeneousConstantPressureVirtualChemistry batchReactorHomogeneousConstantPressureVirtualChemistry(*thermodynamicsMapXML, *virtualChemistryTable);
+
 // ODE Solver (constant pressure)
 typedef OdeSMOKE::KernelDense<OpenSMOKE::BatchReactorHomogeneousConstantPressure_ODE_OpenSMOKE> denseOdeConstantPressure;
 typedef OdeSMOKE::MethodGear<denseOdeConstantPressure> methodGearConstantPressure;
@@ -64,6 +67,13 @@ typedef OdeSMOKE::MethodGear<denseOdeConstantVolume> methodGearConstantVolume;
 autoPtr< OdeSMOKE::MultiValueSolver<methodGearConstantVolume> > odeSolverConstantVolume;
 odeSolverConstantVolume.reset(new OdeSMOKE::MultiValueSolver<methodGearConstantVolume>);
 odeSolverConstantVolume().SetReactor(&batchReactorHomogeneousConstantVolume);
+
+// ODE Solver for Virtual Chemistry (constant pressure)
+typedef OdeSMOKE::KernelDense<OpenSMOKE::BatchReactorHomogeneousConstantPressureVirtualChemistry_ODE_OpenSMOKE> denseOdeConstantPressureVirtualChemistry;
+typedef OdeSMOKE::MethodGear<denseOdeConstantPressureVirtualChemistry> methodGearConstantPressureVirtualChemistry;
+autoPtr< OdeSMOKE::MultiValueSolver<methodGearConstantPressureVirtualChemistry> > odeSolverConstantPressureVirtualChemistry;
+odeSolverConstantPressureVirtualChemistry.reset(new OdeSMOKE::MultiValueSolver<methodGearConstantPressureVirtualChemistry>);
+odeSolverConstantPressureVirtualChemistry().SetReactor(&batchReactorHomogeneousConstantPressureVirtualChemistry);
 
 OpenSMOKE::BatchReactorHomogeneousConstantPressure_ODE_CHEMEQ2 *chemeq2SolverConstantPressure;
 if (odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_CHEMEQ2)
@@ -187,5 +197,4 @@ if (odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE
     #include "memoryAllocation_ISAT.H"
 #endif
 #endif
-
 
