@@ -6,9 +6,9 @@ export OPENFOAM_VERSION='-DOPENFOAM_VERSION=40'
 export DEVVERSION='-DDEVVERSION=1'
 
 #Compulsory path
-export EIGEN_LIBRARY_PATH=/software/chimica2/libraries/eigen/eigen-3.3.4
-export BOOST_LIBRARY_PATH=/software/chimica2/libraries/boost/boost-1.65.1-gcc-6.3.0
-export RAPIDXML_LIBRARY_PATH=/software/chimica2/libraries/rapidxml/rapidxml-1.13
+export EIGEN_LIBRARY_PATH=$HOME/Development/ExternalNumericalLibraries/Eigen/eigen-3.3
+export BOOST_LIBRARY_PATH=/marconi/prod/opt/libraries/boost/1.61.0/intelmpi--2017--binary
+export RAPIDXML_LIBRARY_PATH=$HOME/Development/ExternalNumericalLibraries/RapidXML/rapidxml-1.13
 
 #Options: ISAT support
 export ISAT_SUPPORT='-DOPENSMOKE_USE_ISAT=1'
@@ -20,15 +20,15 @@ export MKL_SUPPORT='-DOPENSMOKE_USE_MKL=1'
 export EXTERNAL_ODE_SOLVERS='-DOPENSMOKE_USE_ODEPACK=1 -DOPENSMOKE_USE_RADAU=1 -DOPENSMOKE_USE_DASPK=1 -DOPENSMOKE_USE_MEBDF=0 -DOPENSMOKE_USE_SUNDIALS=1'
 
 #Only if the OPENSMOKE_USE_MKL is turned on
-export MKL_PATH=/home/chimica2/cuoci/intel/compilers_and_libraries/linux/mkl/
+export MKL_PATH=/marconi/prod/opt/compilers/intel/pe-xe-2017/binary/mkl/
 export MKL_LIBS='-Wl,--start-group $(MKL_PATH)/lib/intel64/libmkl_intel_lp64.a $(MKL_PATH)/lib/intel64/libmkl_core.a $(MKL_PATH)/lib/intel64/libmkl_sequential.a -Wl,--end-group -lpthread -lm -lifcore'
 
 ##Optional external ODE solvers (ODEPACK already includes LSODE, LSODA, and DVODE)
 export MEBDF_LIBS=
-export RADAU_LIBS=/software/chimica2/libraries/radau/radau-gcc-6.3.0/lib/libRADAU_LAPACK_intel_64bit.a
-export DASPK_LIBS=/software/chimica2/libraries/daspk/daspk-gcc-6.3.0/lib/libDASPK20_LAPACK_intel_64bit.a
-export ODEPACK_LIBS=/software/chimica2/libraries/odepack/odepack-gcc-6.3.0/lib/libODEPACK_LAPACK_intel_64bit.a
-export LINPACK_LIBS=/software/chimica2/libraries/linpack/linpack-gcc-6.3.0/lib/libLINPACK_intel_64bit.a
-export SUNDIALS_PATH=/software/chimica2/libraries/sundials/sundials-3.1.0-opensmoke++/serial-gcc-6.3.0/
-export SUNDIALS_LIBS='-L$(SUNDIALS_PATH)/lib/ -lsundials_cvode -lsundials_nvecserial -lsundials_sunlinsolband -lsundials_sunlinsoldense -lsundials_sunlinsollapackband -lsundials_sunlinsollapackdense'
+export RADAU_LIBS=$HOME/Development/ExternalNumericalLibraries/RADAU/lib/linux/libRADAU_LAPACK_intel_64bit_broadwell.a
+export DASPK_LIBS=$HOME/Development/ExternalNumericalLibraries/DASPK/lib/linux/libDASPK20_LAPACK_intel_64bit_broadwell.a
+export ODEPACK_LIBS=$HOME/Development/ExternalNumericalLibraries//ODEPACK/lib/linux/libODEPACK_LAPACK_intel_64bit_broadwell.a
+export LINPACK_LIBS=$HOME/Development/ExternalNumericalLibraries/LINPACK/lib/linux/libLINPACK_intel_64bit_broadwell.a
+export SUNDIALS_PATH=$HOME/Development/ExternalNumericalLibraries/Sundials/sundials-2.6.2/lib/linux-intel-serial-broadwell
+export SUNDIALS_LIBS='$(SUNDIALS_PATH)/lib/libsundials_cvode.a $(SUNDIALS_PATH)/lib/libsundials_nvecserial.a'
 
