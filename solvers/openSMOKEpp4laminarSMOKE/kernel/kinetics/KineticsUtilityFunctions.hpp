@@ -133,7 +133,7 @@ namespace OpenSMOKE_Utilities
 		try
 		{
 			tokenizer_only_blanks::iterator tok_iter = tokens.begin();
-			boost::advance(tok_iter, count-3);
+			std::advance(tok_iter, count-3);
 			A = boost::lexical_cast<double>(*tok_iter);
 			tok_iter++;
 			beta = boost::lexical_cast<double>(*tok_iter);
