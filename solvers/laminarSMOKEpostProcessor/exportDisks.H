@@ -40,8 +40,7 @@
 
 if (exportDisks == true)
 {
-	const std::string alignement = "yx";
-	const bool invert_north_south = false;
+	const std::string alignement = "xy";
 	const bool invert_east_west = true;
 
 	label ns = Y.size();
@@ -71,14 +70,6 @@ if (exportDisks == true)
 		std::string west_name_u = "West." + id.str();
 		std::string east_name_l = "east." + id.str();
 		std::string west_name_l = "west." + id.str();
-
-		if (invert_north_south == true)
-		{
-			north_name_u = "South." + id.str();
-			south_name_u = "North." + id.str();
-			north_name_l = "south." + id.str();
-			south_name_l = "north." + id.str();
-		}
 
 		if (invert_east_west == true)
 		{
@@ -161,6 +152,8 @@ if (exportDisks == true)
 					fDisk << "</NumberOfPoints>" << std::endl;
 
 					fDisk << "<Points>" << std::endl;
+					
+					int count = 0; 
 					forAll(mesh.boundaryMesh()[patchi].faceCentres(), facei)
 					{
 						if (alignement == "yx")
@@ -175,18 +168,24 @@ if (exportDisks == true)
 							<< 5.e-4 << " "
 							<< std::endl;
 
-						if (k==0 && alignement == "yx")	y_north = mesh.boundaryMesh()[patchi].faceCentres()[facei].x();
-						if (k==0 && alignement == "xy")	y_north = mesh.boundaryMesh()[patchi].faceCentres()[facei].y();
-						if (k==1 && alignement == "yx")	y_south = mesh.boundaryMesh()[patchi].faceCentres()[facei].x();
-						if (k==1 && alignement == "xy")	y_south = mesh.boundaryMesh()[patchi].faceCentres()[facei].y();
+						if (k==0 && alignement == "yx")	y_north += mesh.boundaryMesh()[patchi].faceCentres()[facei].y();
+						if (k==0 && alignement == "xy")	y_north += mesh.boundaryMesh()[patchi].faceCentres()[facei].x();
+						if (k==1 && alignement == "yx")	y_south += mesh.boundaryMesh()[patchi].faceCentres()[facei].y();
+						if (k==1 && alignement == "xy")	y_south += mesh.boundaryMesh()[patchi].faceCentres()[facei].x();
 
-						if (k==2 && alignement == "yx")	x_west = mesh.boundaryMesh()[patchi].faceCentres()[facei].y();
-						if (k==2 && alignement == "xy")	x_west = mesh.boundaryMesh()[patchi].faceCentres()[facei].x();
-						if (k==3 && alignement == "yx")	x_east = mesh.boundaryMesh()[patchi].faceCentres()[facei].y();
-						if (k==3 && alignement == "xy")	x_east = mesh.boundaryMesh()[patchi].faceCentres()[facei].x();
-
+						if (k==2 && alignement == "yx")	x_west += mesh.boundaryMesh()[patchi].faceCentres()[facei].x();
+						if (k==2 && alignement == "xy")	x_west += mesh.boundaryMesh()[patchi].faceCentres()[facei].y();
+						if (k==3 && alignement == "yx")	x_east += mesh.boundaryMesh()[patchi].faceCentres()[facei].x();
+						if (k==3 && alignement == "xy")	x_east += mesh.boundaryMesh()[patchi].faceCentres()[facei].y();
+						
+						count++;
 					}
 					fDisk << "</Points>" << std::endl;
+
+					if (k==0) y_north /= double(count);
+					if (k==1) y_south /= double(count);
+					if (k==2) x_west  /= double(count);
+					if (k==3) x_east  /= double(count);
 
 					fDisk << "<Areas>" << std::endl;
 					label startFace = mesh.boundaryMesh()[patchi].start();
@@ -260,20 +259,14 @@ if (exportDisks == true)
 
 			if (x_west > x_east)
 			{
-				Info << "West: " << x_west << " East: " << x_east << endl;
+				Info << "East:  " << x_east <<  " West:  " << x_west << endl;
+				Info << "North: " << y_north << " South: " << y_south << endl;
 				Info << "Error in exportDisks: the east faces must be always the external faces" << endl;
 				Info << "Please switch east/west faces" << endl;
 				abort();
 			}
-			if (y_south > y_north)
-			{
-				Info << "South: " << y_south << " North: " << y_north << endl;
-				Info << "Error in exportDisks: the north faces must be always the top faces" << endl;
-				Info << "Please switch top/south faces" << endl;
-				abort();
-			}
 
-			if ((y_north-y_south) > x_east)
+			if ( std::fabs(y_north-y_south) > x_east )
 			{
 				Info << "Thickness: " << y_north-y_south << " Radius: " << x_east << endl;
 				Info << "Error in exportDisks: the disk thickness is larger than the external radius" << endl;

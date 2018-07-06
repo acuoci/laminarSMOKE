@@ -84,12 +84,17 @@
 #include "utilities.H"
 #include "laminarSMOKEthermoClass.H"
 
+// Virtual chemistry
+#include "virtual-chemistry/VirtualChemistry.h"
+
 // Homogeneous reactors
 #include "DRG.h"
 #include "BatchReactorHomogeneousConstantPressure.H"
 #include "BatchReactorHomogeneousConstantPressure_ODE_Interface.H"
 #include "BatchReactorHomogeneousConstantVolume.H"
 #include "BatchReactorHomogeneousConstantVolume_ODE_Interface.H"
+#include "virtual-chemistry/BatchReactorHomogeneousConstantPressureVirtualChemistry.H"
+#include "virtual-chemistry/BatchReactorHomogeneousConstantPressureVirtualChemistry_ODE_Interface.H"
 
 // ISAT
 #if OPENSMOKE_USE_ISAT == 1

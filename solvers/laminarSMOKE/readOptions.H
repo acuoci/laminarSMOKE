@@ -112,6 +112,7 @@ scalar thermodynamicPressure = 101325.;
 label zMixDmixIndex = inertIndex;
 scalar direct_integration_minimum_temperature_for_chemistry = 200.;
 Switch mwCorrectionInDiffusionFluxes = false;
+Switch simplifiedTransportProperties = false;
 Switch diskSourceTerms = false;
 
 const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel");
@@ -126,6 +127,7 @@ const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel
 	iMassDiffusionInEnergyEquation = Switch(physicalModelDictionary.lookup(word("massDiffusionInEnergyEquation")));
 	direct_integration_minimum_temperature_for_chemistry  = readScalar(physicalModelDictionary.lookup("minTemperature4Chemistry"));
 	mwCorrectionInDiffusionFluxes = Switch(physicalModelDictionary.lookupOrDefault(word("mwCorrectionInDiffusionFluxes"), word("on")));
+	simplifiedTransportProperties = Switch(physicalModelDictionary.lookupOrDefault(word("simplifiedTransportProperties"), word("off")));
 	diskSourceTerms = Switch(physicalModelDictionary.lookupOrDefault(word("diskSourceTerms"), word("off")));
 
 	// Info
@@ -371,7 +373,7 @@ std::vector<int> physicalSootDiffusivityCorrectionIndex;
 } 
 
 // Disks preprocessing
-#include "preprocessDisks.H"
+#include "extensions/preprocessDisks.H"
 
 // Soot post-processing
 OpenSMOKE::PolimiSoot_Analyzer* sootAnalyzer;
@@ -600,5 +602,68 @@ OpenSMOKE::ODE_Parameters odeParameterBatchReactorHomogeneous;
 
 //label minMaxUpdate  = 25;
 //label minMaxCounter = minMaxUpdate;
+
+Switch virtual_chemistry = false;
+Switch virtual_chemistry_table_check = false;
+
+OpenSMOKE::VirtualChemistry* virtualChemistryTable;
+Eigen::MatrixXd VCT;
+
+const dictionary& virtualChemistryDictionary = solverOptions.subDict("VirtualChemistry");
+{
+	virtual_chemistry = Switch(virtualChemistryDictionary.lookup(word("virtualChemistry")));
+	
+	if ( virtual_chemistry == true)
+	{
+		if (virtual_chemistry_table_check == true)
+		{
+			VCT.resize(254,21);
+			Foam::string table_check_file = virtualChemistryDictionary.lookup("tableCheck");
+			boost::filesystem::path table_check_file_complete_path = table_check_file;
+
+			std::ifstream fInput(table_check_file_complete_path.c_str(), std::ios::in);
+
+			std::string first_line;
+			std::getline (fInput, first_line);
+
+			for(unsigned int i=0;i<254;i++)
+				for(unsigned int j=0;j<21;j++)
+					fInput >> VCT(i,j);
+
+			std::string dummy;
+			fInput >> dummy;
+			Info << dummy << endl;
+			getchar();
+			fInput.close();
+		}
+
+		Foam::string tabulation_file = virtualChemistryDictionary.lookup("table");
+		boost::filesystem::path tabulation_file_complete_path = tabulation_file;
+
+		virtualChemistryTable = new OpenSMOKE::VirtualChemistry(*thermodynamicsMapXML, tabulation_file_complete_path);
+
+		label iOptimization = readLabel(virtualChemistryDictionary.lookup("iOptimization"));
+		
+		Foam::string fuelName = virtualChemistryDictionary.lookup("fuelName");
+		Foam::string oxidizerName = virtualChemistryDictionary.lookup("oxidizerName");
+		Foam::string inertName = virtualChemistryDictionary.lookup("inertName");
+		scalar fuelMW = readScalar(virtualChemistryDictionary.lookup("fuelMW"));
+		scalar oxidizerMW = readScalar(virtualChemistryDictionary.lookup("oxidizerMW"));
+		scalar inertMW = readScalar(virtualChemistryDictionary.lookup("inertMW"));
+		
+		scalar mu0 = readScalar(virtualChemistryDictionary.lookup("mu0"));
+		scalar T0 = readScalar(virtualChemistryDictionary.lookup("T0"));
+		scalar Beta0 = readScalar(virtualChemistryDictionary.lookup("Beta0"));
+		scalar Pr0 = readScalar(virtualChemistryDictionary.lookup("Pr0"));
+
+		virtualChemistryTable->SetOptimization(iOptimization);
+		virtualChemistryTable->SetFuel(fuelName, fuelMW);
+		virtualChemistryTable->SetOxidizer(oxidizerName, oxidizerMW);
+		virtualChemistryTable->SetInert(inertName, inertMW);
+		virtualChemistryTable->SetTransportProperties(mu0, T0, Beta0, Pr0);
+		for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
+			virtualChemistryTable->SetLewisNumber(i, LewisNumbers(i));
+	}
+}
 
 Info<< "Solver options correctly read\n" << endl;

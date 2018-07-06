@@ -88,5 +88,6 @@ Spark
 #include "drgOptions"
 #include "isatOptions"
 #include "lewisNumbers"
+#include "virtualChemistry"
 
 // ************************************************************************* //
