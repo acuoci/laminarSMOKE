@@ -53,101 +53,205 @@ tmp<volScalarField> Rho(volScalarField& p, volScalarField& psi)
 	return p*psi;
 }
 
-void normalizeMassFractions(double* omega, const label celli, const double massFractionsTol, const unsigned int n)
+void normalizeMassFractions(double* omega, const label celli, const double massFractionsTol, const unsigned int n, const bool virtual_chemistry, const unsigned int n_main)
 {
-	const double eps = 1.e-3;
-
-	double sumFractions = 0.;
-    	for(int i=0; i < n; i++)
-		sumFractions += omega[i];
-
-	if (sumFractions > 1.+eps || sumFractions < 1.-eps)
+	if (virtual_chemistry == false)
 	{
-		Info << "WARNING: sum of mass-fractions = " << sumFractions << " in cell " << celli <<endl;
+		const double eps = 1.e-3;
 
+		double sumFractions = 0.;
+	    	for(int i=0; i < n; i++)
+			sumFractions += omega[i];
+
+		if (sumFractions > 1.+eps || sumFractions < 1.-eps)
+		{
+			Info << "WARNING: sum of mass-fractions = " << sumFractions << " in cell " << celli <<endl;
+
+			if (time == 0)
+			{
+			    Info << "\nFATAL ERROR: sum of Yi is not 1" <<endl;
+			    Info << "Check internal field on cell: " << celli <<endl;
+			    abort();
+			}    
+		}
+	
+		for(int i=0; i < n; i++)
+			omega[i] /= sumFractions;
+	}
+	else
+	{
+		const double eps = 1.e-3;
+
+		double sumFractions = 0.;
+	    	for(int i=0; i < n_main; i++)
+			sumFractions += omega[i];
+
+		if (sumFractions > 1.+eps || sumFractions < 1.-eps)
+		{
+			Info << "WARNING: sum of mass-fractions = " << sumFractions << " in cell " << celli <<endl;
+
+			if (time == 0)
+			{
+			    Info << "\nFATAL ERROR: sum of Yi is not 1" <<endl;
+			    Info << "Check internal field on cell: " << celli <<endl;
+			    abort();
+			}    
+		}
+	
+		for(int i=0; i < n_main; i++)
+			omega[i] /= sumFractions;
+	}
+}
+
+void normalizeMassFractions(Eigen::VectorXd& omega_plus_additional_variables, const int N, const label celli, const double massFractionsTol, const bool virtual_chemistry, const unsigned int n_main)
+{
+	if (virtual_chemistry == false)
+	{
+	    double sumFractions = 0.;
+	    for(int i=0; i < N; i++)	
+		sumFractions += omega_plus_additional_variables(i);
+
+	    if (sumFractions > 1.+massFractionsTol || sumFractions < 1.-massFractionsTol)
+	    {
+		Info << "WARNING: sum of mass-fractions = " << sumFractions << " in cell " << celli <<endl;
+		
 		if (time == 0)
 		{
 		    Info << "\nFATAL ERROR: sum of Yi is not 1" <<endl;
 		    Info << "Check internal field on cell: " << celli <<endl;
 		    abort();
 		}    
+	    }
+	
+	    for(int i=0; i < N; i++)
+		omega_plus_additional_variables(i) /= sumFractions;
 	}
-	
-	for(int i=0; i < n; i++)
-		omega[i] /= sumFractions;
-}
+	else
+	{
+	    double sumFractions = 0.;
+	    for(int i=0; i < n_main; i++)	
+		sumFractions += omega_plus_additional_variables(i);
 
-void normalizeMassFractions(Eigen::VectorXd& omega_plus_additional_variables, const int N, const label celli, const double massFractionsTol)
-{
-    double sumFractions = 0.;
-    for(int i=0; i < N; i++)	
-	sumFractions += omega_plus_additional_variables(i);
-
-    if (sumFractions > 1.+massFractionsTol || sumFractions < 1.-massFractionsTol)
-    {
-        Info << "WARNING: sum of mass-fractions = " << sumFractions << " in cell " << celli <<endl;
-        
-        if (time == 0)
-        {
-            Info << "\nFATAL ERROR: sum of Yi is not 1" <<endl;
-            Info << "Check internal field on cell: " << celli <<endl;
-            abort();
-        }    
-    }
+	    if (sumFractions > 1.+massFractionsTol || sumFractions < 1.-massFractionsTol)
+	    {
+		Info << "WARNING: sum of mass-fractions = " << sumFractions << " in cell " << celli <<endl;
+		
+		if (time == 0)
+		{
+		    Info << "\nFATAL ERROR: sum of Yi is not 1" <<endl;
+		    Info << "Check internal field on cell: " << celli <<endl;
+		    abort();
+		}    
+	    }
 	
-    for(int i=0; i < N; i++)
-	omega_plus_additional_variables(i) /= sumFractions;
+	    for(int i=0; i < n_main; i++)
+		omega_plus_additional_variables(i) /= sumFractions;
+	}
 }
 
 
-void normalizeMassFractions(Eigen::VectorXd& omega_plus_temperature, const label celli, const double massFractionsTol)
+void normalizeMassFractions(Eigen::VectorXd& omega_plus_temperature, const label celli, const double massFractionsTol, const bool virtual_chemistry, const unsigned int n_main)
 {
-	double sumFractions = 0.;
-    for(int i=0; i < omega_plus_temperature.size()-1; i++)
-            sumFractions += omega_plus_temperature(i);
+	if (virtual_chemistry == false)
+	{
+		double sumFractions = 0.;
+	    	for(int i=0; i < omega_plus_temperature.size()-1; i++)
+		    sumFractions += omega_plus_temperature(i);
 
-    if (sumFractions > 1.+massFractionsTol || sumFractions < 1.-massFractionsTol)
-    {
-        Info << "WARNING: sum of mass-fractions = " << sumFractions << " in cell " << celli <<endl;
+	    if (sumFractions > 1.+massFractionsTol || sumFractions < 1.-massFractionsTol)
+	    {
+		Info << "WARNING: sum of mass-fractions = " << sumFractions << " in cell " << celli <<endl;
 
-        //for(int i=0; i < omega_plus_temperature.size()-1; i++)
-        //    cout << i << ")\t" << omega_plus_temperature(i) << endl;
-        
-        if (time == 0)
-        {
-            Info << "\nFATAL ERROR: sum of Yi is not 1" <<endl;
-            Info << "Check internal field on cell: " << celli <<endl;
-            abort();
-        }    
-    }
+		//for(int i=0; i < omega_plus_temperature.size()-1; i++)
+		//    cout << i << ")\t" << omega_plus_temperature(i) << endl;
+		
+		if (time == 0)
+		{
+		    Info << "\nFATAL ERROR: sum of Yi is not 1" <<endl;
+		    Info << "Check internal field on cell: " << celli <<endl;
+		    abort();
+		}    
+	    }
 	
-	 for(int i=0; i < omega_plus_temperature.size()-1; i++)
-            omega_plus_temperature(i) /= sumFractions;
+		 for(int i=0; i < omega_plus_temperature.size()-1; i++)
+		    omega_plus_temperature(i) /= sumFractions;
+	}
+	else
+	{
+		double sumFractions = 0.;
+	    	for(int i=0; i < n_main; i++)
+		    sumFractions += omega_plus_temperature(i);
+
+	    if (sumFractions > 1.+massFractionsTol || sumFractions < 1.-massFractionsTol)
+	    {
+		Info << "WARNING: sum of mass-fractions = " << sumFractions << " in cell " << celli <<endl;
+
+		//for(int i=0; i < omega_plus_temperature.size()-1; i++)
+		//    cout << i << ")\t" << omega_plus_temperature(i) << endl;
+		
+		if (time == 0)
+		{
+		    Info << "\nFATAL ERROR: sum of Yi is not 1" <<endl;
+		    Info << "Check internal field on cell: " << celli <<endl;
+		    abort();
+		}    
+	    }
+	
+		 for(int i=0; i < n_main; i++)
+		    omega_plus_temperature(i) /= sumFractions;
+	}
 }
 
-void normalizeMassFractions(OpenSMOKE::OpenSMOKEVectorDouble& omega_plus_temperature, const label celli, const double massFractionsTol)
+void normalizeMassFractions(OpenSMOKE::OpenSMOKEVectorDouble& omega_plus_temperature, const label celli, const double massFractionsTol, const bool virtual_chemistry, const unsigned int n_main)
 {
-    double sumFractions = 0.;
-    for(int i=1; i <= omega_plus_temperature.Size()-1; i++)
-            sumFractions += omega_plus_temperature[i];
+	if (virtual_chemistry == false)
+	{
+	    double sumFractions = 0.;
+	    for(int i=1; i <= omega_plus_temperature.Size()-1; i++)
+		    sumFractions += omega_plus_temperature[i];
 
-    if (sumFractions > 1.+massFractionsTol || sumFractions < 1.-massFractionsTol)
-    {
-        Info << "WARNING: sum of mass-fractions = " << sumFractions << " in cell " << celli <<endl;
+	    if (sumFractions > 1.+massFractionsTol || sumFractions < 1.-massFractionsTol)
+	    {
+		Info << "WARNING: sum of mass-fractions = " << sumFractions << " in cell " << celli <<endl;
 
-        //for(int i=1; i <= omega_plus_temperature.Size()-1; i++)
-        //    cout << i << ")\t" << omega_plus_temperature[i] << endl;
-        
-        if (time == 0)
-        {
-            Info << "\nFATAL ERROR: sum of Yi is not 1" <<endl;
-            Info << "Check internal field on cell: " << celli <<endl;
-            abort();
-        }    
-    }
+		//for(int i=1; i <= omega_plus_temperature.Size()-1; i++)
+		//    cout << i << ")\t" << omega_plus_temperature[i] << endl;
+		
+		if (time == 0)
+		{
+		    Info << "\nFATAL ERROR: sum of Yi is not 1" <<endl;
+		    Info << "Check internal field on cell: " << celli <<endl;
+		    abort();
+		}    
+	    }
 	
-	 for(int i=1; i <= omega_plus_temperature.Size()-1; i++)
-            omega_plus_temperature[i] /= sumFractions;
+		 for(int i=1; i <= omega_plus_temperature.Size()-1; i++)
+		    omega_plus_temperature[i] /= sumFractions;
+	}
+	else
+	{
+	    double sumFractions = 0.;
+	    for(int i=1; i <= n_main; i++)
+		    sumFractions += omega_plus_temperature[i];
+
+	    if (sumFractions > 1.+massFractionsTol || sumFractions < 1.-massFractionsTol)
+	    {
+		Info << "WARNING: sum of mass-fractions = " << sumFractions << " in cell " << celli <<endl;
+
+		//for(int i=1; i <= omega_plus_temperature.Size()-1; i++)
+		//    cout << i << ")\t" << omega_plus_temperature[i] << endl;
+		
+		if (time == 0)
+		{
+		    Info << "\nFATAL ERROR: sum of Yi is not 1" <<endl;
+		    Info << "Check internal field on cell: " << celli <<endl;
+		    abort();
+		}    
+	    }
+	
+		 for(int i=1; i <= n_main; i++)
+		    omega_plus_temperature[i] /= sumFractions;
+	}
 }
 /*
 Foam::wordList heBoundaryBaseTypes(volScalarField& T_)

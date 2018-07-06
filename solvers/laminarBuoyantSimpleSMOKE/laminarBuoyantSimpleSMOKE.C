@@ -78,7 +78,7 @@
 #include "laminarSMOKEthermoClass.H"
 
 // Virtual chemistry
-#include "virtual-chemistry/VirtualChemistry.h"
+#include "utilities/virtualchemistry/VirtualChemistry.h"
 
 // Linearization
 #include "linearModel.H"
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    while (simple.loop(runTime))
+    while (simple.loop())
     {
          Info<< "Time = " << runTime.timeName() << nl << endl;
 		

@@ -80,7 +80,7 @@
 #include "laminarSMOKEthermoClass.H"
 
 // Virtual chemistry
-#include "virtual-chemistry/VirtualChemistry.h"
+#include "utilities/virtualchemistry/VirtualChemistry.h"
 
 // Linearization
 #include "linearModel.H"

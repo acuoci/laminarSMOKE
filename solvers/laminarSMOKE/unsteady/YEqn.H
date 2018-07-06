@@ -119,7 +119,16 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 			
 			// Sum of mass fractions
 		    	Yi.max(0.0);
-		   	Yt += Yi;
+	
+			if(virtual_chemistry == false)
+		   	{
+				Yt += Yi;
+			}
+			else
+			{
+				if (i<virtualChemistryTable->ns_main())
+					Yt += Yi;
+			}
 		}
 		else
 		{
@@ -156,7 +165,16 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 			
 			// Sum of mass fractions
 		    	Yi.max(0.0);
-		   	Yt += Yi;
+
+			if(virtual_chemistry == false)
+		   	{
+				Yt += Yi;
+			}
+			else
+			{
+				if (i<virtualChemistryTable->ns_main())
+					Yt += Yi;
+			}
 		}
         }
     }

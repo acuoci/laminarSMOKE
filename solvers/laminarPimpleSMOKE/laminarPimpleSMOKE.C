@@ -91,7 +91,7 @@
 #include "laminarSMOKEthermoClass.H"
 
 // Virtual chemistry
-#include "virtual-chemistry/VirtualChemistry.h"
+#include "utilities/virtualchemistry/VirtualChemistry.h"
 
 // Homogeneous reactors
 #include "DRG.h"
@@ -99,8 +99,8 @@
 #include "BatchReactorHomogeneousConstantPressure_ODE_Interface.H"
 #include "BatchReactorHomogeneousConstantVolume.H"
 #include "BatchReactorHomogeneousConstantVolume_ODE_Interface.H"
-#include "virtual-chemistry/BatchReactorHomogeneousConstantPressureVirtualChemistry.H"
-#include "virtual-chemistry/BatchReactorHomogeneousConstantPressureVirtualChemistry_ODE_Interface.H"
+#include "BatchReactorHomogeneousConstantPressureVirtualChemistry.H"
+#include "BatchReactorHomogeneousConstantPressureVirtualChemistry_ODE_Interface.H"
 
 // ISAT
 #if OPENSMOKE_USE_ISAT == 1
@@ -137,6 +137,5 @@ int main(int argc, char *argv[])
 		#include "laminarPimpleSMOKE.2x.H"
 	#endif
 }
-
 
 // ************************************************************************* //

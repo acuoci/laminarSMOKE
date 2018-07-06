@@ -70,7 +70,7 @@
 
     Info<< "\nStarting time loop\n" << endl;
 
-    while (simple.loop(runTime))
+    while (simple.loop())
     {
          Info<< "Time = " << runTime.timeName() << nl << endl;
 		

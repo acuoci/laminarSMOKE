@@ -50,7 +50,7 @@ else
 		if(virtual_chemistry == false)
 			#include "chemistry_DI.H"
 		else
-			#include "virtual-chemistry/chemistry_virtual.H"
+			#include "chemistry_Virtual.H"
 	}
 	else
 		#include "chemistry_DRG.H"
@@ -61,7 +61,7 @@ else
 		if(virtual_chemistry == false)
 			#include "chemistry_DI.H"
 		else
-			#include "virtual-chemistry/chemistry_virtual.H"
+			#include "chemistry_Virtual.H"
 	}	
 	else
 		#include "chemistry_DRG.H"

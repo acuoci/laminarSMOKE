@@ -637,13 +637,13 @@ const dictionary& virtualChemistryDictionary = solverOptions.subDict("VirtualChe
 			fInput.close();
 		}
 
-		Foam::string tabulation_file = virtualChemistryDictionary.lookup("table");
-		boost::filesystem::path tabulation_file_complete_path = tabulation_file;
+		bool submechanism_co = Switch(virtualChemistryDictionary.lookup(word("subMechanismCO")));
+		bool submechanism_no = Switch(virtualChemistryDictionary.lookup(word("subMechanismNO")));
 
-		virtualChemistryTable = new OpenSMOKE::VirtualChemistry(*thermodynamicsMapXML, tabulation_file_complete_path);
-
-		label iOptimization = readLabel(virtualChemistryDictionary.lookup("iOptimization"));
+		Foam::string tabulation_file_main = virtualChemistryDictionary.lookup("table_main");
+		boost::filesystem::path tabulation_file_complete_path_main = tabulation_file_main;
 		
+		label iVersion = readLabel(virtualChemistryDictionary.lookup("iVersion"));	
 		Foam::string fuelName = virtualChemistryDictionary.lookup("fuelName");
 		Foam::string oxidizerName = virtualChemistryDictionary.lookup("oxidizerName");
 		Foam::string inertName = virtualChemistryDictionary.lookup("inertName");
@@ -656,11 +656,43 @@ const dictionary& virtualChemistryDictionary = solverOptions.subDict("VirtualChe
 		scalar Beta0 = readScalar(virtualChemistryDictionary.lookup("Beta0"));
 		scalar Pr0 = readScalar(virtualChemistryDictionary.lookup("Pr0"));
 
-		virtualChemistryTable->SetOptimization(iOptimization);
+		virtualChemistryTable = new OpenSMOKE::VirtualChemistry(*thermodynamicsMapXML);
+
+		virtualChemistryTable->SetTableMain(tabulation_file_complete_path_main);
+		
 		virtualChemistryTable->SetFuel(fuelName, fuelMW);
 		virtualChemistryTable->SetOxidizer(oxidizerName, oxidizerMW);
 		virtualChemistryTable->SetInert(inertName, inertMW);
 		virtualChemistryTable->SetTransportProperties(mu0, T0, Beta0, Pr0);
+
+		if (submechanism_co == true)
+		{
+			Foam::string tabulation_file_co = virtualChemistryDictionary.lookup("table_co");
+			boost::filesystem::path tabulation_file_complete_path_co = tabulation_file_co;
+			virtualChemistryTable->SetTableCO(tabulation_file_complete_path_co);
+		}
+		if (submechanism_no == true)
+		{
+			Foam::string tabulation_file_no1 = virtualChemistryDictionary.lookup("table_no1");
+			Foam::string tabulation_file_no2 = virtualChemistryDictionary.lookup("table_no2");
+			Foam::string tabulation_file_no3 = virtualChemistryDictionary.lookup("table_no3");
+			Foam::string tabulation_file_no4 = virtualChemistryDictionary.lookup("table_no4");
+			Foam::string tabulation_file_no5 = virtualChemistryDictionary.lookup("table_no5");
+
+			boost::filesystem::path tabulation_file_complete_path_no1 = tabulation_file_no1;
+			boost::filesystem::path tabulation_file_complete_path_no2 = tabulation_file_no2;
+			boost::filesystem::path tabulation_file_complete_path_no3 = tabulation_file_no3;
+			boost::filesystem::path tabulation_file_complete_path_no4 = tabulation_file_no4;
+			boost::filesystem::path tabulation_file_complete_path_no5 = tabulation_file_no5;
+			virtualChemistryTable->SetTableNO(tabulation_file_complete_path_no1, tabulation_file_complete_path_no2,
+							  tabulation_file_complete_path_no3, tabulation_file_complete_path_no4,
+							  tabulation_file_complete_path_no5);
+
+			label iType = readLabel(virtualChemistryDictionary.lookup("subMechanismTypeNO"));
+			virtualChemistryTable->SetSubMechanismType_NO(iType);
+		}
+
+		virtualChemistryTable->SetVersion(iVersion);
 		for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 			virtualChemistryTable->SetLewisNumber(i, LewisNumbers(i));
 	}

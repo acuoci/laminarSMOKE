@@ -89,11 +89,22 @@
 
 	// Correction flux
 	Jc *= 0.;
-	forAll (Y,i)
+	if(virtual_chemistry == false)
 	{
-		Jc -= J[i];
+		forAll (Y,i)
+		{
+			Jc -= J[i];
+		}
 	}
-
+	else
+	{
+		forAll (Y,i)
+		{
+			if (i<virtualChemistryTable->ns_main())
+				Jc -= J[i];
+		}	
+	}
+	
 	// Corrected fluxes
 	forAll (Y,i)
 	{

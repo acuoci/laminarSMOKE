@@ -388,7 +388,7 @@ else
 					massFractions[i+1] = Y[i].internalField()[celli];
 
 			if (virtual_chemistry_table_check == true)
-				#include "virtual-chemistry/VirtualChemistryTableCheck.H"
+				#include "utilities/virtualchemistry/VirtualChemistryTableCheck.H"
 	
 			// Concentration [kmol/m3]
 			cTotCells[celli] = pCells[celli]/PhysicalConstants::R_J_kmol/TCells[celli];
