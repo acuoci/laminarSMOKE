@@ -55,7 +55,7 @@ greyMeanAbsorptionEmissionCoeffs
         Tcommon         200;
         invTemp         true;
         Tlow            200;
-        Thigh           2500;
+        Thigh           3000;
 
         loTcoeffs
         ( 0 0 0 0 0 0 );
