@@ -105,9 +105,10 @@ SIMPLE
     pRefCell                 0;
     pRefValue                0;
 
+    pMinFactor      0.1;
+    pMaxFactor      2;
     rhoMin          rhoMin [ 1 -3  0 0 0 ] 0.02;
     rhoMax          rhoMax [ 1 -3  0 0 0 ] 3.00;
-    pMin	    pMin   [ 1 -1 -2 0 0 ] 1e4;
 
     residualControl
     {

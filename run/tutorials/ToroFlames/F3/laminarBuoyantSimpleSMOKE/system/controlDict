@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     laminarSimpleSMOKE;
+application     laminarBuoyantSimpleSMOKE;
 
 startFrom       latestTime;
 
