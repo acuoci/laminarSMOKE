@@ -16,9 +16,9 @@ Dictionary CHEMKIN_PreProcessor
 {
 	@Thermodynamics POLIMI_TOT_NOX_1412.CKT;
 	@Transport	POLIMI_TOT_NOX_1412.TRC;
-	@Kinetics 	POLIMI_H2CO_1412.CKI;
+	@Kinetics 	POLIMI_H2_1412.CKI;
 	
-	@Output		kinetics-POLIMI_H2CO_1412.CKI;
+	@Output		kinetics;
 	
 	@Comments 	CRECK-Signature;
 }

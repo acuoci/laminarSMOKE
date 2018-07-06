@@ -1,0 +1,31 @@
+//-----------------------------------------------------------------//
+//     ____                    ______ __  __  ____  _  ________    //
+//    / __ \                  /  ___ |  \/  |/ __ \| |/ /  ____|   //
+//   | |  | |_ __   ___ _ __ |  (___ | \  / | |  | | ' /| |__      //
+//   | |  | | '_ \ / _ \ '_ \ \___  \| |\/| | |  | |  < |  __|     //
+//   | |__| | |_) |  __/ | | |____)  | |  | | |__| | . \| |____    //
+//    \____/| .__/ \___|_| |_|______/|_|  |_|\____/|_|\_\______|   //
+//         | |                                                     //
+//         |_|                                                     //
+//                                                                 //
+//                http://www.opensmoke.polimi.it/                  //
+//             http://creckmodeling.chem.polimi.it/                //
+//-----------------------------------------------------------------//
+
+Dictionary CHEMKIN_PreProcessor
+{
+	@Thermodynamics POLIMI_TOT_NOX_1412.CKT;
+	@Transport	POLIMI_TOT_NOX_1412.TRC;
+	@Kinetics 	POLIMI_H2CO_1412.CKI;
+	
+	@Output		kinetics;
+	
+	@Comments 	CRECK-Signature;
+}
+
+Dictionary CRECK-Signature
+{
+	@Author 	CRECK Modeling Group;
+	@Place  	Politecnico di Milano (Italy);
+	@Comments	This kinetic mechanism can be downloaded at: www.creckmodeling.chem.polimi.it;
+}

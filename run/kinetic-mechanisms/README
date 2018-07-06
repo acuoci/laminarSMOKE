@@ -15,6 +15,3 @@ In order to use a detailed kinetic mechanism (available in CHEMKIN
 format) in laminarSMOKE you need to pre-process it using the 
 OpenSMOKE++ kinetic preprocessor (available in the solvers folder).
 
-Please consider that some of the kinetic mechanisms available in this 
-folder have been already pre-processed (you can recognize them because 
-of the presence of XML files).

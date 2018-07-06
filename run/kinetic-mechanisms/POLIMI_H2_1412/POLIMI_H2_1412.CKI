@@ -1,0 +1,60 @@
+! 
+! CRECK Modeling Group (Politecnico di Milano)
+! http://creckmodeling.chem.polimi.it/
+!
+! H2 kinetic mechanism 
+! Version 1412, December 2014
+! Detailed mechanism of hydrogen oxidation.
+!
+! Kinetic scheme: 11 species and 19 reactions
+!
+! References
+!
+!E. Ranzi, A. Frassoldati, R. Grana, A. Cuoci, T. Faravelli, A.P. Kelley, C.K. Law, Hierarchical and comparative kinetic modeling of laminar flame speeds of hydrocarbon and oxygenated fuels, 
+!Progress in Energy and Combustion Science, 38 (4), pp. 468-501 (2012), DOI: 10.1016/j.pecs.2012.03.004
+!
+!
+!
+ELEMENTS
+H O N 
+END
+
+SPECIES
+H2             O2             H2O            H2O2                       
+O              H              OH             HO2
+N2            
+END
+
+REACTIONS
+
+H+O2=OH+O                                .9600E+15   -.200  16625.0
+O+H2=OH+H                                .4330E+14    .000  10000.0
+H+O2(+M)=HO2(+M)                             .5580E+13   .400       .0
+ LOW/  .8400E+18   -.800       .0/
+TROE/     .5000        .1000E-29    .1000E+31            /
+H2O/ 18.00/H2/  2.50/N2/  1.26/       
+OH+HO2=H2O+O2                            .5000E+14    .000   1000.0
+H+HO2=OH+OH                              .2500E+15    .000   1900.0             
+O+HO2=O2+OH                              .3250E+14    .000       .0
+OH+OH=O+H2O                              .3570E+05   2.400  -2110.0
+H2+M=H+H+M                               .1115E+15   .000  96081.0              
+H2/  2.50/H2O/ 12.00/                           
+O2+M=O+O+M                               .1550E+15   .000 115120.0
+H2/  2.50/H2O/ 12.00/
+H+OH+M=H2O+M                             .4500E+23 -2.000       .0
+H2O/ 16.00/H2/  2.00/
+H+HO2=H2+O2                              .2500E+14    .000    700.0                  
+HO2+HO2=H2O2+O2                          .2110E+13    .000       .0
+OH+OH(+M)=H2O2(+M)                           .7400E+14  -.370       .0
+ LOW/  .1300E+19   -.900  -1700.0/
+TROE/     .7346        94.00        1756.        5182.    /
+H2/  2.00/H2O/  6.00/N2/   .90/
+O+OH+M=HO2+M                             .1000E+17    .000       .0
+H+H2O=H2+OH                              .4800E+11   1.000  19000.0
+H2O2+H=H2O+OH                            .2410E+14    .000   3970.0
+H2O2+H=H2+HO2                            .6025E+14    .000   7950.0
+HO2     +H2O=>H2O2    +OH  .5388E+06 2.0  28780.05
+OH      +H2O2=>H2O     +HO2  .3195E+06 2.0  -4169.95
+O       +H2O2=>OH      +HO2  .1083E+07 2.0  -1657.32
+
+END

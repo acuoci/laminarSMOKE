@@ -1,0 +1,23 @@
+! 
+! Global mechanism for H2 (1 step)
+! Be careful: this mechanism must be used only for starting a simulation
+!             the kinetic parameters have no physical meaning, they are
+!             simply chosen to emulate infinitely fast chemistry 
+!
+
+ELEMENTS
+H O N 
+END
+
+SPECIES
+H2             O2             
+H2O            N2            
+END
+
+REACTIONS
+
+H2 + 0.5O2 => H2O		1e15	0	20000
+FORD /H2 1/
+FORD /O2 1/
+
+END
