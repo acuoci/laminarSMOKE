@@ -15,8 +15,8 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-radiation               on;
-radiationModel          P1;
+radiation               off;
+radiationModel          none;
 solverFreq 	        10;
 absorptionEmissionModel greyMeanAbsorptionEmission;
 scatterModel    	none;
