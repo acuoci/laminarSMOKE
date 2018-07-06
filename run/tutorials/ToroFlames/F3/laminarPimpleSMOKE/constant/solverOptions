@@ -17,7 +17,7 @@ FoamFile
 
 Kinetics
 {
-	folder	   		"../../../../kinetic-mechanisms/kinetics-1step";
+	folder	   		"../../../../kinetic-mechanisms/GLOBAL_H2_1step/kinetics";
 	inertSpecies 		N2;
 }
 
@@ -47,24 +47,12 @@ PhysicalModel
 	minTemperature4Chemistry	0;
 }
 
-Radiation
-{
-	radiationModel "optically-thin";
-	environmentTemperature 300.;
-}
-
 Output
 {
 	gasProperties		off;
 	gasRadiation		off;
 	formationRates		off;
 	diffusivities		off;
-}
-
-PolimiSoot
-{
-	thermophoreticEffectTag "BIN";
-	physicalSootDiffusivity	off;
 }
 
 OdeHomogeneous
@@ -85,11 +73,6 @@ OdeHomogeneous
 	}
 }
 
-PostProcessing
-{
-	soot	off;
-}
-
 Spark
 {
 	spark 		on;
@@ -98,6 +81,22 @@ Spark
 	temperature 	2205;
 	duration 	0.025;
 	diameter 	1.5e-3;
+}
+
+PostProcessing
+{
+	soot	off;
+}
+
+PolimiSoot
+{
+	thermophoreticEffectTag "BIN";
+	physicalSootDiffusivity	off;
+}
+
+VirtualChemistry
+{
+	virtualChemistry off;
 }
 
 #include "drgOptions"
