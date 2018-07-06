@@ -608,6 +608,7 @@ Switch virtual_chemistry_table_check = false;
 
 OpenSMOKE::VirtualChemistry* virtualChemistryTable;
 Eigen::MatrixXd VCT;
+unsigned int vc_main_species = 0;
 
 const dictionary& virtualChemistryDictionary = solverOptions.subDict("VirtualChemistry");
 {
@@ -615,6 +616,8 @@ const dictionary& virtualChemistryDictionary = solverOptions.subDict("VirtualChe
 	
 	if ( virtual_chemistry == true)
 	{
+		vc_main_species = virtualChemistryTable->ns_main();
+
 		if (virtual_chemistry_table_check == true)
 		{
 			VCT.resize(254,21);

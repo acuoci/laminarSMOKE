@@ -84,7 +84,7 @@
 		Eigen::VectorXd y0(NEQ);
 		Eigen::VectorXd yf(NEQ);
 
-		Info <<" * Solving homogeneous chemistry (OpenSMOKE solver)... "<<endl;
+		Info <<" * Solving homogeneous chemistry (OpenSMOKE++ solver, Direct integration)... "<<endl;
 		{			
 			unsigned int counter = 0;
 			
@@ -216,7 +216,7 @@
 				}
 
 				// Check mass fractions
-				normalizeMassFractions(yf, celli, massFractionsTol, virtual_chemistry, virtualChemistryTable->ns_main());
+				normalizeMassFractions(yf, celli, massFractionsTol, vc_main_species);
 
 				if (strangAlgorithm != STRANG_COMPACT)
 				{
@@ -421,7 +421,7 @@
 					}
 			
 					// Check mass fractions
-					normalizeMassFractions(yf.data(), celli, massFractionsTol, NC, virtual_chemistry, virtualChemistryTable->ns_main());
+					normalizeMassFractions(yf.data(), celli, massFractionsTol, NC, vc_main_species);
 
 
 					if (strangAlgorithm != STRANG_COMPACT)
@@ -644,7 +644,7 @@
 					}
 				
 					// Check mass fractions
-					normalizeMassFractions(yf, celli, massFractionsTol, virtual_chemistry, virtualChemistryTable->ns_main());
+					normalizeMassFractions(yf, celli, massFractionsTol, vc_main_species);
 
 					if (strangAlgorithm != STRANG_COMPACT)
 					{

@@ -198,7 +198,7 @@
 				}
 			
 				// Check mass fractions
-				normalizeMassFractions(yf, NC, celli, massFractionsTol, virtual_chemistry, virtualChemistryTable->ns_main());
+				normalizeMassFractions(yf, NC, celli, massFractionsTol, vc_main_species);
 
 				// Assign mass fractions
 				#if OPENFOAM_VERSION >= 40

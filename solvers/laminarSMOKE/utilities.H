@@ -53,9 +53,9 @@ tmp<volScalarField> Rho(volScalarField& p, volScalarField& psi)
 	return p*psi;
 }
 
-void normalizeMassFractions(double* omega, const label celli, const double massFractionsTol, const unsigned int n, const bool virtual_chemistry, const unsigned int n_main)
+void normalizeMassFractions(double* omega, const label celli, const double massFractionsTol, const unsigned int n, const unsigned int vc_main_species)
 {
-	if (virtual_chemistry == false)
+	if (vc_main_species == 0)
 	{
 		const double eps = 1.e-3;
 
@@ -83,7 +83,7 @@ void normalizeMassFractions(double* omega, const label celli, const double massF
 		const double eps = 1.e-3;
 
 		double sumFractions = 0.;
-	    	for(int i=0; i < n_main; i++)
+	    	for(int i=0; i < vc_main_species; i++)
 			sumFractions += omega[i];
 
 		if (sumFractions > 1.+eps || sumFractions < 1.-eps)
@@ -98,14 +98,14 @@ void normalizeMassFractions(double* omega, const label celli, const double massF
 			}    
 		}
 	
-		for(int i=0; i < n_main; i++)
+		for(int i=0; i < vc_main_species; i++)
 			omega[i] /= sumFractions;
 	}
 }
 
-void normalizeMassFractions(Eigen::VectorXd& omega_plus_additional_variables, const int N, const label celli, const double massFractionsTol, const bool virtual_chemistry, const unsigned int n_main)
+void normalizeMassFractions(Eigen::VectorXd& omega_plus_additional_variables, const int N, const label celli, const double massFractionsTol, const unsigned int vc_main_species)
 {
-	if (virtual_chemistry == false)
+	if (vc_main_species == 0)
 	{
 	    double sumFractions = 0.;
 	    for(int i=0; i < N; i++)	
@@ -129,7 +129,7 @@ void normalizeMassFractions(Eigen::VectorXd& omega_plus_additional_variables, co
 	else
 	{
 	    double sumFractions = 0.;
-	    for(int i=0; i < n_main; i++)	
+	    for(int i=0; i < vc_main_species; i++)	
 		sumFractions += omega_plus_additional_variables(i);
 
 	    if (sumFractions > 1.+massFractionsTol || sumFractions < 1.-massFractionsTol)
@@ -144,15 +144,15 @@ void normalizeMassFractions(Eigen::VectorXd& omega_plus_additional_variables, co
 		}    
 	    }
 	
-	    for(int i=0; i < n_main; i++)
+	    for(int i=0; i < vc_main_species; i++)
 		omega_plus_additional_variables(i) /= sumFractions;
 	}
 }
 
 
-void normalizeMassFractions(Eigen::VectorXd& omega_plus_temperature, const label celli, const double massFractionsTol, const bool virtual_chemistry, const unsigned int n_main)
+void normalizeMassFractions(Eigen::VectorXd& omega_plus_temperature, const label celli, const double massFractionsTol, const unsigned int vc_main_species)
 {
-	if (virtual_chemistry == false)
+	if (vc_main_species == 0)
 	{
 		double sumFractions = 0.;
 	    	for(int i=0; i < omega_plus_temperature.size()-1; i++)
@@ -179,7 +179,7 @@ void normalizeMassFractions(Eigen::VectorXd& omega_plus_temperature, const label
 	else
 	{
 		double sumFractions = 0.;
-	    	for(int i=0; i < n_main; i++)
+	    	for(int i=0; i < vc_main_species; i++)
 		    sumFractions += omega_plus_temperature(i);
 
 	    if (sumFractions > 1.+massFractionsTol || sumFractions < 1.-massFractionsTol)
@@ -197,14 +197,14 @@ void normalizeMassFractions(Eigen::VectorXd& omega_plus_temperature, const label
 		}    
 	    }
 	
-		 for(int i=0; i < n_main; i++)
+		 for(int i=0; i < vc_main_species; i++)
 		    omega_plus_temperature(i) /= sumFractions;
 	}
 }
 
-void normalizeMassFractions(OpenSMOKE::OpenSMOKEVectorDouble& omega_plus_temperature, const label celli, const double massFractionsTol, const bool virtual_chemistry, const unsigned int n_main)
+void normalizeMassFractions(OpenSMOKE::OpenSMOKEVectorDouble& omega_plus_temperature, const label celli, const double massFractionsTol, const unsigned int vc_main_species)
 {
-	if (virtual_chemistry == false)
+	if (vc_main_species == 0)
 	{
 	    double sumFractions = 0.;
 	    for(int i=1; i <= omega_plus_temperature.Size()-1; i++)
@@ -231,7 +231,7 @@ void normalizeMassFractions(OpenSMOKE::OpenSMOKEVectorDouble& omega_plus_tempera
 	else
 	{
 	    double sumFractions = 0.;
-	    for(int i=1; i <= n_main; i++)
+	    for(int i=1; i <= vc_main_species; i++)
 		    sumFractions += omega_plus_temperature[i];
 
 	    if (sumFractions > 1.+massFractionsTol || sumFractions < 1.-massFractionsTol)
@@ -249,7 +249,7 @@ void normalizeMassFractions(OpenSMOKE::OpenSMOKEVectorDouble& omega_plus_tempera
 		}    
 	    }
 	
-		 for(int i=1; i <= n_main; i++)
+		 for(int i=1; i <= vc_main_species; i++)
 		    omega_plus_temperature[i] /= sumFractions;
 	}
 }
