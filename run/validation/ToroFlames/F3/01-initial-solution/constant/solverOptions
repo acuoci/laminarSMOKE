@@ -17,7 +17,7 @@ FoamFile
 
 Kinetics
 {
-	folder	   		"../../../../kinetic-mechanisms/kinetics-POLIMI_H2CO_1412";
+	folder	   		"../../../../kinetic-mechanisms/POLIMI_H2_1412/kinetics";
 	inertSpecies 		N2;
 }
 
@@ -47,6 +47,25 @@ PhysicalModel
 	minTemperature4Chemistry	0;
 }
 
+OdeHomogeneous
+{
+	odeSolver 	"OpenSMOKE";
+	relTolerance 	1e-7;
+	absTolerance 	1e-12;
+	maximumOrder 	5;
+	fullPivoting 	false;
+}
+
+Spark
+{
+	spark 		on;
+	position    	(5.95e-3  0.0 1.5e-3);
+	time		0.;
+	temperature 	2205;
+	duration 	0.01;
+	diameter 	1.5e-3;
+}
+
 Output
 {
 	gasProperties		off;
@@ -61,33 +80,18 @@ PolimiSoot
 	physicalSootDiffusivity	off;
 }
 
-OdeHomogeneous
-{
-	odeSolver 	"OpenSMOKE";
-	relTolerance 	1e-7;
-	absTolerance 	1e-12;
-	maximumOrder 	5;
-	fullPivoting 	false;
-}
-
 PostProcessing
 {
 	soot	off;
 }
 
-Spark
+VirtualChemistry
 {
-	spark 		on;
-	position    	(5.95e-3  0.0 1.5e-3);
-	time		0.;
-	temperature 	2205;
-	duration 	0.01;
-	diameter 	1.5e-3;
+	virtualChemistry off;
 }
 
 #include "drgOptions"
 #include "isatOptions"
 #include "lewisNumbers"
-#include "virtualChemistry"
 
 // ************************************************************************* //

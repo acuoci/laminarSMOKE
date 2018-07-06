@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     reactingFoam;
+application     laminarBuoyantPimpleSMOKE;
 
 startFrom       latestTime;
 
@@ -51,8 +51,4 @@ maxCo           0.1;
 
 // ************************************************************************* //
 
-libs (
-      "libOpenFOAM.so"
-      "libswakFunctionObjects.so"
-      "libgroovyBC.so"
-     );
+libs ( "libOpenFOAM.so" );

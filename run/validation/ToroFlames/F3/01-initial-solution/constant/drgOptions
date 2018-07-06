@@ -1,18 +1,27 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|  \\    /   O peration     | Version:  1.7.1                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      acii;
+    class       dictionary;
+    location    "constant";
+    object      drgOptions;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 DRG
 {
-	drg		off;
-	epsilon		0.001;
-	temperature	3000;
-	minTemperature	290;
-	species		(N2 H2 OH);
+        drg     	off;
+        minTemperature  300;
+        temperature     1000. 3000.;
+        epsilon         0.01  0.001;
+        species         (H2 N2 OH);
 }
 
-/*---------------------------------------------------------------------------*/
+// ************************************************************************* //

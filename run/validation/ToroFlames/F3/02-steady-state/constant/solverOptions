@@ -17,7 +17,7 @@ FoamFile
 
 Kinetics
 {
-	folder	   		"../../../../kinetic-mechanisms/kinetics-POLIMI_H2CO_1412";
+	folder	   		"../../../../kinetic-mechanisms/POLIMI_H2_1412/kinetics";
 	inertSpecies 		N2;
 }
 
@@ -57,20 +57,6 @@ PhysicalModel
 	minTemperature4Chemistry	0;
 }
 
-Output
-{
-	gasProperties		off;
-	gasRadiation		off;
-	formationRates		off;
-	diffusivities		off;
-}
-
-PolimiSoot
-{
-	physicalSootDiffusivity off;
-	thermophoreticEffectTag "BIN";
-}
-
 OdeHomogeneous
 {
 	odeSolver 	"OpenSMOKE";
@@ -90,9 +76,28 @@ Spark
 	diameter 	1.5e-3;
 }
 
+Output
+{
+	gasProperties		off;
+	gasRadiation		off;
+	formationRates		off;
+	diffusivities		off;
+}
+
+PolimiSoot
+{
+	physicalSootDiffusivity off;
+	thermophoreticEffectTag "BIN";
+}
+
 PostProcessing
 {
 	soot	off;
+}
+
+VirtualChemistry
+{
+	virtualChemistry off;
 }
 
 #include "drgOptions"

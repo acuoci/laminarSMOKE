@@ -23,7 +23,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         20000;
+endTime         4000;
 
 deltaT          1;
 
@@ -50,8 +50,4 @@ runTimeModifiable true;
 
 // ************************************************************************* //
 
-libs (
-      "libOpenFOAM.so"
-      "libswakFunctionObjects.so"
-      "libgroovyBC.so"
-     );
+libs ( "libOpenFOAM.so" );
