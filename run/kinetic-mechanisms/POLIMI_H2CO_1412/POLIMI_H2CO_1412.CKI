@@ -10,11 +10,22 @@
 !
 ! References
 !
-!E. Ranzi, A. Frassoldati, R. Grana, A. Cuoci, T. Faravelli, A.P. Kelley, C.K. Law, Hierarchical and comparative kinetic modeling of laminar flame speeds of hydrocarbon and oxygenated fuels, 
-!Progress in Energy and Combustion Science, 38 (4), pp. 468-501 (2012), DOI: 10.1016/j.pecs.2012.03.004
-!
-!
-!
+! Stagni, A., Cuoci, A., Frassoldati, A., Faravelli, T., Ranzi, E.
+! Skeletal mechanism reduction through species-targeted sensitivity analysis
+! Combustion and Flame, 163, pp.382-393 (2016)
+! DOI: 10.1016/j.combustflame.2015.10.013
+! 
+! Stagni, A., Cuoci, A., Frassoldati, A., Faravelli, T., Ranzi, E.
+! Lumping and reduction of detailed kinetic schemes: An effective coupling
+! Industrial and Engineering Chemistry Research, 53 (22), pp. 9004-9016 (2014)
+! DOI: 10.1021/ie403272f
+! 
+! Ranzi, A. Frassoldati, A. Stagni, M. Pelucchi, A. Cuoci, T. Faravelli
+! Reduced Kinetic Schemes of Complex Reaction Systems: Fossil and Biomass-Derived Transportation Fuels
+! International Journal of Chemical Kinetics, 46(9), pp.512-542 (2014)
+! DOI: 10.1002/kin.20867
+
+
 ELEMENTS
 C H O AR HE N 
 END

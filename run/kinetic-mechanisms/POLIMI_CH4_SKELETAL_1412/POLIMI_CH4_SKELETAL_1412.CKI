@@ -1,0 +1,389 @@
+! 
+! CRECK Modeling Group (Politecnico di Milano)
+! http://creckmodeling.chem.polimi.it/
+!
+! CH4 skeletal kinetic mechanism 
+! Version 1412, December 2014
+! Detailed mechanism of hydrogen oxidation.
+!
+! Kinetic scheme: 24 species and 155 reactions
+!
+! References
+!
+! Stagni, A., Cuoci, A., Frassoldati, A., Faravelli, T., Ranzi, E.
+! Skeletal mechanism reduction through species-targeted sensitivity analysis
+! Combustion and Flame, 163, pp.382-393 (2016)
+! DOI: 10.1016/j.combustflame.2015.10.013
+! 
+! Stagni, A., Cuoci, A., Frassoldati, A., Faravelli, T., Ranzi, E.
+! Lumping and reduction of detailed kinetic schemes: An effective coupling
+! Industrial and Engineering Chemistry Research, 53 (22), pp. 9004-9016 (2014)
+! DOI: 10.1021/ie403272f
+! 
+! Ranzi, A. Frassoldati, A. Stagni, M. Pelucchi, A. Cuoci, T. Faravelli
+! Reduced Kinetic Schemes of Complex Reaction Systems: Fossil and Biomass-Derived Transportation Fuels
+! International Journal of Chemical Kinetics, 46(9), pp.512-542 (2014)
+! DOI: 10.1002/kin.20867
+
+ELEMENTS
+C
+H
+O
+N
+END
+
+SPECIES
+CH4                           O2                            CO2                           
+CO                            H2O                           H2                            
+H                             O                             OH                            
+HO2                           CH2                           CH2S                          
+CH3                           HCO                           CH2O                          
+CH3OO                         C2H4                          C2H5                          
+HCCO                          CH2CO                         CH2CHO                        
+C2H3                          C2H2                          N2                            
+END
+
+REACTIONS
+
+O2+H=O+OH                                               2.4000e+14    0.000     16650.00
+
+H2+O=H+OH                                               4.3300e+13    0.000     10000.00
+
+O2+H(+M)=HO2(+M)                                        4.6500e+12    0.400         0.00
+ LOW/   7.00e+17     -0.800          0.0/
+TROE/           0.5000   1.000e-30   1.000e+30/
+H2O/ 18.00/  H2/ 2.50/  N2/ 1.26/  O2/ 0.00/  CO/ 1.20/  CO2/ 2.40/  
+
+2O2+H=O2+HO2                                            8.9000e+14    0.000     -2822.00
+
+OH+HO2=O2+H2O                                           5.0000e+13    0.000      1000.00
+
+H+HO2=2OH                                               2.5000e+14    0.000      1900.00
+
+O+HO2=O2+OH                                             3.2500e+13    0.000         0.00
+
+2OH=H2O+O                                               3.5700e+04    2.400     -2110.00
+
+H2+M=2H+M                                               2.2300e+14    0.000     96081.00
+H2/ 2.50/ H2O/ 12.00/ CO/ 1.90/ CO2/ 3.80/ 
+
+O2+M=2O+M                                               1.5500e+14    0.000    115120.00
+H2/ 2.50/ H2O/ 12.00/ CO/ 1.90/ CO2/ 3.80/ 
+
+H+OH+M=H2O+M                                            4.5000e+22   -2.000         0.00
+H2O/ 16.00/ H2/ 2.00/ CO2/ 1.90/ 
+
+H+HO2=O2+H2                                             2.5000e+13    0.000       700.00
+
+O+OH+M=HO2+M                                            1.0000e+16    0.000         0.00
+
+O2+CO=CO2+O                                             2.5300e+12    0.000     47700.00
+
+O2+HCO=CO+HO2                                           1.0000e+12    0.000         0.00
+
+CO+O(+M)=CO2(+M)                                        9.6400e+10    0.000      3800.00
+ LOW/   2.07e+26     -3.340       7610.0/
+H2O/ 12.00/  H2/ 2.00/  CO/ 1.50/  CO2/ 2.00/  
+
+CO+OH=CO2+H                                             9.6000e+11    0.140      7352.00
+ DUPLICATE
+
+CO+OH=CO2+H                                             7.3200e+10    0.030       -16.00
+ DUPLICATE
+
+CO+HO2=CO2+OH                                           3.0000e+13    0.000     23000.00
+
+CO+H2O=CO2+H2                                           2.0000e+11    0.000     38000.00
+
+H+CH3(+M)=CH4(+M)                                       1.2000e+15   -0.400         0.00
+ LOW/   6.40e+23     -1.800          0.0/
+SRI/   0.4500  797.0000  979.0000  1.0000  0.0000/
+H2/ 2.00/  CO/ 2.00/  CO2/ 3.00/  H2O/ 5.00/  
+
+C2H4(+M)=H2+C2H2(+M)                                    8.0000e+12    0.440     88770.00
+ LOW/   1.58e+51     -9.300      97800.0/
+TROE/           0.7345   180.0   1035.   5417./
+H2/ 2.00/  H2O/ 6.00/  CH4/ 2.00/  CO/ 1.50/  CO2/ 2.00/  
+
+H+C2H3(+M)=C2H4(+M)                                     6.0800e+12    0.270       280.00
+ LOW/   1.40e+30     -3.860       3320.0/
+TROE/           0.7820   207.5   2663.   6095./
+H2/ 2.00/  H2O/ 6.00/  CH4/ 2.00/  CO/ 1.50/  CO2/ 2.00/  
+
+H2+C2H2=H+C2H3                                          2.0000e+13    0.000     65000.00
+
+H2+C2H4=H+C2H5                                          1.0000e+14    0.000     65000.00
+
+2CH3=>H2+C2H4                                           5.0000e+14    0.000     32000.00
+
+CH3+C2H3=CH4+C2H2                                       1.3330e+13    0.000         0.00
+
+CH4+C2H4=>CH3+C2H5                                      3.0000e+13    0.000     62000.00
+
+C2H4+C2H2=2C2H3                                         2.4000e+13    0.000     68360.00
+
+2C2H4=C2H5+C2H3                                         4.8000e+14    0.000     71500.00
+
+H+C2H2(+M)=C2H3(+M)                                     1.0000e+13    0.000      2770.00
+ LOW/   3.90e+16      0.000       -560.0/
+TROE/           0.5000   675.0   675.0   1.000e+30/
+H2O/ 5.00/  CO/ 2.00/  CO2/ 3.00/  H2/ 2.00/  
+
+H+C2H4(+M)=C2H5(+M)                                     1.7700e+13    0.000      2110.00
+ LOW/   4.60e+18      0.000       1070.0/
+TROE/           1.000   1.000e-15   95.00   200.0/
+H2O/ 5.00/  CO2/ 3.00/  H2/ 2.00/  CO/ 2.00/  
+
+2CH3=H+C2H5                                             1.4000e+14    0.000     14000.00
+
+CH2O+M=CO+H2+M                                          8.3000e+15    0.000     70000.00
+H2O/ 16.00/ CO2/ 3.80/ H2/ 2.50/ CO/ 1.90/ 
+
+CH2O+M=H+HCO+M                                          2.0000e+16    0.000     75600.00
+H2O/ 16.00/ CO2/ 3.80/ H2/ 2.50/ CO/ 1.90/ 
+
+O2+C2H2=OH+HCCO                                         2.0000e+07    1.500     30000.00
+
+CH4+O2=HO2+CH3                                          9.0000e+13    0.000     56000.00
+
+O2+CH2O=HO2+HCO                                         1.3000e+14    0.000     41000.00
+
+O2+C2H4=HO2+C2H3                                        1.0000e+14    0.000     60000.00
+
+HCO+M=CO+H+M                                            1.2000e+17   -1.000     17000.00
+CH4/ 2.80/ H2O/ 5.00/ CO2/ 3.00/ H2/ 1.90/ CO/ 1.90/ 
+
+H+CH2CO=>CO+CH3                                         2.0000e+13    0.000         0.00
+
+O+C2H2=>CH2CO                                           1.0000e+13    0.000     15000.00
+
+O+C2H4=CH3+HCO                                          5.0000e+06    1.880       200.00
+
+O+CH2O=>CO2+2H                                          2.0000e+13    0.000      5000.00
+
+O+CH2CO=>2HCO                                           2.0000e+13    0.000      2300.00
+
+O+CH2CO=>CO+CH2O                                        1.0000e+12    0.000      5000.00
+
+OH+C2H2=>CO+CH3                                         1.5000e+11    0.000         0.00
+
+OH+CH2O=>CO2+H2+H                                       1.0000e+12    0.000         0.00
+
+OH+CH2CO=>HCO+CH2O                                      2.8000e+13    0.000         0.00
+
+OH+CH2CO=>CO2+CH3                                       3.0000e+12    0.000         0.00
+
+HO2+C2H2=>HCO+CH2O                                      5.0000e+12    0.000     15000.00
+
+HCO+C2H2=>CO+C2H3                                       5.0000e+11    0.000      6000.00
+
+HCO+CH2O=CO2+CH3                                        1.5000e+12    0.000      6000.00
+
+O2+C2H2=>CO+CH2O                                        3.0000e+11    0.000     26000.00
+
+O2+C2H4=>2CH2O                                          1.0000e+14    0.000     48000.00
+
+O2+CH2CO=>CO2+CH2O                                      1.0000e+14    0.000     37000.00
+
+O2+CH2CO=>CO+OH+HCO                                     6.0000e+14    0.000     40000.00
+
+O2+C2H2=>2HCO                                           3.0000e+11    0.000     27000.00
+
+O2+C2H5=>HO2+C2H4                                       2.0000e+12    0.000      3000.00
+
+O2+C2H3=O+CH2CHO                                        6.0500e+14   -0.611      5260.00
+
+O2+C2H3=>HCO+CH2O                                       1.0000e+12    0.000      4000.00
+
+O2+C2H3=>OH+CH2CO                                       6.0000e+11    0.000      1000.00
+
+O2+C2H3=HO2+C2H2                                        6.0000e+10    0.000         0.00
+
+O2+C2H5=>O+CH3+CH2O                                     1.0000e+13    0.000     27000.00
+
+O2+CH2CHO=>CO+OH+CH2O                                   6.0000e+10    0.000         0.00
+
+O+C2H3=>CH2CHO                                          2.5000e+13    0.000         0.00
+
+O+CH2CHO=>HCO+CH2O                                      5.0000e+13    0.000         0.00
+
+OH+CH3=H2+CH2O                                          6.0000e+12    0.000         0.00
+
+OH+CH3=CH4+O                                            2.0000e+12    0.000      8000.00
+
+OH+C2H3=H2O+C2H2                                        4.0000e+12    0.000         0.00
+
+OH+CH2CHO=>H2O+CH2CO                                    5.0000e+12    0.000         0.00
+
+HO2+C2H3=>OH+CH2CHO                                     3.0000e+12    0.000         0.00
+
+HO2+C2H5=>OH+CH3+CH2O                                   5.0000e+12    0.000         0.00
+
+O+HCO=CO2+H                                             3.0000e+13    0.000         0.00
+
+H+HCO=CO+H2                                             1.0000e+14    0.000         0.00
+
+OH+HCO=CO+H2O                                           5.0000e+13    0.000         0.00
+
+HO2+HCO=>CO2+H+OH                                       3.0000e+13    0.000         0.00
+
+2HCO=CO+CH2O                                            6.0000e+11    0.000         0.00
+
+CH3+HCO=>CH4+CO                                         1.0000e+14    0.000         0.00
+
+HO2+CH2CO=>CO+OH+CH2O                                   1.0000e+10    0.000      5000.00
+
+CH2CHO=H+CH2CO                                          6.0000e+13    0.000     41000.00
+
+O+C2H4=>H+CH2CHO                                        1.0000e+13    0.000      3000.00
+
+OH+C2H2=>CH2CHO                                         5.0000e+11    0.000         0.00
+
+O2+CH2CHO=>HO2+CH2CO                                    5.0000e+11    0.000      3000.00
+
+CH4+CH2=2CH3                                            4.3000e+12    0.000     10034.00
+
+CH4+CH2S=2CH3                                           4.3000e+13    0.000         0.00
+
+CH3+M=H+CH2+M                                           1.0000e+16    0.000     90600.00
+
+H2+CH2S=H+CH3                                           7.2000e+13    0.000         0.00
+
+OH+CH3=H2O+CH2S                                         2.0000e+13    0.000         0.00
+
+CH2+CH3=H+C2H4                                          4.2000e+13    0.000         0.00
+
+CH2S+CH3=H+C2H4                                         2.0000e+13    0.000         0.00
+
+CH2+HCO=CO+CH3                                          2.0000e+13    0.000         0.00
+
+O+CH2=CO+2H                                             7.0000e+13    0.000         0.00
+
+O+CH2=CO+H2                                             5.0000e+13    0.000         0.00
+
+OH+CH2=H+CH2O                                           3.0000e+13    0.000         0.00
+
+O2+CH2=O+CH2O                                           5.0000e+13    0.000      9000.00
+
+O2+CH2=CO+H2O                                           1.6000e+13    0.000      1500.00
+
+O2+CH2=CO+H+OH                                          1.7000e+13    0.000      1500.00
+
+CO2+CH2=CO+CH2O                                         1.1000e+11    0.000      1000.00
+
+O2+CH2=CO2+2H                                           1.3200e+13    0.000      1500.00
+
+2CH2=2H+C2H2                                            1.2000e+14    0.000         0.00
+
+CH2S+M=CH2+M                                            1.0000e+13    0.000         0.00
+H/ 20.00/ H2O/ 3.00/ C2H2/ 4.00/ 
+
+O+CH2S=CO+2H                                            3.0000e+13    0.000         0.00
+
+OH+CH2S=H+CH2O                                          3.0000e+13    0.000         0.00
+
+O2+CH2S=CO+H+OH                                         3.1000e+13    0.000         0.00
+
+CO2+CH2S=CO+CH2O                                        3.0000e+12    0.000         0.00
+
+O+C2H2=CO+CH2                                           3.5000e+03    2.800       500.00
+
+O+C2H2=H+HCCO                                           5.0000e+06    2.000      1900.00
+
+CH2CO(+M)=CO+CH2(+M)                                    6.0000e+12    0.000     76000.00
+ LOW/   3.60e+15      0.000      59270.0/
+
+O+CH2CO=CO2+CH2                                         1.5000e+12    0.000      1350.00
+
+CH2+CH2CO=CO+C2H4                                       1.0000e+12    0.000         0.00
+
+CH2+CH2CO=CH3+HCCO                                      3.6000e+13    0.000     11000.00
+
+CH3+CH2CO=CO+C2H5                                       1.0000e+11    0.000      2000.00
+
+H+HCCO=CO+CH2S                                          1.5000e+14    0.000         0.00
+
+O+HCCO=2CO+H                                            9.6000e+13    0.000       600.00
+
+OH+HCCO=CO+H+HCO                                        1.0000e+13    0.000         0.00
+
+O2+HCCO=2CO+OH                                          1.6000e+12    0.000       830.00
+
+O2+HCCO=CO2+HCO                                         2.4000e+11    0.000      -854.00
+
+CH2+HCCO=CO+C2H3                                        3.0000e+13    0.000         0.00
+
+2HCCO=2CO+C2H2                                          1.0000e+13    0.000         0.00
+
+H2O+H=H2+OH                                             4.0000e+10    1.000     19000.00
+
+H+CH2O=H2+HCO                                           6.0000e+13    0.000      5000.00
+
+CH4+H=H2+CH3                                            3.0000e+07    2.000     10000.00
+
+O2+CH3=CH3OO                                            2.0000e+12    0.000         0.00
+
+CH3OO=OH+CH2O                                           1.5000e+13    0.000     47000.00
+
+HO2+CH3OO=>O2+H2O+CH2O                                  5.0000e+10    0.000         0.00
+
+CH2O+CH3OO=>CO+H2+OH+CH2O                               2.0000e+11    0.000     11000.00
+
+H2+C2H3=>H+C2H4                                         9.4960e+05    2.000      8459.77
+
+H2+HCCO=>H+CH2CO                                        5.9920e+05    2.000      8978.05
+
+CH4+OH=>H2O+CH3                                         2.7960e+06    2.000      1566.11
+
+CH4+HCO=>CH3+CH2O                                       8.8410e+05    2.000     20281.38
+
+CH4+C2H3=>CH3+C2H4                                      4.7480e+05    2.000     11093.60
+
+CH4+HCCO=>CH3+CH2CO                                     2.9960e+05    2.000     11647.78
+
+H+C2H4=>H2+C2H3                                         1.9250e+07    2.000     10409.77
+
+OH+C2H4=>H2O+C2H3                                       3.1950e+06    2.000      1757.40
+
+O+C2H4=>OH+C2H3                                         1.0830e+07    2.000      8781.96
+
+HCO+C2H4=>CH2O+C2H3                                     1.0100e+06    2.000     20620.50
+
+CH3+C2H4=>CH4+C2H3                                      3.1220e+05    2.000     11393.60
+
+C2H4+HCCO=>CH2CO+C2H3                                   3.4240e+05    2.000     11936.23
+
+H2O+HCO=>OH+CH2O                                        1.2630e+06    2.000     28234.13
+
+H2O+CH3=>CH4+OH                                         3.9030e+05    2.000     15366.11
+
+H2O+C2H3=>OH+C2H4                                       6.7830e+05    2.000     15257.40
+
+H2O+HCCO=>OH+CH2CO                                      4.2800e+05    2.000     15890.13
+
+OH+CH2O=>H2O+HCO                                        3.1950e+06    2.000     -2065.87
+
+O+CH2O=>OH+HCO                                          1.0830e+07    2.000      1094.46
+
+CH3+CH2O=>CH4+HCO                                       3.1220e+05    2.000      3781.38
+
+CH2O+C2H3=>HCO+C2H4                                     5.4260e+05    2.000      3820.50
+
+CH2O+HCCO=>HCO+CH2CO                                    3.4240e+05    2.000      4259.56
+
+O2+CH2CO=>HO2+HCCO                                      1.7040e+07    2.000     51633.86
+
+H+CH2CO=>H2+HCCO                                        2.4070e+07    2.000     10428.05
+
+OH+CH2CO=>H2O+HCCO                                      3.9940e+06    2.000      1890.13
+
+O+CH2CO=>OH+HCCO                                        1.3530e+07    2.000      8781.96
+
+HCO+CH2CO=>CH2O+HCCO                                    1.2630e+06    2.000     20559.56
+
+CH3+CH2CO=>CH4+HCCO                                     3.9030e+05    2.000     11447.78
+
+CH2CO+C2H3=>C2H4+HCCO                                   6.7830e+05    2.000     11436.23
+
+END
+

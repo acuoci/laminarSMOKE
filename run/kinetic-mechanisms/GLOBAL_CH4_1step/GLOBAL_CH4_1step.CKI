@@ -1,0 +1,22 @@
+! 
+! Global mechanism for CH4 (1 step)
+! Be careful: this mechanism must be used only for starting a simulation
+!             the kinetic parameters have no physical meaning, they are
+!             simply chosen to emulate infinitely fast chemistry 
+!
+
+ELEMENTS
+N O H C
+END
+
+SPECIES
+CH4 O2 CO2 H2O N2
+END
+
+REACTIONS
+
+CH4+2O2=>CO2+2H2O       1.0000e+15    0.000     20000.0
+FORD /CH4 1/
+FORD /O2 1/
+
+END
