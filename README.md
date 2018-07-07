@@ -84,16 +84,16 @@ Three different options are available to compile the code, according to the leve
 Preprocessing of CHEMKIN files
 -----------------------------------------------------
 In order to run a simulation with laminarSMOKE, a CHEMKIN mechanism (kinetics, thermodynamic and transport properties) has to be pre-processed using the `openSMOKEppCHEMKINPreProcessor` utility (see Section 6 above). 
-An example of pre-processing is available in the `run/kinetic-mechanisms/POLIMI_H2O_1412` folder. In particular, here you can find the three files corresponding to the CHEMKIN input (kinetics, thermodynamics and transport properties) and an additional `input.dic` file, containing the instructions for the `openSMOKEppCHEMKINPreProcessor`.
-1. Go to the `run/kinetic-mechanisms/POLIMI_H2O_1412`
+Examples of mechanisms ready to be pre-processed are available in the `run/kinetic-mechanisms` folder. In particular, for in each mechanism folder you can find the three files corresponding to the CHEMKIN input (kinetics, thermodynamics, and transport properties) and an additional `input.dic` file, containing the instructions for the `openSMOKEppCHEMKINPreProcessor`.
+In order to pre-process a kinetic mechanisms, the operations to carry out are very simple. As an example, for `POLIMI_H2CO_1412` mechanism:
+1. Go to the `run/kinetic-mechanisms/POLIMI_H2CO_1412`
 2. Type `openSMOKEppCHEMKINPreProcessor`
-3. If everything works correctly, a `kinetics-POLIMI_H2O_1412` folder will be created, including the preprocessed CHEMKIN files (in XML folder). This is the folder which has to be supplied to the `laminarSMOKE` solver.
-4. For your convenience the `run/kinetic-mechanisms` folder already contains three pre-processed mechanisms.
+3. If everything works correctly, a `kinetics-POLIMI_H2CO_1412` folder will be created, including the preprocessed CHEMKIN files (in XML folder). This is the folder which has to be supplied to the `laminarSMOKE` solver.
 
 Run your first case
 -----------------------------------------------------
 The folder `run/tutorials/ToroFlames/F3/` contains a simple test case (laminar coflow diffusion flame fed with hydrogen).
 
-1. Unsteady simulation: Open the `laminarBuoyantPimpleSMOKE-Global` folder, build the mesh using the `blockMesh` utility, and run the case using the `laminarBuoyantPimpleSMOKE` solver. Even if you are interested in steady state conditions, we strongly suggest to always start with unsteady calculations to create a reasonable first-guess solution for the application of the steady state solver. In this case, you can stop the unsteady simulation after 50 ms of physical time.
+1. Unsteady simulation: Open the `laminarBuoyantPimpleSMOKE` folder, build the mesh using the `blockMesh` utility, and run the case using the `laminarBuoyantPimpleSMOKE` solver. Even if you are interested in steady state conditions, we strongly suggest to always start with unsteady calculations to create a reasonable first-guess solution for the application of the steady state solver. In this case, you can stop the unsteady simulation after 50 ms of physical time.
 
-2. Steady state simuation: you can now move to the `laminarBuoyantSimpleSMOKE-Global` folder. Copy the last time folder calculated by the unsteady solver (point 1 above), build the mesh using the `blockMesh` utility, and run the case using the `laminarBuoyantSimpleSMOKE` solver. In order to reach the steady state conditions, 5000-6000 iterations are enough.
+2. Steady state simuation: you can now move to the `laminarBuoyantSimpleSMOKE` folder. Copy the last time folder calculated by the unsteady solver (point 1 above), build the mesh using the `blockMesh` utility, and run the case using the `laminarBuoyantSimpleSMOKE` solver. In order to reach the steady state conditions, 5000-6000 iterations are enough.
