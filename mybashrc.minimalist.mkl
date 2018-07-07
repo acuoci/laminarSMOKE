@@ -1,5 +1,4 @@
-#OpenFOAM VERSION (22, 23, 24, 30, 40)
-#OpenFOAM-dev is equivalent to 40
+#OpenFOAM VERSION (22, 23, 24, 30, >=40)
 export OPENFOAM_VERSION='-DOPENFOAM_VERSION=40'
 
 #If OpenFOAM dev version is used, this must be equal to 1
