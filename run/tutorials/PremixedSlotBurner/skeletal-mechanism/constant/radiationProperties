@@ -1,0 +1,113 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.7.1                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      radiationProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+radiation               off;
+radiationModel          none;
+solverFreq 	        10;
+absorptionEmissionModel greyMeanAbsorptionEmission;
+scatterModel    	none;
+
+fvDOMCoeffs
+{
+    nPhi        4;          // azimuthal angles in PI/2 on X-Y.(from Y to X)
+    nTheta      0;          // polar angles in PI (from Z to X-Y plane)
+    convergence 1e-2;       // convergence criteria for radiation iteration
+    maxIter     4;          // maximum number of iterations
+    cacheDiv    true;       // cache the div of the RTE equation.
+}
+
+opticallyThinCoeffs
+{
+    ambientTemperature        300;	// Ambient temperature in K
+}
+
+constantAbsorptionEmissionCoeffs
+{
+    absorptivity    absorptivity    [ m^-1 ]       0.01;
+    emissivity      emissivity      [ m^-1 ]       0.01;
+    E               E               [ kg m^-1 s^-3 ]  0;
+}
+
+greyMeanAbsorptionEmissionCoeffs
+{
+    lookUpTableFileName     none;
+
+    EhrrCoeff               0.0;
+
+    sootRadiation	    none;
+
+    N2
+    {
+        Tcommon         200;
+        invTemp         true;
+        Tlow            200;
+        Thigh           3000;
+
+        loTcoeffs
+        ( 0 0 0 0 0 0 );
+        hiTcoeffs
+        ( 0.1 0 0 0 0 0 );
+    }
+
+    H2O
+    {
+        Tcommon         200;
+        invTemp         true;
+        Tlow            200;
+        Thigh           3000;
+
+        loTcoeffs ( 0 0 0 0 0 0 );
+        hiTcoeffs ( -0.23093 -1.12390e3 9.4153e6 -2.99885e9 0.51382e12 -1.868e10 );
+    }
+
+    CO2
+    {
+        Tcommon         200;   
+        invTemp         true;  
+        Tlow            200;   
+        Thigh           3000;  
+
+        loTcoeffs ( 0 0 0 0 0 0 );
+        hiTcoeffs ( 18.741 -121.31e3  273.5e6 -194.05e9 56.31e12 -5.8169e15 );
+    }
+
+    CH4
+    {
+        Tcommon         200;
+        Tlow            200;
+        Thigh           3000;
+        invTemp         false;
+
+        loTcoeffs ( 0 0 0 0 0 0 );
+        hiTcoeffs (  6.6334 -0.0035686 1.6682e-8 2.5611e-10 -2.6558e-14 0 );
+    }
+    
+    /*
+    CO
+    {
+        Tcommon         750;   
+        invTemp         false; 
+        Tlow            200;   
+        Thigh           3000;  
+
+        loTcoeffs ( 4.7869 -0.06953 2.9577e-4 -4.25732e-7 2.02894e-10 0 );
+        hiTcoeffs ( 10.09 -0.01183 4.7753e-6 -5.87209e-10 -2.5334e-14 0 );
+    }
+    */
+}
+
+// ************************************************************************* //

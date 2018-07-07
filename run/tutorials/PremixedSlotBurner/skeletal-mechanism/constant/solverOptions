@@ -1,0 +1,108 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.2;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      solverOptions;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+Kinetics
+{
+	folder			"../../../kinetic-mechanisms/POLIMI_CH4_SKELETAL_1412/kinetics";
+	inertSpecies 		N2;
+}
+
+PhysicalModel
+{
+	strangAlgorithm 		"MomentumTransportReaction";
+	homogeneousReactions 		on;
+	momentumEquations		on;
+	speciesEquations		on;
+	energyEquation			on;
+	constPressureBatchReactor 	true;
+	sparseJacobian			false;
+	
+	mwCorrectionInDiffusionFluxes	on;
+	massDiffusionInEnergyEquation	on;
+	diffusivityModel		"multi-component";
+        simplifiedTransportProperties   on;
+	
+	thermophoreticEffect		off;
+	soretEffect			off;
+
+	includeDpDt			off;
+	thermodynamicPressure		101325.;
+
+	zMixEquation			on;
+	tauEquation			on;
+	zMixDmixSpecies			N2;
+
+	minTemperature4Chemistry	0;
+}
+
+OdeHomogeneous
+{
+	odeSolver 	"OpenSMOKE";
+	relTolerance 	1e-6;
+	absTolerance 	1e-10;
+	maximumOrder 	5;
+	fullPivoting 	false;
+
+	CHEMEQ2
+	{
+		epsilonMinimum	1e-2;
+		epsilonMaximum	1e2;
+		yMinimum	1e-32;
+		dtMinimum	1e-20;
+		subIterations	1;
+	}
+}
+
+Spark
+{
+	spark 		on;
+	position    	(1.5e-3 0. 6e-3);
+	time		0.;
+	temperature 	1800;
+	duration 	0.001;
+	diameter 	1.e-3;
+}
+
+VirtualChemistry
+{
+	virtualChemistry	off;
+}
+
+Output
+{
+	gasProperties		off;
+	gasRadiation		off;
+	formationRates		off;
+	diffusivities		off;
+}
+
+PolimiSoot
+{
+	thermophoreticEffectTag "BIN";
+	physicalSootDiffusivity	off;
+}
+
+PostProcessing
+{
+	soot	off;
+}
+
+#include "drgOptions"
+#include "isatOptions"
+#include "lewisNumbers"
+
+// ************************************************************************* //
