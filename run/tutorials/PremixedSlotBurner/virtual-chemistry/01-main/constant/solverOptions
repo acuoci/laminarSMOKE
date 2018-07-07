@@ -1,0 +1,136 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.2;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      solverOptions;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+Kinetics
+{
+	folder			"../data/virtual-chemistry-170911/kinetics";
+	inertSpecies 		N2;
+}
+
+PhysicalModel
+{
+	strangAlgorithm 		"MomentumTransportReaction";
+	homogeneousReactions 		on;
+	momentumEquations		on;
+	speciesEquations		on;
+	energyEquation			on;
+	constPressureBatchReactor 	true;
+	sparseJacobian			false;
+	
+	mwCorrectionInDiffusionFluxes	off;
+	massDiffusionInEnergyEquation	off;
+	diffusivityModel		"lewis-numbers";
+        simplifiedTransportProperties   on;
+	
+	thermophoreticEffect		off;
+	soretEffect			off;
+
+	includeDpDt			off;
+	thermodynamicPressure		101325.;
+
+	zMixEquation			on;
+	tauEquation			on;
+	zMixDmixSpecies			N2;
+
+	minTemperature4Chemistry	0;
+}
+
+OdeHomogeneous
+{
+	odeSolver 	"OpenSMOKE";
+	relTolerance 	1e-6;
+	absTolerance 	1e-10;
+	maximumOrder 	5;
+	fullPivoting 	false;
+
+	CHEMEQ2
+	{
+		epsilonMinimum	1e-2;
+		epsilonMaximum	1e2;
+		yMinimum	1e-32;
+		dtMinimum	1e-20;
+		subIterations	1;
+	}
+}
+
+Spark
+{
+	spark 		on;
+	position    	(1.5e-3 0. 6e-3);
+	time		0.;
+	temperature 	1800;
+	duration 	0.001;
+	diameter 	1.e-3;
+}
+
+VirtualChemistry
+{
+	virtualChemistry	on;
+	subMechanismCO		off;
+	subMechanismNO		off;
+	
+	table_main		"../data/virtual-chemistry-170911/lookuptable.dat";
+
+	table_co		"../data/virtual-chemistry-170911-CO/lookuptable.co.dat";
+
+	table_no1		"../data/virtual-chemistry-170911-NO-20180622/lookuptable.no.dat.1";
+	table_no2		"../data/virtual-chemistry-170911-NO-20180622/lookuptable.no.dat.2";
+	table_no3		"../data/virtual-chemistry-170911-NO-20180622/lookuptable.no.dat.3";
+	table_no4		"../data/virtual-chemistry-170911-NO-20180622/lookuptable.no.dat.4";
+	table_no5		"../data/virtual-chemistry-170911-NO-20180622/lookuptable.no.dat.5";
+	
+	iVersion		170911;
+
+	fuelName		"FUEL";
+	fuelMW			16.043000;
+	oxidizerName		"OX";
+	oxidizerMW		31.997999;
+	inertName		"N2";
+	inertMW			28.014000;
+
+	mu0   1.8405e-5;	// [kg/m/s]
+	T0    300.;		// [K]
+	Beta0 0.6759;
+	Pr0   0.7;
+
+	tableCheck		"table.dat";
+}
+
+Output
+{
+	gasProperties		off;
+	gasRadiation		off;
+	formationRates		off;
+	diffusivities		off;
+}
+
+PolimiSoot
+{
+	thermophoreticEffectTag "BIN";
+	physicalSootDiffusivity	off;
+}
+
+PostProcessing
+{
+	soot	off;
+}
+
+#include "drgOptions"
+#include "isatOptions"
+#include "lewisNumbers"
+
+// ************************************************************************* //
