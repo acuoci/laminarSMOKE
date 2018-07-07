@@ -8,30 +8,20 @@
 FoamFile
 {
     version     2.0;
-    format      ascii;
+    format      acii;
     class       dictionary;
     location    "constant";
-    object      lewisNumbers;
+    object      drgOptions;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-LewisNumbers
+DRG
 {
-	FUEL 	1.;
-	OX	1.;
-	I	1.;
-	P1	1.;
-	P2	1.;
-	P3	1.;
-	P4	1.;
-	N2	1.;
-	CO	1.;
-	V1	1.;
-	V2	1.;
-	NO	1.;
-	W1	1.;
-	W2	1.;
-	W3	1.;
+        drg     	off;
+        minTemperature  300;
+        temperature     1000. 3000.;
+        epsilon         0.01  0.001;
+        species         (H2 N2 OH);
 }
 
 // ************************************************************************* //

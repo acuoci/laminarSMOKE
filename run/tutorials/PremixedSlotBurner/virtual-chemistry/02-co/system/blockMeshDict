@@ -1,0 +1,109 @@
+/*---------------------------------------------------------------------------*\               
+| =========                 |                                                 |                
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |                
+|  \\    /   O peration     | Version:  1.0                                   |                
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |                
+|    \\/     M anipulation  |                                                 |                
+\*---------------------------------------------------------------------------*/                
+                                        
+FoamFile                                
+{                                       
+    version         2.0;                
+    format          ascii;              
+                                        
+    root            "";               
+    case            "";               
+    instance        "";               
+    local           "";               
+                                        
+    class           dictionary;         
+    object          blockMeshDict;      
+}          
+
+
+convertToMeters 0.001;  
+
+L1    6.;
+L2    12.;
+
+X1    3;
+X2    6;
+Yp    0.01;
+Ym   -0.01;
+                                         
+vertices                                
+(                                       
+   (0.		$Ym  	  $L1	)   // 0
+   (0. 		$Yp       $L1	)   // 1
+   ($X1		$Ym  	  $L1	)   // 2
+   ($X1 	$Yp       $L1	)   // 3
+   ($X2		$Ym  	  $L1	)   // 4
+   ($X2 	$Yp       $L1	)   // 5
+
+   (0.		$Ym  	  $L2	)   // 6
+   (0. 		$Yp       $L2	)   // 7
+   ($X1		$Ym  	  $L2	)   // 8
+   ($X1 	$Yp       $L2	)   // 9
+   ($X2		$Ym  	  $L2	)   // 10
+   ($X2 	$Yp       $L2	)   // 11
+
+   (0.		$Ym  	  0.	)   // 12
+   (0. 		$Yp       0.	)   // 13
+   ($X1		$Ym  	  0.	)   // 14
+   ($X1 	$Yp       0.	)   // 15
+);
+
+NX       12;
+NZbottom 24;
+NZtop    24;
+
+GX       1.;
+GZbottom 1.;
+GZtop    1.;
+
+blocks
+( 	
+	// Fuel
+	hex (12 14 15 13 0 2 3 1)     ($NX   1 $NZbottom  )  simpleGrading   ($GX  1. $GZbottom	)
+	hex (0 2 3 1 6 8 9 7)         ($NX   1 $NZtop     )  simpleGrading   ($GX  1. $GZtop	)
+);                                            
+                             
+patches                              
+(                                    
+    patch inlet                  
+    (                                
+        (13 15 14 12)                    
+    )
+                                
+    patch outlet                     
+    (                                
+        (7 6 8 9)
+    )                                
+                                                                     
+    wall leftside                    
+    (                                              
+        (9 8 2 3)                                 
+        (3 2 14 15)                   
+    )                                
+                                     
+    symmetryPlane axis                       
+    (                                
+        (6 7 1 0)                    
+        (0 1 13 12)                    
+    )   
+                               
+    empty frontAndBack                     
+    (                                
+        (8 6 0 2)
+	(2 0 12 14)                
+
+	(15 13 1 3)
+	(3 1 7 9)              
+    )                                
+                                     
+);                                   
+                                     
+mergePatchPairs                      
+(                                    
+);                                   
+                                                                  
