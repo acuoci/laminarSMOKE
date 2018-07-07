@@ -6,9 +6,9 @@ set title "Residuals"
 set ylabel 'Residual'
 set xlabel 'Iteration'
 
-plot "< cat log | grep 'Solving for CH4,' |  cut -d' ' -f9 | tr -d ','" title 'CH4'  with lines,\
-     "< cat log | grep 'Solving for O2,'  |  cut -d' ' -f9 | tr -d ','" title 'O2'  with lines,\
-     "< cat log | grep 'Solving for H2O,' |  cut -d' ' -f9 | tr -d ','" title 'H2O' with lines,\
+plot "< cat log | grep 'Solving for FUEL,' |  cut -d' ' -f9 | tr -d ','" title 'FUEL'  with lines,\
+     "< cat log | grep 'Solving for OX,'   |  cut -d' ' -f9 | tr -d ','" title 'OX'  with lines,\
+     "< cat log | grep 'Solving for NO,'  |  cut -d' ' -f9 | tr -d ','" title 'NO' with lines,\
      "< cat log | grep 'Solving for T,'   |  cut -d' ' -f9 | tr -d ','" title 'T'   with lines,\
      "< cat log | grep 'Solving for Ux,'  |  cut -d' ' -f9 | tr -d ','" title 'Ux'  with lines,\
      "< cat log | grep 'Solving for Uz,'  |  cut -d' ' -f9 | tr -d ','" title 'Uz'  with lines
