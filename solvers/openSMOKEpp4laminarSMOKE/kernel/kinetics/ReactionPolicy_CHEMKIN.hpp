@@ -1573,17 +1573,17 @@ namespace OpenSMOKE
 		}
 	}
 
-	void ReactionPolicy_CHEMKIN::GetReactionStringCHEMKIN(	const std::vector<std::string>& list_species, std::stringstream& reaction_data) const
+	void ReactionPolicy_CHEMKIN::GetReactionStringCHEMKIN(	const std::vector<std::string>& list_species, std::stringstream& reaction_data, const std::string& strong_comment) const
 	{
 		std::vector<bool> isReducedSpecies(list_species.size());
 		for(unsigned int i=0;i<list_species.size();i++)
 			isReducedSpecies[i] = true;
 
-		GetReactionStringCHEMKIN( list_species, reaction_data, isReducedSpecies);
+		GetReactionStringCHEMKIN( list_species, reaction_data, isReducedSpecies, strong_comment);
 	}
 
 	void ReactionPolicy_CHEMKIN::GetReactionStringCHEMKIN(const std::vector<std::string>& list_species,
-                std::stringstream& reaction_data, const std::vector<bool>& isReducedSpecies) const
+                std::stringstream& reaction_data, const std::vector<bool>& isReducedSpecies, const std::string& strong_comment) const
 	{
         std::string reaction_string;
         GetReactionString(list_species, reaction_string);
@@ -1603,8 +1603,11 @@ namespace OpenSMOKE
             reaction_data.width(9);
 			reaction_data << std::fixed << std::right << beta_;
             reaction_data.precision(2);
-            reaction_data << std::setw(13) << std::right <<E_over_R() * PhysicalConstants::R_cal_mol << std::endl;
-            
+			if (strong_comment.length() > 2)
+				reaction_data << std::setw(13) << std::right << E_over_R() * PhysicalConstants::R_cal_mol << "     " << strong_comment << std::endl;
+			else
+				reaction_data << std::setw(13) << std::right << E_over_R() * PhysicalConstants::R_cal_mol << std::endl;
+
             if(IsDuplicate() == true)
                 reaction_data << " DUPLICATE" << std::endl;
             

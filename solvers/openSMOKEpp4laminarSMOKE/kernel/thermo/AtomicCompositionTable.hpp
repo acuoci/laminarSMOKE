@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------*\
+/*-----------------------------------------------------------------------*\
 |    ___                   ____  __  __  ___  _  _______                  |
 |   / _ \ _ __   ___ _ __ / ___||  \/  |/ _ \| |/ / ____| _     _         |
 |  | | | | '_ \ / _ \ '_ \\___ \| |\/| | | | | ' /|  _| _| |_ _| |_       |
@@ -241,13 +241,12 @@ namespace OpenSMOKE
 					reaction.set_product_nu(i, new_coefficient);
 				}
 
+				return 1;
 			}
 			else
 			{
-				OpenSMOKE::FatalErrorMessage("Something wrong in the stoichiometry: number of equations larger than number of unknowns");
+				return 0;
 			}
-
-			return 0;
 		}
 	}
 

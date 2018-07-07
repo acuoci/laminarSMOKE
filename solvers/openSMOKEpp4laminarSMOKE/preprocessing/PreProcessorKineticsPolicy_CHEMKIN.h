@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------*\
+/*-----------------------------------------------------------------------*\
 |    ___                   ____  __  __  ___  _  _______                  |
 |   / _ \ _ __   ___ _ __ / ___||  \/  |/ _ \| |/ / ____| _     _         |
 |  | | | | '_ \ / _ \ '_ \\___ \| |\/| | | | | ' /|  _| _| |_ _| |_       |
@@ -38,6 +38,7 @@
 #define	OpenSMOKE_PreProcessorKineticsPolicy_CHEMKIN_H
 
 #include "kernel/thermo/InputFileCHEMKIN.h"
+#include "AbstractionReactions.h"
 
 namespace OpenSMOKE
 {
@@ -140,6 +141,7 @@ namespace OpenSMOKE
 	protected:
 
 		InputFileCHEMKIN* myKinetics;				//!< file containing the kinetic mechanism in CHEMKIN format 
+		AbstractionReactions* abstractions_;		//!< pointer to abstraction reactions class
 		std::vector<unsigned int> reaction_lines;	//!< list of lines referring to a reaction 
 		std::vector<unsigned int> iReactionLines;   //!< indices of lines referring to a reaction 
 

@@ -174,8 +174,15 @@ namespace OpenSMOKE
 			typename Thermo::map_species::iterator thermo_it=thermo_species.find(kinetics.names_species()[i]);
 			if( thermo_it == thermo_species.end())
 			{
+				if (kinetics.names_species()[i] == "R" || kinetics.names_species()[i] == "RH")
+				{
+					iThermoFound == true;
+				}
+				else
+				{
 					iThermoFound = false;
 					std::cout << "Error: This species is not available in thermodynamic database: " << kinetics.names_species()[i] << std::endl;
+				}
 			}
 			
 			if (iThermoFound == true)

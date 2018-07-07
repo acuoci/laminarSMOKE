@@ -81,6 +81,11 @@ namespace OpenSMOKE
 			{
 					std::getline(myfile,line);
 
+					size_t found_comment = line.find("!#");
+					std::string comment = "";
+					if (found_comment != line.npos)
+						comment = line.substr(found_comment);
+
 					size_t found=line.find_first_of("!");
 					if (found!=line.npos)
 						line.erase(found);
@@ -95,6 +100,7 @@ namespace OpenSMOKE
 					{	
 							good_lines_.push_back(line);
 							indices_of_good_lines_.push_back(count);
+							strong_comments_.push_back(comment);
 					}
 					count++;
 			}
@@ -104,6 +110,25 @@ namespace OpenSMOKE
 			number_of_blank_lines_ = boost::lexical_cast<int>(indices_of_blank_lines_.size());
 			number_of_good_lines_ = boost::lexical_cast<int>(indices_of_good_lines_.size());
 			number_of_lines_ = number_of_blank_lines_ + number_of_good_lines_;
+	}
+
+	void InputFileCHEMKIN::ConvertGoodLinesIntoBlankLines(const std::vector<unsigned int> lines_to_remove)
+	{
+		std::vector<unsigned int> indices = lines_to_remove;
+		std::sort(indices.begin(), indices.end());
+		std::reverse(indices.begin(), indices.end());
+
+		number_of_blank_lines_ += indices.size();
+		number_of_good_lines_ -= indices.size();
+
+		for (unsigned int j = 0; j < indices.size(); j++)
+		{
+			indices_of_blank_lines_.push_back(indices_of_good_lines_[indices[j]]);
+			indices_of_good_lines_.erase(indices_of_good_lines_.begin() + (indices[j]-1));
+		}
+
+		for (unsigned int j = 0; j<indices.size(); j++)
+			good_lines_.erase(good_lines_.begin() + (indices[j]-1));	
 	}
 
 	InputFileCHEMKIN::InputFileCHEMKIN(const InputFileCHEMKIN& orig) {

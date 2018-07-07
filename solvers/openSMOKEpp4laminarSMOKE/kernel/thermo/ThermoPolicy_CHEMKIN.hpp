@@ -1198,6 +1198,16 @@ namespace OpenSMOKE
 				fout << "&";
 			fout << std::endl;
 
+			if (list_of_nonstandard_atomic_composition.size() != 0)
+			{
+				for (unsigned int j = 0; j<list_of_nonstandard_atomic_composition.size(); j++)
+				{
+					unsigned int i = list_of_nonstandard_atomic_composition[j];
+					fout << atomic_composition_.element_names()[i] << " " << atomic_composition_.element_coefficients()[i] << " ";
+				}
+				fout << std::endl;
+			}
+
 			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(AHT,2);
 			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(BHT,2);
 			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(CHT,2);
@@ -1216,16 +1226,6 @@ namespace OpenSMOKE
 			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(GLT,2);
 			fout << std::setw(15) << " ";
 			fout << "    4" << std::endl;
-
-			if (list_of_nonstandard_atomic_composition.size() != 0)
-			{
-				for(unsigned int j=0;j<list_of_nonstandard_atomic_composition.size();j++)
-				{
-					unsigned int i = list_of_standard_atomic_composition[j];
-					fout << atomic_composition_.element_names()[i] << " " << atomic_composition_.element_coefficients()[i] << " ";
-				}
-				fout << std::endl;
-			}
 		}
 	}
 
@@ -1405,6 +1405,16 @@ namespace OpenSMOKE
 				fout << "&";
 			fout << std::endl;
 
+			if (list_of_nonstandard_atomic_composition.size() != 0)
+			{
+				for (unsigned int j = 0; j<list_of_nonstandard_atomic_composition.size(); j++)
+				{
+					unsigned int i = list_of_nonstandard_atomic_composition[j];
+					fout << atomic_composition_.element_names()[i] << " " << atomic_composition_.element_coefficients()[i] << " ";
+				}
+				fout << std::endl;
+			}
+
 			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(AHT, 2);
 			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(BHT, 2);
 			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(CHT, 2);
@@ -1423,16 +1433,6 @@ namespace OpenSMOKE
 			fout << std::setw(15) << std::right << ScientificNotationWithFixedExponentDigits(GLT, 2);
 			fout << std::setw(15) << " ";
 			fout << "    4" << std::endl;
-
-			if (list_of_nonstandard_atomic_composition.size() != 0)
-			{
-				for (unsigned int j = 0; j<list_of_nonstandard_atomic_composition.size(); j++)
-				{
-					unsigned int i = list_of_standard_atomic_composition[j];
-					fout << atomic_composition_.element_names()[i] << " " << atomic_composition_.element_coefficients()[i] << " ";
-				}
-				fout << std::endl;
-			}
 		}
 	}
 }

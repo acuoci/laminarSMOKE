@@ -168,6 +168,98 @@ namespace OpenSMOKE
 		this->P_ = P;
 	}
 
+	void ThermodynamicsMap_CHEMKIN::Change_a_HT(const unsigned int species, const unsigned int j, const double value)
+	{
+
+		const unsigned int i1 = species * 5 + (j - 1);
+		const unsigned int i2 = species * 6 + (j - 1);
+			
+		if (j == 1)
+		{
+			Cp_HT[i1] = value;
+			DH_HT[i2] = value;
+			DS_HT[i2] = value;
+		}
+		else if (j == 2)
+		{
+			Cp_HT[i1] = value;
+			DH_HT[i2] = value/2.;
+			DS_HT[i2] = value;
+		}
+		else if (j == 3)
+		{
+			Cp_HT[i1] = value;
+			DH_HT[i2] = value/3.;
+			DS_HT[i2] = value/2.;
+		}
+		else if (j == 4)
+		{
+			Cp_HT[i1] = value;
+			DH_HT[i2] = value/4.;
+			DS_HT[i2] = value/3.;
+		}
+		else if (j == 5)
+		{
+			Cp_HT[i1] = value;
+			DH_HT[i2] = value/5.;
+			DS_HT[i2] = value/4.;
+		}
+		else if (j == 6)
+		{
+			DH_HT[i2] = value;
+		}
+		else if (j == 7)
+		{
+			DS_HT[i2] = value;
+		}
+	}
+
+	void ThermodynamicsMap_CHEMKIN::Change_a_LT(const unsigned int species, const unsigned int j, const double value)
+	{
+
+		const unsigned int i1 = species * 5 + (j - 1);
+		const unsigned int i2 = species * 6 + (j - 1);
+
+		if (j == 1)
+		{
+			Cp_LT[i1] = value;
+			DH_LT[i2] = value;
+			DS_LT[i2] = value;
+		}
+		else if (j == 2)
+		{
+			Cp_LT[i1] = value;
+			DH_LT[i2] = value / 2.;
+			DS_LT[i2] = value;
+		}
+		else if (j == 3)
+		{
+			Cp_LT[i1] = value;
+			DH_LT[i2] = value / 3.;
+			DS_LT[i2] = value / 2.;
+		}
+		else if (j == 4)
+		{
+			Cp_LT[i1] = value;
+			DH_LT[i2] = value / 4.;
+			DS_LT[i2] = value / 3.;
+		}
+		else if (j == 5)
+		{
+			Cp_LT[i1] = value;
+			DH_LT[i2] = value / 5.;
+			DS_LT[i2] = value / 4.;
+		}
+		else if (j == 6)
+		{
+			DH_LT[i2] = value;
+		}
+		else if (j == 7)
+		{
+			DS_LT[i2] = value;
+		}
+	}
+
 	void ThermodynamicsMap_CHEMKIN::SetCoefficients(const unsigned k, const double* coefficients)
 	{
 		const double one_third = 1./3.;

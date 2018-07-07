@@ -16,7 +16,7 @@
 |                                                                         |
 |   This file is part of OpenSMOKE++ framework.                           |
 |                                                                         |
-|	License                                                           |
+|	License                                                               |
 |                                                                         |
 |   Copyright(C) 2014, 2013, 2012  Alberto Cuoci                          |
 |   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
@@ -44,7 +44,7 @@
 
 namespace OpenSMOKE
 {
-	const double TransportPropertiesMap_CHEMKIN::threshold_ = 1.e-12;
+	const double TransportPropertiesMap_CHEMKIN::threshold_ = 1.e-14;
 
 	TransportPropertiesMap_CHEMKIN::TransportPropertiesMap_CHEMKIN(const unsigned int nSpecies)
 	{
@@ -640,10 +640,10 @@ namespace OpenSMOKE
 		if (viscosity_model_node != 0)
 		{
 			const std::string dummy = boost::trim_copy(std::string(viscosity_model_node->value()));
-			
-			std::cout << " * User-defined viscosity model: " << dummy << std::endl;
 
-			if (dummy == "Wilke")			viscosity_model = PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_WILKE;
+			std::cout << " * User defined viscosity model: " << dummy << std::endl;
+
+			if (dummy == "Wilke")				viscosity_model = PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_WILKE;
 			else if (dummy == "Herning")		viscosity_model = PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_HERNING;
 			else if (dummy == "MathurSaxena")	viscosity_model = PhysicalConstants::OPENSMOKE_GASMIXTURE_VISCOSITYMODEL_MATHUR_SAXENA;
 			else ErrorMessage("TransportPropertiesMap_CHEMKIN::ImportViscosityModelFromXMLFile", "Error in reading the viscosity model.");

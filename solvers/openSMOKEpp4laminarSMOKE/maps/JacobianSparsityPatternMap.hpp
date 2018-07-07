@@ -283,11 +283,13 @@ namespace OpenSMOKE
 			}
 		}
 
+		/*
 		std::cout << "Jacobian sparsity pattern " << std::endl;
 		std::cout << " * black elements:  " << jacobian_matrix_->nonZeros() << " (" << jacobian_matrix_->nonZeros() / double(nc*nc)*100. << "%)" << std::endl;
 		std::cout << " * white elements:  " << nc*nc - jacobian_matrix_->nonZeros() << " (" << (nc*nc - jacobian_matrix_->nonZeros()) / double(nc*nc)*100. << "%)" << std::endl;
 		std::cout << " * blacks per row:  " << jacobian_matrix_->nonZeros() / double(nc) << std::endl;
 		std::cout << std::endl;
+		*/
 	}
 
 	template<typename map>

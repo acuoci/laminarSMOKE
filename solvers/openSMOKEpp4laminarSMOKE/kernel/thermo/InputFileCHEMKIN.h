@@ -109,6 +109,11 @@ namespace OpenSMOKE
 		*@brief Returns the blank lines (i.e. lines to be interpreted)
 		*/
 		const std::vector<std::string>& blank_lines() const { return blank_lines_; }
+
+		/**
+		*@brief Returns the strong comments 
+		*/
+		const std::vector<std::string>& strong_comments() const { return strong_comments_; }
     
 		/**
 		*@brief Returns the name of the file
@@ -129,6 +134,13 @@ namespace OpenSMOKE
 		*@brief Writes information about the status of the file on output stream
 		*/
 		void Status(std::ostream &fOut) const;
+
+		void ConvertGoodLinesIntoBlankLines(const std::vector<unsigned int> indices);
+
+		/**
+		*@brief Returns the good lines (i.e. lines to be interpreted)
+		*/
+		void ReplaceGoodLine(const unsigned int i, const std::string& line) { good_lines_[i] = line; }
     
 	private:
     
@@ -139,6 +151,7 @@ namespace OpenSMOKE
 		std::vector<int> indices_of_blank_lines_;		//!< indices of blank lines
 		std::vector<std::string> good_lines_;			//!< good lines
 		std::vector<std::string> blank_lines_;			//!< blank lines
+		std::vector<std::string> strong_comments_;		//!< strong comments
     
 		boost::filesystem::path* file_name_;			//!< full name (path + file name)
     

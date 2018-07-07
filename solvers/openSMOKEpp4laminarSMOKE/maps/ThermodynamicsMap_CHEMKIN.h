@@ -321,6 +321,22 @@ namespace OpenSMOKE
 		*/
 		void NASA_Coefficients(double* coefficients) const;
 
+		/**
+		*@brief Changes the raw NASA coefficients (low-temperature) of a given species
+		*@param species the index (0-based) of species to be changed
+		*@param j the index (from 1 to 7) of coefficient to be changed
+		*@param value the new value
+		*/
+		void Change_a_LT(const unsigned int species, const unsigned int j, const double value);
+
+		/**
+		*@brief Changes the raw NASA coefficients (high-temperature) of a given species
+		*@param species the index (0-based) of species to be changed
+		*@param j the index (from 1 to 7) of coefficient to be changed
+		*@param value the new value
+		*/
+		void Change_a_HT(const unsigned int species, const unsigned int j, const double value);
+
 
 	protected:
 

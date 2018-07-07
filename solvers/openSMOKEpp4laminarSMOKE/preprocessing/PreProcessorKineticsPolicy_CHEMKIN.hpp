@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------*\
+/*-----------------------------------------------------------------------*\
 |    ___                   ____  __  __  ___  _  _______                  |
 |   / _ \ _ __   ___ _ __ / ___||  \/  |/ _ \| |/ / ____| _     _         |
 |  | | | | '_ \ / _ \ '_ \\___ \| |\/| | | | | ' /|  _| _| |_ _| |_       |
@@ -71,21 +71,27 @@ namespace OpenSMOKE
 		//myKinetics->Status(std::cout);
 
 		{
-			std::vector<unsigned int> iElementLines;
-			std::vector<unsigned int> iSpeciesLines;
-			std::vector<unsigned int> iEndLines;
-			std::vector<unsigned int> iThermoLines;
-
-			for (unsigned int j=0;j<myKinetics->good_lines().size();j++)
+			// Abstractions (CRECK Modeling standard, not available in original CHEMKIN)
+			std::cout << " * Check if Abstraction Reaction module is available... " << std::endl;
+			abstractions_ = new AbstractionReactions(*myKinetics);
+			if (abstractions_->is_active() == true)
 			{
-				size_t found=myKinetics->good_lines()[j].find("REACTIONS");
-				if (found!=std::string::npos)
+				std::cout << " * Found Abstraction Reaction Module... " << std::endl;
+				abstractions_->Checking(*myKinetics);
+				abstractions_->ExtractTables();
+				abstractions_->Summary(std::cout);
+			}
+
+			for (unsigned int j = 0; j<myKinetics->good_lines().size(); j++)
+			{
+				size_t found = myKinetics->good_lines()[j].find("REACTIONS");
+				if (found != std::string::npos)
 				{
 					iReactionLines.push_back(j);
 					break;
 				}
-				found=myKinetics->good_lines()[j].find("reactions");
-				if (found!=std::string::npos)
+				found = myKinetics->good_lines()[j].find("reactions");
+				if (found != std::string::npos)
 				{
 					iReactionLines.push_back(j);
 					break;
@@ -98,6 +104,10 @@ namespace OpenSMOKE
 				return false;
 			}
 
+			std::vector<unsigned int> iElementLines;
+			std::vector<unsigned int> iSpeciesLines;
+			std::vector<unsigned int> iEndLines;
+			std::vector<unsigned int> iThermoLines;
 			for (unsigned int j=0;j<iReactionLines[0];j++)
 			{
 				std::string line = myKinetics->good_lines()[j];
@@ -313,6 +323,17 @@ namespace OpenSMOKE
 				tokenizer_blank tokens(line_species, sep_blank);
 				for (tokenizer_blank::iterator tok_iter = tokens.begin();tok_iter != tokens.end(); ++tok_iter)
 					names_species_.push_back(*tok_iter);
+
+				// Abstractions
+				if (abstractions_->is_active() == true)
+				{
+					names_species_.push_back("R");
+					names_species_.push_back("RH");
+
+					// Check the species
+					if ( abstractions_->CheckListOfSpecies(names_species_) == false)
+						return false;
+				}
 				
 				// Checking if a species appears more tha once
 				{
@@ -425,6 +446,25 @@ namespace OpenSMOKE
 		if (number_of_reactions > 20)
 			std::cout << " * Parsing " << number_of_reactions << " reactions: ";
 
+		// Abstractions
+		if (abstractions_->is_active() == true)
+		{
+			for (unsigned int j = 0; j < number_of_reactions; j++)
+			{
+				std::string line = myKinetics->good_lines()[reaction_lines[j]];
+				const int success = abstractions_->ReplaceAbstractionReaction(line);
+
+				if (success == -1)
+				{
+					const unsigned int index_line = myKinetics->indices_of_good_lines()[reaction_lines[j]];
+					std::cout << "Fatal error: please check the abstraction reaction at line: " << index_line << std::endl;
+					return false;
+				}
+
+				myKinetics->ReplaceGoodLine(reaction_lines[j], line);
+			}
+		}
+
 		unsigned int large_error_in_stoichiometries = 0;
 		unsigned int small_error_in_stoichiometries = 0;
 		for (unsigned int j=0;j<number_of_reactions;j++)
@@ -473,10 +513,11 @@ namespace OpenSMOKE
 
 						// Correct the stoichiometry and write the corrected reaction
 						{
-							atomicComposition.CorrectStoichiometry(reactions_[j]);
+							unsigned int flag = atomicComposition.CorrectStoichiometry(reactions_[j]);
 							std::string reaction_string; reactions_[j].GetReactionString(names_species(), reaction_string);
 							boost::erase_all(reaction_string, " ");
-							flog << "Corrected reaction (line " << reaction_lines[j] + 1 << "): " << reaction_string << std::endl;
+							if (flag == 1)	flog << "Corrected reaction (line " << reaction_lines[j] + 1 << "): " << reaction_string << std::endl;
+							else            flog << "Correction failed for reaction (line " << reaction_lines[j] + 1 << "): " << reaction_string << std::endl;
 						}
 					}					
 					flog << std::endl;
@@ -486,6 +527,88 @@ namespace OpenSMOKE
 			{
 				std::cout << "Reading kinetic scheme: error in reaction starting at line " << myKinetics->indices_of_good_lines()[k] << std::endl;
 				return false;
+			}
+		}
+
+		if (abstractions_->is_active() == true)
+		{
+			// Search for abstraction reactions
+			std::vector<unsigned int> list_lines_to_be_exploded;
+			{
+				std::cout << " * Search for abstraction reactions..." << std::endl;
+				
+				unsigned int n_abstraction_reactions = 0;
+				for (unsigned int j = 0; j < number_of_reactions; j++)
+				{
+					const int is_abstraction = abstractions_->ParseReaction(reactions_[j], names_species_);
+
+					if (is_abstraction == 1)	// abstraction reaction
+					{
+						n_abstraction_reactions++;
+						std::vector<unsigned int> list_of_lines;
+						for (unsigned int i = reaction_lines[j]; i < reaction_lines[j + 1]; i++)
+							list_of_lines.push_back(i);
+
+						if (list_of_lines.size() != 1)
+						{
+							std::cout << "The abstraction reactions must be written in a single line. No multiple lines are allowed." << std::endl;
+							std::cout << "Please check the abstraction reaction starting at line: " << reaction_lines[j] << std::endl;
+							return false;
+						}
+						else
+						{
+							list_lines_to_be_exploded.push_back(list_of_lines[0]);
+						}
+					}
+					else if (is_abstraction == -1) // conventional reaction
+					{
+						std::cout << "Please check the abstraction reaction starting at line: " << myKinetics->indices_of_good_lines()[reaction_lines[j]] << std::endl;
+						return false;
+					}
+				}
+
+				std::cout << "   Found (to be exploded): " << n_abstraction_reactions << std::endl;
+			}
+
+			// Check for exisiting abstraction reactions
+			{
+				std::cout << " * Checking for abstraction reactions already available in the mechanism..." << std::endl;
+				unsigned int n_existing_reactions = 0;
+				for (unsigned int j = 0; j < number_of_reactions; j++)
+					n_existing_reactions += abstractions_->RemoveExistingReactions(reactions_[j], names_species_);
+				std::cout << "   Found: " << n_existing_reactions << std::endl;
+			}
+
+			// Exploding abstraction reactions
+			{
+				std::cout << " * Exploding abstraction reactions..." << std::endl;
+				abstractions_->ExplodeReactions();
+			}
+
+			// Write abstraction reactions on EXT file
+			{
+				std::cout << " * Writing abstraction reactions on file..." << std::endl;
+				boost::filesystem::path exploded_file_name = myKinetics->folder_path() / (myKinetics->file_name().string() + ".EXT");
+				std::ofstream fExploded(exploded_file_name.string(), std::ios::out);
+				for (unsigned int j = 0; j < myKinetics->good_lines().size(); j++)
+				{
+					std::vector<unsigned int>::iterator it = std::find(list_lines_to_be_exploded.begin(), list_lines_to_be_exploded.end(), j);
+
+					if (it != list_lines_to_be_exploded.end())
+					{
+						const unsigned int k = std::distance(list_lines_to_be_exploded.begin(), it);
+						abstractions_->exploded()[k].PrintExplodedReactions(fExploded);
+					}
+					else
+					{
+						fExploded << myKinetics->good_lines()[j] << " " << myKinetics->strong_comments()[j] << std::endl;
+					}
+				}
+				fExploded.close();
+
+				// Final message before leaving the pre-processor
+				std::cout << "   Abstractions correctly written on the output file: " << exploded_file_name.string() << std::endl;
+				exit(-1);
 			}
 		}
 
@@ -608,7 +731,7 @@ namespace OpenSMOKE
 			for (unsigned int j = 0; j < reactions_.size(); j++)
 			{
 				std::stringstream reaction_data;
-				reactions_[j].GetReactionStringCHEMKIN(names_species(), reaction_data);
+				reactions_[j].GetReactionStringCHEMKIN(names_species(), reaction_data, myKinetics->strong_comments()[reaction_lines[j]]);
 				fOut << reaction_data.str();
 				fOut << std::endl;
 			}

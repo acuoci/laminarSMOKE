@@ -296,12 +296,12 @@ namespace OpenSMOKE
 		/**
 		*@brief Returns a string reporting the reaction in CHEMKIN format (CGS units)
 		*/
-		void GetReactionStringCHEMKIN(const std::vector<std::string>& list_species, std::stringstream& line_reaction, const std::vector<bool>& isReducedSpecies) const;
+		void GetReactionStringCHEMKIN(const std::vector<std::string>& list_species, std::stringstream& line_reaction, const std::vector<bool>& isReducedSpecies, const std::string& strong_comment) const;
 
 		/**
 		*@brief Returns a string reporting the reaction in CHEMKIN format (CGS units)
 		*/
-		void GetReactionStringCHEMKIN(const std::vector<std::string>& list_species, std::stringstream& line_reaction) const;
+		void GetReactionStringCHEMKIN(const std::vector<std::string>& list_species, std::stringstream& line_reactionconst, const std::string& strong_comment) const;
 
 		/**
 		*@brief Reports the reaction data (details) on a file
