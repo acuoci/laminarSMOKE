@@ -1,4 +1,4 @@
 laminarPimpleSMOKE.C
 
-EXE = $(FOAM_USER_APPBIN)/laminarPimpleSMOKE
+EXE = $(FOAM_USER_APPBIN)/laminarPimpleSMOKE.SPARC
 

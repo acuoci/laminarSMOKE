@@ -1,13 +1,17 @@
+NEURAL_NETWORK=neuralNetworkOpenSMOKE++.template
+
 EXE_INC = \
     $(OPENFOAM_VERSION) \
     -w \
     $(MKL_SUPPORT) \
     $(ISAT_SUPPORT) \
+    $(SPARC_SUPPORT) \
     $(DEVVERSION) \
     $(EXTERNAL_ODE_SOLVERS) \
     -I../laminarSMOKE \
     -I../laminarSMOKE/unsteady \
     -I../../libs/radiationOpenSMOKE++/lnInclude \
+    -I../../libs/$(NEURAL_NETWORK)/lnInclude \
     -I../openSMOKEpp4laminarSMOKE/ \
     -I$(BOOST_LIBRARY_PATH)/include \
     -I$(EIGEN_LIBRARY_PATH) \
@@ -15,6 +19,7 @@ EXE_INC = \
     -I$(SUNDIALS_PATH)/include \
     -I$(MKL_PATH)/include \
     -I/$(ISAT_INCLUDE) \
+    -I/$(SPARC_INCLUDE) \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/fvOptions/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
@@ -25,6 +30,7 @@ EXE_LIBS = \
     -L$(BOOST_LIBRARY_PATH)/lib \
     $(MKL_LIBS) \
     -lradiationOpenSMOKE++ \
+    -l$(NEURAL_NETWORK) \
     -lfiniteVolume \
     -lfvOptions \
     -lmeshTools \

@@ -8,7 +8,7 @@
 |   ╚═╩╝╚╩╩╩╩╩╝╚╩╝╚╩╝╚═══╩╝╚╝╚╩═══╩╝╚═╩═══╝                               |
 |                                                                         |
 |                                                                         |
-|   Authors: A. Cuoci                                                     |
+|   Authors: A. Cuoci, G. D'Alessio, A. Parente                           |
 |                                                                         |
 |   Contacts: Alberto Cuoci                                               |
 |   email: alberto.cuoci@polimi.it                                        |
@@ -22,7 +22,7 @@
 |                                                                         |
 |   License                                                               |
 |                                                                         |
-|   Copyright(C) 2016, 2015, 2014 A. Cuoci                                |
+|   Copyright(C) 2018 A. Cuoci                                            |
 |   laminarSMOKE is free software: you can redistribute it and/or modify  |
 |   it under the terms of the GNU General Public License as published by  |
 |   the Free Software Foundation, either version 3 of the License, or     |
@@ -38,51 +38,81 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#if OPENSMOKE_USE_ISAT == 1
-if(isatCheck == true)
-{
-	#include "chemistry_ISAT.H"
-}
-else
-{
-	if (drg_analysis == false)
-	{
-		if(virtual_chemistry == false)
-		{
-			#if SPARC==1
-			if (nclusters != 0)
-			#include "extensions/sparc/SPARC_chemistry.H"	
-			else
-			#endif
-			#include "chemistry_DI.H"
-		}
-		else
-		{
-			#include "chemistry_Virtual.H"
-		}
-	}
-	else
-		#include "chemistry_DRG.H"
-}
-#else
-	if (drg_analysis == false)
-	{
-		if(virtual_chemistry == false)
-		{
-			#if SPARC==1
-			if (nclusters != 0)
-			#include "extensions/sparc/SPARC_chemistry.H"	
-			else
-			#endif
-			#include "chemistry_DI.H"
-		}
-		else
-		{
-			#include "chemistry_Virtual.H"
-		}
-	}	
-	else
-		#include "chemistry_DRG.H"
-#endif
+#if SPARC==1
 
+Info<< "Creating Cluster fields" << endl;
+volScalarField clusterIndex
+(
+	IOobject
+	(
+		"clusterIndex",
+		runTime.timeName(),
+		mesh,
+		IOobject::NO_READ,
+		IOobject::AUTO_WRITE
+	),
+	mesh,
+	dimensionedScalar("dummy", dimensionSet(0, 0, 0, 0, 0), 0.),
+	#if OPENFOAM_VERSION >= 40
+	extrapolatedCalculatedFvPatchScalarField::typeName
+	#else
+	zeroGradientFvPatchScalarField::typeName
+	#endif
+);
+volScalarField clusterWeight
+(
+	IOobject
+	(
+		"clusterWeight",
+		runTime.timeName(),
+		mesh,
+		IOobject::NO_READ,
+		IOobject::AUTO_WRITE
+	),
+	mesh,
+	dimensionedScalar("dummy", dimensionSet(0, 0, 0, 0, 0), 0.),
+	#if OPENFOAM_VERSION >= 40
+	extrapolatedCalculatedFvPatchScalarField::typeName
+	#else
+	zeroGradientFvPatchScalarField::typeName
+	#endif
+);
+volScalarField clusterSpecies
+(
+	IOobject
+	(
+		"clusterSpecies",
+		runTime.timeName(),
+		mesh,
+		IOobject::NO_READ,
+		IOobject::AUTO_WRITE
+	),
+	mesh,
+	dimensionedScalar("dummy", dimensionSet(0, 0, 0, 0, 0), 0.),
+	#if OPENFOAM_VERSION >= 40
+	extrapolatedCalculatedFvPatchScalarField::typeName
+	#else
+	zeroGradientFvPatchScalarField::typeName
+	#endif
+);
+volScalarField clusterReactions
+(
+        IOobject
+        (
+                "clusterReactions",
+                runTime.timeName(),
+                mesh,
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("dummy", dimensionSet(0, 0, 0, 0, 0), 0.),
+        #if OPENFOAM_VERSION >= 40
+        extrapolatedCalculatedFvPatchScalarField::typeName
+        #else
+        zeroGradientFvPatchScalarField::typeName
+        #endif
+);
+
+#endif
 

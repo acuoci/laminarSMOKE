@@ -102,6 +102,13 @@
 #include "BatchReactorHomogeneousConstantPressureVirtualChemistry.H"
 #include "BatchReactorHomogeneousConstantPressureVirtualChemistry_ODE_Interface.H"
 
+#if SPARC==1
+#include "myNeuralNetworkBasedOnPCA.h"
+#include "extensions/sparc/SPARC_classifier_VQ2.H"
+#include "extensions/sparc/BatchReactorHomogeneousConstantPressureSPARC.H"
+#include "extensions/sparc/BatchReactorHomogeneousConstantPressureSPARC_ODE_Interface.H"
+#endif
+
 // ISAT
 #if OPENSMOKE_USE_ISAT == 1
     #include "ISAT.h"

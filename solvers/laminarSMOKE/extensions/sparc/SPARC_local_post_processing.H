@@ -8,7 +8,7 @@
 |   ╚═╩╝╚╩╩╩╩╩╝╚╩╝╚╩╝╚═══╩╝╚╝╚╩═══╩╝╚═╩═══╝                               |
 |                                                                         |
 |                                                                         |
-|   Authors: A. Cuoci                                                     |
+|   Authors: A. Cuoci, G. D'Alessio, A. Parente                           |
 |                                                                         |
 |   Contacts: Alberto Cuoci                                               |
 |   email: alberto.cuoci@polimi.it                                        |
@@ -22,7 +22,7 @@
 |                                                                         |
 |   License                                                               |
 |                                                                         |
-|   Copyright(C) 2016, 2015, 2014 A. Cuoci                                |
+|   Copyright(C) 2018 A. Cuoci                                            |
 |   laminarSMOKE is free software: you can redistribute it and/or modify  |
 |   it under the terms of the GNU General Public License as published by  |
 |   the Free Software Foundation, either version 3 of the License, or     |
@@ -38,51 +38,68 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#if OPENSMOKE_USE_ISAT == 1
-if(isatCheck == true)
+#if SPARC==1
+
+// SOM variables
+if (iSOM == true)
 {
-	#include "chemistry_ISAT.H"
-}
-else
-{
-	if (drg_analysis == false)
-	{
-		if(virtual_chemistry == false)
+
+	const double som_mean_chemistryCpu =  sum(cpuChemistry).value()/double(mesh.globalData().nTotalCells());
+	const double som_max_chemistryCpu = max(cpuChemistry).value();
+	const double som_mean_species = sum(clusterSpecies).value()/double(mesh.globalData().nTotalCells());
+	const double som_max_species = max(clusterSpecies).value();
+        const double som_mean_reactions = sum(clusterReactions).value()/double(mesh.globalData().nTotalCells());
+        const double som_max_reactions = max(clusterReactions).value();
+
+	if (somIntegralCounter == somIntegralUpdate)
+	{	
+		if (Pstream::master())
 		{
-			#if SPARC==1
-			if (nclusters != 0)
-			#include "extensions/sparc/SPARC_chemistry.H"	
-			else
-			#endif
-			#include "chemistry_DI.H"
+			fSom() << std::setw(20) << runTime.value();
+			fSom() << std::setw(20) << som_mean_species;
+			fSom() << std::setw(20) << som_max_species;
+			fSom() << std::setw(20) << som_mean_reactions;
+			fSom() << std::setw(20) << som_max_reactions;
+			fSom() << std::setw(20) << som_mean_chemistryCpu;
+			fSom() << std::setw(20) << som_max_chemistryCpu;
+			fSom() << std::endl;
 		}
-		else
-		{
-			#include "chemistry_Virtual.H"
-		}
+		
+		somIntegralCounter = 0;
 	}
-	else
-		#include "chemistry_DRG.H"
+
+	somIntegralCounter++;
 }
-#else
-	if (drg_analysis == false)
-	{
-		if(virtual_chemistry == false)
+
+// VQ2 variables
+if (iVQ2 == true)
+{
+
+	const double vq2_mean_chemistryCpu =  sum(cpuChemistry).value()/double(mesh.globalData().nTotalCells());
+	const double vq2_max_chemistryCpu = max(cpuChemistry).value();
+	const double vq2_mean_species = sum(clusterSpecies).value()/double(mesh.globalData().nTotalCells());
+	const double vq2_max_species = max(clusterSpecies).value();
+        const double vq2_mean_reactions = sum(clusterReactions).value()/double(mesh.globalData().nTotalCells());
+        const double vq2_max_reactions = max(clusterReactions).value();
+
+	if (vq2IntegralCounter == vq2IntegralUpdate)
+	{	
+		if (Pstream::master())
 		{
-			#if SPARC==1
-			if (nclusters != 0)
-			#include "extensions/sparc/SPARC_chemistry.H"	
-			else
-			#endif
-			#include "chemistry_DI.H"
+			fVQ2() << std::setw(20) << runTime.value();
+			fVQ2() << std::setw(20) << vq2_mean_species;
+			fVQ2() << std::setw(20) << vq2_max_species;
+			fVQ2() << std::setw(20) << vq2_mean_reactions;
+			fVQ2() << std::setw(20) << vq2_max_reactions;
+			fVQ2() << std::setw(20) << vq2_mean_chemistryCpu;
+			fVQ2() << std::setw(20) << vq2_max_chemistryCpu;
+			fVQ2() << std::endl;
 		}
-		else
-		{
-			#include "chemistry_Virtual.H"
-		}
-	}	
-	else
-		#include "chemistry_DRG.H"
+		
+		vq2IntegralCounter = 0;
+	}
+
+	vq2IntegralCounter++;
+}
+
 #endif
-
-

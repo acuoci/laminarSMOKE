@@ -75,6 +75,8 @@ autoPtr< OdeSMOKE::MultiValueSolver<methodGearConstantPressureVirtualChemistry> 
 odeSolverConstantPressureVirtualChemistry.reset(new OdeSMOKE::MultiValueSolver<methodGearConstantPressureVirtualChemistry>);
 odeSolverConstantPressureVirtualChemistry().SetReactor(&batchReactorHomogeneousConstantPressureVirtualChemistry);
 
+#include "extensions/sparc/SPARC_memory_allocation.H"
+
 OpenSMOKE::BatchReactorHomogeneousConstantPressure_ODE_CHEMEQ2 *chemeq2SolverConstantPressure;
 if (odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_CHEMEQ2)
 {

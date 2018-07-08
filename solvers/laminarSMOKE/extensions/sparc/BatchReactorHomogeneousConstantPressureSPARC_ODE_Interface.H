@@ -36,107 +36,45 @@
 |   You should have received a copy of the GNU General Public License     |
 |   along with laminarSMOKE. If not, see <http://www.gnu.org/licenses/>.  |
 |                                                                         |
-|                                                                         |
-|   Application: laminarBuoyantPimpleSMOKE                                |
-|                                                                         |
-|   Description: unsteady solver for reactive flows with detailed kinetic |
-|                mechanisms.                                              |
-|                                                                         |
 \*-----------------------------------------------------------------------*/
 
-// This is not a steady state simulation
-#define STEADYSTATE 0
+#ifndef BatchReactorHomogeneousConstantPressureSPARC_ODE_Interface_H
+#define	BatchReactorHomogeneousConstantPressureSPARC_ODE_Interface_H
 
-// OpenSMOKE++ Definitions
-#include "OpenSMOKEpp"
+#include "math/OpenSMOKEVector.h"
+#include "math/external-ode-solvers/OpenSMOKE_OdeSystemObject.h"
 
-// CHEMKIN maps
-#include "maps/Maps_CHEMKIN"
-#include "utilities/soot/polimi/OpenSMOKE_PolimiSoot_Analyzer.h"
+#include "math/external-ode-solvers/OpenSMOKE_CHEMEQ2.h"
+#include "math/external-ode-solvers/OpenSMOKE_CHEMEQ2_Interface.h"
 
-// OpenSMOKE++ Dictionaries
-#include "dictionary/OpenSMOKE_Dictionary"
+#include "math/external-ode-solvers/OpenSMOKE_OdeSystemObject.h"
+#include "ODESystemVirtualClassWithOpenSMOKEVectors.H"
+#include "BatchReactorHomogeneousConstantPressureSPARC.H"
 
-// ODE solvers
-#include "math/native-ode-solvers/MultiValueSolver"
-#include "math/external-ode-solvers/ODE_Parameters.h"
-
-// OpenFOAM
-#include "fvCFD.H"
-#include "multivariateScheme.H"
-#include "pimpleControl.H"
-#if OPENFOAM_VERSION >= 40
-#include "fvOptions.H"
-#include "localEulerDdtScheme.H"
-#include "fvcSmooth.H"
-#else
-#include "fvIOoptionList.H"
-#endif
-
-#include "interpolation.H"
-#include "fixedFluxPressureFvPatchScalarField.H"
-
-// Customized radiation model
-#include "OpenSMOKEradiationModel.H"
-
-// Additional include files
-#include "sparkModel.H"
-#include "utilities.H"
-#include "laminarSMOKEthermoClass.H"
-
-// Virtual chemistry
-#include "utilities/virtualchemistry/VirtualChemistry.h"
-
-// Homogeneous reactors
-#include "DRG.h"
-#include "BatchReactorHomogeneousConstantPressure.H"
-#include "BatchReactorHomogeneousConstantPressure_ODE_Interface.H"
-#include "BatchReactorHomogeneousConstantVolume.H"
-#include "BatchReactorHomogeneousConstantVolume_ODE_Interface.H"
-#include "BatchReactorHomogeneousConstantPressureVirtualChemistry.H"
-#include "BatchReactorHomogeneousConstantPressureVirtualChemistry_ODE_Interface.H"
-
-#if SPARC==1
-#include "myNeuralNetworkBasedOnPCA.h"
-#include "extensions/sparc/SPARC_classifier_VQ2.H"
-#include "extensions/sparc/BatchReactorHomogeneousConstantPressureSPARC.H"
-#include "extensions/sparc/BatchReactorHomogeneousConstantPressureSPARC_ODE_Interface.H"
-#endif
-
-// ISAT
-#if OPENSMOKE_USE_ISAT == 1
-    #include "ISAT.h"
-    #include "numericalJacobian4ISAT.H"
-    #include "mappingGradients/mappingGradient4OpenFOAM.h"
-#endif
-
-// Soot
-#include "sootUtilities.H"
-
-template<typename Solver, typename OdeBatch>
-void SolveOpenSourceSolvers(OdeBatch& ode, const double t0, const double tf, const OpenSMOKE::OpenSMOKEVectorDouble& y0, OpenSMOKE::OpenSMOKEVectorDouble& yf, const OpenSMOKE::ODE_Parameters& parameters)
+namespace OpenSMOKE
 {
-	Solver o(ode);
-	o.SetDimensions(y0.Size());
-	o.SetAbsoluteTolerance(parameters.absolute_tolerance());
-	o.SetRelativeTolerance(parameters.relative_tolerance());
-	o.SetAnalyticalJacobian(false);
-	o.SetInitialValues(t0, y0.GetHandle());
-	o.Solve(tf);
-	o.Solution(yf.GetHandle());
-}		
+	class BatchReactorHomogeneousConstantPressureSPARC_ODE_OpenSMOKE : public ODESystemVirtualClassWithOpenSMOKEVectors
+	{
+	public:
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+		BatchReactorHomogeneousConstantPressureSPARC_ODE_OpenSMOKE() {};
 
-int main(int argc, char *argv[])
-{
-	#if OPENFOAM_VERSION == 40
-		#include "laminarBuoyantPimpleSMOKE.4x.H"
-	#elif OPENFOAM_VERSION == 30
-		#include "laminarBuoyantPimpleSMOKE.3x.H"
-	#else
-		#include "laminarBuoyantPimpleSMOKE.2x.H"
-	#endif
+		void SetReactor(BatchReactorHomogeneousConstantPressureSPARC* reactor) { reactor_ = reactor; }
+
+		virtual void GetEquations(const OpenSMOKE::OpenSMOKEVectorDouble& y, const double t, OpenSMOKE::OpenSMOKEVectorDouble& dy)
+		{
+			reactor_->Equations(t, y, dy);
+		}
+		virtual void PrintResults(const OpenSMOKE::OpenSMOKEVectorDouble& y, const double t)
+		{
+			reactor_->Print(t, y);
+		}
+
+	private:
+
+		BatchReactorHomogeneousConstantPressureSPARC* reactor_;
+	};
 }
 
-// ************************************************************************* //
+#endif	// BatchReactorHomogeneousConstantPressureSPARC_ODE_Interface_H
+

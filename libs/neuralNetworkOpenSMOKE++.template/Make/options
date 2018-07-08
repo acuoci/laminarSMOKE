@@ -1,0 +1,5 @@
+EXE_INC = \
+     $(OPENFOAM_VERSION) \
+     $(DEVVERSION) 
+
+LIB_LIBS = 

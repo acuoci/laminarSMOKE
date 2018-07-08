@@ -501,3 +501,5 @@ else
 
 	Info << "done in " << tEnd - tStart << " s  (" << (tEnd-tStart)/double(mesh.nCells())*1000. << " ms per cell)" << endl;
 }
+
+#include "extensions/sparc/SPARC_classification.H"

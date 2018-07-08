@@ -8,7 +8,7 @@
 |   ╚═╩╝╚╩╩╩╩╩╝╚╩╝╚╩╝╚═══╩╝╚╝╚╩═══╩╝╚═╩═══╝                               |
 |                                                                         |
 |                                                                         |
-|   Authors: A. Cuoci                                                     |
+|   Authors: A. Cuoci, G. D'Alessio, A. Parente                           |
 |                                                                         |
 |   Contacts: Alberto Cuoci                                               |
 |   email: alberto.cuoci@polimi.it                                        |
@@ -22,7 +22,7 @@
 |                                                                         |
 |   License                                                               |
 |                                                                         |
-|   Copyright(C) 2016, 2015, 2014 A. Cuoci                                |
+|   Copyright(C) 2018 A. Cuoci                                            |
 |   laminarSMOKE is free software: you can redistribute it and/or modify  |
 |   it under the terms of the GNU General Public License as published by  |
 |   the Free Software Foundation, either version 3 of the License, or     |
@@ -38,51 +38,35 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#if OPENSMOKE_USE_ISAT == 1
-if(isatCheck == true)
+#if SPARC==1
+
+// Batch reactor homogeneous
+typedef OdeSMOKE::KernelDense<OpenSMOKE::BatchReactorHomogeneousConstantPressureSPARC_ODE_OpenSMOKE> denseOdeConstantPressureSPARC;
+typedef OdeSMOKE::MethodGear<denseOdeConstantPressureSPARC> methodGearConstantPressureSPARC;
+
+PtrList< BatchReactorHomogeneousConstantPressureSPARC > 		vector_batchReactorHomogeneousConstantPressure(nclusters);
+PtrList< BatchReactorHomogeneousConstantVolume >   			vector_batchReactorHomogeneousConstantVolume(nclusters);
+PtrList< OdeSMOKE::MultiValueSolver<methodGearConstantPressureSPARC> >  vector_odeSolverConstantPressure(nclusters);
+PtrList< OdeSMOKE::MultiValueSolver<methodGearConstantVolume>   >  	vector_odeSolverConstantVolume(nclusters);
+for(unsigned int i=0;i<nclusters;i++)
 {
-	#include "chemistry_ISAT.H"
+	Info << "Creating constant pressure batch reactor: " << i << " - "; 
+	vector_batchReactorHomogeneousConstantPressure.set(i, new BatchReactorHomogeneousConstantPressureSPARC(*vector_thermodynamicsMapXML[i], *vector_kineticsMapXML[i]));
+	//vector_batchReactorHomogeneousConstantPressure.set(i, new BatchReactorHomogeneousConstantPressureSPARC(*thermodynamicsMapXML, *kineticsMapXML));
+	Info << "Number of species: " << vector_batchReactorHomogeneousConstantPressure[i].NumberOfEquations() << endl; 
+
+	Info << "Creating constant volume batch reactor:   " << i << " - "; 
+	vector_batchReactorHomogeneousConstantVolume.set(i, new BatchReactorHomogeneousConstantVolume(*vector_thermodynamicsMapXML[i], *vector_kineticsMapXML[i]));
+	//vector_batchReactorHomogeneousConstantVolume.set(i, new BatchReactorHomogeneousConstantVolume(*thermodynamicsMapXML, *kineticsMapXML));
+	Info << "Number of species: " << vector_batchReactorHomogeneousConstantPressure[i].NumberOfEquations() << endl; 
+
+	Info << "Creating constant pressure ODE solver:   " << i << endl; 
+	vector_odeSolverConstantPressure.set(i, new OdeSMOKE::MultiValueSolver<methodGearConstantPressureSPARC>);
+	vector_odeSolverConstantPressure[i].SetReactor(&vector_batchReactorHomogeneousConstantPressure[i]);
+
+	Info << "Creating constant volume ODE solver:   " << i << endl; 
+	vector_odeSolverConstantVolume.set(i, new OdeSMOKE::MultiValueSolver<methodGearConstantVolume>);
+	vector_odeSolverConstantVolume[i].SetReactor(&vector_batchReactorHomogeneousConstantVolume[i]);
 }
-else
-{
-	if (drg_analysis == false)
-	{
-		if(virtual_chemistry == false)
-		{
-			#if SPARC==1
-			if (nclusters != 0)
-			#include "extensions/sparc/SPARC_chemistry.H"	
-			else
-			#endif
-			#include "chemistry_DI.H"
-		}
-		else
-		{
-			#include "chemistry_Virtual.H"
-		}
-	}
-	else
-		#include "chemistry_DRG.H"
-}
-#else
-	if (drg_analysis == false)
-	{
-		if(virtual_chemistry == false)
-		{
-			#if SPARC==1
-			if (nclusters != 0)
-			#include "extensions/sparc/SPARC_chemistry.H"	
-			else
-			#endif
-			#include "chemistry_DI.H"
-		}
-		else
-		{
-			#include "chemistry_Virtual.H"
-		}
-	}	
-	else
-		#include "chemistry_DRG.H"
+
 #endif
-
-

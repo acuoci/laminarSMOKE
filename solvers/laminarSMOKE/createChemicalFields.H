@@ -686,6 +686,8 @@ if (sootOnTheFlyFill == true)
 	);
 }
 
+#include "extensions/sparc/SPARC_create_fields.H"
+
 volScalarField cpuChemistry
 (
         IOobject

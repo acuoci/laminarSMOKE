@@ -451,6 +451,8 @@ if (iPolimiSoot == true)
 	}
 }
 
+#include "extensions/sparc/SPARC_local_post_processing.H"
+
 // Formation rates
 {
 	if (runTime.outputTime() == true && outputFormationRatesIndices.size()>0)

@@ -375,6 +375,9 @@ std::vector<int> physicalSootDiffusivityCorrectionIndex;
 // Disks preprocessing
 #include "extensions/preprocessDisks.H"
 
+// SPARC preprocessing
+#include "extensions/sparc/SPARC_setup.H"
+
 // Soot post-processing
 OpenSMOKE::PolimiSoot_Analyzer* sootAnalyzer;
 Switch iPolimiSoot = false;

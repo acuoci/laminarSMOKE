@@ -14,6 +14,10 @@ export ISAT_SUPPORT='-DOPENSMOKE_USE_ISAT=0'
 export ISAT_INCLUDE=
 export ISAT_LIBS=
 
+#Options: SPARC support
+export SPARC_SUPPORT='-DSPARC=1'
+export SPARC_INCLUDE=$HOME/Development/ExternalNumericalLibraries/Armadillo/armadillo-8.600.0/include
+
 #Options
 export MKL_SUPPORT='-DOPENSMOKE_USE_MKL=0'
 export EXTERNAL_ODE_SOLVERS=
