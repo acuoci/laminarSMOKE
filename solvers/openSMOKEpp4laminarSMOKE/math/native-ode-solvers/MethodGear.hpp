@@ -64,11 +64,16 @@ namespace OdeSMOKE
 	template <typename ODESystemKernel>
 	MethodGear<ODESystemKernel>::~MethodGear()
 	{
-		delete[] r_;
-		delete[] Ep_;
-		delete[] z_;
-		delete[] v_;
-		delete[] alfa2_;
+		// TODO
+		// It works, but better to find a smarter way
+		if (deltaAlfa1_ == DELTA_ALFA1)
+		{
+			delete[] r_;
+			delete[] Ep_;
+			delete[] z_;
+			delete[] v_;
+			delete[] alfa2_;
+		}
 	}
 
 	template <typename ODESystemKernel>
