@@ -56,7 +56,7 @@ namespace OpenSMOKE
 		/**
 		*@brief Default constructor
 		*/
-		VirtualChemistry( OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMap );
+		VirtualChemistry( OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMap, bool is_active=true);
 		VirtualChemistry(OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMapXML, OpenSMOKE::OpenSMOKE_Dictionary& dictionary);
 
 		/**
@@ -70,7 +70,6 @@ namespace OpenSMOKE
 		void SetTableNO(	const boost::filesystem::path path_table_1, const boost::filesystem::path path_table_2,
 							const boost::filesystem::path path_table_3, const boost::filesystem::path path_table_4,
 							const boost::filesystem::path path_table_5);
-		void SetSubMechanismType_NO(const unsigned int flag);
 
 		void SetReactions(const bool flag);
 
@@ -82,7 +81,7 @@ namespace OpenSMOKE
 		void SetTransportProperties(const double mu0, const double T0, const double Beta0_, const double Pr0_);
 		void SetLewisNumber(const unsigned int i, const double Le);
 
-		void SetOnTheFlyOptimization(const bool flag);
+		void SetOnTheFlyOptimization(const std::string flag);
 		void SetParameters(const Eigen::VectorXd& parameters, const std::vector<bool>& flag);
 		void GetParameters(Eigen::VectorXd& parameters, const std::vector<bool>& flag) const;
 		void GetOriginalParameters(Eigen::VectorXd& parameters);
@@ -104,7 +103,7 @@ namespace OpenSMOKE
 
 		bool is_active() const { return (NSVector_.size() != 0); }
 
-		bool is_on_the_fly_optimization() const { return is_on_the_fly_optimization_; }
+		std::string on_the_fly_optimization() const { return on_the_fly_optimization_; }
 		
 		unsigned int ns() const { return ns_; }
 		unsigned int ns_main() const { return ns_main_; }
@@ -144,7 +143,6 @@ namespace OpenSMOKE
 		bool iReactions_;
 		bool iSubMechanism_CO_;
 		bool iSubMechanism_NO_;
-		int iSubMechanismType_NO_;
 
 		unsigned int ns_;
 		unsigned int ns_main_;
@@ -165,7 +163,21 @@ namespace OpenSMOKE
 		LookupTable table_no_4_;
 		LookupTable table_no_5_;
 
-		bool is_on_the_fly_optimization_;
+		std::string on_the_fly_optimization_;
+
+		double A1_;
+		double A2_;
+		double E1_;
+		double E2_;
+		double nuF_1_;
+		double nuOX_1_;
+		double nuI_2_;
+
+		// Interpolation (table main)
+		double alpha1_;
+		double alpha2_;
+		double alpha3_;
+		double alpha4_;
 
 		double A3_NO_;
 		double A4_NO_;

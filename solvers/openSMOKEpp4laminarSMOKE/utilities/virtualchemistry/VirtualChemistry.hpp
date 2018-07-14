@@ -40,28 +40,37 @@ namespace OpenSMOKE
 {
 	double POW(const double C_mol_cm3, const double lambda, const double conversion = 1000.);
 
-	VirtualChemistry::VirtualChemistry(OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMap) :
+	VirtualChemistry::VirtualChemistry(OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMap, const bool is_active) :
 	thermodynamicsMap_(thermodynamicsMap)
 	{
-		// Initializing
-		ns_ = thermodynamicsMap_.NumberOfSpecies();
-		ns_main_ = 8;
-		NSVector_.resize(ns_);
-		MW_.resize(ns_);
-		Le_.resize(ns_);
-		Le_.setConstant(1.);
-		iReactions_ = true;
-		iSubMechanism_CO_ = false;
-		iSubMechanism_NO_ = false;
-		iSubMechanismType_NO_ = 1;
-		is_on_the_fly_optimization_ = false;
+		if (is_active == true)
+		{
+			// Initializing
+			ns_ = thermodynamicsMap_.NumberOfSpecies();
+			ns_main_ = 8;
+			NSVector_.resize(ns_);
+			MW_.resize(ns_);
+			Le_.resize(ns_);
+			Le_.setConstant(1.);
+			iReactions_ = true;
+			iSubMechanism_CO_ = false;
+			on_the_fly_optimization_ = "none";
 
-		// Indices of products
-		I_index_  = thermodynamicsMap_.IndexOfSpecies("I")-1;
-		P1_index_ = thermodynamicsMap_.IndexOfSpecies("P1")-1;
-		P2_index_ = thermodynamicsMap_.IndexOfSpecies("P2")-1;
-		P3_index_ = thermodynamicsMap_.IndexOfSpecies("P3")-1;
-		P4_index_ = thermodynamicsMap_.IndexOfSpecies("P4")-1;
+			// Indices of products
+			I_index_ = thermodynamicsMap_.IndexOfSpecies("I") - 1;
+			P1_index_ = thermodynamicsMap_.IndexOfSpecies("P1") - 1;
+			P2_index_ = thermodynamicsMap_.IndexOfSpecies("P2") - 1;
+			P3_index_ = thermodynamicsMap_.IndexOfSpecies("P3") - 1;
+			P4_index_ = thermodynamicsMap_.IndexOfSpecies("P4") - 1;
+
+			A1_ = 1.5384796696859927E+18;
+			A2_ = 3.9225000838284247E+18;
+			E1_ = 3.5075174514637045E+04;
+			E2_ = 8.5680603523860715E+04;
+			nuF_1_ = 1.7099829697856470;
+			nuOX_1_ = 0.8686294702424591;
+			nuI_2_ = 2.3399221348980621;
+		}
 	}
 
 	VirtualChemistry::VirtualChemistry(OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMap, OpenSMOKE::OpenSMOKE_Dictionary& dictionary) :
@@ -226,8 +235,6 @@ namespace OpenSMOKE
 
 				if (iSubMechanism_NO_ == true)
 				{
-					dictionary.ReadInt("@SubMechanismType_NO", iSubMechanismType_NO_);
-
 					NO_index_ = thermodynamicsMap_.IndexOfSpecies("NO") - 1;
 					W1_index_ = thermodynamicsMap_.IndexOfSpecies("W1") - 1;
 					W2_index_ = thermodynamicsMap_.IndexOfSpecies("W2") - 1;
@@ -326,162 +333,218 @@ namespace OpenSMOKE
 		table_no_5_.Setup(path_table_5);
 	}
 
-	void VirtualChemistry::SetSubMechanismType_NO(const unsigned int flag)
-	{
-		iSubMechanismType_NO_ = flag;
-	}
-
 	void VirtualChemistry::SetReactions(const bool flag)
 	{
 		iReactions_ = flag;
 	}
 
-	void VirtualChemistry::SetOnTheFlyOptimization(const bool flag)
+	void VirtualChemistry::SetOnTheFlyOptimization(const std::string flag)
 	{
-		is_on_the_fly_optimization_ = flag;
+		on_the_fly_optimization_ = flag;
 
 		const double YN2 = 7.246638000E-01;
 
-		// Interpolation (table 2)
-		table_no_2_.Interpolation(YN2);
-		Kc5_NO_ = table_no_2_.interpolated()(0);
-		beta_NO_ = table_no_2_.interpolated()(1);
-		alpha_NO_ = table_no_2_.interpolated()(2);
-		gamma_NO_ = table_no_2_.interpolated()(3);
+		if (on_the_fly_optimization_ == "main")
+		{
+			// Interpolation (table main)
+			table_main_.Interpolation(YN2);
+			alpha1_ = table_main_.interpolated()(3);
+			alpha2_ = table_main_.interpolated()(4);
+			alpha3_ = table_main_.interpolated()(5);
+			alpha4_ = table_main_.interpolated()(6);
+		}
+		else if (on_the_fly_optimization_ == "NO")
+		{
+			// Interpolation (table 2)
+			table_no_2_.Interpolation(YN2);
+			Kc5_NO_ = table_no_2_.interpolated()(0);
+			beta_NO_ = table_no_2_.interpolated()(1);
+			alpha_NO_ = table_no_2_.interpolated()(2);
+			gamma_NO_ = table_no_2_.interpolated()(3);
 
-		// Interpolation (table 3)
-		table_no_3_.Interpolation(YN2);
-		E3_NO_ = table_no_3_.interpolated()(0);
-		E4_NO_ = table_no_3_.interpolated()(1);
-		E5_NO_ = table_no_3_.interpolated()(2);
-		E6_NO_ = table_no_3_.interpolated()(3);
-		E7_NO_ = table_no_3_.interpolated()(4);
+			// Interpolation (table 3)
+			table_no_3_.Interpolation(YN2);
+			E3_NO_ = table_no_3_.interpolated()(0);
+			E4_NO_ = table_no_3_.interpolated()(1);
+			E5_NO_ = table_no_3_.interpolated()(2);
+			E6_NO_ = table_no_3_.interpolated()(3);
+			E7_NO_ = table_no_3_.interpolated()(4);
 
-		// Interpolation (table 4)
-		table_no_4_.Interpolation(YN2);
-		nuF_3_NO_ = table_no_4_.interpolated()(0);
-		nuOX_3_NO_ = table_no_4_.interpolated()(1);
-		nuW1_4_NO_ = table_no_4_.interpolated()(2);
-		nuNO_5f_NO_ = table_no_4_.interpolated()(3);
-		nuW2_5f_NO_ = table_no_4_.interpolated()(4);
-		nuNO_5b_NO_ = table_no_4_.interpolated()(5);
-		nuW2_5b_NO_ = table_no_4_.interpolated()(6);
-		nuW3_6_NO_ = table_no_4_.interpolated()(7);
-		nuW3_7_NO_ = table_no_4_.interpolated()(8);
+			// Interpolation (table 4)
+			table_no_4_.Interpolation(YN2);
+			nuF_3_NO_ = table_no_4_.interpolated()(0);
+			nuOX_3_NO_ = table_no_4_.interpolated()(1);
+			nuW1_4_NO_ = table_no_4_.interpolated()(2);
+			nuNO_5f_NO_ = table_no_4_.interpolated()(3);
+			nuW2_5f_NO_ = table_no_4_.interpolated()(4);
+			nuNO_5b_NO_ = table_no_4_.interpolated()(5);
+			nuW2_5b_NO_ = table_no_4_.interpolated()(6);
+			nuW3_6_NO_ = table_no_4_.interpolated()(7);
+			nuW3_7_NO_ = table_no_4_.interpolated()(8);
 
-		// Interpolation (table 5)
-		table_no_5_.Interpolation(YN2);
-		A3_NO_ = table_no_5_.interpolated()(0);
-		A4_NO_ = table_no_5_.interpolated()(1);
-		A5_NO_ = table_no_5_.interpolated()(2);
-		A6_NO_ = table_no_5_.interpolated()(3);
-		A7_NO_ = table_no_5_.interpolated()(4);
+			// Interpolation (table 5)
+			table_no_5_.Interpolation(YN2);
+			A3_NO_ = table_no_5_.interpolated()(0);
+			A4_NO_ = table_no_5_.interpolated()(1);
+			A5_NO_ = table_no_5_.interpolated()(2);
+			A6_NO_ = table_no_5_.interpolated()(3);
+			A7_NO_ = table_no_5_.interpolated()(4);
+		}
 	}
 
 	void VirtualChemistry::GetOriginalParameters(Eigen::VectorXd& parameters)
 	{
-		parameters.resize(23);
+		if (on_the_fly_optimization_ == "main")
+		{
+			parameters.resize(4);
 
-		const double YN2 = 7.246638000E-01;
+			const double YN2 = 7.246638000E-01;
 
-		// Interpolation (table 2)
-		table_no_2_.Interpolation(YN2);
-		parameters(10) = table_no_2_.interpolated()(0);		// Kc5_NO_
-		parameters(11) = table_no_2_.interpolated()(2);		// alpha_NO
-		parameters(12) = table_no_2_.interpolated()(1);		// beta_NO
-		parameters(13) = table_no_2_.interpolated()(3);		// gamma_NO
+			// Interpolation (table main)
+			table_main_.Interpolation(YN2);
+			parameters(0) = table_main_.interpolated()(3);
+			parameters(1) = table_main_.interpolated()(4);
+			parameters(2) = table_main_.interpolated()(5);
+			parameters(3) = table_main_.interpolated()(6);
+		}
+		else if (on_the_fly_optimization_ == "CO")
+		{
+			// TODO
+		}
+		else if (on_the_fly_optimization_ == "NO")
+		{
+			parameters.resize(23);
 
-		// Interpolation (table 3)
-		table_no_3_.Interpolation(YN2);
-		parameters(5) = table_no_3_.interpolated()(0);		// E3
-		parameters(6) = table_no_3_.interpolated()(1);		// E4
-		parameters(7) = table_no_3_.interpolated()(2);		// E5
-		parameters(8) = table_no_3_.interpolated()(3);		// E6
-		parameters(9) = table_no_3_.interpolated()(4);		// E7
+			const double YN2 = 7.246638000E-01;
 
-		// Interpolation (table 4)
-		table_no_4_.Interpolation(YN2);
-		parameters(14) = table_no_4_.interpolated()(0);		// stoichiometric coefficients
-		parameters(15) = table_no_4_.interpolated()(1);
-		parameters(16) = table_no_4_.interpolated()(2);
-		parameters(17) = table_no_4_.interpolated()(3);
-		parameters(18) = table_no_4_.interpolated()(4);
-		parameters(19) = table_no_4_.interpolated()(5);
-		parameters(20) = table_no_4_.interpolated()(6);
-		parameters(21) = table_no_4_.interpolated()(7);
-		parameters(22) = table_no_4_.interpolated()(8);
+			// Interpolation (table 2)
+			table_no_2_.Interpolation(YN2);
+			parameters(10) = table_no_2_.interpolated()(0);		// Kc5_NO_
+			parameters(11) = table_no_2_.interpolated()(2);		// alpha_NO
+			parameters(12) = table_no_2_.interpolated()(1);		// beta_NO
+			parameters(13) = table_no_2_.interpolated()(3);		// gamma_NO
 
-		// Interpolation (table 5)
-		table_no_5_.Interpolation(YN2);
-		parameters(0) = table_no_5_.interpolated()(0);		// A1
-		parameters(1) = table_no_5_.interpolated()(1);		// A2
-		parameters(2) = table_no_5_.interpolated()(2);		// A3
-		parameters(3) = table_no_5_.interpolated()(3);		// A4
-		parameters(4) = table_no_5_.interpolated()(4);		// A5
+			// Interpolation (table 3)
+			table_no_3_.Interpolation(YN2);
+			parameters(5) = table_no_3_.interpolated()(0);		// E3
+			parameters(6) = table_no_3_.interpolated()(1);		// E4
+			parameters(7) = table_no_3_.interpolated()(2);		// E5
+			parameters(8) = table_no_3_.interpolated()(3);		// E6
+			parameters(9) = table_no_3_.interpolated()(4);		// E7
+
+			// Interpolation (table 4)
+			table_no_4_.Interpolation(YN2);
+			parameters(14) = table_no_4_.interpolated()(0);		// stoichiometric coefficients
+			parameters(15) = table_no_4_.interpolated()(1);
+			parameters(16) = table_no_4_.interpolated()(2);
+			parameters(17) = table_no_4_.interpolated()(3);
+			parameters(18) = table_no_4_.interpolated()(4);
+			parameters(19) = table_no_4_.interpolated()(5);
+			parameters(20) = table_no_4_.interpolated()(6);
+			parameters(21) = table_no_4_.interpolated()(7);
+			parameters(22) = table_no_4_.interpolated()(8);
+
+			// Interpolation (table 5)
+			table_no_5_.Interpolation(YN2);
+			parameters(0) = table_no_5_.interpolated()(0);		// A1
+			parameters(1) = table_no_5_.interpolated()(1);		// A2
+			parameters(2) = table_no_5_.interpolated()(2);		// A3
+			parameters(3) = table_no_5_.interpolated()(3);		// A4
+			parameters(4) = table_no_5_.interpolated()(4);		// A5
+		}
+
 	}
 
 	void VirtualChemistry::GetParameters(Eigen::VectorXd& parameters, const std::vector<bool>& flag) const
 	{
 		unsigned int k = 0;
 
-		if (flag[0] == true) parameters(k++) = A3_NO_;			// #0
-		if (flag[1] == true) parameters(k++) = A4_NO_;			// #1
-		if (flag[2] == true) parameters(k++) = A5_NO_;			// #2
-		if (flag[3] == true) parameters(k++) = A6_NO_;			// #3
-		if (flag[4] == true) parameters(k++) = A7_NO_;			// #4
+		if (on_the_fly_optimization_ == "main")
+		{
+			if (flag[0] == true) parameters(k++) = alpha1_;			// #0
+			if (flag[1] == true) parameters(k++) = alpha2_;			// #1
+			if (flag[2] == true) parameters(k++) = alpha3_;			// #2
+			if (flag[3] == true) parameters(k++) = alpha4_;			// #3
+		}
+		else if (on_the_fly_optimization_ == "CO")
+		{
+			// TODO
+		}
+		else if (on_the_fly_optimization_ == "NO")
+		{
+			if (flag[0] == true) parameters(k++) = A3_NO_;			// #0
+			if (flag[1] == true) parameters(k++) = A4_NO_;			// #1
+			if (flag[2] == true) parameters(k++) = A5_NO_;			// #2
+			if (flag[3] == true) parameters(k++) = A6_NO_;			// #3
+			if (flag[4] == true) parameters(k++) = A7_NO_;			// #4
 
-		if (flag[5] == true) parameters(k++) = E3_NO_;			// #5
-		if (flag[6] == true) parameters(k++) = E4_NO_;			// #6
-		if (flag[7] == true) parameters(k++) = E5_NO_;			// #7
-		if (flag[8] == true) parameters(k++) = E6_NO_;			// #8
-		if (flag[9] == true) parameters(k++) = E7_NO_;			// #9
-		if (flag[10] == true) parameters(k++) = Kc5_NO_;		// #10
+			if (flag[5] == true) parameters(k++) = E3_NO_;			// #5
+			if (flag[6] == true) parameters(k++) = E4_NO_;			// #6
+			if (flag[7] == true) parameters(k++) = E5_NO_;			// #7
+			if (flag[8] == true) parameters(k++) = E6_NO_;			// #8
+			if (flag[9] == true) parameters(k++) = E7_NO_;			// #9
+			if (flag[10] == true) parameters(k++) = Kc5_NO_;		// #10
 
-		if (flag[11] == true) parameters(k++) = alpha_NO_;		// #11
-		if (flag[12] == true) parameters(k++) = beta_NO_;		// #12
-		if (flag[13] == true) parameters(k++) = gamma_NO_;		// #13
+			if (flag[11] == true) parameters(k++) = alpha_NO_;		// #11
+			if (flag[12] == true) parameters(k++) = beta_NO_;		// #12
+			if (flag[13] == true) parameters(k++) = gamma_NO_;		// #13
 
-		if (flag[14] == true) parameters(k++) = nuF_3_NO_;		// #14
-		if (flag[15] == true) parameters(k++) = nuOX_3_NO_;		// #15
-		if (flag[16] == true) parameters(k++) = nuW1_4_NO_;		// #16
-		if (flag[17] == true) parameters(k++) = nuNO_5f_NO_;	// #17
-		if (flag[18] == true) parameters(k++) = nuW2_5f_NO_;	// #18
-		if (flag[19] == true) parameters(k++) = nuNO_5b_NO_;	// #19
-		if (flag[20] == true) parameters(k++) = nuW2_5b_NO_;	// #20
-		if (flag[21] == true) parameters(k++) = nuW3_6_NO_;		// #21
-		if (flag[22] == true) parameters(k++) = nuW3_7_NO_;		// #22
+			if (flag[14] == true) parameters(k++) = nuF_3_NO_;		// #14
+			if (flag[15] == true) parameters(k++) = nuOX_3_NO_;		// #15
+			if (flag[16] == true) parameters(k++) = nuW1_4_NO_;		// #16
+			if (flag[17] == true) parameters(k++) = nuNO_5f_NO_;	// #17
+			if (flag[18] == true) parameters(k++) = nuW2_5f_NO_;	// #18
+			if (flag[19] == true) parameters(k++) = nuNO_5b_NO_;	// #19
+			if (flag[20] == true) parameters(k++) = nuW2_5b_NO_;	// #20
+			if (flag[21] == true) parameters(k++) = nuW3_6_NO_;		// #21
+			if (flag[22] == true) parameters(k++) = nuW3_7_NO_;		// #22
+		}
 	}
 
 	void VirtualChemistry::SetParameters(const Eigen::VectorXd& parameters, const std::vector<bool>& flag)
 	{
 		unsigned int k = 0;
 
-		if (flag[0] == true)	A3_NO_ = parameters(k++);		// #0
-		if (flag[1] == true)	A4_NO_ = parameters(k++);		// #1
-		if (flag[2] == true)	A5_NO_ = parameters(k++);		// #2
-		if (flag[3] == true)	A6_NO_ = parameters(k++);		// #3
-		if (flag[4] == true)	A7_NO_ = parameters(k++);		// #4
+		if (on_the_fly_optimization_ == "main")
+		{
+			if (flag[0] == true)	alpha1_ = parameters(k++);		// #0
+			if (flag[1] == true)	alpha2_ = parameters(k++);		// #1
+			if (flag[2] == true)	alpha3_ = parameters(k++);		// #2
+			if (flag[3] == true)	alpha4_ = parameters(k++);		// #3
+		}
+		else if (on_the_fly_optimization_ == "CO")
+		{
+			// TODO
+		}
+		else if (on_the_fly_optimization_ == "NO")
+		{
+			if (flag[0] == true)	A3_NO_ = parameters(k++);		// #0
+			if (flag[1] == true)	A4_NO_ = parameters(k++);		// #1
+			if (flag[2] == true)	A5_NO_ = parameters(k++);		// #2
+			if (flag[3] == true)	A6_NO_ = parameters(k++);		// #3
+			if (flag[4] == true)	A7_NO_ = parameters(k++);		// #4
 
-		if (flag[5] == true)	E3_NO_ = parameters(k++);		// #5
-		if (flag[6] == true)	E4_NO_ = parameters(k++);		// #6
-		if (flag[7] == true)	E5_NO_ = parameters(k++);		// #7
-		if (flag[8] == true)	E6_NO_ = parameters(k++);		// #8
-		if (flag[9] == true)	E7_NO_ = parameters(k++);		// #9
-		if (flag[10] == true)	Kc5_NO_ = parameters(k++);		// #10
+			if (flag[5] == true)	E3_NO_ = parameters(k++);		// #5
+			if (flag[6] == true)	E4_NO_ = parameters(k++);		// #6
+			if (flag[7] == true)	E5_NO_ = parameters(k++);		// #7
+			if (flag[8] == true)	E6_NO_ = parameters(k++);		// #8
+			if (flag[9] == true)	E7_NO_ = parameters(k++);		// #9
+			if (flag[10] == true)	Kc5_NO_ = parameters(k++);		// #10
 
-		if (flag[11] == true)	alpha_NO_ = parameters(k++);	// #11
-		if (flag[12] == true)	beta_NO_ = parameters(k++);		// #12
-		if (flag[13] == true)	gamma_NO_ = parameters(k++);	// #13
+			if (flag[11] == true)	alpha_NO_ = parameters(k++);	// #11
+			if (flag[12] == true)	beta_NO_ = parameters(k++);		// #12
+			if (flag[13] == true)	gamma_NO_ = parameters(k++);	// #13
 
-		if (flag[14] == true)	nuF_3_NO_ = parameters(k++);	// #14
-		if (flag[15] == true)	nuOX_3_NO_ = parameters(k++);	// #15
-		if (flag[16] == true)	nuW1_4_NO_ = parameters(k++);	// #16
-		if (flag[17] == true)	nuNO_5f_NO_ = parameters(k++);	// #17
-		if (flag[18] == true)	nuW2_5f_NO_ = parameters(k++);	// #18
-		if (flag[19] == true)	nuNO_5b_NO_ = parameters(k++);	// #19
-		if (flag[20] == true)	nuW2_5b_NO_ = parameters(k++);	// #20
-		if (flag[21] == true)	nuW3_6_NO_ = parameters(k++);	// #21
-		if (flag[22] == true)	nuW3_7_NO_ = parameters(k++);	// #22
+			if (flag[14] == true)	nuF_3_NO_ = parameters(k++);	// #14
+			if (flag[15] == true)	nuOX_3_NO_ = parameters(k++);	// #15
+			if (flag[16] == true)	nuW1_4_NO_ = parameters(k++);	// #16
+			if (flag[17] == true)	nuNO_5f_NO_ = parameters(k++);	// #17
+			if (flag[18] == true)	nuW2_5f_NO_ = parameters(k++);	// #18
+			if (flag[19] == true)	nuNO_5b_NO_ = parameters(k++);	// #19
+			if (flag[20] == true)	nuW2_5b_NO_ = parameters(k++);	// #20
+			if (flag[21] == true)	nuW3_6_NO_ = parameters(k++);	// #21
+			if (flag[22] == true)	nuW3_7_NO_ = parameters(k++);	// #22
+		}
 	}
 
 	void VirtualChemistry::SetVersion(const unsigned int value)
@@ -733,15 +796,20 @@ namespace OpenSMOKE
 	{
 		// Mass fraction of N2
 		const double YN2 = Y[inert_index_];
-
 		// Lookup-table
-		table_main_.Interpolation(YN2);
-		const double f1 = table_main_.interpolated()(1);
-		const double f2 = table_main_.interpolated()(2);
-		const double alpha1 = table_main_.interpolated()(3);
-		const double alpha2 = table_main_.interpolated()(4);
-		const double alpha3 = table_main_.interpolated()(5);
-		const double alpha4 = table_main_.interpolated()(6);
+		double f1 = 1.;
+		double f2 = 1.;
+		if (on_the_fly_optimization_ != "main")
+		{
+			table_main_.Interpolation(YN2);
+			f1 = table_main_.interpolated()(1);
+			f2 = table_main_.interpolated()(2);
+
+			alpha1_ = table_main_.interpolated()(3);
+			alpha2_ = table_main_.interpolated()(4);
+			alpha3_ = table_main_.interpolated()(5);
+			alpha4_ = table_main_.interpolated()(6);
+		}
 
 		// Mass fractions
 		const double YF = Y[fuel_index_];
@@ -755,18 +823,18 @@ namespace OpenSMOKE
 
 		double r1 = 0.;
 		double r2 = 0.;
-
+		
 		if (iReactions_ == true)
 		{
 			if (iVersion_ == 170911)
 			{
 				// Kinetic constants [mol, cm3, s]
-				const double k1 = 1.5384796696859927E+18*f1*std::exp(-3.5075174514637045E+04 / 1.987 / T);
-				const double k2 = 3.9225000838284247E+18*std::exp(-8.5680603523860715E+04 / 1.987 / T);
+				const double k1 = A1_*f1*std::exp(-E1_/ 1.987 / T);
+				const double k2 = A2_*std::exp(-E2_/ 1.987 / T);
 
 				// Reaction rates [kmol/m3/s]
-				r1 = k1 * POW(CF, 1.7099829697856470)*POW(COX, 0.8686294702424591) * 1000;
-				r2 = k2 * POW(CI, 2.3399221348980621*f2) * 1000;
+				r1 = k1 * POW(CF, nuF_1_)*POW(COX, nuOX_1_) * 1000.;
+				r2 = k2 * POW(CI, nuI_2_*f2) * 1000.;
 
 				// 0.2FUEL + 0.8OX => I 		1.5384796696859927E+18	0.	3.5075174514637045E+04
 				// FORD /FUEL 1.7099829697856470/
@@ -800,11 +868,11 @@ namespace OpenSMOKE
 		Omega[fuel_index_] = -0.2*r1;			// FUEL
 		Omega[oxidizer_index_] = -0.8*r1;		// OX
 		Omega[I_index_] = r1-r2;				// I
-		Omega[P1_index_] = alpha1 *r2;			// P1
-		Omega[P2_index_] = alpha2 *r2;			// P2
-		Omega[P3_index_] = alpha3 *r2;			// P3
-		Omega[P4_index_] = alpha4 *r2;			// P4
-		Omega[inert_index_] = 0.;					// N2
+		Omega[P1_index_] = alpha1_ *r2;			// P1
+		Omega[P2_index_] = alpha2_ *r2;			// P2
+		Omega[P3_index_] = alpha3_ *r2;			// P3
+		Omega[P4_index_] = alpha4_ *r2;			// P4
+		Omega[inert_index_] = 0.;				// N2
 
 		if (iReactions_ == true && iSubMechanism_CO_ == true)
 		{
@@ -857,7 +925,7 @@ namespace OpenSMOKE
 			double f6 = 1.;
 			double f7 = 1.;
 
-			if (is_on_the_fly_optimization_ == false)	// interpolate values from tables
+			if (on_the_fly_optimization_ != "NO")	// interpolate values from tables
 			{
 				// Interpolation (table 1)
 				table_no_1_.Interpolation(YN2);
@@ -904,7 +972,6 @@ namespace OpenSMOKE
 				A7_NO_ = table_no_5_.interpolated()(4);
 			}
 
-			if (iSubMechanismType_NO_ == 1)
 			{
 				// Mass fractions
 				const double YNO = Y[NO_index_];
@@ -942,76 +1009,6 @@ namespace OpenSMOKE
 				Omega[W1_index_] = alpha_NO_ * r3 - r4;
 				Omega[W2_index_] = (1. - alpha_NO_)*r3 + (1. - beta_NO_)*r4 - r5 + r7;
 				Omega[W3_index_] = gamma_NO_ * r3 - r6 - r7;
-			}
-			else if (iSubMechanismType_NO_ == 2 || iSubMechanismType_NO_ == 3)
-			{
-				// Mass fractions
-				const double YN2  = Y[inert_index_];
-				const double YOX  = Y[oxidizer_index_];
-				const double YNO  = Y[NO_index_];
-				const double YH2O = Y[P1_index_];
-
-				// Concentrations [mol/m3]
-				const double N2  = cTot * YN2*MW  / MW_[fuel_index_] * 1000.;
-				const double O2  = cTot * YOX*MW  / MW_[oxidizer_index_] * 1000.;
-				const double NO  = cTot * YNO*MW  / MW_[NO_index_] * 1000.;
-				const double H2O = cTot * YH2O*MW / MW_[P1_index_] * 1000.;
-
-				// Prompt sub-mechanism
-				double SNO_prompt = 0.;
-				if (iSubMechanismType_NO_ == 3)
-				{
-					//	double a = 0.;
-					//	if (YOX < 0.0041)		a = 1.;
-					//	else if (YOX < 0.011)	a = -3.95 - 0.9*std::log(YOX);
-					//	else if (YOX < 0.030)	a = -0.35 - 0.1*std::log(YOX);
-					//	const double gamma = std::pow(1 / (cTot*1000.), a + 1.);
-					//	const double r3 = k3 *gamma* POW(CF, 1.)*POW(COX, a)*POW(CN2, 1.) * 1e-3;	// [kmol/m3/s]
-				}
-
-				// Thermal sub-mechanism
-				const double epsilon = 1.e-12;
-				const double Af1 = 1.15e8;
-				const double Af2 = 9.e3*T;
-				const double Af3 = 3.36e7;
-				const double Ef1 = 75634.;
-				const double Ef2 = 6500.;
-				const double Ef3 = 385.;
-				const double Ar1 = 2.7e7;
-				const double Ar2 = 1.e0*T;
-				const double Ar3 = 1.09e8;
-				const double Er1 = 355.;
-				const double Er2 = 38010.;
-				const double Er3 = 48685.;
-
-				const double kf1 = Af1 * std::exp(-Ef1 / 1.987 / T);
-				const double kf2 = Af2 * std::exp(-Ef2 / 1.987 / T);
-				const double kf3 = Af3 * std::exp(-Ef3 / 1.987 / T);
-				const double kr1 = Ar1 * std::exp(-Er1 / 1.987 / T);
-				const double kr2 = Ar2 * std::exp(-Er2 / 1.987 / T);
-				const double kr3 = Ar3 * std::exp(-Er3 / 1.987 / T);
-				const double kStar = kr1 * kr2 / kf1 / kf2;
-
-				// Concentrations of radicals [mol/m3]
-				const double O = alpha_NO_ * 36.64*std::sqrt(T)*std::exp(-27123./T)*std::sqrt(O2);						// [mol/m3]
-				const double OH = beta_NO_ * 212.9*std::pow(T, -0.57)*std::exp(-4595. / T)*std::sqrt(O)*std::sqrt(H2O);	// [mol/m3]
-
-				const double psi = 1.e-3;	// conversion
-				const double A = kStar * POW(NO, 2., psi)*POW(N2, -1., psi)*POW(O2, -1., psi);
-				const double B = kr1 * NO / (kf2*O2 + kf3 * OH + epsilon);
-				
-				const double SNO_thermal = gamma_NO_ * 2. * kf1*O*N2 * (1.-A)/(1.+B) * 1e-3;		// [kmol/m3/s]
-
-				
-				// Formation rates [kg/m3/s]
-				// Since the molecular weights of species are assumed equal to 1
-				// we are calculating the formation rates of species in mass units [kg/m3/s]
-				Omega[NO_index_] = MW_[NO_index_] * (SNO_thermal + SNO_prompt);
-				
-				// Not relevant
-				Omega[W1_index_] = 0.;
-				Omega[W2_index_] = 0.;
-				Omega[W3_index_] = 0.;
 			}
 		}
 	}

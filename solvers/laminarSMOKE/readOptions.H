@@ -690,9 +690,6 @@ const dictionary& virtualChemistryDictionary = solverOptions.subDict("VirtualChe
 			virtualChemistryTable->SetTableNO(tabulation_file_complete_path_no1, tabulation_file_complete_path_no2,
 							  tabulation_file_complete_path_no3, tabulation_file_complete_path_no4,
 							  tabulation_file_complete_path_no5);
-
-			label iType = readLabel(virtualChemistryDictionary.lookup("subMechanismTypeNO"));
-			virtualChemistryTable->SetSubMechanismType_NO(iType);
 		}
 
 		virtualChemistryTable->SetVersion(iVersion);

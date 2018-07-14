@@ -126,11 +126,6 @@ namespace OpenSMOKE
 				"Sub-mechanism for NO formation (default: false)",
 				true));
 
-			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@SubMechanismType_NO",
-				OpenSMOKE::SINGLE_INT,
-				"Sub-mechanism type for NO formation (default: 1)",
-				true));
-
 			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@Table_CO",
 				OpenSMOKE::SINGLE_PATH,
 				"Path to the look-up table for CO sub-mechanism",
