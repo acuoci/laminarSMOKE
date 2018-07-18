@@ -54,6 +54,7 @@ namespace OpenSMOKE
 			Le_.setConstant(1.);
 			iReactions_ = true;
 			iSubMechanism_CO_ = false;
+			iSubMechanism_NO_ = false;
 			on_the_fly_optimization_ = "none";
 
 			// Indices of products

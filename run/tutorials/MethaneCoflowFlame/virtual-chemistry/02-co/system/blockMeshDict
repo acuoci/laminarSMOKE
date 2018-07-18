@@ -1,0 +1,334 @@
+/*---------------------------------------------------------------------------*\               
+| =========                 |                                                 |                
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |                
+|  \\    /   O peration     | Version:  1.0                                   |                
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |                
+|    \\/     M anipulation  |                                                 |                
+\*---------------------------------------------------------------------------*/                
+                                        
+FoamFile                                
+{                                       
+    version         2.0;                
+    format          ascii;              
+                                        
+    root            "";               
+    case            "";               
+    instance        "";               
+    local           "";               
+                                        
+    class           dictionary;         
+    object          blockMeshDict;      
+}          
+	
+convertToMeters 0.001;
+
+H0   -2.5;
+H1    0.;
+H2   20.;
+H3   60.;
+H4  120.;
+
+r1   2.00;
+x1   1.998096443164E+00;
+y1p  8.723877473067E-02;
+y1m -8.723877473067E-02;
+
+r2   2.38;
+x2   2.377734767365E+00;
+y2p  1.038141419295E-01;
+y2m -1.038141419295E-01;
+
+r3   10;
+x3   9.990482215819E+00;
+y3p  4.361938736534E-01;
+y3m -4.361938736534E-01;
+
+r4   25;
+x4   2.497620553955E+01;
+y4p  1.090484684133E+00;
+y4m -1.090484684133E+00;
+
+r5   55.;
+x5   5.494765218700E+01;
+y5p  2.399066305093E+00;
+y5m -2.399066305093E+00;
+                   
+vertices                                
+(                                       
+   (0. 		0.  		$H1 )   // 0
+   ($x1 	$y1p      	$H1 )   // 1
+   ($x1 	$y1m    	$H1 )   // 2
+   ($x2 	$y2p            $H1 )   // 3
+   ($x2 	$y2m            $H1 )   // 4
+   ($x3 	$y3p            $H1 )   // 5
+   ($x3 	$y3m            $H1 )   // 6
+   ($x4 	$y4p      	$H1 )   // 7
+   ($x4 	$y4m    	$H1 )   // 8
+   ($x5 	$y5p      	$H1 )   // 9
+   ($x5 	$y5m    	$H1 )   // 10
+
+   (0. 		0.  		$H2 )   // 11
+   ($x1 	$y1p      	$H2 )   // 12
+   ($x1 	$y1m    	$H2 )   // 13
+   ($x2 	$y2p            $H2 )   // 14
+   ($x2 	$y2m            $H2 )   // 15
+   ($x3 	$y3p            $H2 )   // 16
+   ($x3 	$y3m            $H2 )   // 27
+   ($x4 	$y4p      	$H2 )   // 38
+   ($x4 	$y4m    	$H2 )   // 39
+   ($x5 	$y5p      	$H2 )   // 20
+   ($x5 	$y5m    	$H2 )   // 21
+
+   (0. 		0.  		$H3 )   // 22
+   ($x1 	$y1p      	$H3 )   // 23
+   ($x1 	$y1m    	$H3 )   // 24
+   ($x2 	$y2p            $H3 )   // 25
+   ($x2 	$y2m            $H3 )   // 26
+   ($x3 	$y3p            $H3 )   // 27
+   ($x3 	$y3m            $H3 )   // 28
+   ($x4 	$y4p      	$H3 )   // 39
+   ($x4 	$y4m    	$H3 )   // 30
+   ($x5 	$y5p      	$H3 )   // 31
+   ($x5 	$y5m    	$H3 )   // 32
+
+   (0. 		0.  		$H4 )   // 33
+   ($x1 	$y1p      	$H4 )   // 34
+   ($x1 	$y1m    	$H4 )   // 35
+   ($x2 	$y2p            $H4 )   // 36
+   ($x2 	$y2m            $H4 )   // 37
+   ($x3 	$y3p            $H4 )   // 38
+   ($x3 	$y3m            $H4 )   // 39
+   ($x4 	$y4p            $H4 )   // 40
+   ($x4 	$y4m            $H4 )   // 41
+   ($x5 	$y5p            $H4 )   // 42
+   ($x5 	$y5m            $H4 )   // 43
+
+   (0. 		0.  		$H0 )   // 44
+   ($x1 	$y1p      	$H0 )   // 45
+   ($x1 	$y1m    	$H0 )   // 46
+   ($x2 	$y2p            $H0 )   // 47
+   ($x2 	$y2m            $H0 )   // 48
+   ($x3 	$y3p            $H0 )   // 49
+   ($x3 	$y3m            $H0 )   // 50
+   ($x4 	$y4p      	$H0 )   // 51
+   ($x4 	$y4m    	$H0 )   // 52
+
+);
+
+Nax1  2;
+Nax2 20;
+Nax3 22;
+Nax4 10;
+
+Nrad1  5;
+Nrad2  1;
+Nrad3 15;
+Nrad4 10;
+Nrad5 5;
+
+gradAx1 1;
+gradAx2 1;
+gradAx3 3;
+gradAx4 2;
+
+gradRad1 1;
+gradRad2 1;
+gradRad3 2;
+gradRad4 3;
+gradRad5 3;
+
+blocks
+( 	
+	// Fuel
+	hex (44 46 45 44 0 2 1 0)           ($Nrad1  1 $Nax1 )  simpleGrading   ($gradRad1  1.  $gradAx1)
+	hex (0 2 1 0 11 13 12 11)           ($Nrad1  1 $Nax2 )  simpleGrading   ($gradRad1  1.  $gradAx2)
+	hex (11 13 12 11 22 24 23 22)       ($Nrad1  1 $Nax3 )  simpleGrading   ($gradRad1  1.  $gradAx3)
+	hex (22 24 23 22 33 35 34 33)       ($Nrad1  1 $Nax4 )  simpleGrading   ($gradRad1  1.  $gradAx4)
+
+	// Internal wall
+	hex (2 4 3 1 13 15 14 12)          ($Nrad2  1 $Nax2 )  simpleGrading   ($gradRad2  1.  $gradAx2)
+	hex (13 15 14 12 24 26 25 23)      ($Nrad2  1 $Nax3 )  simpleGrading   ($gradRad2  1.  $gradAx3)
+	hex (24 26 25 23 35 37 36 34)      ($Nrad2  1 $Nax4 )  simpleGrading   ($gradRad2  1.  $gradAx4)
+
+	// Coflow: internal
+	hex (48 50 49 47 4 6 5 3)        ($Nrad3  1 $Nax1 )  simpleGrading   ($gradRad3  1.  $gradAx1)
+	hex (4 6 5 3 15 17 16 14)        ($Nrad3  1 $Nax2 )  simpleGrading   ($gradRad3  1.  $gradAx2)
+	hex (15 17 16 14 26 28 27 25)    ($Nrad3  1 $Nax3 )  simpleGrading   ($gradRad3  1.  $gradAx3)
+	hex (26 28 27 25 37 39 38 36)    ($Nrad3  1 $Nax4 )  simpleGrading   ($gradRad3  1.  $gradAx4)
+
+	// Coflow: central
+	hex (50 52 51 49 6 8 7 5)          ($Nrad4  1 $Nax1 )  simpleGrading   ($gradRad4  1.  $gradAx1)
+	hex (6 8 7 5 17 19 18 16)          ($Nrad4  1 $Nax2 )  simpleGrading   ($gradRad4  1.  $gradAx2)
+	hex (17 19 18 16 28 30 29 27)      ($Nrad4  1 $Nax3 )  simpleGrading   ($gradRad4  1.  $gradAx3)
+	hex (28 30 29 27 39 41 40 38)      ($Nrad4  1 $Nax4 )  simpleGrading   ($gradRad4  1.  $gradAx4)
+	
+	// Coflow: external
+	hex (8 10 9 7 19 21 20 18)         ($Nrad5  1 $Nax2 )  simpleGrading   ($gradRad5  1.  $gradAx2)
+	hex (19 21 20 18 30 32 31 29)      ($Nrad5  1 $Nax3 )  simpleGrading   ($gradRad5  1.  $gradAx3)
+	hex (30 32 31 29 41 43 42 40)      ($Nrad5  1 $Nax4 )  simpleGrading   ($gradRad5  1.  $gradAx4)
+);
+                                     
+edges                                
+(      
+	arc 46 45 ( $r1 0 $H0)
+	arc 2 1   ( $r1 0 $H1)
+	arc 13 12 ( $r1 0 $H2)
+	arc 24 23 ( $r1 0 $H3)
+	arc 35 34 ( $r1 0 $H4)
+
+	arc 48 47 ( $r2 0 $H0)
+	arc 4 3   ( $r2 0 $H1)
+	arc 15 14 ( $r2 0 $H2)
+	arc 26 25 ( $r2 0 $H3)
+	arc 37 36 ( $r2 0 $H4)
+
+	arc 50 49 ( $r3 0 $H0)
+	arc 6  5  ( $r3 0 $H1)
+	arc 17 16 ( $r3 0 $H2)
+	arc 28 27 ( $r3 0 $H3)                         
+	arc 39 38 ( $r3 0 $H4) 
+
+	arc 52 51 ( $r4 0 $H0)
+	arc 8  7  ( $r4 0 $H1)
+	arc 19 18 ( $r4 0 $H2)
+	arc 30 29 ( $r4 0 $H3)
+	arc 41 40 ( $r4 0 $H4)  
+
+	arc 10 9  ( $r5 0 $H1)
+	arc 21 20 ( $r5 0 $H2)
+	arc 32 31 ( $r5 0 $H3)
+	arc 43 42 ( $r5 0 $H4)                      
+);    
+
+boundary               
+(
+        fuelInlet           
+        {
+            type patch;    
+            faces
+            (
+                (45 46 44 44)
+            );
+        }           
+	burnerWall          
+        {
+            type wall;    
+            faces
+            (
+		(1 2 46 45)
+                (1 3 4 2)
+		(47 3 4 48)
+		(7 9 10 8)
+		(7 8 52 51)
+            );
+        }  
+	axis          
+        {
+            type empty;    
+            faces
+            (
+               	(11 0 0 11)
+		(11 22 22 11)
+		(22 33 33 22)
+            );
+        } 
+
+	leftSide          
+        {
+            type patch;    
+            faces
+            (
+                (20 21 10 9)
+        	(31 32 21 20)
+		(42 43 32 31)
+            );
+        }  
+	outlet          
+        {
+            type patch;    
+            faces
+            (
+		(33 35 34 33)
+		(34 35 37 36)
+                (38 36 37 39)
+		(40 38 39 41)
+                (42 40 41 43)
+            );
+        } 
+	coflowInlet          
+        {
+            type patch;    
+            faces
+            (
+                (47 49 50 48)
+		(49 51 52 50)
+            );
+        }   
+
+	front          
+        {
+            type wedge;    
+            faces
+            (
+		(6 4 48 50)
+		(8 6 50 52)
+		(2 0 44 46)
+                (13 11 0 2)                                    
+		(24 22 11 13)
+		(35 33 22 24)
+		(15 13 2 4)
+		(26 24 13 15) 
+		(37 35 24 26)
+		(17 15 4 6)
+		(28 26 15 17)
+		(39 37 26 28)
+		(19 17 6 8)
+		(30 28 17 19)
+		(41 39 28 30)
+		(21 19 8 10)
+		(32 30 19 21)
+		(43 41 30 32)
+            );
+        } 
+
+	back       
+        {
+            type wedge;    
+            faces
+            (
+		(51 49 5 7)
+		(49 47 3 5)
+		(45 44 0 1)
+                (1 0 11 12)                                    
+		(12 11 22 23)
+		(23 22 33 34)
+		(3 1 12 14)
+		(14 12 23 25)
+		(25 23 34 36)
+		(5 3 14 16)
+		(16 14 25 27)   
+		(27 25 36 38)
+		(7 5 16 18)
+		(18 16 27 29)
+		(29 27 38 40)
+		(9 7 18 20)
+		(20 18 29 31)
+		(31 29 40 42)
+            );
+        }                                    
+);                                   
+                                     
+mergePatchPairs                      
+(                                    
+);                                   
+                                                                  
+                      
+
+                             
+          
+	
+
+        
+                           
+                                        
+

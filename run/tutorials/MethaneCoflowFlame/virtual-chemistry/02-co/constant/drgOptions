@@ -1,33 +1,14 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.7.1                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|  \\    /   O peration     | Version:  2.2.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-FoamFile
-{
-    version     2.0;
-    format      ascii;
-    class       dictionary;
-    location    "constant";
-    object      lewisNumbers;
-}
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-LewisNumbers
+DRG
 {
-	FUEL 	1.;
-	OX	1.;
-	I	1.;
-	P1	1.;
-	P2	1.;
-	P3	1.;
-	P4	1.;
-	N2	1.;
-	CO	1.;
-	V1	1.;
-	V2	1.;
+	drg	off;
 }
 
 // ************************************************************************* //

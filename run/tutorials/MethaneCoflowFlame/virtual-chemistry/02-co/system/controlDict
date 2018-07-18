@@ -8,26 +8,49 @@
 FoamFile
 {
     version     2.0;
-    format      ascii;
+    format      binary;
     class       dictionary;
-    location    "constant";
-    object      lewisNumbers;
+    location    "system";
+    object      controlDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-LewisNumbers
-{
-	FUEL 	1.;
-	OX	1.;
-	I	1.;
-	P1	1.;
-	P2	1.;
-	P3	1.;
-	P4	1.;
-	N2	1.;
-	CO	1.;
-	V1	1.;
-	V2	1.;
-}
+application     	laminarBuoyantPimpleSMOKE;
+
+startFrom       	latestTime;
+
+startTime       	0;
+
+stopAt          	endTime;
+
+endTime         	1.0;
+
+deltaT          	1e-6;
+
+writeControl    	adjustableRunTime;
+
+writeInterval   	1e-1;
+
+purgeWrite      	3;
+
+writeFormat     	ascii;
+
+writePrecision  	12;
+
+writeCompression 	uncompressed;
+
+timeFormat      	general;
+
+timePrecision   	9;
+
+runTimeModifiable 	yes;
+
+adjustTimeStep  	yes;
+
+maxCo           	0.1;
 
 // ************************************************************************* //
+
+libs (
+      "libOpenFOAM.so"
+     );
