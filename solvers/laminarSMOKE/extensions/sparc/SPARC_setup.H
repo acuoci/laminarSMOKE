@@ -64,8 +64,21 @@ if (iVQ2 == true)
 	boost::filesystem::path path_kinetics_folder = path_main_folder / "kinetics";
 	boost::filesystem::path path_data_folder = path_main_folder / "data";	
 
+	int scaling = 0;
+	word scaling_type(vq2Dictionary.lookup("scaling"));
+	if (scaling_type == "AUTO")		scaling = 0;
+	else if (scaling_type == "VAST")	scaling = 1;
+	else if (scaling_type == "PARETO")	scaling = 2;
+	else
+	{
+		Info << "Wrong scaling option: AUTO || VAST || PARETO" << endl;
+		abort();
+	}
+
+	label eigens  = vq2Dictionary.lookupOrDefault("eigens", 1);
+
 	std::cout << "Opening files containing VQ2 data..." << std::endl;
-	VQ2.Setup(path_data_folder.c_str());
+	VQ2.Setup(path_data_folder.c_str(), eigens, scaling);
 	nclusters = VQ2.nc();
 	
 	if (VQ2.nv() != (thermodynamicsMapXML->NumberOfSpecies()+1))

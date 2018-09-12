@@ -141,7 +141,9 @@ if (iVQ2 == true)
 		}
 
 		// Classification
-		std::vector<int> idx = VQ2.Classify(observations);
+		std::vector<int> idx(n_cells);
+		VQ2.Classify(observations, idx);
+
 		forAll(TCells, celli)
 		{
 			if (TCells[celli] > direct_integration_minimum_temperature_for_chemistry)
