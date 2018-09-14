@@ -40,8 +40,6 @@
 
 if (exportDisks == true)
 {
-	const std::string alignement = "xy";
-	const bool invert_east_west = true;
 
 	label ns = Y.size();
 
@@ -156,27 +154,27 @@ if (exportDisks == true)
 					int count = 0; 
 					forAll(mesh.boundaryMesh()[patchi].faceCentres(), facei)
 					{
-						if (alignement == "yx")
+						if (disk_alignement == "yx")
 						fDisk 	<< mesh.boundaryMesh()[patchi].faceCentres()[facei].x() << " " 
 							<< mesh.boundaryMesh()[patchi].faceCentres()[facei].y() << " "
 							<< 5.e-4 << " "
 							<< std::endl;
 
-						if (alignement == "xy")
+						if (disk_alignement == "xy")
 						fDisk 	<< mesh.boundaryMesh()[patchi].faceCentres()[facei].y() << " " 
 							<< mesh.boundaryMesh()[patchi].faceCentres()[facei].x() << " "
 							<< 5.e-4 << " "
 							<< std::endl;
 
-						if (k==0 && alignement == "yx")	y_north += mesh.boundaryMesh()[patchi].faceCentres()[facei].y();
-						if (k==0 && alignement == "xy")	y_north += mesh.boundaryMesh()[patchi].faceCentres()[facei].x();
-						if (k==1 && alignement == "yx")	y_south += mesh.boundaryMesh()[patchi].faceCentres()[facei].y();
-						if (k==1 && alignement == "xy")	y_south += mesh.boundaryMesh()[patchi].faceCentres()[facei].x();
+						if (k==0 && disk_alignement == "yx")	y_north += mesh.boundaryMesh()[patchi].faceCentres()[facei].y();
+						if (k==0 && disk_alignement == "xy")	y_north += mesh.boundaryMesh()[patchi].faceCentres()[facei].x();
+						if (k==1 && disk_alignement == "yx")	y_south += mesh.boundaryMesh()[patchi].faceCentres()[facei].y();
+						if (k==1 && disk_alignement == "xy")	y_south += mesh.boundaryMesh()[patchi].faceCentres()[facei].x();
 
-						if (k==2 && alignement == "yx")	x_west += mesh.boundaryMesh()[patchi].faceCentres()[facei].x();
-						if (k==2 && alignement == "xy")	x_west += mesh.boundaryMesh()[patchi].faceCentres()[facei].y();
-						if (k==3 && alignement == "yx")	x_east += mesh.boundaryMesh()[patchi].faceCentres()[facei].x();
-						if (k==3 && alignement == "xy")	x_east += mesh.boundaryMesh()[patchi].faceCentres()[facei].y();
+						if (k==2 && disk_alignement == "yx")	x_west += mesh.boundaryMesh()[patchi].faceCentres()[facei].x();
+						if (k==2 && disk_alignement == "xy")	x_west += mesh.boundaryMesh()[patchi].faceCentres()[facei].y();
+						if (k==3 && disk_alignement == "yx")	x_east += mesh.boundaryMesh()[patchi].faceCentres()[facei].x();
+						if (k==3 && disk_alignement == "xy")	x_east += mesh.boundaryMesh()[patchi].faceCentres()[facei].y();
 						
 						count++;
 					}

@@ -208,8 +208,11 @@ int main(int argc, char *argv[])
 	
 	
 	bool xmlProbeLocations = false;
-	bool exportDisks = false;
 	bool exportSPARC = false;
+
+	bool exportDisks = false;
+	Foam::string disk_alignement = "xy";
+	bool invert_east_west = true;
 
 	bool reconstructMixtureFraction = false;
 	std::vector<std::string> 	fuel_names;
@@ -260,6 +263,14 @@ int main(int argc, char *argv[])
 		xmlProbeLocations = Switch(postProcessingDictionary.lookupOrDefault(word("xmlProbeLocations"), word("off")));
 
 		exportDisks = Switch(postProcessingDictionary.lookupOrDefault(word("exportDisks"), word("off")));
+
+		if (exportDisks == true)
+		{
+			const dictionary& exportDisksDictionary = postProcessingDictionary.subDict("exportDisksDict");
+
+			invert_east_west = Switch(exportDisksDictionary.lookup(word("invertEastWest")));
+			disk_alignement = exportDisksDictionary.lookup("alignement");
+		}
 
 		exportSPARC = Switch(postProcessingDictionary.lookupOrDefault(word("exportSPARC"), word("off")));
 
