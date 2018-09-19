@@ -64,10 +64,11 @@ if (exportSPARC == true)
 		"clusterIndex",
 		runTime.timeName(),
 		mesh,
-		IOobject::MUST_READ,
+		IOobject::READ_IF_PRESENT,
 		IOobject::NO_WRITE
 	    ),
-	    mesh
+	    mesh,
+	    dimensionedScalar("clusterIndex", dimensionSet(0, 0, 0, 0, 0), -1)
 	);
 
         Info<< "Reading field clusterSpecies..." << endl;
@@ -78,10 +79,11 @@ if (exportSPARC == true)
 		"clusterSpecies",
 		runTime.timeName(),
 		mesh,
-		IOobject::MUST_READ,
+		IOobject::READ_IF_PRESENT,
 		IOobject::NO_WRITE
 	    ),
-	    mesh
+	    mesh,
+	    dimensionedScalar("clusterSpecies", dimensionSet(0, 0, 0, 0, 0), -1)
 	);
 
         Info<< "Reading field clusterReactions..." << endl;
@@ -92,16 +94,53 @@ if (exportSPARC == true)
 		"clusterReactions",
 		runTime.timeName(),
 		mesh,
-		IOobject::MUST_READ,
+		IOobject::READ_IF_PRESENT,
 		IOobject::NO_WRITE
 	    ),
-	    mesh
+	    mesh,
+	    dimensionedScalar("clusterReactions", dimensionSet(0, 0, 0, 0, 0), -1)
+	);
+
+	Info<< "Reading field cpuChemistry..." << endl;
+	volScalarField cpuChemistry
+	(
+	    IOobject
+	    (
+		"cpuChemistry",
+		runTime.timeName(),
+		mesh,
+		IOobject::READ_IF_PRESENT,
+		IOobject::NO_WRITE
+	    ),
+	    mesh,
+	    dimensionedScalar("cpuChemistry", dimensionSet(0, 0, 0, 0, 0), -1)
 	);
 
 	std::string filename = "output." + runTime.timeName();
 	std::ofstream fOutput(filename.c_str(), std::ios::out);
 	fOutput.setf(std::ios::scientific);
-	fOutput << "Data from OpenFOAM simulation" << std::endl;
+	fOutput << std::setw(15) << "time[s](1)";
+	fOutput << std::setw(15) << "x[m](2)";
+	fOutput << std::setw(15) << "y[m](3)";
+	fOutput << std::setw(15) << "z[m](4)";
+	fOutput << std::setw(15) << "V[m3](5)";
+	fOutput << std::setw(15) << "cluster(6)";
+	fOutput << std::setw(15) << "species(7)";
+	fOutput << std::setw(15) << "reactions(8)";
+	fOutput << std::setw(15) << "cpuChem[ms](9)";
+	fOutput << std::setw(15) << "csi(10)";
+	fOutput << std::setw(15) << "T[k](11)";
+
+	unsigned int count = 12;
+	for(unsigned int i=0;i<Y.size();i++)
+	{
+		std::stringstream tag; tag << count;
+		std::string label = thermodynamicsMapXML->NamesOfSpecies()[i] + "(" + tag.str() + ")";
+		fOutput << std::setw(25) << label;
+		count++;
+	}
+	fOutput << std::endl;
+
 
 	const scalarField& TCells = T.internalField();
 	const scalarField& zMixCells = zMix.internalField();
@@ -120,17 +159,18 @@ if (exportSPARC == true)
 			fOutput << std::setw(15) << std::scientific << std::setprecision(6) << mesh.C()[celli][0];
 			fOutput << std::setw(15) << std::scientific << std::setprecision(6) << mesh.C()[celli][1];
 			fOutput << std::setw(15) << std::scientific << std::setprecision(6) << mesh.C()[celli][2];
+			fOutput << std::setw(15) << std::scientific << std::setprecision(6) << mesh.V()[celli];
 
-			fOutput << std::setw(15) << std::fixed << clusterIndexCells[celli];
-			fOutput << std::setw(15) << std::fixed << clusterSpeciesCells[celli];
-			fOutput << std::setw(15) << std::fixed << clusterReactionsCells[celli];
+			fOutput << std::setw(15) << std::fixed << std::setprecision(0) << clusterIndexCells[celli];
+			fOutput << std::setw(15) << std::fixed << std::setprecision(0) << clusterSpeciesCells[celli];
+			fOutput << std::setw(15) << std::fixed << std::setprecision(0) << clusterReactionsCells[celli];
+			fOutput << std::setw(15) << std::scientific << std::setprecision(6) << cpuChemistry[celli];
 
 			fOutput << std::setw(15) << std::scientific << std::setprecision(6) << zMixCells[celli];
 
-
 			fOutput << std::setw(15) << std::scientific << std::setprecision(6) << TCells[celli];
 			for(unsigned int i=0;i<Y.size();i++)
-				fOutput << std::setw(15) << std::scientific << std::setprecision(6) << Y[i].internalField()[celli];
+				fOutput << std::setw(25) << std::scientific << std::setprecision(6) << Y[i].internalField()[celli];
 
 			fOutput << std::endl;
 		}
