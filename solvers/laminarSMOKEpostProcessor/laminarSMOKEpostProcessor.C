@@ -361,6 +361,22 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	// Reaction rates of selected species
+	Eigen::VectorXd outputReactionRatesIndices;
+	{
+		const dictionary& outputDictionary = solverOptionsDictionary.subDict("Output"); 
+		{
+			Switch outputReactionRates = Switch(outputDictionary.lookup(word("reactionRates")));
+			if (outputReactionRates == true)
+			{
+				List<label>  listReactionRates(outputDictionary.lookup("listReactionRates"));
+				outputReactionRatesIndices.resize(listReactionRates.size());
+				for (int i=0;i<listReactionRates.size();i++)
+					outputReactionRatesIndices(i) = listReactionRates[i];
+			}
+		}
+	}
+
     	forAll(timeDirs, timeI)
     	{
        		runTime.setTime(timeDirs[timeI], timeI);
@@ -389,6 +405,7 @@ int main(int argc, char *argv[])
 		#include "calculateMoleFractions.H"
 		#include "calculateConcentrations.H"
 		#include "calculateFormationRates.H"
+		#include "calculateReactionRates.H"
 
 		// XML probe locations
 		#include "calculateProbeLocationsXML.H"

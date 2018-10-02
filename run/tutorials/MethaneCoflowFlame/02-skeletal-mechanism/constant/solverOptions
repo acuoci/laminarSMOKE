@@ -58,7 +58,12 @@ PhysicalModel
 
 Output
 {
-	formationRates		off;
+	formationRates		on;
+	listFormationRates	(CH4 H2);
+
+	reactionRates           on;
+	listReactionRates	(3 10 12);
+
 	diffusivities		off;
 	gasProperties		off;
 	gasRadiation		off;

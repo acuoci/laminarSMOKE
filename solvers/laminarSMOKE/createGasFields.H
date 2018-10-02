@@ -144,7 +144,12 @@ volScalarField Q
         IOobject::AUTO_WRITE
     ),
     mesh,
-    dimensionedScalar("gas_Q", dimensionSet(1, -1, -3, 0, 0), 0.0)
+    dimensionedScalar("gas_Q", dimensionSet(1, -1, -3, 0, 0), 0.0),
+    #if OPENFOAM_VERSION >= 40
+    extrapolatedCalculatedFvPatchScalarField::typeName
+    #else
+    zeroGradientFvPatchScalarField::typeName
+    #endif
 ); 
 
 //- Allocating memory for mean specific heat [J/kg/K]

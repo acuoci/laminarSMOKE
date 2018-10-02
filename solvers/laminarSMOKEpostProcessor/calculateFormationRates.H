@@ -65,6 +65,21 @@ if (outputFormationRatesIndices.size() > 0)
 		);
 	}
 
+	//- Allocating memory for heat release [W/m3]
+	volScalarField Q
+	(
+	    IOobject
+	    (
+		"gas_Q",
+		runTime.timeName(),
+		mesh,
+		IOobject::NO_READ,
+		IOobject::AUTO_WRITE
+	    ),
+	    mesh,
+	    dimensionedScalar("gas_Q", dimensionSet(1, -1, -3, 0, 0), 0.0)
+	);
+
 	unsigned int ns = Y.size();
 	OpenSMOKE::OpenSMOKEVectorDouble massFractions(ns);
 	OpenSMOKE::OpenSMOKEVectorDouble moleFractions(ns);
@@ -73,6 +88,13 @@ if (outputFormationRatesIndices.size() > 0)
 
 	const scalarField& TCells = T.internalField();
 	const scalarField& pCells = p.internalField();
+
+	//- Heat release
+	#if OPENFOAM_VERSION >= 40
+	scalarField& QCells = Q.ref();
+	#else
+	scalarField& QCells = Q.internalField();
+	#endif
 
 	forAll(TCells, celli)
 	{	
@@ -95,6 +117,9 @@ if (outputFormationRatesIndices.size() > 0)
 		kineticsMapXML->ReactionRates(c.GetHandle());
 		kineticsMapXML->FormationRates(R.GetHandle());
 
+		// Heat release [W/m3]
+		QCells[celli] = kineticsMapXML->HeatRelease(R.GetHandle());
+
 		// Fill formation rates fields
 		for (int j=0;j<outputFormationRatesIndices.size();j++)
 		{
@@ -113,6 +138,12 @@ if (outputFormationRatesIndices.size() > 0)
 	{
 		const fvPatchScalarField& pp = p.boundaryField()[patchi];
 		const fvPatchScalarField& pT = T.boundaryField()[patchi];
+
+		#if OPENFOAM_VERSION >= 40
+		fvPatchScalarField& pQ = Q.boundaryFieldRef()[patchi];
+		#else
+		fvPatchScalarField& pQ = Q.boundaryField()[patchi];
+		#endif
 
 		forAll(pT, facei)
 		{
@@ -134,6 +165,9 @@ if (outputFormationRatesIndices.size() > 0)
 			kineticsMapXML->KineticConstants();
 			kineticsMapXML->ReactionRates(c.GetHandle());
 			kineticsMapXML->FormationRates(R.GetHandle());
+
+			// Heat release [W/m3]
+			pQ[facei] = kineticsMapXML->HeatRelease(R.GetHandle());
 			
 			// Fill formation rates fields
 			for (int j=0;j<outputFormationRatesIndices.size();j++)
@@ -149,6 +183,7 @@ if (outputFormationRatesIndices.size() > 0)
 	}
 
 	// Write on file
+	Q.write();
 	for (int i=0;i<outputFormationRatesIndices.size();i++)
 		FormationRates[i].write();
 }
