@@ -372,7 +372,14 @@ int main(int argc, char *argv[])
 				List<label>  listReactionRates(outputDictionary.lookup("listReactionRates"));
 				outputReactionRatesIndices.resize(listReactionRates.size());
 				for (int i=0;i<listReactionRates.size();i++)
+				{
+					if (listReactionRates[i] > kineticsMapXML->NumberOfReactions())
+					{
+						Info << "Output-listReactionRates: reaction " << listReactionRates[i] << " is not included in the kinetic mechanism" << endl;
+						abort();
+					}
 					outputReactionRatesIndices(i) = listReactionRates[i];
+				}
 			}
 		}
 	}
