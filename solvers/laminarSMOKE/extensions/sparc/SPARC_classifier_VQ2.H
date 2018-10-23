@@ -31,7 +31,6 @@
 \*-----------------------------------------------------------------------*/
 
 #ifndef ClassifierVQ2_HPP
-#ifndef ClassifierVQ2_HPP
 #define ClassifierVQ2_HPP
 
 #include <fstream>
