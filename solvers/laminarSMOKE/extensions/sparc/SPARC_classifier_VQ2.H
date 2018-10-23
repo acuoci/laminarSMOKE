@@ -31,6 +31,7 @@
 \*-----------------------------------------------------------------------*/
 
 #ifndef ClassifierVQ2_HPP
+#ifndef ClassifierVQ2_HPP
 #define ClassifierVQ2_HPP
 
 #include <fstream>
@@ -200,17 +201,17 @@ arma::field<arma::Mat<double>> GetMuSigma(const arma::Mat<double>& matrix, const
     if(scaling == 0)
     {
         for(int j=0; j<n_variab; j++)
-            d.col(j) = arma::stddev(matrix.col(j)); 
+            d.col(j) = arma::stddev(matrix.col(j)) + 1e-16; 
     } 
     else if(scaling == 1)
     {
         for(int j=0; j<n_variab; j++)
-            d.col(j) = std::pow(arma::stddev(matrix.col(j)),2.)/(mediarow.col(j)); 
+            d.col(j) = std::pow(arma::stddev(matrix.col(j)),2.)/(mediarow.col(j)) + 1e-16; 
     } 
     else if(scaling == 2)
     {
         for(int j=0; j<n_variab; j++)
-            d.col(j) = arma::stddev(matrix.col(j)); 
+            d.col(j) = arma::stddev(matrix.col(j)) + 1e-16; 
     }
 
     arma::field<arma::Mat<double>> MuSigma(2,1);
@@ -234,17 +235,17 @@ arma::Mat<double> CenterScale(const arma::Mat<double>& X, const int scaling)
     if(scaling == 0)
     {
         for(int j=0; j<X.n_cols; j++)
-            d.col(j) = arma::stddev(X.col(j)); 
+            d.col(j) = arma::stddev(X.col(j)) + 1e-16; 
     } 
     else if(scaling == 1)
     {
         for(int j=0; j<X.n_cols; j++)
-            d.col(j) = std::pow(arma::stddev(X.col(j)),2)/(rowave.col(j)); 
+            d.col(j) = std::pow(arma::stddev(X.col(j)),2)/(rowave.col(j)) + 1e-16; 
     } 
     else if(scaling == 2)
     {
         for(int j=0; j<X.n_cols; j++)
-            d.col(j) = arma::stddev(X.col(j)); 
+            d.col(j) = arma::stddev(X.col(j)) + 1e-16; 
     }
     
     // Subtract the mean and divide by the scaling factor
