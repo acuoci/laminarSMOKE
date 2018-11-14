@@ -205,6 +205,7 @@ int main(int argc, char *argv[])
 	bool calculateLocalStrainRate = false;
 	bool calculateMoleFractions = false;
 	bool calculateConcentrations = false;
+	bool calculateHeatRelease = false;
 	
 	
 	bool xmlProbeLocations = false;
@@ -248,11 +249,12 @@ int main(int argc, char *argv[])
 		const dictionary& postProcessingDictionary = solverOptionsDictionary.subDict("PostProcessing");
 		
 		calculateMoleFractions = Switch(postProcessingDictionary.lookup(word("moleFractions")));
-		calculateConcentrations = Switch(postProcessingDictionary.lookup(word("concentrations")));
+		calculateConcentrations = Switch(postProcessingDictionary.lookupOrDefault(word("concentrations"), word("off")));
 
 		calculateThermophoreticVelocity = Switch(postProcessingDictionary.lookupOrDefault(word("thermophoreticVelocity"), word("off")));
 		calculateRatesAcrossBoundaries = Switch(postProcessingDictionary.lookupOrDefault(word("flowRates"), word("off")));
 		calculateLocalStrainRate = Switch(postProcessingDictionary.lookupOrDefault(word("localStrainRate"), word("off")));
+		calculateHeatRelease = Switch(postProcessingDictionary.lookupOrDefault(word("heatRelease"), word("off")));
 
 		reconstructMixtureFraction = Switch(postProcessingDictionary.lookupOrDefault(word("reconstructMixtureFraction"), word("off")));
 
@@ -357,6 +359,8 @@ int main(int argc, char *argv[])
 				outputFormationRatesIndices.resize(listFormationRates.size());
 				for (int i=0;i<listFormationRates.size();i++)
 					outputFormationRatesIndices(i) = thermodynamicsMapXML->IndexOfSpecies(listFormationRates[i])-1;
+
+				calculateHeatRelease = true;
 			}
 		}
 	}
@@ -380,6 +384,8 @@ int main(int argc, char *argv[])
 					}
 					outputReactionRatesIndices(i) = listReactionRates[i];
 				}
+
+				calculateHeatRelease = true;
 			}
 		}
 	}
@@ -413,6 +419,7 @@ int main(int argc, char *argv[])
 		#include "calculateConcentrations.H"
 		#include "calculateFormationRates.H"
 		#include "calculateReactionRates.H"
+		#include "calculateHeatRelease.H"
 
 		// XML probe locations
 		#include "calculateProbeLocationsXML.H"
