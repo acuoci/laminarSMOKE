@@ -92,7 +92,11 @@
 
 int main(int argc, char *argv[])
 {
-	#if OPENFOAM_VERSION >= 40
+	#if OPENFOAM_VERSION == 60
+		#include "laminarSimpleSMOKE.6x.H"
+	#elif OPENFOAM_VERSION == 50
+		#include "laminarSimpleSMOKE.4x.H"
+	#elif OPENFOAM_VERSION == 40
 		#include "laminarSimpleSMOKE.4x.H"
 	#elif OPENFOAM_VERSION == 30
 		#include "laminarSimpleSMOKE.3x.H"

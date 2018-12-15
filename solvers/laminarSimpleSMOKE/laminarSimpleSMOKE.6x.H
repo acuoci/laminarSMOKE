@@ -38,107 +38,95 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-volScalarField rAU(1.0/UEqn.A());
-surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rho*rAU));
-volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
-
-if (pimple.nCorrPISO() <= 1)
 {
-    tUEqn.clear();
-}
+	#include "setRootCase.H"
+	#include "createTime.H"
+	#include "createMesh.H"
+	#include "createControl.H"
 
-surfaceScalarField phiHbyA
-(
-    "phiHbyA",
-    (
-        fvc::flux(rho*HbyA)
-      + rhorAUf*fvc::ddtCorr(rho, U, phi)
-    )
-);
+	#include "readGravitationalAcceleration.H"
+	#include "createBasicFields.H"
+	#include "readOptions.H"
+	#include "readOptionsSteadyState.H"
 
-MRF.makeRelative(fvc::interpolate(rho), phiHbyA);
+	linearModel linear_model(*thermodynamicsMapXML, *kineticsMapXML);
+	
+	#include "createGasFields.H"
+	#include "createChemicalFields.H"
+	#include "createLaminarSMOKEThermoClass.H"
+        
+	#include "createMRF.H"
+	#include "createFvOptions.H"
+	#include "initContinuityErrs.H"
 
-// Update the pressure BCs to ensure flux consistency
-constrainPressure(p, rho, U, phiHbyA, rhorAUf, MRF);
+	#include "createRadiationModel.H"
+	#include "memoryAllocation.H"
+	#include "properties.H"
+	#include "createAdditionalFields.H"
 
-if (pimple.transonic())
-{
-    surfaceScalarField phid
-    (
-        "phid",
-        (fvc::interpolate(psi)/fvc::interpolate(rho))*phiHbyA
-    );
-    phiHbyA -= fvc::interpolate(p)*phid;
+	dimensionedScalar initialMass = fvc::domainIntegrate(rho);
 
-    while (pimple.correctNonOrthogonal())
+    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+    Info<< "\nStarting time loop\n" << endl;
+
+    #if OPENFOAM_VERSION >= 60
+    while (simple.loop(runTime))
+    #else
+    while (simple.loop())
+    #endif
     {
-        fvScalarMatrix pEqn
-        (
-            fvm::ddt(psi, p)
-          + fvc::div(phiHbyA)
-          + fvm::div(phid, p)
-          - fvm::laplacian(rhorAUf, p)
-         ==
-            fvOptions(psi, p, rho.name())
-        );
+         Info<< "Time = " << runTime.timeName() << nl << endl;
+		
+	 double t0 = runTime.value() - runTime.deltaT().value();
+	 double tf = runTime.value();
 
-        // Relax the pressure equation to ensure diagonal-dominance
-        pEqn.relax();
-	pEqn.solve(mesh.solver(p.select(pimple.finalInnerIter())));
+	 // Pressure-velocity SIMPLE corrector
+         {
+		if (momentumEquations == true)
+		{
+		    #include "UEqn.H"
 
-        if (pimple.finalNonOrthogonalIter())
-        {
-            phi = phiHbyA + pEqn.flux();
-        }
+		    #include "updateProperties.H"
+		    #include "jacobianEvaluation.H"
+
+		    #include "fluxes.H"
+		    #include "YEqn.H"
+		    #include "TEqn.H" 
+		    if (simple.consistent())
+		    {
+		    	#include "pcEqn.H"
+		    }
+		    else
+		    {
+		        #include "pEqn.H"
+		    }
+		}
+		else
+		{
+		    #include "updateProperties.H"
+		    #include "jacobianEvaluation.H"
+
+		    #include "fluxes.H"
+		    #include "YEqn.H"
+		    #include "TEqn.H" 
+		}
+	    
+		// Passive scalars
+	        #include "zMixEqn.H"
+		#include "tauEqn.H"
+         }	
+
+	 #include "localPostProcessing.H"
+				
+	 runTime.write();
+		
+         Info << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+              << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+              << nl << endl;
     }
+
+    Info<< "End\n" << endl;
+
+    return 0;
 }
-else
-{
-    while (pimple.correctNonOrthogonal())
-    {
-        fvScalarMatrix pEqn
-        (
-            fvm::ddt(psi, p)
-          + fvc::div(phiHbyA)
-          - fvm::laplacian(rhorAUf, p)
-         ==
-            fvOptions(psi, p, rho.name())
-        );
-
-	pEqn.solve(mesh.solver(p.select(pimple.finalInnerIter())));
-
-        if (pimple.finalNonOrthogonalIter())
-        {
-            phi = phiHbyA + pEqn.flux();
-        }
-    }
-}
-
-#include "rhoEqn.H"
-#include "compressibleContinuityErrs.H"
-
-// Explicitly relax pressure for momentum corrector
-p.relax();
-
-U = HbyA - rAU*fvc::grad(p);
-U.correctBoundaryConditions();
-fvOptions.correct(U);
-K = 0.5*magSqr(U);
-
-#if DEVVERSION == 1
-pressureControl.limit(p);
-#endif
-p.correctBoundaryConditions();
-rho = Rho(p,psi);
-
-if (!pimple.transonic())
-{
-    rho.relax();
-}
-
-if (includeDpDt == true)
-{
-	//DpDt = fvc::DDt(surfaceScalarField("phiU", phi/fvc::interpolate(rho)), p);
-	DpDt = fvc::ddt(p);
-}
-

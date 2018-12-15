@@ -84,7 +84,7 @@ if (pimple.transonic())
 
         // Relax the pressure equation to ensure diagonal-dominance
         pEqn.relax();
-	pEqn.solve(mesh.solver(p.select(pimple.finalInnerIter())));
+	pEqn.solve(p.select(pimple.finalInnerIter()));
 
         if (pimple.finalNonOrthogonalIter())
         {
@@ -105,8 +105,8 @@ else
             fvOptions(psi, p, rho.name())
         );
 
-	pEqn.solve(mesh.solver(p.select(pimple.finalInnerIter())));
-
+	pEqn.solve(p.select(pimple.finalInnerIter()));
+        
         if (pimple.finalNonOrthogonalIter())
         {
             phi = phiHbyA + pEqn.flux();

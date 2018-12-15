@@ -47,7 +47,11 @@
 #elif OPENFOAM_VERSION == 30
 	#include "pEqn.3x.H"
 #elif OPENFOAM_VERSION >= 40
+	#if OPENFOAM_VERSION >= 60
+	#include "pEqn.6x.H"
+	#else
 	#include "pEqn.4x.H"
+	#endif
 #else
 	Compilation_Error_You_Did_Not_Define_The_OPENFOAM_VERSION_Macro
 #endif

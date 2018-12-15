@@ -207,7 +207,52 @@ Foam::radiation::radiativeIntensityRay::~radiativeIntensityRay()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-#if OPENFOAM_VERSION >= 40
+#if OPENFOAM_VERSION >= 60
+Foam::scalar Foam::radiation::radiativeIntensityRay::correct()
+{
+    // Reset boundary heat flux to zero
+    Qr_.boundaryFieldRef() = 0.0;
+    
+    scalar maxResidual = -GREAT;
+
+    forAll(ILambda_, lambdaI)
+    {
+        const volScalarField& k = dom_.aLambda(lambdaI);
+
+        const surfaceScalarField Ji(dAve_ & mesh_.Sf());
+
+        fvScalarMatrix IiEq
+        (
+            fvm::div(Ji, ILambda_[lambdaI], "div(Ji,Ii_h)")
+          + fvm::Sp(k*omega_, ILambda_[lambdaI])
+        ==
+            1.0/constant::mathematical::pi*omega_
+           *(
+                // Remove aDisp from k
+                (k - absorptionEmission_.aDisp(lambdaI))
+               *blackBody_.bLambda(lambdaI)
+
+              + absorptionEmission_.E(lambdaI)/4
+            )
+        );
+
+        IiEq.relax();
+
+        const solverPerformance ILambdaSol = solve
+        (
+            IiEq,
+            "Ii"
+        );
+
+        const scalar initialRes =
+            ILambdaSol.initialResidual()*omega_/dom_.omegaMax();
+
+        maxResidual = max(initialRes, maxResidual);
+    }
+
+    return maxResidual;
+}
+#elif OPENFOAM_VERSION >= 40
 Foam::scalar Foam::radiation::radiativeIntensityRay::correct()
 {
     // Reset boundary heat flux to zero

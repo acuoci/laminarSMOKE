@@ -70,7 +70,11 @@
 
     Info<< "\nStarting time loop\n" << endl;
 
+    #if OPENFOAM_VERSION >= 60
+    while (simple.loop(runTime))
+    #else
     while (simple.loop())
+    #endif
     {
          Info<< "Time = " << runTime.timeName() << nl << endl;
 		

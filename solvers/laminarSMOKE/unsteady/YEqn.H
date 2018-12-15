@@ -114,7 +114,11 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 			// Solve
 			YiEqn.relax();
 			fvOptions.constrain(YiEqn);
+			#if OPENFOAM_VERSION >= 60
+			YiEqn.solve("Yi");
+			#else
 			YiEqn.solve(mesh.solver("Yi"));
+			#endif		
 			fvOptions.correct(Yi);	
 			
 			// Sum of mass fractions
@@ -160,7 +164,11 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 			// Solve
 			YiEqn.relax();
 			fvOptions.constrain(YiEqn);
+			#if OPENFOAM_VERSION >= 60
+			YiEqn.solve("Yi");
+			#else
 			YiEqn.solve(mesh.solver("Yi"));
+			#endif
 			fvOptions.correct(Yi);	
 			
 			// Sum of mass fractions

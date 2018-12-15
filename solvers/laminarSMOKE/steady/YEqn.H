@@ -111,7 +111,11 @@ if(speciesEquations == true)
 			// Solve
 			YiEqn.relax();
 			fvOptions.constrain(YiEqn);
+			#if OPENFOAM_VERSION >= 60
+			YiEqn.solve(exceptional_species[i]);
+			#else
 			YiEqn.solve(mesh.solver(exceptional_species[i]));
+			#endif
 			fvOptions.correct(Yi);	
 			
 			// Sum of mass fractions
@@ -147,7 +151,11 @@ if(speciesEquations == true)
 			// Solve
 			YiEqn.relax();
 			fvOptions.constrain(YiEqn);
+			#if OPENFOAM_VERSION >= 60
+			YiEqn.solve(exceptional_species[i]);
+			#else
 			YiEqn.solve(mesh.solver(exceptional_species[i]));
+			#endif
 			fvOptions.correct(Yi);	
 			
 			// Sum of mass fractions
