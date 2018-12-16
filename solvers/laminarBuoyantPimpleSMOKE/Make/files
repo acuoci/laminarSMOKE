@@ -1,4 +1,4 @@
 laminarBuoyantPimpleSMOKE.C
 
-EXE = $(FOAM_USER_APPBIN)/laminarBuoyantPimpleSMOKE
+EXE = $(FOAM_USER_APPBIN)/laminarBuoyantPimpleSMOKE.virtual-chemistry
 
