@@ -40,10 +40,14 @@
 
 {	
 	#if OPENFOAM_VERSION >= 40
+		#if OPENFOAM_VERSION >= 60
+		    #include "rhoEqn.H"
+		#else
 		if (pimple.nCorrPIMPLE() <= 1)
 		{
 		    #include "rhoEqn.H"
 		}
+		#endif
 	#else
 		#include "rhoEqn.H"
 	#endif
