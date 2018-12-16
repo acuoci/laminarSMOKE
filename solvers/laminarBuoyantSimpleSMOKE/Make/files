@@ -1,3 +1,4 @@
 laminarBuoyantSimpleSMOKE.C
 
-EXE = $(FOAM_USER_APPBIN)/laminarBuoyantSimpleSMOKE
+EXE = $(FOAM_USER_APPBIN)/laminarBuoyantSimpleSMOKE.SPARC
+

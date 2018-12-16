@@ -15,11 +15,13 @@ EXE_INC = \
     -I$(SUNDIALS_PATH)/include \
     -I$(MKL_PATH)/include \
     -I/$(ISAT_INCLUDE) \
+    -I/$(SPARC_INCLUDE)/include \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/fvOptions/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
     -I$(LIB_SRC)/sampling/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude
+#   $(SPARC_SUPPORT)
 
 EXE_LIBS = \
     -L$(FOAM_USER_LIBBIN) \
@@ -38,10 +40,11 @@ EXE_LIBS = \
     $(DVODE_LIBS)     \
     $(LINPACK_LIBS) \
     $(ISAT_LIBS) \
+    -L$(SPARC_INCLUDE)/lib64 \
     -lgfortran \
     $(MKL_LIBS) \
     -lboost_date_time \
     -lboost_filesystem \
     -lboost_system \
-    -lboost_regex
-    
+    -lboost_regex \
+    -larmadillo 
