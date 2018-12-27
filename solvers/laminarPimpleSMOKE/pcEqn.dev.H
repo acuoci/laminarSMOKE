@@ -39,7 +39,7 @@
 \*-----------------------------------------------------------------------*/
 
 volScalarField rAU(1.0/UEqn.A());
-surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rho*rAU));
+volScalarField rAtU(1.0/(1.0/rAU - UEqn.H1()));
 volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
 
 if (pimple.nCorrPISO() <= 1)
@@ -52,14 +52,16 @@ surfaceScalarField phiHbyA
     "phiHbyA",
     (
         fvc::flux(rho*HbyA)
-      + rhorAUf*fvc::ddtCorr(rho, U, phi)
+      + fvc::interpolate(rho*rAU)*fvc::ddtCorr(rho, U, phi)
     )
 );
 
 MRF.makeRelative(fvc::interpolate(rho), phiHbyA);
 
+volScalarField rhorAtU("rhorAtU", rho*rAtU);
+
 // Update the pressure BCs to ensure flux consistency
-constrainPressure(p, rho, U, phiHbyA, rhorAUf, MRF);
+constrainPressure(p, rho, U, phiHbyA, rhorAtU, MRF);
 
 if (pimple.transonic())
 {
@@ -68,7 +70,12 @@ if (pimple.transonic())
         "phid",
         (fvc::interpolate(psi)/fvc::interpolate(rho))*phiHbyA
     );
-    phiHbyA -= fvc::interpolate(p)*phid;
+
+    phiHbyA +=
+        fvc::interpolate(rho*(rAtU - rAU))*fvc::snGrad(p)*mesh.magSf()
+      - fvc::interpolate(p)*phid;
+
+    HbyA -= (rAU - rAtU)*fvc::grad(p);
 
     while (pimple.correctNonOrthogonal())
     {
@@ -77,14 +84,14 @@ if (pimple.transonic())
             fvm::ddt(psi, p)
           + fvc::div(phiHbyA)
           + fvm::div(phid, p)
-          - fvm::laplacian(rhorAUf, p)
+          - fvm::laplacian(rhorAtU, p)
          ==
             fvOptions(psi, p, rho.name())
         );
 
         // Relax the pressure equation to ensure diagonal-dominance
         pEqn.relax();
-	pEqn.solve(mesh.solver(p.select(pimple.finalInnerIter())));
+	pEqn.solve(p.select(pimple.finalInnerIter()));
 
         if (pimple.finalNonOrthogonalIter())
         {
@@ -94,19 +101,22 @@ if (pimple.transonic())
 }
 else
 {
+    phiHbyA += fvc::interpolate(rho*(rAtU - rAU))*fvc::snGrad(p)*mesh.magSf();
+    HbyA -= (rAU - rAtU)*fvc::grad(p);
+
     while (pimple.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
             fvm::ddt(psi, p)
           + fvc::div(phiHbyA)
-          - fvm::laplacian(rhorAUf, p)
+          - fvm::laplacian(rhorAtU, p)
          ==
             fvOptions(psi, p, rho.name())
         );
 
-	pEqn.solve(mesh.solver(p.select(pimple.finalInnerIter())));
-        
+	pEqn.solve(p.select(pimple.finalInnerIter()));
+
         if (pimple.finalNonOrthogonalIter())
         {
             phi = phiHbyA + pEqn.flux();
@@ -120,7 +130,7 @@ else
 // Explicitly relax pressure for momentum corrector
 p.relax();
 
-U = HbyA - rAU*fvc::grad(p);
+U = HbyA - rAtU*fvc::grad(p);
 U.correctBoundaryConditions();
 fvOptions.correct(U);
 K = 0.5*magSqr(U);
@@ -140,5 +150,6 @@ if (includeDpDt == true)
 {
 	//DpDt = fvc::DDt(surfaceScalarField("phiU", phi/fvc::interpolate(rho)), p);
 	DpDt = fvc::ddt(p);
+
 }
 

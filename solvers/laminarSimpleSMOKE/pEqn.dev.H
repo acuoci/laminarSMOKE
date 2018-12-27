@@ -38,107 +38,134 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-volScalarField rAU(1.0/UEqn.A());
-surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rho*rAU));
-volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
-
-if (pimple.nCorrPISO() <= 1)
 {
+    volScalarField rAU(1.0/UEqn.A());
+    surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rho*rAU));
+    volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
     tUEqn.clear();
-}
 
-surfaceScalarField phiHbyA
-(
-    "phiHbyA",
-    (
-        fvc::flux(rho*HbyA)
-      + rhorAUf*fvc::ddtCorr(rho, U, phi)
-    )
-);
+    bool closedVolume = false;
 
-MRF.makeRelative(fvc::interpolate(rho), phiHbyA);
+    surfaceScalarField phiHbyA("phiHbyA", fvc::flux(rho*HbyA));
+    MRF.makeRelative(fvc::interpolate(rho), phiHbyA);
 
-// Update the pressure BCs to ensure flux consistency
-constrainPressure(p, rho, U, phiHbyA, rhorAUf, MRF);
+    // Update the pressure BCs to ensure flux consistency
+    constrainPressure(p, rho, U, phiHbyA, rhorAUf, MRF);
 
-if (pimple.transonic())
-{
-    surfaceScalarField phid
-    (
-        "phid",
-        (fvc::interpolate(psi)/fvc::interpolate(rho))*phiHbyA
-    );
-    phiHbyA -= fvc::interpolate(p)*phid;
-
-    while (pimple.correctNonOrthogonal())
+    if (simple.transonic())
     {
-        fvScalarMatrix pEqn
+        surfaceScalarField phid
         (
-            fvm::ddt(psi, p)
-          + fvc::div(phiHbyA)
-          + fvm::div(phid, p)
-          - fvm::laplacian(rhorAUf, p)
-         ==
-            fvOptions(psi, p, rho.name())
+            "phid",
+            (fvc::interpolate(psi)/fvc::interpolate(rho))*phiHbyA
         );
+        phiHbyA -= fvc::interpolate(p)*phid;
 
-        // Relax the pressure equation to ensure diagonal-dominance
-        pEqn.relax();
-	pEqn.solve(mesh.solver(p.select(pimple.finalInnerIter())));
-
-        if (pimple.finalNonOrthogonalIter())
+        while (simple.correctNonOrthogonal())
         {
-            phi = phiHbyA + pEqn.flux();
+            fvScalarMatrix pEqn
+            (
+                fvc::div(phiHbyA)
+              + fvm::div(phid, p)
+              - fvm::laplacian(rhorAUf, p)
+              ==
+                fvOptions(psi, p, rho.name())
+            );
+
+            // Relax the pressure equation to ensure diagonal-dominance
+            pEqn.relax();
+
+	    #if DEVVERSION == 1
+            pEqn.setReference
+            (
+                pressureControl.refCell(),
+                pressureControl.refValue()
+            );
+	    #else
+	    pEqn.setReference(pRefCell, pRefValue);
+	    #endif
+
+            pEqn.solve();
+
+            if (simple.finalNonOrthogonalIter())
+            {
+                phi = phiHbyA + pEqn.flux();
+            }
         }
     }
-}
-else
-{
-    while (pimple.correctNonOrthogonal())
+    else
     {
-        fvScalarMatrix pEqn
-        (
-            fvm::ddt(psi, p)
-          + fvc::div(phiHbyA)
-          - fvm::laplacian(rhorAUf, p)
-         ==
-            fvOptions(psi, p, rho.name())
-        );
+        closedVolume = adjustPhi(phiHbyA, U, p);
 
-	pEqn.solve(mesh.solver(p.select(pimple.finalInnerIter())));
-        
-        if (pimple.finalNonOrthogonalIter())
+        while (simple.correctNonOrthogonal())
         {
-            phi = phiHbyA + pEqn.flux();
+            fvScalarMatrix pEqn
+            (
+                fvc::div(phiHbyA)
+              - fvm::laplacian(rhorAUf, p)
+              ==
+                fvOptions(psi, p, rho.name())
+            );
+
+	    #if DEVVERSION == 1
+            pEqn.setReference
+            (
+                pressureControl.refCell(),
+                pressureControl.refValue()
+            );
+	    #else
+	    pEqn.setReference(pRefCell, pRefValue);
+	    #endif
+
+            pEqn.solve();
+
+            if (simple.finalNonOrthogonalIter())
+            {
+                phi = phiHbyA + pEqn.flux();
+            }
         }
     }
-}
 
-#include "rhoEqn.H"
-#include "compressibleContinuityErrs.H"
+    #include "continuityErrs.H"
 
-// Explicitly relax pressure for momentum corrector
-p.relax();
+    // Explicitly relax pressure for momentum corrector
+    p.relax();
 
-U = HbyA - rAU*fvc::grad(p);
-U.correctBoundaryConditions();
-fvOptions.correct(U);
-K = 0.5*magSqr(U);
+    U = HbyA - rAU*fvc::grad(p);
+    U.correctBoundaryConditions();
+    fvOptions.correct(U);
 
-#if DEVVERSION == 1
-pressureControl.limit(p);
-#endif
-p.correctBoundaryConditions();
-rho = Rho(p,psi);
+    #if DEVVERSION == 1
+    pressureControl.limit(p);
+    #endif
 
-if (!pimple.transonic())
-{
-    rho.relax();
-}
+    // For closed-volume cases adjust the pressure and density levels
+    // to obey overall mass continuity
+    if (closedVolume)
+    {
+        p += (initialMass - fvc::domainIntegrate(psi*p))
+            /fvc::domainIntegrate(psi);
+    }
 
-if (includeDpDt == true)
-{
-	//DpDt = fvc::DDt(surfaceScalarField("phiU", phi/fvc::interpolate(rho)), p);
-	DpDt = fvc::ddt(p);
+    p.correctBoundaryConditions();
+
+    //rho = thermo.rho();
+    rho = Rho(p,psi);
+    rho = max(rho, rhoMin);
+    rho = min(rho, rhoMax);
+
+    if (!simple.transonic())
+    {
+        rho.relax();
+    }
+
+    Info << "rho max/min : "
+         << max(rho).value() << " "
+         << min(rho).value() << endl;
+
+    if (includeDpDt == true)
+    {
+	DpDt = fvc::div(surfaceScalarField("phiU", phi/fvc::interpolate(rho)), p);
+    }
 }
 

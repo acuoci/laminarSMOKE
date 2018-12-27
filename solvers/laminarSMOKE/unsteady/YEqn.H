@@ -114,7 +114,7 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 			// Solve
 			YiEqn.relax();
 			fvOptions.constrain(YiEqn);
-			#if OPENFOAM_VERSION >= 60
+			#if OPENFOAM_VERSION >= 1000
 			YiEqn.solve("Yi");
 			#else
 			YiEqn.solve(mesh.solver("Yi"));
@@ -164,7 +164,7 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 			// Solve
 			YiEqn.relax();
 			fvOptions.constrain(YiEqn);
-			#if OPENFOAM_VERSION >= 60
+			#if OPENFOAM_VERSION >= 1000
 			YiEqn.solve("Yi");
 			#else
 			YiEqn.solve(mesh.solver("Yi"));

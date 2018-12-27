@@ -66,7 +66,7 @@
 		TEqn.relax();
 		fvOptions.constrain(TEqn);
 		
-		#if OPENFOAM_VERSION >= 60
+		#if OPENFOAM_VERSION >= 1000
 		TEqn.solve("T");
 		#else
 		TEqn.solve(mesh.solver("T"));

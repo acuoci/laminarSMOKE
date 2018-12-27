@@ -207,7 +207,7 @@ Foam::radiation::radiativeIntensityRay::~radiativeIntensityRay()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-#if OPENFOAM_VERSION >= 60
+#if OPENFOAM_VERSION >= 1000
 Foam::scalar Foam::radiation::radiativeIntensityRay::correct()
 {
     // Reset boundary heat flux to zero
@@ -242,7 +242,7 @@ Foam::scalar Foam::radiation::radiativeIntensityRay::correct()
         (
             IiEq,
             "Ii"
-        );
+        );	
 
         const scalar initialRes =
             ILambdaSol.initialResidual()*omega_/dom_.omegaMax();

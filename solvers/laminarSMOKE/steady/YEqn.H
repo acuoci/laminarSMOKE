@@ -111,7 +111,7 @@ if(speciesEquations == true)
 			// Solve
 			YiEqn.relax();
 			fvOptions.constrain(YiEqn);
-			#if OPENFOAM_VERSION >= 60
+			#if OPENFOAM_VERSION >= 1000
 			YiEqn.solve(exceptional_species[i]);
 			#else
 			YiEqn.solve(mesh.solver(exceptional_species[i]));
@@ -151,7 +151,7 @@ if(speciesEquations == true)
 			// Solve
 			YiEqn.relax();
 			fvOptions.constrain(YiEqn);
-			#if OPENFOAM_VERSION >= 60
+			#if OPENFOAM_VERSION >= 1000
 			YiEqn.solve(exceptional_species[i]);
 			#else
 			YiEqn.solve(mesh.solver(exceptional_species[i]));

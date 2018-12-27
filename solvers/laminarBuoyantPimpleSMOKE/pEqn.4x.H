@@ -98,15 +98,6 @@ if (includeDpDt == true)
     DpDt = fvc::ddt(p);
 }
 
-
-
-
-
-
-
-
-
-
 /*
 rho = Rho(p,psi);
 

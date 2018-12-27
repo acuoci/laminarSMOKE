@@ -52,7 +52,7 @@
 		// Solve
 		tauEqn.relax();
 		fvOptions.constrain(tauEqn);
-		#if OPENFOAM_VERSION >= 60
+		#if OPENFOAM_VERSION >= 1000
 		tauEqn.solve("tau");
 		#else
 		tauEqn.solve(mesh.solver("tau"));

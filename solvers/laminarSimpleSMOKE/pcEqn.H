@@ -40,12 +40,14 @@
 
 #if OPENFOAM_VERSION == 30
 	#include "pcEqn.3x.H"
-#elif OPENFOAM_VERSION >= 40
-	#if OPENFOAM_VERSION >= 60
-	#include "pcEqn.6x.H"
-	#else
+#elif OPENFOAM_VERSION == 40
 	#include "pcEqn.4x.H"
-	#endif
+#elif OPENFOAM_VERSION == 50
+	#include "pcEqn.5x.H"
+#elif OPENFOAM_VERSION == 60
+	#include "pcEqn.6x.H"
+#elif OPENFOAM_VERSION >= 1000
+	#include "pcEqn.dev.H"
 #else
 	Compilation_Error_You_Did_Not_Define_The_OPENFOAM_VERSION_Macro
 #endif
