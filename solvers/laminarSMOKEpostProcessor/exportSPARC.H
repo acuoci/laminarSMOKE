@@ -55,6 +55,20 @@ if (exportSPARC == true)
 	    mesh
 	);
 
+	Info<< "Reading field tau..." << endl;
+	volScalarField tau
+	(
+	    IOobject
+	    (
+		"tau",
+		runTime.timeName(),
+		mesh,
+		IOobject::MUST_READ,
+		IOobject::NO_WRITE
+	    ),
+	    mesh
+	);
+
 	std::string filename = "output." + runTime.timeName();
 	std::ofstream fOutput(filename.c_str(), std::ios::out);
 	fOutput.setf(std::ios::scientific);
@@ -62,6 +76,7 @@ if (exportSPARC == true)
 
 	const scalarField& TCells = T.internalField();
 	const scalarField& zMixCells = zMix.internalField();
+	const scalarField& tauCells = tau.internalField();
 
 	const double T_threshold = 299.;
 	
@@ -76,6 +91,7 @@ if (exportSPARC == true)
 			fOutput << std::setw(15) << std::scientific << std::setprecision(6) << mesh.C()[celli][2];
 
 			fOutput << std::setw(15) << std::scientific << std::setprecision(6) << zMixCells[celli];
+			fOutput << std::setw(15) << std::scientific << std::setprecision(6) << tauCells[celli];
 			fOutput << std::setw(15) << std::scientific << std::setprecision(6) << TCells[celli];
 			for(unsigned int i=0;i<Y.size();i++)
 				fOutput << std::setw(15) << std::scientific << std::setprecision(6) << Y[i].internalField()[celli];
