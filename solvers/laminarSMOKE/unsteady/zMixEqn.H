@@ -55,6 +55,10 @@
 		// Solve
 		zMixEqn.relax();
 		fvOptions.constrain(zMixEqn);
+		#if OPENFOAM_VERSION >= 1000
+		zMixEqn.solve("zMix");
+		#else
 		zMixEqn.solve(mesh.solver("zMix"));
+		#endif	
 	}
 }

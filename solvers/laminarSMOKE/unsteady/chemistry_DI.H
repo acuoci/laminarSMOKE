@@ -40,16 +40,33 @@
 
 {
 	//- Initial conditions
-	scalarField& TCells = T.internalField();
-	scalarField& QCells = Q.internalField();
 	const scalarField& rhoCells = rho.internalField();
 	const scalarField& vCells = mesh.V();
+
+	#if OPENFOAM_VERSION >= 40
+	scalarField& TCells = T.ref();
+	scalarField& QCells = Q.ref();
+	//scalarField& cpuChemistryCells = cpuChemistry.ref();
+
+	scalarField& HMOM_Norm_M00Cells = HMOM_Norm_M00.ref();
+	scalarField& HMOM_Norm_M10Cells = HMOM_Norm_M10.ref();
+	scalarField& HMOM_Norm_M01Cells = HMOM_Norm_M01.ref();
+	scalarField& HMOM_Norm_N0Cells  = HMOM_Norm_N0.ref();
+	scalarField& HMOM_fvCells = HMOM_fv.ref(); 
+
+	#else
+	scalarField& TCells = T.internalField();
+	scalarField& QCells = Q.internalField();
+	//scalarField& cpuChemistryCells = cpuChemistry.internalField();
 
 	scalarField& HMOM_Norm_M00Cells = HMOM_Norm_M00.internalField();
 	scalarField& HMOM_Norm_M10Cells = HMOM_Norm_M10.internalField();
 	scalarField& HMOM_Norm_M01Cells = HMOM_Norm_M01.internalField();
 	scalarField& HMOM_Norm_N0Cells  = HMOM_Norm_N0.internalField();
 	scalarField& HMOM_fvCells = HMOM_fv.internalField(); 
+	#endif
+
+
 
 	if (homogeneousReactions == true && odeParameterBatchReactorHomogeneous.type() == OpenSMOKE::ODE_Parameters::ODE_INTEGRATOR_OPENSMOKE)
 	{
@@ -198,8 +215,13 @@
 				normalizeMassFractions(yf, NC, celli, massFractionsTol);
 
 				// Assign mass fractions
+				#if OPENFOAM_VERSION >= 40
+				for(int i=0;i<NC;i++)
+					Y[i].ref()[celli] = yf(i);
+				#else
 				for(int i=0;i<NC;i++)
 					Y[i].internalField()[celli] = yf(i);
+				#endif
 
 				//- Allocating final values: temperature
 				if (energyEquation == true)
@@ -337,8 +359,13 @@
 					normalizeMassFractions(yf.data(), celli, massFractionsTol, NC);
 
 					// Assign mass fractions
+					#if OPENFOAM_VERSION >= 40
+					for(int i=0;i<NC;i++)
+						Y[i].ref()[celli] = yf(i);
+					#else
 					for(int i=0;i<NC;i++)
 						Y[i].internalField()[celli] = yf(i);
+					#endif
 				}
 
 				if (counter%(int(0.20*mesh.nCells())+1) == 0)
@@ -495,8 +522,13 @@
 					normalizeMassFractions(yf, celli, massFractionsTol);
 
 					// Assign mass fractions
+					#if OPENFOAM_VERSION >= 40
+					for(int i=0;i<NC;i++)
+						Y[i].ref()[celli] = yf[i+1];
+					#else
 					for(int i=0;i<NC;i++)
 						Y[i].internalField()[celli] = yf[i+1];
+					#endif
 
 					//- Allocating final values: temperature
 					if (energyEquation == true)
@@ -516,9 +548,15 @@
 						QCells[celli] = batchReactorHomogeneousConstantPressure.QR();
 						if (outputFormationRatesIndices.size() != 0)
 						{
+						#if OPENFOAM_VERSION >= 40
+							for (int i=0;i<outputFormationRatesIndices.size();i++)
+								FormationRates[i].ref()[celli] = batchReactorHomogeneousConstantPressure.R()[outputFormationRatesIndices[i]+1] *
+                                       	      		                                                   thermodynamicsMapXML->MW()[outputFormationRatesIndices[i]+1];
+							#else
 							for (int i=0;i<outputFormationRatesIndices.size();i++)
 								FormationRates[i].internalField()[celli] = batchReactorHomogeneousConstantPressure.R()[outputFormationRatesIndices[i]+1] *
                                        	      		                                                   thermodynamicsMapXML->MW()[outputFormationRatesIndices[i]+1];
+							#endif
 						}
 					}
 					else
@@ -526,9 +564,15 @@
 						QCells[celli] = batchReactorHomogeneousConstantVolume.QR();
 						if (outputFormationRatesIndices.size() != 0)
 						{
+							#if OPENFOAM_VERSION >= 40
+							for (int i=0;i<outputFormationRatesIndices.size();i++)
+								FormationRates[i].ref()[celli] = batchReactorHomogeneousConstantVolume.R()[outputFormationRatesIndices[i]+1] *
+                                           	                                                           thermodynamicsMapXML->MW()[outputFormationRatesIndices[i]];
+							#else
 							for (int i=0;i<outputFormationRatesIndices.size();i++)
 								FormationRates[i].internalField()[celli] = batchReactorHomogeneousConstantVolume.R()[outputFormationRatesIndices[i]+1] *
-                                           	                                                           thermodynamicsMapXML->MW()[outputFormationRatesIndices[i]+1];
+                                           	                                                           thermodynamicsMapXML->MW()[outputFormationRatesIndices[i]];
+							#endif
 						}
 					}
 				}

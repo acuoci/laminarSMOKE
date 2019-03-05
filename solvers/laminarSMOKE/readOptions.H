@@ -680,4 +680,6 @@ OpenSMOKE::ODE_Parameters odeParameterBatchReactorHomogeneous;
 //label minMaxUpdate  = 25;
 //label minMaxCounter = minMaxUpdate;
 
+unsigned int vc_main_species = 0;
+
 Info<< "Solver options correctly read\n" << endl;

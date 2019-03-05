@@ -41,6 +41,7 @@
 {	
 	#include "rhoEqn.H"
 
+	// --- Pressure-velocity PIMPLE corrector loop
 	while (pimple.loop())
 	{
 		#include "UEqn.H"
@@ -65,3 +66,5 @@
 
 	rho = Rho(p,psi);
 }
+
+

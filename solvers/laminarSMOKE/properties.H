@@ -52,7 +52,29 @@
 	{
 		const scalarField& TCells = T.internalField();
 		const scalarField& pCells = p.internalField(); 
+		
+		#if OPENFOAM_VERSION >= 40
+		scalarField& cTotCells = cTot.ref();
+		scalarField& psiCells =  psi.ref();
+		scalarField& muCells  =  mu.ref();
+		scalarField& lambdaCells = lambda.ref();
+		scalarField& cpCells = cp.ref();
+		scalarField& cvCells = cv.ref();
+		scalarField& hCells = h.ref();
+		scalarField& MWmixCells = MWmix.ref();
 
+		scalarField& HMOM_Norm_N0Cells  = HMOM_Norm_N0.ref();
+		scalarField& HMOM_Norm_M00Cells = HMOM_Norm_M00.ref();
+		scalarField& HMOM_Norm_M01Cells = HMOM_Norm_M01.ref();
+		scalarField& HMOM_Norm_M10Cells = HMOM_Norm_M10.ref();
+
+		scalarField& HMOM_fvCells = HMOM_fv.ref(); 
+		scalarField& HMOM_NCells  = HMOM_N.ref(); 
+		scalarField& HMOM_dpCells = HMOM_dp.ref();
+		scalarField& HMOM_dcCells = HMOM_dc.ref(); 
+		scalarField& HMOM_npCells = HMOM_np.ref(); 
+
+		#else
 		scalarField& cTotCells = cTot.internalField();
 		scalarField& psiCells =  psi.internalField();
 		scalarField& muCells  =  mu.internalField();
@@ -72,6 +94,10 @@
 		scalarField& HMOM_dpCells = HMOM_dp.internalField(); 
 		scalarField& HMOM_dcCells = HMOM_dc.internalField(); 
 		scalarField& HMOM_npCells = HMOM_np.internalField(); 
+		#endif
+
+
+		
 
 
 		forAll(TCells, celli)
@@ -88,8 +114,13 @@
 				
 			thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions,MWmixCells[celli],massFractions);
 
+			#if OPENFOAM_VERSION >= 40
+			for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
+				X[i].ref()[celli] = moleFractions[i+1];
+			#else
 			for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 				X[i].internalField()[celli] = moleFractions[i+1];
+			#endif
 
 			cTotCells[celli] = pCells[celli]/PhysicalConstants::R_J_kmol/TCells[celli];
 			psiCells[celli]  = cTotCells[celli]*MWmixCells[celli]/pCells[celli];
@@ -111,29 +142,53 @@
 				if (iMassDiffusionInEnergyEquation == true)
 				{
 					thermodynamicsMapXML->cpMolar_Species(CpVector);
+
+					#if OPENFOAM_VERSION >= 40
+					for(unsigned int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
+                                               CpSpecies[i].ref()[celli] = CpVector[i+1] / thermodynamicsMapXML->MW()[i+1];
+					#else
 					for(unsigned int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
                                                CpSpecies[i].internalField()[celli] = CpVector[i+1] / thermodynamicsMapXML->MW()[i+1];
+					#endif	
 				}
 			}
 			
 			if (diffusivityModel == DIFFUSIVITY_MODEL_MULTICOMPONENT)
 			{
 				transportMapXML->MassDiffusionCoefficients(Dmixvector, moleFractions);
+
+				#if OPENFOAM_VERSION >= 40
+				for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
+					Dmix[i].ref()[celli] = Dmixvector[i+1];
+				#else
 				for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 					Dmix[i].internalField()[celli] = Dmixvector[i+1];
+				#endif	
 			}
 			else if (diffusivityModel == DIFFUSIVITY_MODEL_LEWIS_NUMBERS)
 			{
 				const double coefficient = lambdaCells[celli]/(pCells[celli]*psiCells[celli])/cpCells[celli];
+
+				#if OPENFOAM_VERSION >= 40
+				for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
+					Dmix[i].ref()[celli] = coefficient/LewisNumbers(i);
+				#else
 				for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 					Dmix[i].internalField()[celli] = coefficient/LewisNumbers(i);
+				#endif	
 			}
 
 			if (physicalSootDiffusivity == true)
 			{
 				const double DmixReference = Dmix[physicalSootDiffusivityReferenceIndex].internalField()[celli];
+
+				#if OPENFOAM_VERSION >= 40
 				for(int i=0;i<physicalSootDiffusivityCorrectionIndex.size();i++)
-					Dmix[physicalSootDiffusivityCorrectionIndex[i]].internalField()[celli] = DmixReference*physicalSootDiffusivityCorrection[i];
+					Dmix[physicalSootDiffusivityCorrectionIndex[i]].ref()[celli] = DmixReference*physicalSootDiffusivityCorrection[i];
+				#else
+				for(int i=0;i<physicalSootDiffusivityCorrectionIndex.size();i++)
+					Dmix[physicalSootDiffusivityCorrectionIndex[i]].internalField()[celli] = 										DmixReference*physicalSootDiffusivityCorrection[i];
+				#endif	
 			}
 
 			// Thermal diffusion coefficients [-]
@@ -143,7 +198,12 @@
 				for(int i=0;i<transportMapXML->iThermalDiffusionRatios().size();i++)
 				{
 					unsigned int index = transportMapXML->iThermalDiffusionRatios()[i];
+
+					#if OPENFOAM_VERSION >= 40
+					Dsoret[i].ref()[celli] =Dmix[index-1].internalField()[celli]*tetamixvector[index]*thermodynamicsMapXML->MW()[index]/MWmixCells[celli];
+					#else
 					Dsoret[i].internalField()[celli] =Dmix[index-1].internalField()[celli]*tetamixvector[index]*thermodynamicsMapXML->MW()[index]/MWmixCells[celli];
+					#endif
 				} 
 			}
 
@@ -174,9 +234,31 @@
 	// Boundaries
 	forAll(T.boundaryField(), patchi)
 	{
+		#if OPENFOAM_VERSION >= 40
+		fvPatchScalarField& pp = p.boundaryFieldRef()[patchi];
+		fvPatchScalarField& pT = T.boundaryFieldRef()[patchi];
+		fvPatchScalarField& pcTot = cTot.boundaryFieldRef()[patchi];
+		fvPatchScalarField& ppsi  = psi.boundaryFieldRef()[patchi];
+		fvPatchScalarField& pmu   = mu.boundaryFieldRef()[patchi];
+		fvPatchScalarField& plambda = lambda.boundaryFieldRef()[patchi];
+		fvPatchScalarField& pcp = cp.boundaryFieldRef()[patchi];
+		fvPatchScalarField& pcv = cv.boundaryFieldRef()[patchi];
+		fvPatchScalarField& ph = h.boundaryFieldRef()[patchi];
+		fvPatchScalarField& pMWmix = MWmix.boundaryFieldRef()[patchi];
+
+		fvPatchScalarField& pHMOM_Norm_N0  = HMOM_Norm_N0.boundaryFieldRef()[patchi];
+		fvPatchScalarField& pHMOM_Norm_M00 = HMOM_Norm_M00.boundaryFieldRef()[patchi];
+		fvPatchScalarField& pHMOM_Norm_M01 = HMOM_Norm_M01.boundaryFieldRef()[patchi];
+		fvPatchScalarField& pHMOM_Norm_M10 = HMOM_Norm_M10.boundaryFieldRef()[patchi];
+
+		fvPatchScalarField& pHMOM_fv = HMOM_fv.boundaryFieldRef()[patchi];
+		fvPatchScalarField& pHMOM_N  = HMOM_N.boundaryFieldRef()[patchi];
+		fvPatchScalarField& pHMOM_dp = HMOM_dp.boundaryFieldRef()[patchi];
+		fvPatchScalarField& pHMOM_dc = HMOM_dc.boundaryFieldRef()[patchi];
+		fvPatchScalarField& pHMOM_np = HMOM_np.boundaryFieldRef()[patchi];
+		#else
 		fvPatchScalarField& pp = p.boundaryField()[patchi];
 		fvPatchScalarField& pT = T.boundaryField()[patchi];
-        
 		fvPatchScalarField& pcTot = cTot.boundaryField()[patchi];
 		fvPatchScalarField& ppsi  = psi.boundaryField()[patchi];
 		fvPatchScalarField& pmu   = mu.boundaryField()[patchi];
@@ -196,6 +278,10 @@
 		fvPatchScalarField& pHMOM_dp = HMOM_dp.boundaryField()[patchi];
 		fvPatchScalarField& pHMOM_dc = HMOM_dc.boundaryField()[patchi];
 		fvPatchScalarField& pHMOM_np = HMOM_np.boundaryField()[patchi];
+		#endif
+
+
+
         
 		forAll(pT, facei)
 		{
@@ -210,8 +296,13 @@
 
 			thermodynamicsMapXML->MoleFractions_From_MassFractions(moleFractions,pMWmix[facei],massFractions);
 
+			#if OPENFOAM_VERSION >= 40
+			for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
+				X[i].boundaryFieldRef()[patchi][facei] = moleFractions[i+1];
+			#else
 			for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 				X[i].boundaryField()[patchi][facei] = moleFractions[i+1];
+			#endif
 
 			pcTot[facei] = pp[facei]/(PhysicalConstants::R_J_kmol*pT[facei]);
 			ppsi[facei]  = pcTot[facei]*pMWmix[facei]/pp[facei];
@@ -234,29 +325,53 @@
 				if (iMassDiffusionInEnergyEquation == true)
 				{
 					thermodynamicsMapXML->cpMolar_Species(CpVector);
-                                        for(unsigned int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
+
+					#if OPENFOAM_VERSION >= 40
+					for(unsigned int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
+                                                CpSpecies[i].boundaryFieldRef()[patchi][facei] = CpVector[i+1] / thermodynamicsMapXML->MW()[i+1];
+					#else
+					for(unsigned int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
                                                 CpSpecies[i].boundaryField()[patchi][facei] = CpVector[i+1] / thermodynamicsMapXML->MW()[i+1];
+					#endif
 				}
 			} 
 			
 			if (diffusivityModel == DIFFUSIVITY_MODEL_MULTICOMPONENT)
 			{
 				transportMapXML->MassDiffusionCoefficients(Dmixvector,moleFractions);
+
+				#if OPENFOAM_VERSION >= 40
+				for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
+					Dmix[i].boundaryFieldRef()[patchi][facei] = Dmixvector[i+1];
+				#else
 				for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 					Dmix[i].boundaryField()[patchi][facei] = Dmixvector[i+1];
+				#endif
 			}
 			else if (diffusivityModel == DIFFUSIVITY_MODEL_LEWIS_NUMBERS)
 			{
 				const double coefficient =  plambda[facei]/(pp[facei]*ppsi[facei])/pcp[facei];
+
+				#if OPENFOAM_VERSION >= 40
+				for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
+					Dmix[i].boundaryFieldRef()[patchi][facei] = coefficient/LewisNumbers(i);
+				#else
 				for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 					Dmix[i].boundaryField()[patchi][facei] = coefficient/LewisNumbers(i);
+				#endif
 			}
 
 			if (physicalSootDiffusivity == true)
 			{
 				const double DmixReference = Dmix[physicalSootDiffusivityReferenceIndex].boundaryField()[patchi][facei];
+
+				#if OPENFOAM_VERSION >= 40
+				for(int i=0;i<physicalSootDiffusivityCorrectionIndex.size();i++)
+					Dmix[physicalSootDiffusivityCorrectionIndex[i]].boundaryFieldRef()[patchi][facei] = DmixReference*physicalSootDiffusivityCorrection[i];
+				#else
 				for(int i=0;i<physicalSootDiffusivityCorrectionIndex.size();i++)
 					Dmix[physicalSootDiffusivityCorrectionIndex[i]].boundaryField()[patchi][facei] = DmixReference*physicalSootDiffusivityCorrection[i];
+				#endif
 			}
 
 			// Thermal diffusion coefficients [-]
@@ -266,7 +381,12 @@
 				for(int i=0;i<transportMapXML->iThermalDiffusionRatios().size();i++)
 				{
 					unsigned int index = transportMapXML->iThermalDiffusionRatios()[i];
+
+					#if OPENFOAM_VERSION >= 40
+					Dsoret[i].boundaryFieldRef()[patchi][facei] = Dmix[index-1].boundaryField()[patchi][facei]*tetamixvector[index]*thermodynamicsMapXML->MW()[index]/pMWmix[facei];
+					#else
 					Dsoret[i].boundaryField()[patchi][facei] = Dmix[index-1].boundaryField()[patchi][facei]*tetamixvector[index]*thermodynamicsMapXML->MW()[index]/pMWmix[facei];
+					#endif
 				}
 			}
 

@@ -59,25 +59,47 @@ if (iPolimiSoot == true)
 		const scalarField& TCells = T.internalField();
 		const scalarField& pCells = p.internalField();
 
-		scalarField& soot_fv_largeCells = sootFields[0].internalField();
-		scalarField& soot_fv_smallCells = sootFields[1].internalField();
-		scalarField& soot_rho_largeCells = sootFields[2].internalField();
-		scalarField& soot_rho_smallCells = sootFields[3].internalField();
-		scalarField& soot_N_largeCells = sootFields[4].internalField();
-		scalarField& soot_N_smallCells = sootFields[5].internalField();
-		scalarField& soot_x_largeCells = sootFields[6].internalField();
-		scalarField& soot_x_smallCells = sootFields[7].internalField();
-		scalarField& soot_omega_largeCells = sootFields[8].internalField();
-		scalarField& soot_omega_smallCells = sootFields[9].internalField();
-		scalarField& pah_omega_1_2Cells = sootFields[10].internalField();
-		scalarField& pah_omega_3_4Cells = sootFields[11].internalField();
-		scalarField& pah_omega_more_4Cells = sootFields[12].internalField();
+		#if OPENFOAM_VERSION >= 40
+			scalarField& soot_fv_largeCells = sootFields[0].ref();
+			scalarField& soot_fv_smallCells = sootFields[1].ref();
+			scalarField& soot_rho_largeCells = sootFields[2].ref();
+			scalarField& soot_rho_smallCells = sootFields[3].ref();
+			scalarField& soot_N_largeCells = sootFields[4].ref();
+			scalarField& soot_N_smallCells = sootFields[5].ref();
+			scalarField& soot_x_largeCells = sootFields[6].ref();
+			scalarField& soot_x_smallCells = sootFields[7].ref();
+			scalarField& soot_omega_largeCells = sootFields[8].ref();
+			scalarField& soot_omega_smallCells = sootFields[9].ref();
+			scalarField& pah_omega_1_2Cells = sootFields[10].ref();
+			scalarField& pah_omega_3_4Cells = sootFields[11].ref();
+			scalarField& pah_omega_more_4Cells = sootFields[12].ref();
 
-		scalarField& R_soot_largeCells = sootFields[13].internalField();
-		scalarField& R_soot_smallCells = sootFields[14].internalField();		
-		scalarField& R_pah_1_2Cells = sootFields[15].internalField();
-		scalarField& R_pah_3_4Cells = sootFields[16].internalField();
-		scalarField& R_pah_more_4Cells = sootFields[17].internalField();
+			scalarField& R_soot_largeCells = sootFields[13].ref();
+			scalarField& R_soot_smallCells = sootFields[14].ref();		
+			scalarField& R_pah_1_2Cells = sootFields[15].ref();
+			scalarField& R_pah_3_4Cells = sootFields[16].ref();
+			scalarField& R_pah_more_4Cells = sootFields[17].ref();
+		#else
+			scalarField& soot_fv_largeCells = sootFields[0].internalField();
+			scalarField& soot_fv_smallCells = sootFields[1].internalField();
+			scalarField& soot_rho_largeCells = sootFields[2].internalField();
+			scalarField& soot_rho_smallCells = sootFields[3].internalField();
+			scalarField& soot_N_largeCells = sootFields[4].internalField();
+			scalarField& soot_N_smallCells = sootFields[5].internalField();
+			scalarField& soot_x_largeCells = sootFields[6].internalField();
+			scalarField& soot_x_smallCells = sootFields[7].internalField();
+			scalarField& soot_omega_largeCells = sootFields[8].internalField();
+			scalarField& soot_omega_smallCells = sootFields[9].internalField();
+			scalarField& pah_omega_1_2Cells = sootFields[10].internalField();
+			scalarField& pah_omega_3_4Cells = sootFields[11].internalField();
+			scalarField& pah_omega_more_4Cells = sootFields[12].internalField();
+
+			scalarField& R_soot_largeCells = sootFields[13].internalField();
+			scalarField& R_soot_smallCells = sootFields[14].internalField();		
+			scalarField& R_pah_1_2Cells = sootFields[15].internalField();
+			scalarField& R_pah_3_4Cells = sootFields[16].internalField();
+			scalarField& R_pah_more_4Cells = sootFields[17].internalField();
+		#endif
 
 		forAll(TCells, celli)
 		{	
@@ -146,25 +168,47 @@ if (iPolimiSoot == true)
 			const fvPatchScalarField& pT  = T.boundaryField()[patchi];
 			const fvPatchScalarField& pp  = p.boundaryField()[patchi];
 		
-			fvPatchScalarField& psoot_fv_large = sootFields[0].boundaryField()[patchi];
-			fvPatchScalarField& psoot_fv_small = sootFields[1].boundaryField()[patchi];
-			fvPatchScalarField& psoot_rho_large = sootFields[2].boundaryField()[patchi];
-			fvPatchScalarField& psoot_rho_small = sootFields[3].boundaryField()[patchi];
-			fvPatchScalarField& psoot_N_large = sootFields[4].boundaryField()[patchi];
-			fvPatchScalarField& psoot_N_small = sootFields[5].boundaryField()[patchi];
-			fvPatchScalarField& psoot_x_large = sootFields[6].boundaryField()[patchi];
-			fvPatchScalarField& psoot_x_small = sootFields[7].boundaryField()[patchi];
-			fvPatchScalarField& psoot_omega_large = sootFields[8].boundaryField()[patchi];
-			fvPatchScalarField& psoot_omega_small = sootFields[9].boundaryField()[patchi];
-			fvPatchScalarField& ppah_omega_1_2 = sootFields[10].boundaryField()[patchi];
-			fvPatchScalarField& ppah_omega_3_4 = sootFields[11].boundaryField()[patchi];
-			fvPatchScalarField& ppah_omega_more_4 = sootFields[12].boundaryField()[patchi];
+			#if OPENFOAM_VERSION >= 40
+				fvPatchScalarField& psoot_fv_large = sootFields[0].boundaryFieldRef()[patchi];
+				fvPatchScalarField& psoot_fv_small = sootFields[1].boundaryFieldRef()[patchi];
+				fvPatchScalarField& psoot_rho_large = sootFields[2].boundaryFieldRef()[patchi];
+				fvPatchScalarField& psoot_rho_small = sootFields[3].boundaryFieldRef()[patchi];
+				fvPatchScalarField& psoot_N_large = sootFields[4].boundaryFieldRef()[patchi];
+				fvPatchScalarField& psoot_N_small = sootFields[5].boundaryFieldRef()[patchi];
+				fvPatchScalarField& psoot_x_large = sootFields[6].boundaryFieldRef()[patchi];
+				fvPatchScalarField& psoot_x_small = sootFields[7].boundaryFieldRef()[patchi];
+				fvPatchScalarField& psoot_omega_large = sootFields[8].boundaryFieldRef()[patchi];
+				fvPatchScalarField& psoot_omega_small = sootFields[9].boundaryFieldRef()[patchi];
+				fvPatchScalarField& ppah_omega_1_2 = sootFields[10].boundaryFieldRef()[patchi];
+				fvPatchScalarField& ppah_omega_3_4 = sootFields[11].boundaryFieldRef()[patchi];
+				fvPatchScalarField& ppah_omega_more_4 = sootFields[12].boundaryFieldRef()[patchi];
 
-			fvPatchScalarField& pR_soot_large = sootFields[13].boundaryField()[patchi];
-			fvPatchScalarField& pR_soot_small = sootFields[14].boundaryField()[patchi];
-			fvPatchScalarField& pR_pah_1_2 = sootFields[15].boundaryField()[patchi];
-			fvPatchScalarField& pR_pah_3_4 = sootFields[16].boundaryField()[patchi];
-			fvPatchScalarField& pR_pah_more_4 = sootFields[17].boundaryField()[patchi];
+				fvPatchScalarField& pR_soot_large = sootFields[13].boundaryFieldRef()[patchi];
+				fvPatchScalarField& pR_soot_small = sootFields[14].boundaryFieldRef()[patchi];
+				fvPatchScalarField& pR_pah_1_2 = sootFields[15].boundaryFieldRef()[patchi];
+				fvPatchScalarField& pR_pah_3_4 = sootFields[16].boundaryFieldRef()[patchi];
+				fvPatchScalarField& pR_pah_more_4 = sootFields[17].boundaryFieldRef()[patchi];
+			#else
+				fvPatchScalarField& psoot_fv_large = sootFields[0].boundaryField()[patchi];
+				fvPatchScalarField& psoot_fv_small = sootFields[1].boundaryField()[patchi];
+				fvPatchScalarField& psoot_rho_large = sootFields[2].boundaryField()[patchi];
+				fvPatchScalarField& psoot_rho_small = sootFields[3].boundaryField()[patchi];
+				fvPatchScalarField& psoot_N_large = sootFields[4].boundaryField()[patchi];
+				fvPatchScalarField& psoot_N_small = sootFields[5].boundaryField()[patchi];
+				fvPatchScalarField& psoot_x_large = sootFields[6].boundaryField()[patchi];
+				fvPatchScalarField& psoot_x_small = sootFields[7].boundaryField()[patchi];
+				fvPatchScalarField& psoot_omega_large = sootFields[8].boundaryField()[patchi];
+				fvPatchScalarField& psoot_omega_small = sootFields[9].boundaryField()[patchi];
+				fvPatchScalarField& ppah_omega_1_2 = sootFields[10].boundaryField()[patchi];
+				fvPatchScalarField& ppah_omega_3_4 = sootFields[11].boundaryField()[patchi];
+				fvPatchScalarField& ppah_omega_more_4 = sootFields[12].boundaryField()[patchi];
+
+				fvPatchScalarField& pR_soot_large = sootFields[13].boundaryField()[patchi];
+				fvPatchScalarField& pR_soot_small = sootFields[14].boundaryField()[patchi];
+				fvPatchScalarField& pR_pah_1_2 = sootFields[15].boundaryField()[patchi];
+				fvPatchScalarField& pR_pah_3_4 = sootFields[16].boundaryField()[patchi];
+				fvPatchScalarField& pR_pah_more_4 = sootFields[17].boundaryField()[patchi];
+			#endif
 
 			forAll(pT, facei)
 			{
@@ -399,7 +443,11 @@ if (iPolimiSoot == true)
 			for (int j=0;j<outputFormationRatesIndices.size();j++)
 			{
 				const int index = outputFormationRatesIndices(j)+1;
-				FormationRates[j].internalField()[celli] = thermodynamicsMapXML->MW()[index]*R[index];
+				#if OPENFOAM_VERSION >= 40
+					FormationRates[j].ref()[celli] = thermodynamicsMapXML->MW()[index]*R[index];
+				#else
+					FormationRates[j].internalField()[celli] = thermodynamicsMapXML->MW()[index]*R[index];
+				#endif
 			}
 		}
 
@@ -407,8 +455,13 @@ if (iPolimiSoot == true)
 		// Boundaries
 		forAll(T.boundaryField(), patchi)
 		{
+			#if OPENFOAM_VERSION >= 40
+			fvPatchScalarField& pp = p.boundaryFieldRef()[patchi];
+			fvPatchScalarField& pT = T.boundaryFieldRef()[patchi];
+			#else
 			fvPatchScalarField& pp = p.boundaryField()[patchi];
 			fvPatchScalarField& pT = T.boundaryField()[patchi];
+			#endif
         
 			forAll(pT, facei)
 			{
@@ -434,7 +487,12 @@ if (iPolimiSoot == true)
 				for (int j=0;j<outputFormationRatesIndices.size();j++)
 				{
 					const int index = outputFormationRatesIndices(j)+1;
+
+					#if OPENFOAM_VERSION >= 40
+					FormationRates[j].boundaryFieldRef()[patchi][facei] = thermodynamicsMapXML->MW()[index]*R[index];
+					#else
 					FormationRates[j].boundaryField()[patchi][facei] = thermodynamicsMapXML->MW()[index]*R[index];
+					#endif
 				}
 			}
 		}

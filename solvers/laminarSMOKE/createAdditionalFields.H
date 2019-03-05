@@ -59,6 +59,17 @@ volScalarField rho
 mesh.setFluxRequired(p.name());
 #endif
 
+#if   OPENFOAM_VERSION >= 40 
+	#if DEVVERSION == 1
+		#if STEADYSTATE != 1
+			pressureControl pressureControl(p, rho, pimple.dict(), false);
+		#else
+			pressureControl pressureControl(p, rho, simple.dict());
+		#endif
+	#endif
+	mesh.setFluxRequired(p.name());
+#endif
+
 #if STEADYSTATE != 1
 
 Info<< "Creating field DpDt\n" << endl;
@@ -74,6 +85,25 @@ volScalarField DpDt
 	dimensionedScalar("DpDt", p.dimensions()/dimTime, 0)
 );
 
+Info<< "Creating DeltaT field" << endl;
+volScalarField DeltaT
+(
+	IOobject
+	(
+		"DeltaT",
+		runTime.timeName(),
+		mesh,
+		IOobject::NO_READ,
+		IOobject::AUTO_WRITE
+	),
+	mesh,
+	dimensionedScalar("one", dimTime, 0),
+	#if OPENFOAM_VERSION >= 40
+	extrapolatedCalculatedFvPatchScalarField::typeName
+	#else
+	zeroGradientFvPatchScalarField::typeName
+	#endif
+);
 
 #else
 

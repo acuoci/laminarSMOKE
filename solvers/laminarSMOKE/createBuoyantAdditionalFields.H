@@ -68,13 +68,76 @@
 		mesh,
 		dimensionedScalar("DpDt", p.dimensions()/dimTime, 0)
 	);
+
+	Info<< "Creating DeltaT field" << endl;
+	volScalarField DeltaT
+	(
+		IOobject
+		(
+			"DeltaT",
+			runTime.timeName(),
+			mesh,
+			IOobject::NO_READ,
+			IOobject::AUTO_WRITE
+		),
+		mesh,
+		dimensionedScalar("one", dimTime, 0),
+		#if OPENFOAM_VERSION >= 40
+		extrapolatedCalculatedFvPatchScalarField::typeName
+		#else
+		zeroGradientFvPatchScalarField::typeName
+		#endif
+	);
+
 	#endif
 
-	// Kinetic energy
+// Kinetic energy
 	Info<< "Creating field kinetic energy K\n" << endl;
 	volScalarField K("K", 0.5*magSqr(U));
 
-	#if   OPENFOAM_VERSION == 30
+	#if   OPENFOAM_VERSION >= 40
+
+		#include "readhRef.H"
+		#include "gh.H"
+		#if STEADYSTATE != 1
+		#include "readpRef.H"
+		#endif
+
+		volScalarField p_rgh
+		(
+		    IOobject
+		    (
+			"p_rgh",
+			runTime.timeName(),
+			mesh,
+			IOobject::MUST_READ,
+			IOobject::AUTO_WRITE
+		    ),
+		    mesh
+		);
+
+		mesh.setFluxRequired(p_rgh.name());
+
+		// Force p_rgh to be consistent with p
+		p_rgh = p - rho*gh;
+
+		#if STEADYSTATE == 1
+
+			label pRefCell = 0;
+			scalar pRefValue = 0.0;
+
+			setRefCell
+			(
+				p,
+				p_rgh,
+				simple.dict(),
+				pRefCell,
+				pRefValue
+			);
+
+		#endif
+
+	#elif   OPENFOAM_VERSION == 30
 
 		#include "readhRef.H"
 		#include "gh.H"

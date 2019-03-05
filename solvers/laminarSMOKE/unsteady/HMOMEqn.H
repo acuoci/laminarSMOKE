@@ -73,8 +73,13 @@
 		// Solve
 		HMOM_Norm_N0Eqn.relax();
 		fvOptions.constrain(HMOM_Norm_N0Eqn);
-		HMOM_Norm_N0Eqn.solve(mesh.solver("HMOM_Norm_N0"));
 
+		#if OPENFOAM_VERSION >= 1000
+		HMOM_Norm_N0Eqn.solve("HMOM_Norm_N0");
+		#else
+		HMOM_Norm_N0Eqn.solve(mesh.solver("HMOM_Norm_N0"));
+		#endif
+		
 		HMOM_Norm_N0.max(hmom_minimum_normalized_value);
 		HMOM_Norm_N0.min(1e0);
 	}
@@ -97,7 +102,12 @@
 		// Solve
 		HMOM_Norm_M00Eqn.relax();
 		fvOptions.constrain(HMOM_Norm_M00Eqn);
+
+		#if OPENFOAM_VERSION >= 1000
+		HMOM_Norm_M00Eqn.solve("HMOM_Norm_M00");
+		#else
 		HMOM_Norm_M00Eqn.solve(mesh.solver("HMOM_Norm_M00"));
+		#endif
 
 		HMOM_Norm_M00.max(hmom_minimum_normalized_value);
 		HMOM_Norm_M00.min(1e0);
@@ -121,7 +131,12 @@
 		// Solve
 		HMOM_Norm_M10Eqn.relax();
 		fvOptions.constrain(HMOM_Norm_M10Eqn);
+
+		#if OPENFOAM_VERSION >= 1000
+		HMOM_Norm_M10Eqn.solve("HMOM_Norm_M10");
+		#else
 		HMOM_Norm_M10Eqn.solve(mesh.solver("HMOM_Norm_M10"));
+		#endif
 
 		HMOM_Norm_M10.max(hmom_minimum_normalized_value);
 		HMOM_Norm_M10.min(1e0);
@@ -145,7 +160,12 @@
 		// Solve
 		HMOM_Norm_M01Eqn.relax();
 		fvOptions.constrain(HMOM_Norm_M01Eqn);
+
+		#if OPENFOAM_VERSION >= 1000
+		HMOM_Norm_M01Eqn.solve("HMOM_Norm_M01");
+		#else
 		HMOM_Norm_M01Eqn.solve(mesh.solver("HMOM_Norm_M01"));
+		#endif
 
 		HMOM_Norm_M01.max(hmom_minimum_normalized_value);
 		HMOM_Norm_M01.min(1e0);

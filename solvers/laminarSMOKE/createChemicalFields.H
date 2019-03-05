@@ -155,7 +155,11 @@ for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 	}
 
 	// check if field exists and can be read
+	#if DEVVERSION == 1
+	if (header.typeHeaderOk<volScalarField>(true))
+	#else
 	if (header.headerOk())
+	#endif
 	{
 		Info << thermodynamicsMapXML->NamesOfSpecies()[i] << endl;
 		Y.set

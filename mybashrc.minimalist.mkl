@@ -1,13 +1,17 @@
-#OpenFOAM VERSION (22, 23, 24, 30)
-export OPENFOAM_VERSION='-DOPENFOAM_VERSION=24'
+#OpenFOAM VERSION (22, 23, 24, 30, 40, 50, 60, 1000)
+#dev version is equivalent to >= 1000
+export OPENFOAM_VERSION='-DOPENFOAM_VERSION=1000'
+
+#This must be equal to 1 if 5.x, 6.x, or dev versions are used
+export DEVVERSION='-DDEVVERSION=1'
 
 #Compulsory path
-export EIGEN_LIBRARY_PATH=/software/chimica2/libraries/eigen/eigen-3.3.3
-export BOOST_LIBRARY_PATH=/software/chimica2/libraries/boost/boost-1.60.0-gcc-4.8.2
+export EIGEN_LIBRARY_PATH=/software/chimica2/libraries/eigen/eigen-3.3.7
+export BOOST_LIBRARY_PATH=/software/chimica2/libraries/boost/boost-1.69.0-gcc-4.8.5
 export RAPIDXML_LIBRARY_PATH=/software/chimica2/libraries/rapidxml/rapidxml-1.13
 
 #Options: ISAT support
-export ISAT_SUPPORT='-DEDCSMOKE_USE_ISAT=1'
+export ISAT_SUPPORT='-DOPENSMOKE_USE_ISAT=1'
 export ISAT_INCLUDE=$HOME/Development/ExternalNumericalLibraries/ISATLib/ISATLib-1.1/src
 export ISAT_LIBS=-lISATLib4OpenFOAM
 
@@ -27,3 +31,4 @@ export ODEPACK_LIBS=
 export LINPACK_LIBS=
 export SUNDIALS_PATH=
 export SUNDIALS_LIBS=
+
