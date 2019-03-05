@@ -44,17 +44,6 @@
 #include <numeric>
 #include <armadillo>
 
-#include <fstream>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <algorithm>
-#include <iterator>
-#include <iostream>
-#include <math.h>
-#include <numeric>
-#include <armadillo>
-
 arma::Mat<double> CenterScale(const arma::Mat<double>& X, const int scaling);
 
 arma::field<arma::Mat<double>> GetMuSigma(const arma::Mat<double>& matrix, const int scaling);

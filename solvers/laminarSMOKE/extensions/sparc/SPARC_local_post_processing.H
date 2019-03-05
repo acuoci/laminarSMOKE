@@ -102,4 +102,35 @@ if (iVQ2 == true)
 	vq2IntegralCounter++;
 }
 
+// SOFTMAX variables
+if (iSOFTMAX == true)
+{
+
+	const double softmax_mean_chemistryCpu =  sum(cpuChemistry).value()/double(mesh.globalData().nTotalCells());
+	const double softmax_max_chemistryCpu = max(cpuChemistry).value();
+	const double softmax_mean_species = sum(clusterSpecies).value()/double(mesh.globalData().nTotalCells());
+	const double softmax_max_species = max(clusterSpecies).value();
+        const double softmax_mean_reactions = sum(clusterReactions).value()/double(mesh.globalData().nTotalCells());
+        const double softmax_max_reactions = max(clusterReactions).value();
+
+	if (softmaxIntegralCounter == softmaxIntegralUpdate)
+	{	
+		if (Pstream::master())
+		{
+			fSOFTMAX() << std::setw(20) << runTime.value();
+			fSOFTMAX() << std::setw(20) << softmax_mean_species;
+			fSOFTMAX() << std::setw(20) << softmax_max_species;
+			fSOFTMAX() << std::setw(20) << softmax_mean_reactions;
+			fSOFTMAX() << std::setw(20) << softmax_max_reactions;
+			fSOFTMAX() << std::setw(20) << softmax_mean_chemistryCpu;
+			fSOFTMAX() << std::setw(20) << softmax_max_chemistryCpu;
+			fSOFTMAX() << std::endl;
+		}
+		
+		softmaxIntegralCounter = 0;
+	}
+
+	softmaxIntegralCounter++;
+}
+
 #endif

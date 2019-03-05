@@ -38,161 +38,85 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-// Mass Fluxes
-#include "fluxes.H"
-
-// Discretization schemes
-tmp<fv::convectionScheme<scalar> > mvConvection
-(
-    fv::convectionScheme<scalar>::New
-    (
-        mesh,
-        fields,
-        phi,
-        mesh.divScheme("div(phi,Yi)")
-    )
-);
-
-
 {
-    double tStart = OpenSMOKE::OpenSMOKEGetCpuTime();
-    
-    volScalarField Yt = 0.0*Y[0];
+	#include "setRootCase.H"
+	#include "createTime.H"
+	#include "createMesh.H"
+	#include "createControl.H"
+	#include "createRDeltaT.H"
 
-    for (label i=0; i<Y.size(); i++)
-    {
-        if (i != inertIndex)
-        {
-           	volScalarField& Yi = Y[i];
-	    	volScalarField& Dmixi = Dmix[i];
-		 
+	#include "readGravitationalAcceleration.H"
+	#include "createBasicFields.H"
+	#include "readOptions.H"
+	#include "createGasFields.H"
+	#include "createChemicalFields.H"
+	#include "createLaminarSMOKEThermoClass.H"
+	#include "createDRGFields.H"
+	#include "createHMOMFields.H"
+	#include "createMRF.H"
+	#include "createFvOptions.H"
+	#include "createRadiationModel.H"
 
-		// Corrections
-		if (mwCorrectionInDiffusionFluxes == true)
-		{
-			dimensionedScalar Mi( "Mi", dimensionSet(1,0,0,0,-1,0,0),thermodynamicsMapXML->MW(i) );
+	#include "memoryAllocation.H"
+	#include "properties.H"
+	#include "createBuoyantAdditionalFields.H"
 
+	#include "initContinuityErrs.H"
+    	#include "createTimeControls.H"
+   	#include "compressibleCourantNo.H"
+    	#include "setInitialDeltaT.H"
+
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+	Info<< "\nStarting time loop\n" << endl;
+
+	while (runTime.run())
+	{
+		#include "createTimeControls.H"
+		#include "compressibleCourantNo.H"
+		#include "setDeltaT.H"
+
+		runTime++;
+		Info<< "Time = " << runTime.timeName() << nl << endl;
+
+		if (momentumEquations == false)
+		{		
+			if (strangAlgorithm == STRANG_MOMENTUM_TRANSPORT_REACTION)
 			{
-				sumDiffusionCorrections *= 0.;
-				for (label k=0; k<Y.size(); k++)
-				{
-					volScalarField& Yk = Y[k];	
-					dimensionedScalar Mk( "Mk", dimensionSet(1,0,0,0,-1,0,0), thermodynamicsMapXML->MW(k) );
-
-					if (i!=k)
-					sumDiffusionCorrections += fvc::laplacian(rho*MWmix/Mk*Dmixi*Yi, Yk);
-				}
+				#include "Policy_TransportReaction.H"
 			}
-
-			fvScalarMatrix YiEqn
-			(
-				fvm::ddt(rho, Yi)
-			      + mvConvection->fvmDiv(phi, Yi)
-			      - fvm::laplacian(rho*Dmixi, Yi)
-				== 
-			      - fvm::laplacian(rho*Dmixi*MWmix*Yi/Mi, Yi)
-			      - sumDiffusionCorrections + 
-		              - fvm::div(Jc,Yi, "div(Jc,Yi)")
-			      + RR[i]
-			      + fvOptions(rho, Yi)
-			);
-
-			// Add Soret effect
-			if (soretEffect == true)
-			{ 
-				if (soretEffectList[i] == true)
-					YiEqn -= fvc::laplacian(rho*Dsoret[indexSoret[i]]/T, T, "laplacian(teta,Yi)");
-			}
-
-			// Add thermophoretic effect
-			if (thermophoreticEffect == true)
+			else if (strangAlgorithm == STRANG_MOMENTUM_REACTION_TRANSPORT)
 			{
-				if (thermophoreticEffectList[i] == true)
-					YiEqn -= fvc::laplacian(0.55*mu/T*Yi, T, "laplacian(teta,Yi)");
-			}
-
-			// Solve
-			YiEqn.relax();
-			fvOptions.constrain(YiEqn);
-			#if OPENFOAM_VERSION >= 1000
-			YiEqn.solve("Yi");
-			#else
-			YiEqn.solve(mesh.solver("Yi"));
-			#endif
-			fvOptions.correct(Yi);	
-			
-			// Sum of mass fractions
-		    	Yi.max(0.0);
-	
-			if(virtual_chemistry == false)
-		   	{
-				Yt += Yi;
-			}
-			else
-			{
-				if (i<virtualChemistryTable->ns_main())
-					Yt += Yi;
+				#include "Policy_ReactionTransport.H"
 			}
 		}
 		else
 		{
-			fvScalarMatrix YiEqn
-			(
-				fvm::ddt(rho, Yi)
-			      + mvConvection->fvmDiv(phi, Yi)
-			      - fvm::laplacian(rho*Dmixi, Yi)
-				== 
-		              - fvm::div(Jc,Yi, "div(Jc,Yi)")
-			      + RR[i]
-			      + fvOptions(rho, Yi)
-			);
-
-			// Add Soret effect
-			if (soretEffect == true)
-			{ 
-				if (soretEffectList[i] == true)
-					YiEqn -= fvc::laplacian(rho*Dsoret[indexSoret[i]]/T, T, "laplacian(teta,Yi)");
-			}
-
-			// Add thermophoretic effect
-			if (thermophoreticEffect == true)
+			if (strangAlgorithm == STRANG_MOMENTUM_TRANSPORT_REACTION)
 			{
-				if (thermophoreticEffectList[i] == true)
-					YiEqn -= fvc::laplacian(0.55*mu/T*Yi, T, "laplacian(teta,Yi)");
+				#include "Policy_MomentumTransportReaction.H"
 			}
-
-			// Solve
-			YiEqn.relax();
-			fvOptions.constrain(YiEqn);
-			#if OPENFOAM_VERSION >= 1000
-			YiEqn.solve("Yi");
-			#else
-			YiEqn.solve(mesh.solver("Yi"));
-			#endif
-			fvOptions.correct(Yi);	
-			
-			// Sum of mass fractions
-		    	Yi.max(0.0);
-
-			if(virtual_chemistry == false)
-		   	{
-				Yt += Yi;
-			}
-			else
+			else if (strangAlgorithm == STRANG_MOMENTUM_REACTION_TRANSPORT)
 			{
-				if (i<virtualChemistryTable->ns_main())
-					Yt += Yi;
-			}
+				#include "Policy_MomentumReactionTransport.H"
+			}		
 		}
-        }
-    }
 
-    Info << "Inert species is " << Y[inertIndex].name() << " with local index equal to " << inertIndex << endl;
-    Y[inertIndex] = scalar(1.0) - Yt;
-    Y[inertIndex].max(0.0);
+		// Passive scalars
+            	#include "zMixEqn.H"
+		#include "tauEqn.H"
 
-    double tEnd = OpenSMOKE::OpenSMOKEGetCpuTime();
+		// Local post processing
+		#include "localPostProcessing.H"
 	
-    Info << "Transport equations of species solved in " << tEnd - tStart << " s " << endl;
-}
+		runTime.write();
 
+		Info 	<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+			<< "  ClockTime = " << runTime.elapsedClockTime() << " s"
+			<< nl << endl;
+	}
+
+	Info<< "End\n" << endl;
+
+	return 0;
+}

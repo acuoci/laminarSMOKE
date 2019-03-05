@@ -99,6 +99,7 @@
 #if SPARC==1
 #include "myNeuralNetworkBasedOnPCA.h"
 #include "extensions/sparc/SPARC_classifier_VQ2.H"
+#include "extensions/sparc/SPARC_classifier_SOFTMAX.H"
 #include "extensions/sparc/BatchReactorHomogeneousConstantPressureSPARC.H"
 #include "extensions/sparc/BatchReactorHomogeneousConstantPressureSPARC_ODE_Interface.H"
 #endif
@@ -130,7 +131,13 @@ void SolveOpenSourceSolvers(OdeBatch& ode, const double t0, const double tf, con
 
 int main(int argc, char *argv[])
 {
-	#if OPENFOAM_VERSION >= 40
+	#if OPENFOAM_VERSION >= 1000
+		#include "laminarBuoyantPimpleSMOKE.4x.H"
+	#elif OPENFOAM_VERSION == 60
+		#include "laminarBuoyantPimpleSMOKE.4x.H"
+	#elif OPENFOAM_VERSION == 50
+		#include "laminarBuoyantPimpleSMOKE.4x.H"
+	#elif OPENFOAM_VERSION == 40
 		#include "laminarBuoyantPimpleSMOKE.4x.H"
 	#elif OPENFOAM_VERSION == 30
 		#include "laminarBuoyantPimpleSMOKE.3x.H"

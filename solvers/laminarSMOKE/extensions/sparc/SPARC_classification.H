@@ -109,9 +109,11 @@ if (iSOM == true)
 	Info << "done in " << tEnd - tStart << " s  (" << (tEnd-tStart)/double(mesh.nCells())*1000. << " ms per cell)" << endl;
 }
 
-if (iVQ2 == true)
+if (iVQ2 == true || iSOFTMAX == true)
 {
-	Info<< "Classification of points (VQ2)... " ;
+	
+	if (iVQ2 == true) 	Info<< "Classification of points (VQ2)... " ;
+	else if (iSOFTMAX== true) 	Info<< "Classification of points (SOFTMAX)... " ;
 
 	double tStart = OpenSMOKE::OpenSMOKEGetCpuTime();
 
@@ -142,7 +144,8 @@ if (iVQ2 == true)
 
 		// Classification
 		std::vector<int> idx(n_cells);
-		VQ2.Classify(observations, idx);
+		if (iVQ2 == true) 		VQ2.Classify(observations, idx);
+		else if (iSOFTMAX == true) 	SOFTMAX.Classify(observations, idx);
 
 		forAll(TCells, celli)
 		{

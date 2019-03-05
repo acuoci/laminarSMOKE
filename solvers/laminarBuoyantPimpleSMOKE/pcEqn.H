@@ -38,132 +38,22 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-rho = Rho(p,psi);
-
-volScalarField rAU(1.0/UEqn.A());
-surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rho*rAU));
-volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
-
-surfaceScalarField phig("phig", -rhorAUf*ghf*fvc::snGrad(rho)*mesh.magSf());
-
-surfaceScalarField phiHbyA
-(
-    "phiHbyA",
-    (
-        fvc::flux(rho*HbyA)
-      + rhorAUf*fvc::ddtCorr(rho, U, phi)
-    )
-  + phig
-);
-
-MRF.makeRelative(fvc::interpolate(rho), phiHbyA);
-
-// Update the pressure BCs to ensure flux consistency
-constrainPressure(p_rgh, rho, U, phiHbyA, rhorAUf, MRF);
-
-while (pimple.correctNonOrthogonal())
-{
-    fvScalarMatrix p_rghEqn
-    (
-        fvm::ddt(psi, p_rgh)
-      + fvc::ddt(psi, rho)*gh
-      + fvc::ddt(psi)*pRef
-      + fvc::div(phiHbyA)
-      - fvm::laplacian(rhorAUf, p_rgh)
-     ==
-        fvOptions(psi, p_rgh, rho.name())
-    );
-
-    p_rghEqn.solve(mesh.solver(p_rgh.select(pimple.finalInnerIter())));
-
-    if (pimple.finalNonOrthogonalIter())
-    {
-        phi = phiHbyA + p_rghEqn.flux();
-        U = HbyA + rAU*fvc::reconstruct((p_rghEqn.flux() + phig)/rhorAUf);
-        U.correctBoundaryConditions();
-        fvOptions.correct(U);
-    }
-}
-
-p = p_rgh + rho*gh + pRef;
-
-#include "rhoEqn.H"
-#include "compressibleContinuityErrs.H"
-
-K = 0.5*magSqr(U);
-
-if (includeDpDt == true)
-{
-    //DpDt = fvc::DDt(surfaceScalarField("phiU", phi/fvc::interpolate(rho)), p);
-    DpDt = fvc::ddt(p);
-}
-
-/*
-rho = Rho(p,psi);
-
-volScalarField rAU(1.0/UEqn.A());
-surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rho*rAU));
-
-volVectorField HbyA("HbyA", U);
-HbyA = rAU*UEqn.H();
-
-surfaceScalarField phig(-rhorAUf*ghf*fvc::snGrad(rho)*mesh.magSf());
-
-surfaceScalarField phiHbyA
-(
-    "phiHbyA",
-    (
-        (fvc::interpolate(rho*HbyA) & mesh.Sf())
-      + rhorAUf*fvc::ddtCorr(rho, U, phi)
-    )
-  + phig
-);
-
-MRF.makeRelative(fvc::interpolate(rho), phiHbyA);
-
-// Update the fixedFluxPressure BCs to ensure flux consistency
-setSnGrad<fixedFluxPressureFvPatchScalarField>
-(
-    p_rgh.boundaryField(),
-    (
-        phiHbyA.boundaryField()
-      - MRF.relative(mesh.Sf().boundaryField() & U.boundaryField())
-       *rho.boundaryField()
-    )/(mesh.magSf().boundaryField()*rhorAUf.boundaryField())
-);
-
-while (pimple.correctNonOrthogonal())
-{
-    fvScalarMatrix p_rghEqn
-    (
-        fvc::ddt(psi, rho)*gh
-      + fvc::div(phiHbyA)
-      + fvm::ddt(psi, p_rgh)
-      - fvm::laplacian(rhorAUf, p_rgh)
-     ==
-        fvOptions(psi, p_rgh, rho.name())
-    );
-
-    p_rghEqn.solve(mesh.solver(p_rgh.select(pimple.finalInnerIter())));
-
-    if (pimple.finalNonOrthogonalIter())
-    {
-        phi = phiHbyA + p_rghEqn.flux();
-        U = HbyA + rAU*fvc::reconstruct((p_rghEqn.flux() + phig)/rhorAUf);
-        U.correctBoundaryConditions();
-        fvOptions.correct(U);
-    }
-}
-
-p = p_rgh + rho*gh;
-
-#include "rhoEqn.H"
-#include "compressibleContinuityErrs.H"
-
-K = 0.5*magSqr(U);
-
-if (includeDpDt == true)
-{
-    DpDt = fvc::DDt(surfaceScalarField("phiU", phi/fvc::interpolate(rho)), p);
-}
-*/
+#if   OPENFOAM_VERSION == 22
+	#include "pEqn.22.H"
+#elif OPENFOAM_VERSION == 23
+	#include "pEqn.23.H"
+#elif OPENFOAM_VERSION == 24
+	#include "pEqn.24.H"
+#elif OPENFOAM_VERSION == 30
+	#include "pEqn.3x.H"
+#elif OPENFOAM_VERSION == 40
+	#include "pEqn.4x.H"
+#elif OPENFOAM_VERSION == 50
+	#include "pEqn.5x.H"
+#elif OPENFOAM_VERSION == 60
+	#include "pEqn.6x.H"
+#elif OPENFOAM_VERSION >= 100
+	#include "pEqn.dev.H"
+#else
+	Compilation_Error_You_Did_Not_Define_The_OPENFOAM_VERSION_Macro
+#endif

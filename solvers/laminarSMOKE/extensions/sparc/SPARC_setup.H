@@ -360,4 +360,94 @@ if (iSOM == true)
                         }	
 }
 
+
+// SOFTMAX
+const dictionary& softmaxDictionary = solverOptions.subDict("SOFTMAX");
+const Switch iSOFTMAX = Switch(softmaxDictionary.lookup(word("SOFTMAX")));
+autoPtr<std::ofstream> fSOFTMAX;
+label softmaxIntegralUpdate  = 10;
+label softmaxIntegralCounter = softmaxIntegralUpdate;
+
+ClassifierSOFTMAX SOFTMAX;
+
+if (iSOFTMAX == true)
+{
+	// This folder contains a 'kinetics' and a 'data' subfolders
+	Foam::string main_folder_name = softmaxDictionary.lookup("folder");	
+	boost::filesystem::path path_main_folder = main_folder_name;
+	boost::filesystem::path path_kinetics_folder = path_main_folder / "kinetics";
+	boost::filesystem::path path_data_folder = path_main_folder / "data";
+
+	std::cout << "Opening files containing SOFTMAX data..." << std::endl;
+	SOFTMAX.Setup(path_data_folder.c_str());
+	nclusters = SOFTMAX.nc();
+	
+	if (SOFTMAX.nv() != (thermodynamicsMapXML->NumberOfSpecies()+1))
+		OpenSMOKE::ErrorMessage("Importing data for SOFTMAX", "Mismatch between the data and the kinetic mechanism");
+
+	// Read thermodynamics and kinetics maps
+	vector_thermodynamicsMapXML.resize(nclusters);
+	vector_transportMapXML.resize(nclusters);
+	vector_kineticsMapXML.resize(nclusters);
+	classifier_indices.resize(nclusters);
+	
+	for (int j = 0; j < nclusters; j++)
+	{
+		std::stringstream label; label << j;
+		const std::string folder_name = "kinetics." + label.str();
+
+		rapidxml::xml_document<> doc;
+		std::vector<char> xml_string;
+		OpenSMOKE::OpenInputFileXML(doc, xml_string, path_kinetics_folder / folder_name / "kinetics.xml");
+
+		double tStart = OpenSMOKE::OpenSMOKEGetCpuTime();
+		vector_thermodynamicsMapXML[j] = new OpenSMOKE::ThermodynamicsMap_CHEMKIN(doc);
+		vector_transportMapXML[j] = new OpenSMOKE::TransportPropertiesMap_CHEMKIN(doc);
+		vector_kineticsMapXML[j] = new OpenSMOKE::KineticsMap_CHEMKIN(*vector_thermodynamicsMapXML[j], doc);
+		double tEnd = OpenSMOKE::OpenSMOKEGetCpuTime();
+		std::cout << "Time to read XML file: " << tEnd - tStart << std::endl;
+
+		// Mapping
+		{
+			unsigned int NC = thermodynamicsMapXML->NumberOfSpecies();
+			unsigned int NClocal = vector_thermodynamicsMapXML[j]->NumberOfSpecies();
+			classifier_indices[j].resize(NClocal);
+			classifier_indices[j].setConstant(-1);
+			for (unsigned int i=0;i<NClocal;i++)
+				for (unsigned int k=0;k<NC;k++)
+					if (thermodynamicsMapXML->NamesOfSpecies()[k] == vector_thermodynamicsMapXML[j]->NamesOfSpecies()[i])
+						classifier_indices[j](i) = k;
+
+			for (unsigned int i=0;i<NClocal;i++)
+				if (classifier_indices[j](i) == -1)
+				{
+					Info << "Kinetic mechanism #" << i << endl;
+					Info << "Species " << vector_thermodynamicsMapXML[j]->NamesOfSpecies()[i] << " is not included in the main kinetic mechanism" << endl;
+					abort();
+				}
+		}
+	}
+
+	if ( !boost::filesystem::exists("softmax.out") )
+        {
+                fSOFTMAX.reset(new std::ofstream("softmax.out", std::ios::out));
+                fSOFTMAX().setf(std::ios::scientific);
+
+                fSOFTMAX() << std::setw(20) << "time";
+                fSOFTMAX() << std::setw(20) << "mean_species";
+                fSOFTMAX() << std::setw(20) << "max_species";
+                fSOFTMAX() << std::setw(20) << "mean_reactions";
+                fSOFTMAX() << std::setw(20) << "max_reactions";
+                fSOFTMAX() << std::setw(20) << "meanCPUchem";
+                fSOFTMAX() << std::setw(20) << "maxCPUchem";
+                fSOFTMAX() << std::endl;
+        }
+        else
+        {
+                fSOFTMAX.reset(new std::ofstream("softmax.out", std::ios::app));
+                fSOFTMAX().setf(std::ios::scientific);
+        }
+}
+
+
 #endif

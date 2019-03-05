@@ -74,7 +74,7 @@ while (pimple.correctNonOrthogonal())
         fvOptions(psi, p_rgh, rho.name())
     );
 
-    p_rghEqn.solve(mesh.solver(p_rgh.select(pimple.finalInnerIter())));
+    p_rghEqn.solve(p_rgh.select(pimple.finalInnerIter()));
 
     if (pimple.finalNonOrthogonalIter())
     {
@@ -97,6 +97,7 @@ if (includeDpDt == true)
     //DpDt = fvc::DDt(surfaceScalarField("phiU", phi/fvc::interpolate(rho)), p);
     DpDt = fvc::ddt(p);
 }
+
 
 /*
 rho = Rho(p,psi);

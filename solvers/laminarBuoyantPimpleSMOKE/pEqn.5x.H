@@ -38,6 +38,7 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
+
 rho = Rho(p,psi);
 
 volScalarField rAU(1.0/UEqn.A());
@@ -98,17 +99,14 @@ if (includeDpDt == true)
     DpDt = fvc::ddt(p);
 }
 
+
 /*
 rho = Rho(p,psi);
-
 volScalarField rAU(1.0/UEqn.A());
 surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rho*rAU));
-
 volVectorField HbyA("HbyA", U);
 HbyA = rAU*UEqn.H();
-
 surfaceScalarField phig(-rhorAUf*ghf*fvc::snGrad(rho)*mesh.magSf());
-
 surfaceScalarField phiHbyA
 (
     "phiHbyA",
@@ -118,9 +116,7 @@ surfaceScalarField phiHbyA
     )
   + phig
 );
-
 MRF.makeRelative(fvc::interpolate(rho), phiHbyA);
-
 // Update the fixedFluxPressure BCs to ensure flux consistency
 setSnGrad<fixedFluxPressureFvPatchScalarField>
 (
@@ -131,7 +127,6 @@ setSnGrad<fixedFluxPressureFvPatchScalarField>
        *rho.boundaryField()
     )/(mesh.magSf().boundaryField()*rhorAUf.boundaryField())
 );
-
 while (pimple.correctNonOrthogonal())
 {
     fvScalarMatrix p_rghEqn
@@ -143,9 +138,7 @@ while (pimple.correctNonOrthogonal())
      ==
         fvOptions(psi, p_rgh, rho.name())
     );
-
     p_rghEqn.solve(mesh.solver(p_rgh.select(pimple.finalInnerIter())));
-
     if (pimple.finalNonOrthogonalIter())
     {
         phi = phiHbyA + p_rghEqn.flux();
@@ -154,14 +147,10 @@ while (pimple.correctNonOrthogonal())
         fvOptions.correct(U);
     }
 }
-
 p = p_rgh + rho*gh;
-
 #include "rhoEqn.H"
 #include "compressibleContinuityErrs.H"
-
 K = 0.5*magSqr(U);
-
 if (includeDpDt == true)
 {
     DpDt = fvc::DDt(surfaceScalarField("phiU", phi/fvc::interpolate(rho)), p);
