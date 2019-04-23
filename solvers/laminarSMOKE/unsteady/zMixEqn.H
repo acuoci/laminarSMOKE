@@ -41,13 +41,11 @@
 {
 	if(zMixEquation == true)
 	{
-		volScalarField& Dmixi = Dmix[zMixDmixIndex];
-
 		fvScalarMatrix zMixEqn
 		(
 			fvm::ddt(rho,zMix)
 		      + fvm::div(phi, zMix) 
-		      - fvm::laplacian(rho*Dmixi, zMix) 
+		      - fvm::laplacian(lambda/cp, zMix) 
 		        == 
 		     	fvOptions(rho, zMix)
 		);

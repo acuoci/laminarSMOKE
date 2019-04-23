@@ -109,7 +109,6 @@ Eigen::VectorXd LewisNumbers;
 std::vector<bool> soretEffectList;
 std::vector<int> indexSoret;
 scalar thermodynamicPressure = 101325.;
-label zMixDmixIndex = inertIndex;
 scalar direct_integration_minimum_temperature_for_chemistry = 200.;
 Switch mwCorrectionInDiffusionFluxes = false;
 Switch simplifiedTransportProperties = false;
@@ -191,13 +190,6 @@ const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel
 
 	// Themodynamic pressure [Pa]
 	thermodynamicPressure = readScalar(physicalModelDictionary.lookup("thermodynamicPressure"));
-
-	//- Inert species
-	if (zMixEquation == true)
-	{
-		word referenceSpecies(physicalModelDictionary.lookup("zMixDmixSpecies"));
-		zMixDmixIndex = thermodynamicsMapXML->IndexOfSpecies(referenceSpecies)-1;
-	}
 }
 
 //- Detect spark
