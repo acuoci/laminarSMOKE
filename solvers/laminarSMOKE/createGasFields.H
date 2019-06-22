@@ -102,6 +102,38 @@ volScalarField lambda
     dimensionSet(1, 1, -3, -1, 0)
 );
 
+//- Allocating memory for thermal diffusion coefficient [W/m/K]
+Info<< "Creating field alpha\n" << endl;
+volScalarField alpha
+(
+    IOobject
+    (
+        "gas_alpha",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        outputGasProperties
+    ),
+    mesh,
+    dimensionSet(0, 2, -1, 0, 0)
+);
+
+//- Allocating memory for 1-Yt
+Info<< "Creating field one_minus_Yt\n" << endl;
+volScalarField one_minus_Yt
+(
+    IOobject
+    (
+        "gas_one_minus_Yt",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        outputGasProperties
+    ),
+    mesh,
+    dimensionedScalar("dimensionless", dimensionSet(0, 0, 0, 0, 0), 0.0)
+);
+
 //- Allocating memory for radiative heat transfer term [W/m3]
 volScalarField Qrad
 (

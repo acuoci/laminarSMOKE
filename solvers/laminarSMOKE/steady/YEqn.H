@@ -60,114 +60,68 @@ if(speciesEquations == true)
     {
 	label i = species_order[j];
 
-        if (i != inertIndex)
-        {
-           	volScalarField& Yi = Y[i];
-	    	volScalarField& Dmixi = Dmix[i];
+        volScalarField& Yi = Y[i];
 
-		// Corrections
-		if (mwCorrectionInDiffusionFluxes == true)
-		{
-			dimensionedScalar Mi( "Mi", dimensionSet(1,0,0,0,-1,0,0),thermodynamicsMapXML->MW(i) ); 
+	fvScalarMatrix YiEqn
+	(
+	    	mvConvection->fvmDiv(phi, Yi)
+	      - fvm::laplacian(rho*alpha/LewisNumbers(i), Yi) 
+                == 
+              - fvm::div(Jc,Yi, "div(Jc,Yi)") 
+	      + sourceExplicit[i] + fvm::Sp(sourceImplicit[i],Yi)						
+	      +	fvOptions(rho, Yi)
+	);
 
-			{
-				sumDiffusionCorrections *= 0.;
-				for (label k=0; k<Y.size(); k++)
-				{
-					volScalarField& Yk = Y[k];	
-					dimensionedScalar Mk( "Mk", dimensionSet(1,0,0,0,-1,0,0), thermodynamicsMapXML->MW(k) );
-
-					if (i!=k)
-					sumDiffusionCorrections += fvc::laplacian(rho*MWmix/Mk*Dmixi*Yi, Yk);
-				}
-			}
-
-			fvScalarMatrix YiEqn
-			(
-			    	mvConvection->fvmDiv(phi, Yi)
-			      - fvm::laplacian(rho*Dmixi, Yi) 
-		                == 
-			      - fvm::laplacian(rho*Dmixi*MWmix*Yi/Mi, Yi)
-			      - sumDiffusionCorrections + 
-		              - fvm::div(Jc,Yi, "div(Jc,Yi)") + 
-				sourceExplicit[i] + fvm::Sp(sourceImplicit[i],Yi) +						
-			     	fvOptions(rho, Yi)
-			);
-
-			// Add Soret effect
-			if (soretEffect == true)
-			{ 
-				if (soretEffectList[i] == true)
-					YiEqn -= fvc::laplacian(rho*Dsoret[indexSoret[i]]/T, T, "laplacian(teta,Yi)");
-			}
-
-			// Add thermophoretic effect
-			if (thermophoreticEffect == true)
-			{
-				if (thermophoreticEffectList[i] == true)
-					YiEqn -= fvc::laplacian(0.55*mu/T*Yi, T, "laplacian(teta,Yi)");
-			}
-
-			// Solve
-			YiEqn.relax();
-			fvOptions.constrain(YiEqn);
-			#if OPENFOAM_VERSION >= 1000
-			YiEqn.solve(exceptional_species[i]);
-			#else
-			YiEqn.solve(mesh.solver(exceptional_species[i]));
-			#endif
-			fvOptions.correct(Yi);	
-			
-			// Sum of mass fractions
-		    	Yi.max(0.0);
-		   	Yt += Yi;
-		}
-		else
-		{
-			fvScalarMatrix YiEqn
-			(
-			    	mvConvection->fvmDiv(phi, Yi)
-			      - fvm::laplacian(rho*Dmixi, Yi) 
-		                == 
-		              - fvm::div(Jc,Yi, "div(Jc,Yi)") 
-			      + sourceExplicit[i] + fvm::Sp(sourceImplicit[i],Yi)						
-			      +	fvOptions(rho, Yi)
-			);
-
-			// Add Soret effect
-			if (soretEffect == true)
-			{ 
-				if (soretEffectList[i] == true)
-					YiEqn -= fvc::laplacian(rho*Dsoret[indexSoret[i]]/T, T, "laplacian(teta,Yi)");
-			}
-
-			// Add thermophoretic effect
-			if (thermophoreticEffect == true)
-			{
-				if (thermophoreticEffectList[i] == true)
-					YiEqn -= fvc::laplacian(0.55*mu/T*Yi, T, "laplacian(teta,Yi)");
-			}
-
-			// Solve
-			YiEqn.relax();
-			fvOptions.constrain(YiEqn);
-			#if OPENFOAM_VERSION >= 1000
-			YiEqn.solve(exceptional_species[i]);
-			#else
-			YiEqn.solve(mesh.solver(exceptional_species[i]));
-			#endif
-			fvOptions.correct(Yi);	
-			
-			// Sum of mass fractions
-		    	Yi.max(0.0);
-		   	Yt += Yi;
-		}
-        }
+	// Solve
+	YiEqn.relax();
+	fvOptions.constrain(YiEqn);
+	#if OPENFOAM_VERSION >= 1000
+	YiEqn.solve(exceptional_species[i]);
+	#else
+	YiEqn.solve(mesh.solver(exceptional_species[i]));
+	#endif
+	fvOptions.correct(Yi);	
+	
+	// Sum of mass fractions
+    	Yi.max(0.0);
+   	Yt += Yi;
     }
 
-    Info << "Inert species is " << Y[inertIndex].name() << " with local index equal to " << inertIndex << endl;
-    Y[inertIndex] = scalar(1.0) - Yt;
-    Y[inertIndex].max(0.0);
+    one_minus_Yt = scalar(1.) - Yt;
+
+    const scalarField& YtCells = Yt.internalField();
+    forAll(YtCells, celli)
+    {
+	const double one_plus_alpha = 1./YtCells[celli];
+	for (label i=0; i<Y.size(); i++)
+		#if OPENFOAM_VERSION >= 40
+		Y[i].ref()[celli] *= one_plus_alpha;
+		#else
+		Y[i].internalField()[celli] *= one_plus_alpha;
+		#endif
+    }
+
+    // Boundaries
+    forAll(Yt.boundaryField(), patchi)
+    {
+	#if OPENFOAM_VERSION >= 40
+	fvPatchScalarField& pYt = Yt.boundaryFieldRef()[patchi];
+	#else
+	fvPatchScalarField& pYt = Yt.boundaryField()[patchi];
+	#endif
+
+	forAll(pYt, facei)
+	{
+		const double one_plus_alpha = 1./pYt[facei];
+		for (label i=0; i<Y.size(); i++)
+			#if OPENFOAM_VERSION >= 40
+			Y[i].boundaryFieldRef()[patchi][facei] *= one_plus_alpha;
+			#else
+			Y[i].boundaryField()[patchi][facei] *= one_plus_alpha;
+			#endif
+			
+	}
+    }
 
     if (species_order_policy == SPECIES_ORDER_POLICY_SWEEP)
     	std::reverse(species_order.begin(),species_order.end());

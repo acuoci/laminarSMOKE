@@ -198,7 +198,7 @@
 				}
 			
 				// Check mass fractions
-				normalizeMassFractions(yf, NC, celli, massFractionsTol, vc_main_species);
+				normalizeMassFractions(yf, NC, celli, massFractionsTol);
 
 				// Assign mass fractions
 				#if OPENFOAM_VERSION >= 40

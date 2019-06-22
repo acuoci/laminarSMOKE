@@ -47,10 +47,7 @@ else
 {
 	if (drg_analysis == false)
 	{
-		if(virtual_chemistry == false)
-			#include "chemistry_DI.H"
-		else
-			#include "chemistry_Virtual.H"
+		#include "chemistry_DI.H"
 	}
 	else
 		#include "chemistry_DRG.H"
@@ -58,10 +55,7 @@ else
 #else
 	if (drg_analysis == false)
 	{
-		if(virtual_chemistry == false)
-			#include "chemistry_DI.H"
-		else
-			#include "chemistry_Virtual.H"
+		#include "chemistry_DI.H"
 	}	
 	else
 		#include "chemistry_DRG.H"

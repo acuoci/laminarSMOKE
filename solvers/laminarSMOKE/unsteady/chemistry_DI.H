@@ -103,29 +103,14 @@
 
 						// Check and normalize the composition
 						{
-							if (virtual_chemistry == false)
+							double sum = 0.;
+							for(unsigned int i=0;i<NC;i++)
 							{
-								double sum = 0.;
-								for(unsigned int i=0;i<NC;i++)
-								{
-									if (y0(i) < 0.)	y0(i) = 0.;
-									sum += y0(i);
-								}
-								for(unsigned int i=0;i<NC;i++)
-									y0(i) /= sum;
+								if (y0(i) < 0.)	y0(i) = 0.;
+								sum += y0(i);
 							}
-							else
-							{
-								const unsigned int ns_main = virtualChemistryTable->ns_main();
-								double sum = 0.;
-								for(unsigned int i=0;i<ns_main;i++)
-								{
-									if (y0(i) < 0.)	y0(i) = 0.;
-									sum += y0(i);
-								}
-								for(unsigned int i=0;i<ns_main;i++)
-									y0(i) /= sum;
-							}
+							for(unsigned int i=0;i<NC;i++)
+								y0(i) /= sum;
 						}
 
 						if (constPressureBatchReactor == true)
@@ -216,7 +201,7 @@
 				}
 
 				// Check mass fractions
-				normalizeMassFractions(yf, celli, massFractionsTol, vc_main_species);
+				normalizeMassFractions(yf, celli, massFractionsTol);
 
 				if (strangAlgorithm != STRANG_COMPACT)
 				{
@@ -421,7 +406,7 @@
 					}
 			
 					// Check mass fractions
-					normalizeMassFractions(yf.data(), celli, massFractionsTol, NC, vc_main_species);
+					normalizeMassFractions(yf.data(), celli, massFractionsTol, NC);
 
 
 					if (strangAlgorithm != STRANG_COMPACT)
@@ -644,7 +629,7 @@
 					}
 				
 					// Check mass fractions
-					normalizeMassFractions(yf, celli, massFractionsTol, vc_main_species);
+					normalizeMassFractions(yf, celli, massFractionsTol);
 
 					if (strangAlgorithm != STRANG_COMPACT)
 					{

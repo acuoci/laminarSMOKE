@@ -44,13 +44,9 @@
 		radiation->correct();
 
 		massDiffusionInEnergyEquation *= 0.;
-		if (iMassDiffusionInEnergyEquation == true)
-		{
 			for (label i=0; i<Y.size(); i++)
 			       massDiffusionInEnergyEquation -= CpSpecies[i]*( fvc::reconstruct(J[i]) & fvc::grad(T));
-		}
 
-	
 		fvScalarMatrix TEqn
 		(
 			cp*fvm::div(phi, T) 

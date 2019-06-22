@@ -1,4 +1,4 @@
 laminarSMOKEpostProcessor.C
 
-EXE = $(FOAM_USER_APPBIN)/laminarSMOKEpostProcessor
+EXE = $(FOAM_USER_APPBIN)/laminarSMOKEpostProcessor.wall-interaction
 

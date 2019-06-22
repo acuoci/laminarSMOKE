@@ -91,7 +91,6 @@ scalar massFractionsTol = 1e-10;
 
 //- Internal models
 enum { STRANG_MOMENTUM_TRANSPORT_REACTION, STRANG_MOMENTUM_REACTION_TRANSPORT, STRANG_COMPACT } strangAlgorithm;
-enum { DIFFUSIVITY_MODEL_MULTICOMPONENT, DIFFUSIVITY_MODEL_LEWIS_NUMBERS} diffusivityModel;
 
 // Physical model
 Switch energyEquation;
@@ -100,19 +99,12 @@ Switch momentumEquations;
 Switch zMixEquation;
 Switch tauEquation;
 Switch homogeneousReactions;
-Switch iMassDiffusionInEnergyEquation;
+Switch iCorrectiveFluxes;
 Switch constPressureBatchReactor;
 Switch includeDpDt;
-Switch soretEffect;
-Switch thermophoreticEffect;
 Eigen::VectorXd LewisNumbers;
-std::vector<bool> soretEffectList;
-std::vector<int> indexSoret;
 scalar thermodynamicPressure = 101325.;
 scalar direct_integration_minimum_temperature_for_chemistry = 200.;
-Switch mwCorrectionInDiffusionFluxes = false;
-Switch simplifiedTransportProperties = false;
-Switch diskSourceTerms = false;
 
 const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel");
 {
@@ -123,27 +115,8 @@ const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel
 	tauEquation = Switch(physicalModelDictionary.lookup(word("tauEquation")));
 	homogeneousReactions = Switch(physicalModelDictionary.lookup(word("homogeneousReactions")));
 	includeDpDt = Switch(physicalModelDictionary.lookup(word("includeDpDt")));
-	iMassDiffusionInEnergyEquation = Switch(physicalModelDictionary.lookup(word("massDiffusionInEnergyEquation")));
+	iCorrectiveFluxes = Switch(physicalModelDictionary.lookup(word("correctiveFluxes")));
 	direct_integration_minimum_temperature_for_chemistry  = readScalar(physicalModelDictionary.lookup("minTemperature4Chemistry"));
-	mwCorrectionInDiffusionFluxes = Switch(physicalModelDictionary.lookupOrDefault(word("mwCorrectionInDiffusionFluxes"), word("on")));
-	simplifiedTransportProperties = Switch(physicalModelDictionary.lookupOrDefault(word("simplifiedTransportProperties"), word("off")));
-	diskSourceTerms = Switch(physicalModelDictionary.lookupOrDefault(word("diskSourceTerms"), word("off")));
-
-	// Info
-	Info << "Molecular weight correction in diffusion fluxes: " << mwCorrectionInDiffusionFluxes << endl;
-	
-	// Thermophoretic effect
-	thermophoreticEffect = Switch(physicalModelDictionary.lookup(word("thermophoreticEffect")));
-
-	// Soret effect
-	soretEffect = Switch(physicalModelDictionary.lookup(word("soretEffect")));
-	soretEffectList.resize(thermodynamicsMapXML->NumberOfSpecies());
-	indexSoret.resize(thermodynamicsMapXML->NumberOfSpecies());
-
-	for(unsigned int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
-		soretEffectList[i] = false;	
-	for(unsigned int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
-		indexSoret[i] = -1;
 	
 	// Algorithm
 	{
@@ -160,29 +133,17 @@ const dictionary& physicalModelDictionary = solverOptions.subDict("PhysicalModel
 	
 	// Diffusivity of species
 	{
-		word diffusivity(physicalModelDictionary.lookup("diffusivityModel"));
-		if (diffusivity == "multi-component")		diffusivityModel = DIFFUSIVITY_MODEL_MULTICOMPONENT;
-		else if (diffusivity == "lewis-numbers")	diffusivityModel = DIFFUSIVITY_MODEL_LEWIS_NUMBERS;
-		else
-		{
-			Info << "Wrong diffusivityModel option: multi-component || lewis-numbers" << endl;
-			abort();
-		}
-		
-		if (diffusivityModel == DIFFUSIVITY_MODEL_LEWIS_NUMBERS)
-		{
-			LewisNumbers.resize(thermodynamicsMapXML->NumberOfSpecies());
-			
-			const dictionary& lewisNumberDictionary = solverOptions.subDict("LewisNumbers");
-			for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
-				LewisNumbers(i) = readScalar(lewisNumberDictionary.lookup(thermodynamicsMapXML->NamesOfSpecies()[i]));
-			
-			Info << endl;
-			Info << "Diffusivities of species will be calculated using the following Lewis numbers: " << endl;
-			for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
-				Info << " " << thermodynamicsMapXML->NamesOfSpecies()[i] << "\t" << LewisNumbers(i) << endl;
-			Info << endl;
-		}
+		LewisNumbers.resize(thermodynamicsMapXML->NumberOfSpecies());
+	
+		const dictionary& lewisNumberDictionary = solverOptions.subDict("LewisNumbers");
+		for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
+			LewisNumbers(i) = readScalar(lewisNumberDictionary.lookup(thermodynamicsMapXML->NamesOfSpecies()[i]));
+	
+		Info << endl;
+		Info << "Diffusivities of species will be calculated using the following Lewis numbers: " << endl;
+		for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
+			Info << " " << thermodynamicsMapXML->NamesOfSpecies()[i] << "\t" << LewisNumbers(i) << endl;
+		Info << endl;
 	}
 	
 	//- Constant pressure reactors
@@ -277,188 +238,6 @@ const dictionary& drgDictionary = solverOptions.subDict("DRG");
 }
 
 #endif
-
-// Thermophoretic effect
-std::vector<bool> thermophoreticEffectList;
-Switch physicalSootDiffusivity = false;
-label  physicalSootDiffusivityReferenceIndex = -1;
-std::vector<double> physicalSootDiffusivityCorrection;
-std::vector<int> physicalSootDiffusivityCorrectionIndex;
-{ 
-	const dictionary& polimiSootDictionary = solverOptions.subDict("PolimiSoot");
-
-	if (thermophoreticEffect == true)
-	{
-		thermophoreticEffectList.resize(thermodynamicsMapXML->NumberOfSpecies());
-		for(unsigned int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
-			thermophoreticEffectList[i] = false;
-
-		// Populate the list of thermophoretic species
-		if (thermophoreticEffect == true)
-		{
-			word tag = polimiSootDictionary.lookup(word("thermophoreticEffectTag"));	
-	
-			unsigned int count = 0;
-			for(unsigned int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
-			{
-				std::string name = thermodynamicsMapXML->NamesOfSpecies()[i];
-				std::string prefix = name.substr(0,tag.size());
-				if (prefix == tag)
-				{
-					thermophoreticEffectList[i] = true;
-					count++;
-				}
-			}
-				
-			if (count == 0)
-				std::cout << "Warning: No " << tag << " species were found in the kinetic scheme! Are you sure you want to account for the thermophoretic effect?" << std::endl;
-			else
-				std::cout << "Thermophoretic effect: Number of " << tag << " species found equal to " << count << std::endl;
-		}
-	}
-
-	physicalSootDiffusivity = Switch(polimiSootDictionary.lookup(word("physicalSootDiffusivity")));
-
-	if (physicalSootDiffusivity == true)
-	{
-		scalar physicalSootDiffusivityExponent = polimiSootDictionary.lookupOrDefault("exponent", -0.681);
-		scalar physicalSootDiffusivityCorrectionAdditional  = polimiSootDictionary.lookupOrDefault("physicalSootDiffusivityCorrectionFactor", 1.0);
-		label physicalSootDiffusivityIndex = readLabel(polimiSootDictionary.lookup("physicalSootDiffusivityIndex"));
-
-		for(unsigned int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
-		{
-			if (thermodynamicsMapXML->NamesOfSpecies()[i] == "BIN1A")
-			{
-				physicalSootDiffusivityReferenceIndex = i;
-				break;
-			}
-		}
-		if (physicalSootDiffusivityReferenceIndex == -1)
-		{
-			Info << "Species BIN1A is not included in the kinetic mechanism" << endl;
-			abort();
-		}
-		else
-		{
-			int count = -1;
-			for(unsigned int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
-			{
-				if (thermodynamicsMapXML->NamesOfSpecies()[i].compare(0,3,"BIN") == 0)
-				{
-					count++;
-					double MWratio = std::min(	thermodynamicsMapXML->MW(i)/thermodynamicsMapXML->MW(physicalSootDiffusivityReferenceIndex), 
-									std::pow(2., double(physicalSootDiffusivityIndex)) );
-
-					if (thermodynamicsMapXML->MW(i)/thermodynamicsMapXML->MW(physicalSootDiffusivityReferenceIndex) < 10.)
-						physicalSootDiffusivityCorrection.push_back( std::pow(MWratio, physicalSootDiffusivityExponent)  );
-					else	// For BINs>=BIN5 additional reduction factor
-						physicalSootDiffusivityCorrection.push_back( std::pow(MWratio, physicalSootDiffusivityExponent)*physicalSootDiffusivityCorrectionAdditional );
-						
-
-					physicalSootDiffusivityCorrectionIndex.push_back(i);
-			
-					Info << "Physical diffusion coefficient: " << thermodynamicsMapXML->NamesOfSpecies()[i] << " : " << physicalSootDiffusivityCorrection[count] << endl;
-				}
-			}
-		}
-	}
-} 
-
-// Disks preprocessing
-#include "extensions/preprocessDisks.H"
-
-// Soot post-processing
-OpenSMOKE::PolimiSoot_Analyzer* sootAnalyzer;
-Switch iPolimiSoot = false;
-label sootIntegralUpdate  = 1;
-label sootIntegralCounter = sootIntegralUpdate;
-Switch sootOnTheFlyFill = false;
-autoPtr<std::ofstream> fSootIntegrals;
-
-//List<vector> pnts_soot_psdf;
-{	
-		const dictionary& postProcessingDictionary = solverOptions.subDict("PostProcessing");		
-		iPolimiSoot = Switch(postProcessingDictionary.lookup(word("soot")));
-
-		if (iPolimiSoot == true)
-		{
-			const dictionary& postProcessingPolimiSootDictionary = postProcessingDictionary.subDict("PolimiSoot");
-		/*	List<word> list_soot_precursors = List<word>(postProcessingPolimiSootDictionary.lookup("sootPrecursors"));
-
-			for(unsigned int k=0;k<list_soot_precursors.size();k++)
-			{
-				bool found = false;
-				for(unsigned int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
-				{
-					if (list_soot_precursors[k] == thermodynamicsMapXML->NamesOfSpecies()[i])
-					{
-						soot_precursors_indices.push_back(i);
-						found = true;
-					}	
-				}
-				if (found == false)
-				{
-					Info << "The following soot precursor is not included in the kinetic mechanism: " << list_soot_precursors[k] << endl;
-					abort();
-				}
-				else
-				{
-					Info << "Soot precursor " << k+1 << " " << list_soot_precursors[k] << " : index " << soot_precursors_indices[k] << endl;
-				}
-			}
-		*/
-			
-			sootOnTheFlyFill    = Switch(postProcessingPolimiSootDictionary.lookup(word("onTheFlyFill")));
-			sootIntegralUpdate  = readLabel(postProcessingPolimiSootDictionary.lookup("integralUpdate"));
-			sootIntegralCounter = sootIntegralUpdate;
-
-			Foam::string minimum_bin = postProcessingPolimiSootDictionary.lookup("binMinimum");
-			label bin_index_zero     = readLabel(postProcessingPolimiSootDictionary.lookup("binIndexZero"));
-			label bin_index_final    = readLabel(postProcessingPolimiSootDictionary.lookup("binIndexFinal"));
-			scalar bin_density_zero  = readScalar(postProcessingPolimiSootDictionary.lookup("binDensityZero"));
-			scalar bin_density_final = readScalar(postProcessingPolimiSootDictionary.lookup("binDensityFinal"));
-			scalar fractal_diameter  = readScalar(postProcessingPolimiSootDictionary.lookup("fractalDiameter"));
-			Foam::string planck_coefficient = postProcessingPolimiSootDictionary.lookup("planckCoefficient");
-
-
-
-			sootAnalyzer = new OpenSMOKE::PolimiSoot_Analyzer(thermodynamicsMapXML);
-			sootAnalyzer->SetFractalDiameter(fractal_diameter);
-			sootAnalyzer->SetMinimumSection(minimum_bin);
-			sootAnalyzer->SetDensity(bin_index_zero, bin_index_final, bin_density_zero, bin_density_final);
-			sootAnalyzer->SetPlanckAbsorptionCoefficient(planck_coefficient);
-			sootAnalyzer->Setup();
-
-			// Particle size distribution function
-			// List<vector> pnts_soot_psdf_dummy(postProcessingPolimiSootDictionary.lookup("PSDF"));
-			// pnts_soot_psdf = pnts_soot_psdf_dummy;
-
-			// Soot integrals
-			if ( !boost::filesystem::exists("soot.integrals") )
-			{
-  				fSootIntegrals.reset(new std::ofstream("soot.integrals", std::ios::out));
-				fSootIntegrals().setf(std::ios::scientific);
-
-				fSootIntegrals() << std::setw(20) << "time";
-				fSootIntegrals() << std::setw(20) << "soot_mass[kg]";
-				fSootIntegrals() << std::setw(20) << "soot_volume[m3]";
-				fSootIntegrals() << std::setw(20) << "soot_particles[#]";		
-				fSootIntegrals() << std::setw(20) << "prec_mass[kg]";
-				fSootIntegrals() << std::setw(20) << "prec_volume[m3]";
-				fSootIntegrals() << std::setw(20) << "prec_partciles[#]";
-				fSootIntegrals() << std::setw(20) << "dimer_mass[kg]";		
-				fSootIntegrals() << std::setw(20) << "pah12_340nm[kg]";
-				fSootIntegrals() << std::setw(20) << "pah34_400nm[kg]";
-				fSootIntegrals() << std::setw(20) << "pahlarge_500nm[kg]";
-				fSootIntegrals() << std::endl;
-			}
-			else
-			{
-				fSootIntegrals.reset(new std::ofstream("soot.integrals", std::ios::app));
-				fSootIntegrals().setf(std::ios::scientific);
-			}
-		}
-}
 
 /*********************************************************************************************************************/ 
 
@@ -591,103 +370,5 @@ OpenSMOKE::ODE_Parameters odeParameterBatchReactorHomogeneous;
     #include "readOptions_ISAT.H"
 #endif
 #endif
-
-//label minMaxUpdate  = 25;
-//label minMaxCounter = minMaxUpdate;
-
-Switch virtual_chemistry = false;
-Switch virtual_chemistry_table_check = false;
-
-OpenSMOKE::VirtualChemistry* virtualChemistryTable;
-Eigen::MatrixXd VCT;
-unsigned int vc_main_species = 0;
-
-const dictionary& virtualChemistryDictionary = solverOptions.subDict("VirtualChemistry");
-{
-	virtual_chemistry = Switch(virtualChemistryDictionary.lookup(word("virtualChemistry")));
-	
-	if ( virtual_chemistry == true)
-	{
-		vc_main_species = virtualChemistryTable->ns_main();
-
-		if (virtual_chemistry_table_check == true)
-		{
-			VCT.resize(254,21);
-			Foam::string table_check_file = virtualChemistryDictionary.lookup("tableCheck");
-			boost::filesystem::path table_check_file_complete_path = table_check_file;
-
-			std::ifstream fInput(table_check_file_complete_path.c_str(), std::ios::in);
-
-			std::string first_line;
-			std::getline (fInput, first_line);
-
-			for(unsigned int i=0;i<254;i++)
-				for(unsigned int j=0;j<21;j++)
-					fInput >> VCT(i,j);
-
-			std::string dummy;
-			fInput >> dummy;
-			Info << dummy << endl;
-			getchar();
-			fInput.close();
-		}
-
-		bool submechanism_co = Switch(virtualChemistryDictionary.lookup(word("subMechanismCO")));
-		bool submechanism_no = Switch(virtualChemistryDictionary.lookup(word("subMechanismNO")));
-
-		Foam::string tabulation_file_main = virtualChemistryDictionary.lookup("table_main");
-		boost::filesystem::path tabulation_file_complete_path_main = tabulation_file_main;
-		
-		label iVersion = readLabel(virtualChemistryDictionary.lookup("iVersion"));	
-		Foam::string fuelName = virtualChemistryDictionary.lookup("fuelName");
-		Foam::string oxidizerName = virtualChemistryDictionary.lookup("oxidizerName");
-		Foam::string inertName = virtualChemistryDictionary.lookup("inertName");
-		scalar fuelMW = readScalar(virtualChemistryDictionary.lookup("fuelMW"));
-		scalar oxidizerMW = readScalar(virtualChemistryDictionary.lookup("oxidizerMW"));
-		scalar inertMW = readScalar(virtualChemistryDictionary.lookup("inertMW"));
-		
-		scalar mu0 = readScalar(virtualChemistryDictionary.lookup("mu0"));
-		scalar T0 = readScalar(virtualChemistryDictionary.lookup("T0"));
-		scalar Beta0 = readScalar(virtualChemistryDictionary.lookup("Beta0"));
-		scalar Pr0 = readScalar(virtualChemistryDictionary.lookup("Pr0"));
-
-		virtualChemistryTable = new OpenSMOKE::VirtualChemistry(*thermodynamicsMapXML);
-
-		virtualChemistryTable->SetTableMain(tabulation_file_complete_path_main);
-		
-		virtualChemistryTable->SetFuel(fuelName, fuelMW);
-		virtualChemistryTable->SetOxidizer(oxidizerName, oxidizerMW);
-		virtualChemistryTable->SetInert(inertName, inertMW);
-		virtualChemistryTable->SetTransportProperties(mu0, T0, Beta0, Pr0);
-
-		if (submechanism_co == true)
-		{
-			Foam::string tabulation_file_co = virtualChemistryDictionary.lookup("table_co");
-			boost::filesystem::path tabulation_file_complete_path_co = tabulation_file_co;
-			virtualChemistryTable->SetTableCO(tabulation_file_complete_path_co);
-		}
-		if (submechanism_no == true)
-		{
-			Foam::string tabulation_file_no1 = virtualChemistryDictionary.lookup("table_no1");
-			Foam::string tabulation_file_no2 = virtualChemistryDictionary.lookup("table_no2");
-			Foam::string tabulation_file_no3 = virtualChemistryDictionary.lookup("table_no3");
-			Foam::string tabulation_file_no4 = virtualChemistryDictionary.lookup("table_no4");
-			Foam::string tabulation_file_no5 = virtualChemistryDictionary.lookup("table_no5");
-
-			boost::filesystem::path tabulation_file_complete_path_no1 = tabulation_file_no1;
-			boost::filesystem::path tabulation_file_complete_path_no2 = tabulation_file_no2;
-			boost::filesystem::path tabulation_file_complete_path_no3 = tabulation_file_no3;
-			boost::filesystem::path tabulation_file_complete_path_no4 = tabulation_file_no4;
-			boost::filesystem::path tabulation_file_complete_path_no5 = tabulation_file_no5;
-			virtualChemistryTable->SetTableNO(tabulation_file_complete_path_no1, tabulation_file_complete_path_no2,
-							  tabulation_file_complete_path_no3, tabulation_file_complete_path_no4,
-							  tabulation_file_complete_path_no5);
-		}
-
-		virtualChemistryTable->SetVersion(iVersion);
-		for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
-			virtualChemistryTable->SetLewisNumber(i, LewisNumbers(i));
-	}
-}
 
 Info<< "Solver options correctly read\n" << endl;
