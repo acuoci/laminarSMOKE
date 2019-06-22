@@ -51,7 +51,6 @@ IOdictionary solverOptions
 	)
 );
 
-label inertIndex;
 OpenSMOKE::ThermodynamicsMap_CHEMKIN*			thermodynamicsMapXML; 
 OpenSMOKE::KineticsMap_CHEMKIN* 			kineticsMapXML;
 OpenSMOKE::TransportPropertiesMap_CHEMKIN* 		transportMapXML;
@@ -80,10 +79,6 @@ const dictionary& kineticsDictionary = solverOptions.subDict("Kinetics");
 		double tEnd = OpenSMOKE::OpenSMOKEGetCpuTime();
 		std::cout << " * Time to read XML file: " << tEnd-tStart << std::endl;
 	}
-
-	//- Inert species
-	word inertSpecies(kineticsDictionary.lookup("inertSpecies"));
-	inertIndex = thermodynamicsMapXML->IndexOfSpecies(inertSpecies)-1;
 }
 
 //- Mass fractions tolerance
