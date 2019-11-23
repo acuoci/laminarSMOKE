@@ -217,6 +217,11 @@ int hmom_coagulation = 1;
 int hmom_coagulation_continous = 1;
 double hmom_schmidt_number = 50.;
 
+double hmom_surface_density = 1.7e19;
+double hmom_sticking_coefficient = 0.002;
+double hmom_soot_density = 1800.;
+int hmom_thermophoretic_model = 1;
+
 scalar hmom_minimum_normalized_value = 1.e-16;
 scalar hmom_minimum_fv_for_integration = 1.e-16;
 
@@ -259,8 +264,18 @@ const dictionary& hmomDictionary = solverOptions.subDict("HMOM");
 
 		hmom_schmidt_number = hmomDictionary.lookupOrDefault<scalar>(word("schmidt_number"),  scalar(50.));
 
+		hmom_surface_density = hmomDictionary.lookupOrDefault<scalar>(word("surface_density"),  scalar(1.7e19));
+		hmom_sticking_coefficient = hmomDictionary.lookupOrDefault<scalar>(word("sticking_coefficient"),  scalar(0.002));
+		hmom_soot_density = hmomDictionary.lookupOrDefault<scalar>(word("soot_density"),  scalar(1800.));
+		hmom_thermophoretic_model = hmomDictionary.lookupOrDefault<label>(word("thermophoretic_model"),  label(1));
+
 		hmom_minimum_normalized_value   = hmomDictionary.lookupOrDefault<scalar>(word("mininum_normalized_value"),  scalar(1.e-16));
 		hmom_minimum_fv_for_integration = hmomDictionary.lookupOrDefault<scalar>(word("mininum_fv_for_integration"),  scalar(1.e-16));
+
+		Info << "HMOM: surface density (#/m2): " << hmom_surface_density << endl;
+		Info << "HMOM: sticking coefficient:   " << hmom_sticking_coefficient << endl;
+		Info << "HMOM: soot density (kg/m3):   " << hmom_soot_density  << endl;
+		Info << "HMOM: thermophoresis:         " << hmom_thermophoretic_model  << endl;
 
 		Info << "HMOM: minimum normalized moments: " << hmom_minimum_normalized_value << endl;
 		Info << "HMOM: minimum fv for integration: " << hmom_minimum_fv_for_integration << endl;

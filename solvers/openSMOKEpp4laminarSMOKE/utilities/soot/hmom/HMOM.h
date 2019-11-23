@@ -16,7 +16,7 @@
 |                                                                         |
 |   This file is part of OpenSMOKE++ framework.                           |
 |                                                                         |
-|	License                                                               |
+|	License                                                           |
 |                                                                         |
 |   Copyright(C) 2016 B. Franzelli, A.L. Bodor, A. Cuoci                  |
 |   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
@@ -212,6 +212,24 @@ namespace OpenSMOKE
 		*@param value Schmidt number for moments
 		*/
 		void SetSchmidtNumber(const double value);
+
+		/**
+		*@brief Sets the sticking coefficient
+		*@param value the sticking coefficient (default value: 0.002)
+		*/
+		void SetStickingCoefficient(const double value);
+
+		/**
+		*@brief Sets the surface density
+		*@param value the surface density (default: 1.7e19 #/m2)
+		*/
+		void SetSurfaceDensity(const double value);
+
+		/**
+		*@brief Sets the soot density
+		*@param value the soot density (default value: 1800 kg/m3)
+		*/
+		void SetSootDensity(const double value);
 
 		/**
 		*@brief Calculates the source terms for moment equations
@@ -592,6 +610,9 @@ namespace OpenSMOKE
 		int coagulation_continous_model_;		//!< coagulation (continous) model
 		int thermophoretic_model_;				//!< thermophoretic model
 
+		double rho_soot_;						//!< soot density [kg/m3]
+		double Cfm_;							//!< TODO
+		double betaN_TV_;						//!< TODO
 		double dimerization_rate_;				//!< dimerization rate [mol/m3/s]
 		double pah_volume_;						//!< PAH volume [m3]
 		double dimer_volume_;					//!< dimer volume [m3]
@@ -609,13 +630,15 @@ namespace OpenSMOKE
 		double As_collisional_;					//!< [???]
 		double K_collisional_;					//!< [???]
 
-		std::vector<std::string> pah_species_;	//!< names of PAH species
-		bool pah_consumption_;					//!< PAH consumption
+		std::vector<std::string> pah_species_;		//!< names of PAH species
+		bool pah_consumption_;				//!< PAH consumption
 
 		SootPlanckCoefficient soot_planck_coefficient_;
 		bool radiative_heat_transfer_;
 
-		double schmidt_number_;
+		double schmidt_number_;				//!< soot Schmidt number
+		double sticking_coefficient_;			//!< sticking coefficient
+		double surface_density_;			//!< surface density []#/m2
 
 	private:
 
@@ -624,12 +647,8 @@ namespace OpenSMOKE
 		static const double AvogadroNumber;
 		static const double K_diam;
 		static const double K_spher;
-		static const double rho_soot;
-		static const double Cfm;
-		static const double betaN_TV;
 		static const double Rgas;
 		static const double KB;
-		static const double surface_density;
 
 		static const double A1f;
 		static const double n1f;

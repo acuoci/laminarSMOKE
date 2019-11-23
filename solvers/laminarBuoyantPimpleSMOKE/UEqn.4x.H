@@ -76,9 +76,3 @@
 
 	Info << " Umin: " << min(U).value() << " Umax: " << max(U).value() << endl;
 
-
-
-
-   
-
-    

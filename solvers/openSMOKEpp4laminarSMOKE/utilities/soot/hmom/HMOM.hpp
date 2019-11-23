@@ -16,7 +16,7 @@
 |                                                                         |
 |   This file is part of OpenSMOKE++ framework.                           |
 |                                                                         |
-|	License                                                               |
+|	License                                                           |
 |                                                                         |
 |   Copyright(C) 2016 B. Franzelli, A.L. Bodor, A. Cuoci                  |
 |   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
@@ -36,17 +36,13 @@
 
 namespace OpenSMOKE
 {
-	const double HMOM::surface_density = 1.7e19;				// [#/m2]
 	const double HMOM::pi = 3.141592653589793;					// [-]
 	const double HMOM::WC = 12.e-3;								// [kg/mol]
 	const double HMOM::AvogadroNumber = 6.022e23;				// [#/mol]
 	const double HMOM::K_diam = std::pow(6. / pi, 1. / 3.);			// [-]
 	const double HMOM::K_spher = std::pow(36.*pi, 1. / 3.);		// [-]
-	const double HMOM::rho_soot = 1800.;						// [kg/m3]
 	const double HMOM::Rgas = 8.3143;							// [J/mol/K]
 	const double HMOM::KB = Rgas / AvogadroNumber;				// [J/K]
-	const double HMOM::Cfm = std::sqrt(pi*KB / 2.0 / rho_soot);
-	const double HMOM::betaN_TV = 2.2 * 4 * std::sqrt(2.0)*std::pow(K_diam, 2.)*Cfm;
 
 	// Kinetics
 	const double HMOM::A1f = 6.72e1;
@@ -82,12 +78,18 @@ namespace OpenSMOKE
 
 		// Total number of moments
 		n_moments_ = 4;
-		
+
+		// Soot density [kg/m3]
+		rho_soot_ = 1800.;
+		Cfm_ = std::sqrt(pi*KB / 2.0 / rho_soot_);
+		betaN_TV_ = 2.2 * 4 * std::sqrt(2.0)*std::pow(K_diam, 2.)*Cfm_;
+
 		// PAH species
 		pah_species_.resize(1);
 		pah_species_[0] = "C10H8";
 
 		// Physical/Chemical phenomena
+		surface_density_ = 1.7e19;				// [#/m2]
 		nucleation_model_ = 1;
 		condensation_model_ = 1;
 		surface_growth_model_ = 1;
@@ -96,6 +98,7 @@ namespace OpenSMOKE
 		coagulation_continous_model_ = 1;
 		thermophoretic_model_ = 1;
 		schmidt_number_ = 50.;
+		sticking_coefficient_ = 2e-3;
 		radiative_heat_transfer_ = true;
 		soot_planck_coefficient_ = SOOT_PLANCK_COEFFICIENT_SMOOKE;
 
@@ -225,6 +228,40 @@ namespace OpenSMOKE
 			dictionary.ReadDouble("@SchmidtNumber", value);
 			SetSchmidtNumber(value);
 		}
+
+		if (dictionary.CheckOption("@StickingCoefficient") == true)
+		{
+			double value;
+			dictionary.ReadDouble("@StickingCoefficient", value);
+			SetStickingCoefficient(value);
+		}
+
+		if (dictionary.CheckOption("@SootDensity") == true)
+		{
+			double value;
+			std::string units;
+			dictionary.ReadMeasure("@SootDensity", value, units);
+
+			if (units == "kg/m3")		value = value;
+			else if (units == "g/cm3")	value *= 1000.;
+			else OpenSMOKE::FatalErrorMessage("@SootDensity: allowed units kg/m3 | g/cm3");
+
+			SetSootDensity(value);
+		}
+
+		if (dictionary.CheckOption("@SurfaceDensity") == true)
+		{
+			double value;
+			std::string units;
+			dictionary.ReadMeasure("@SurfaceDensity", value, units);
+
+			if (units == "#/m2")		value = value;
+			else if (units == "#/cm2")	value *= 1.e4;
+			else if (units == "#/mm2")	value *= 1.e6;
+			else OpenSMOKE::FatalErrorMessage("@SurfaceDensity: allowed units #/m2 | #/cm2 | #/mm2");
+
+			SetSurfaceDensity(value);
+		}
 	}
 
 	void HMOM::MemoryAllocation()
@@ -305,12 +342,12 @@ namespace OpenSMOKE
 
 	void HMOM::SetNumberCarbonPAH(const int n_carbon_pah)
 	{
-		pah_volume_ = (WC / rho_soot / AvogadroNumber) * double(n_carbon_pah);	// [m3]
+		pah_volume_ = (WC / rho_soot_ / AvogadroNumber) * double(n_carbon_pah);	// [m3]
 		dimer_volume_ = 2. * pah_volume_;										// [m3]
 		dimer_surface_ = K_spher * std::pow(dimer_volume_, 2. / 3.);			// [m2]
 		V0_ = 2.* dimer_volume_;												// nucleated particle volume (eq. 16) [m3]
 		S0_ = K_spher * std::pow(V0_, 2. / 3.);									// nucleated particle surface (eq. 17) [m2]
-		VC2_ = (WC / rho_soot / AvogadroNumber)*2.;								// [m3]
+		VC2_ = (WC / rho_soot_ / AvogadroNumber)*2.;								// [m3]
 	}
 
 	void HMOM::SetCollisionDiameterModel(const int dc_model)
@@ -375,6 +412,23 @@ namespace OpenSMOKE
 	void HMOM::SetSchmidtNumber(const double value)
 	{
 		schmidt_number_ = value;
+	}
+
+	void HMOM::SetStickingCoefficient(const double value)
+	{
+		sticking_coefficient_ = value;
+	}
+
+	void HMOM::SetSurfaceDensity(const double value)
+	{
+		surface_density_ = value;
+	}
+
+	void HMOM::SetSootDensity(const double value)
+	{
+		rho_soot_ = value;
+		Cfm_ = std::sqrt(pi*KB / 2.0 / rho_soot_);
+		betaN_TV_ = 2.2 * 4 * std::sqrt(2.0)*std::pow(K_diam, 2.)*Cfm_;
 	}
 	
 	void HMOM::SetNormalizedMoments(	const double M00_normalized, const double M10_normalized,
@@ -523,13 +577,12 @@ namespace OpenSMOKE
 
 	void HMOM::DimerConcentration()
 	{
-		betaN_ = betaN_TV * std::sqrt(T_) * std::pow(dimer_volume_, 1./6.);
+		betaN_ = betaN_TV_ * std::sqrt(T_) * std::pow(dimer_volume_, 1./6.);
 
-		const double sticking_coefficient = 2e-3;
 		const double betaC = GetBetaC();
-		const double KfmPAH = betaN_TV * std::sqrt(T_) * std::pow(pah_volume_, 1. / 6.);
+		const double KfmPAH = betaN_TV_ * std::sqrt(T_) * std::pow(pah_volume_, 1. / 6.);
 		const double aromatics_conc = conc_PAH_*1.e6;
-		dimerization_rate_ = 0.5* KfmPAH * std::pow(aromatics_conc, 2.) * sticking_coefficient;	// [mol/m3/s]
+		dimerization_rate_ = 0.5* KfmPAH * std::pow(aromatics_conc, 2.) * sticking_coefficient_;	// [mol/m3/s]
 		const double delta = std::pow(betaC, 2.) + 4.0 * betaN_ * dimerization_rate_ * std::pow(AvogadroNumber, 2.0);
 
 		conc_DIMER_ = (std::sqrt(delta) - betaC) / (2.0*betaN_*AvogadroNumber);
@@ -570,20 +623,20 @@ namespace OpenSMOKE
 
 		const double k6 = 8.94  * eff6 * std::sqrt(T_) * AvogadroNumber;
 		kox_ = A5 * std::pow(T_, n5) * std::exp(-E5 / T_) * conc_O2_ * conc_sootStar +
-			(0.5 / surface_density) * k6 * conc_OH_;
+			(0.5 / surface_density_) * k6 * conc_OH_;
 	}
 
 	void HMOM::SootSurfaceGrowthM4()
 	{
 		source_growth_(0) = 0.;
-		source_growth_(1) = ksg_ * surface_density * VC2_ * GetMoment(0., 1.) / AvogadroNumber / V0_;
-		source_growth_(2) = ksg_ * surface_density * VC2_ * K_fractal_ * GetMoment(Av_fractal_, As_fractal_ + 2.) / AvogadroNumber / S0_;
-		source_growth_(3) = -ksg_ * surface_density * S0_ * N0_ / AvogadroNumber;
+		source_growth_(1) = ksg_ * surface_density_ * VC2_ * GetMoment(0., 1.) / AvogadroNumber / V0_;
+		source_growth_(2) = ksg_ * surface_density_ * VC2_ * K_fractal_ * GetMoment(Av_fractal_, As_fractal_ + 2.) / AvogadroNumber / S0_;
+		source_growth_(3) = -ksg_ * surface_density_ * S0_ * N0_ / AvogadroNumber;
 	}
 
 	void HMOM::SootOxidationM4()
 	{
-		const double coefficient = kox_ * surface_density * VC2_;
+		const double coefficient = kox_ * surface_density_ * VC2_;
 		const double M01 = GetMissingMoment(0., 1.);
 		const double M_12 = GetMissingMoment(-1., 2.);
 
@@ -604,16 +657,16 @@ namespace OpenSMOKE
 			std::pow(K_collisional_, 2.0) * (GetMoment(2.0*Av_collisional_, 2.0*As_collisional_) + 0.5*dimer_volume_*GetMoment(2.0*Av_collisional_ - 1.0, 2.0*As_collisional_)) +
 			2.0*D_DIM*K_collisional_ * (GetMoment(Av_collisional_, As_collisional_) + 0.5*dimer_volume_*GetMoment(Av_collisional_ - 1.0, As_collisional_));
 
-		source_condensation_(1) = Cfm * std::sqrt(dimer_volume_) * conc_DIMER_ * std::sqrt(T_) * source_condensation_(1) / V0_;
+		source_condensation_(1) = Cfm_ * std::sqrt(dimer_volume_) * conc_DIMER_ * std::sqrt(T_) * source_condensation_(1) / V0_;
 
 		source_condensation_(2) = std::pow(D_DIM, 2.) *   (GetMoment(Av_fractal_, As_fractal_ + 1.0) + 0.5*dimer_volume_*GetMoment(Av_fractal_ - 1., As_fractal_ + 1.)) +
 			std::pow(K_collisional_, 2.0) *   (GetMoment(Av_fractal_ + 2.0*Av_collisional_, As_fractal_ + 1. + 2.*As_collisional_)
 				+ 0.5*dimer_volume_*GetMoment(Av_fractal_ + 2.0*Av_collisional_ - 1.0, As_fractal_ + 1. + 2.0*As_collisional_)) +
 			2.0*D_DIM*K_collisional_ * (GetMoment(Av_fractal_ + Av_collisional_, As_fractal_ + 1. + As_collisional_)
 				+ 0.5*dimer_volume_*GetMoment(Av_fractal_ + Av_collisional_ - 1.0, As_fractal_ + 1. + As_collisional_));
-		source_condensation_(2) = Cfm * std::sqrt(dimer_volume_) * conc_DIMER_ * std::sqrt(T_) * source_condensation_(2) / S0_ * K_fractal_;
+		source_condensation_(2) = Cfm_ * std::sqrt(dimer_volume_) * conc_DIMER_ * std::sqrt(T_) * source_condensation_(2) / S0_ * K_fractal_;
 
-		source_condensation_(3) = -Cfm * 1. / std::sqrt(dimer_volume_) * conc_DIMER_ * std::sqrt(T_) * (1.0 + 0.5*dimer_volume_ / V0_) * std::pow(D_DIM + D_NUCL, 2.) * N0_;
+		source_condensation_(3) = -Cfm_ * 1. / std::sqrt(dimer_volume_) * conc_DIMER_ * std::sqrt(T_) * (1.0 + 0.5*dimer_volume_ / V0_) * std::pow(D_DIM + D_NUCL, 2.) * N0_;
 	}
 
 	double HMOM::GetBetaC()
@@ -625,7 +678,7 @@ namespace OpenSMOKE
 			2.0*K_diam*K_collisional_ * std::pow(dimer_volume_, 5. / 6.)  * GetMoment(Av_collisional_ - 1.0, As_collisional_) +
 			0.5*std::pow(K_diam, 2.) * std::pow(dimer_volume_, 7. / 6.)  * GetMoment(-1., 0.);
 
-		betaC = Cfm*std::sqrt(T_)*betaC;
+		betaC = Cfm_*std::sqrt(T_)*betaC;
 
 		return betaC;
 	}
@@ -654,7 +707,7 @@ namespace OpenSMOKE
 	{
 		const double DcNUCL = K_diam * std::pow(V0_, 1. / 3.);
 		const double S00 = K_spher * std::pow(2.0*V0_, 2. / 3.);
-		const double beta00 = 2.20*Cfm*std::sqrt(2.0 / V0_)*std::pow(2.*DcNUCL, 2.) * std::sqrt(T_);
+		const double beta00 = 2.20*Cfm_*std::sqrt(2.0 / V0_)*std::pow(2.*DcNUCL, 2.) * std::sqrt(T_);
 
 		source_coagulation_ss_(0) = -0.5* beta00 * std::pow(N0_, 2.) / AvogadroNumber;
 		source_coagulation_ss_(1) = 0.0;
@@ -679,7 +732,7 @@ namespace OpenSMOKE
 
 			source_coagulation_sl_(0) = 0.;
 			if (psi0*psi1>=0.)
-				source_coagulation_sl_(0) = -2.2 * Cfm * std::sqrt(T_) * N0_ / AvogadroNumber * std::sqrt(psi0*psi1);
+				source_coagulation_sl_(0) = -2.2 * Cfm_ * std::sqrt(T_) * N0_ / AvogadroNumber * std::sqrt(psi0*psi1);
 		}
 
 		source_coagulation_sl_(1) = 0.0;
@@ -697,7 +750,7 @@ namespace OpenSMOKE
 
 			source_coagulation_sl_(2) = source_coagulation_sl_(0);
 			if (psi0*psi1>=0.)
-				source_coagulation_sl_(2) += 	2.2*Cfm*std::sqrt(T_)*N0_*V0_*K_fractal_ / S0_ / AvogadroNumber*std::sqrt(psi0*psi1);
+				source_coagulation_sl_(2) += 	2.2*Cfm_*std::sqrt(T_)*N0_*V0_*K_fractal_ / S0_ / AvogadroNumber*std::sqrt(psi0*psi1);
 		}
 
 		source_coagulation_sl_(3) = source_coagulation_sl_(0);
@@ -717,7 +770,7 @@ namespace OpenSMOKE
 					GetMissingMoment(2.0*Av_collisional_ - 0.5, 2.0*As_collisional_)*GetMissingMoment(1. / 2., 0.));
 
 		if (psi0*psi1>=0.)
-			source_coagulation_ll_(0) = -0.5 * 2.2 * Cfm * std::sqrt(T_) / AvogadroNumber * std::sqrt(psi1*psi0);			
+			source_coagulation_ll_(0) = -0.5 * 2.2 * Cfm_ * std::sqrt(T_) / AvogadroNumber * std::sqrt(psi1*psi0);			
 	}
 
 	void HMOM::SootCoagulationContinousM4()

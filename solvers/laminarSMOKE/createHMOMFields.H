@@ -40,18 +40,22 @@
 
 OpenSMOKE::HMOM hmom;
 
+hmom.SetSurfaceDensity(hmom_surface_density);
 hmom.SetNucleation(hmom_nucleation);
 hmom.SetSurfaceGrowth(hmom_surface_growth);
 hmom.SetOxidation(hmom_oxidation);
 hmom.SetCondensation(hmom_condensation);
 hmom.SetCoagulation(hmom_coagulation);
 hmom.SetCoagulationContinous(hmom_coagulation_continous);
+hmom.SetThermophoreticModel(hmom_thermophoretic_model);
 hmom.SetPAH(hmom_pah_species_names);
 
 hmom.SetNumberCarbonPAH(hmom_pah_nc);
 hmom.SetFractalDiameterModel(hmom_fractal_diameter_model);
 hmom.SetCollisionDiameterModel(hmom_collision_diameter_model);
 hmom.SetSchmidtNumber(hmom_schmidt_number);
+hmom.SetStickingCoefficient(hmom_sticking_coefficient);
+hmom.SetSootDensity(hmom_soot_density);
 
 Info<< "HMOM_Norm_N0 [mol/m3]\n" << endl;
 volScalarField HMOM_Norm_N0

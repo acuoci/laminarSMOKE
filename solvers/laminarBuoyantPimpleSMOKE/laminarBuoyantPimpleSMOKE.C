@@ -84,6 +84,9 @@
 #include "utilities.H"
 #include "laminarSMOKEthermoClass.H"
 
+// Virtual chemistry
+//#include "utilities/virtualchemistry/VirtualChemistry.h"
+
 // Homogeneous reactors
 #include "DRG.h"
 #include "BatchReactorHomogeneousConstantPressure.H"

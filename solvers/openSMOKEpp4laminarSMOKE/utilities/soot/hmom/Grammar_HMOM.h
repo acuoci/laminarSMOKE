@@ -16,7 +16,7 @@
 |                                                                         |
 |   This file is part of OpenSMOKE++ framework.                           |
 |                                                                         |
-|	License                                                               |
+|	License                                                           |
 |                                                                         |
 |   Copyright(C) 2016 B. Franzelli, A.L. Bodor, A. Cuoci                  |
 |   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
@@ -128,6 +128,21 @@ namespace OpenSMOKE
 			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@SchmidtNumber",
 				OpenSMOKE::SINGLE_DOUBLE,
 				"Schmidt number (default: 50)",
+				false));
+
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@StickingCoefficient",
+				OpenSMOKE::SINGLE_DOUBLE,
+				"StickingCoefficient (default: 0.002)",
+				false));
+
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@SootDensity",
+				OpenSMOKE::SINGLE_MEASURE,
+				"Density of soot particles (default: 1800 kg/m3)",
+				false));
+
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@SurfaceDensity",
+				OpenSMOKE::SINGLE_MEASURE,
+				"Surface density (default: 1.7 #/m2)",
 				false));
 		}
 	};
