@@ -50,12 +50,33 @@ namespace OpenSMOKE
 		
 		return 0;
 	}
+
+	unsigned int ThermodynamicsMap::IndexOfSpeciesCaseInsensitive(const std::string name) const
+	{
+		for (unsigned int i = 0; i < nspecies_; ++i)
+			if (boost::iequals(name,names_[i]))
+				return i + 1;
+
+		ErrorMessage(	"const unsigned int ThermodynamicsMap::IndexOfSpeciesCaseInsensitive(const std::string name) const",
+						"The requested species " + name + " is not available in the kinetic mechanism");
+
+		return 0;
+	}
  
 	unsigned int ThermodynamicsMap::IndexOfSpeciesWithoutError(const std::string name) const
 	{
 		for(unsigned int i=0;i<nspecies_;++i)
 			if (name == names_[i])
 				return i+1;
+
+		return 0;
+	}
+
+	unsigned int ThermodynamicsMap::IndexOfSpeciesWithoutErrorCaseInsensitive(const std::string name) const
+	{
+		for (unsigned int i = 0; i < nspecies_; ++i)
+			if (boost::iequals(name, names_[i]))
+				return i + 1;
 
 		return 0;
 	}
@@ -168,8 +189,9 @@ namespace OpenSMOKE
 		return mole;
 	}
 
-	double ThermodynamicsMap::GetLocalEquivalenceRatio( 	const std::vector<double>& moles, const std::vector<double>& moles_st,
-									const std::vector<std::string>& fuel_names)
+	double ThermodynamicsMap::GetLocalEquivalenceRatio( const std::vector<double>& moles, 
+														const std::vector<double>& moles_st,
+														const std::vector<std::string>& fuel_names)
 	{
 		double nFuelStoichiometric = 0.;
 		double nFuel = 0.;
@@ -183,6 +205,67 @@ namespace OpenSMOKE
 		const double nOxygen               = moles[IndexOfSpecies("O2")-1];
 
 		const double phi = Min( nFuel*nOxygenStoichiometric/nFuelStoichiometric/(nOxygen+1e-12), 100.);
+
+		return phi;
+	}
+
+	double ThermodynamicsMap::GetLocalEquivalenceRatioFromMassFractions(const double* mass_fractions)
+	{
+		double MW = 0.;
+		std::vector<double> mole_fractions(nspecies_);
+		MoleFractions_From_MassFractions(mole_fractions.data(), MW, mass_fractions);
+		
+		return GetLocalEquivalenceRatioFromMoleFractions(mole_fractions.data());
+	}
+
+	double ThermodynamicsMap::GetLocalEquivalenceRatioFromMoleFractions(const double* mole_fractions)
+	{
+		const unsigned int jC = IndexOfElementWithoutError("C");
+		const unsigned int jH = IndexOfElementWithoutError("H");
+		const unsigned int jO = IndexOfElementWithoutError("O");
+		const unsigned int jS = IndexOfElementWithoutError("S");
+		const unsigned int jN = IndexOfElementWithoutError("N");
+
+		double nC = 0.;
+		if (jC > 0)
+		{
+			for (unsigned int j = 0; j < nspecies_; j++)
+				nC += atomic_composition_(j, jC - 1)*mole_fractions[j];
+		}
+
+		double nH = 0.;
+		if (jH > 0)
+		{
+			for (unsigned int j = 0; j < nspecies_; j++)
+				nH += atomic_composition_(j, jH - 1)*mole_fractions[j];
+		}
+
+		double nO = 0.;
+		if (jO > 0)
+		{
+			for (unsigned int j = 0; j < nspecies_; j++)
+				nO += atomic_composition_(j, jO - 1)*mole_fractions[j];
+		}
+
+		double nS = 0.;
+		if (jS > 0)
+		{
+			for (unsigned int j = 0; j < nspecies_; j++)
+				nS += atomic_composition_(j, jS - 1)*mole_fractions[j];
+		}
+
+		double nN = 0.;
+		if (jN > 0)
+		{
+			for (unsigned int j = 0; j < nspecies_; j++)
+				nN += atomic_composition_(j, jN - 1)*mole_fractions[j];
+
+			const unsigned int iN2 = IndexOfSpeciesWithoutErrorCaseInsensitive("N2");
+			if (iN2 > 0)
+				nN -= atomic_composition_(iN2-1, jN - 1)*mole_fractions[iN2-1];
+		}
+
+		const double phi = std::min( ( 2.*nC + 0.5*nH + 2.*nS + 2.*nN) / (nO + 1.e-16), 1.e3);
 
 		return phi;
 	}
@@ -208,43 +291,43 @@ namespace OpenSMOKE
 		const unsigned int jC = IndexOfElementWithoutError("C");
 		const unsigned int jO = IndexOfElementWithoutError("O");
 		const unsigned int jH = IndexOfElementWithoutError("H");
+		
+		const double WC = OpenSMOKE::AtomicWeights["C"];
+		const double WO = OpenSMOKE::AtomicWeights["O"];
+		const double WH = OpenSMOKE::AtomicWeights["H"];
 	
 		if (jC>0)
 		{
 			for(unsigned int j=0;j<number_of_fuels;j++)
-				omegaFuelC += atomic_composition_(IndexOfSpecies(fuel_names[j])-1,jC-1)*mass_fuel[j];
+				omegaFuelC += atomic_composition_(IndexOfSpecies(fuel_names[j])-1,jC-1)*mass_fuel[j]*(WC/MW(IndexOfSpecies(fuel_names[j])-1));
 			for(unsigned int j=0;j<number_of_oxidizers;j++)
-				omegaOxidizerC += atomic_composition_(IndexOfSpecies(oxidizer_names[j])-1,jC-1)*mass_oxidizer[j];
+				omegaOxidizerC += atomic_composition_(IndexOfSpecies(oxidizer_names[j])-1,jC-1)*mass_oxidizer[j]*(WC/MW(IndexOfSpecies(oxidizer_names[j])-1));
 			for(unsigned int j=0;j<nspecies_;j++)
-				omegaC += atomic_composition_(j,jC-1)*mass[j];
+				omegaC += atomic_composition_(j,jC-1)*mass[j]*(WC/MW(j));
 		}
 		
 		if (jH>0)
 		{
 			for(unsigned int j=0;j<number_of_fuels;j++)
-				omegaFuelH += atomic_composition_(IndexOfSpecies(fuel_names[j])-1,jH-1)*mass_fuel[j];
+				omegaFuelH += atomic_composition_(IndexOfSpecies(fuel_names[j])-1,jH-1)*mass_fuel[j]*(WH/MW(IndexOfSpecies(fuel_names[j])-1));
 			for(unsigned int j=0;j<number_of_oxidizers;j++)
-				omegaOxidizerH += atomic_composition_(IndexOfSpecies(oxidizer_names[j])-1,jH-1)*mass_oxidizer[j];
+				omegaOxidizerH += atomic_composition_(IndexOfSpecies(oxidizer_names[j])-1,jH-1)*mass_oxidizer[j]*(WH/MW(IndexOfSpecies(oxidizer_names[j])-1));
 			for(unsigned int j=0;j<nspecies_;j++)
-				omegaH += atomic_composition_(j,jH-1)*mass[j];
+				omegaH += atomic_composition_(j,jH-1)*mass[j]*(WH/MW(j));
 		}
 
 		if (jO>0)
 		{
 			for(unsigned int j=0;j<number_of_fuels;j++)
-				omegaFuelO += atomic_composition_(IndexOfSpecies(fuel_names[j])-1,jO-1)*mass_fuel[j];
+				omegaFuelO += atomic_composition_(IndexOfSpecies(fuel_names[j])-1,jO-1)*mass_fuel[j]*(WO/MW(IndexOfSpecies(fuel_names[j])-1));
 			for(unsigned int j=0;j<number_of_oxidizers;j++)
-				omegaOxidizerO += atomic_composition_(IndexOfSpecies(oxidizer_names[j])-1,jO-1)*mass_oxidizer[j];
+				omegaOxidizerO += atomic_composition_(IndexOfSpecies(oxidizer_names[j])-1,jO-1)*mass_oxidizer[j]*(WO/MW(IndexOfSpecies(oxidizer_names[j])-1));
 			for(unsigned int j=0;j<nspecies_;j++)
-				omegaO += atomic_composition_(j,jO-1)*mass[j];
+				omegaO += atomic_composition_(j,jO-1)*mass[j]*(WO/MW(j));
 		}
 
-		const double WC = OpenSMOKE::AtomicWeights["C"];
-		const double WO = OpenSMOKE::AtomicWeights["O"];
-		const double WH = OpenSMOKE::AtomicWeights["H"];
-
 		const double z = ( 	2.*(omegaC-omegaOxidizerC)/WC 		+ (omegaH-omegaOxidizerH)/2./WH 	- (omegaO-omegaOxidizerO)/WO 		) /
-				 ( 	2.*(omegaFuelC-omegaOxidizerC)/WC 	+ (omegaFuelH-omegaOxidizerH)/2./WH 	- (omegaFuelO-omegaOxidizerO)/WO 	) ;
+						 ( 	2.*(omegaFuelC-omegaOxidizerC)/WC 	+ (omegaFuelH-omegaOxidizerH)/2./WH 	- (omegaFuelO-omegaOxidizerO)/WO 	) ;
 
 		return z;
 	}

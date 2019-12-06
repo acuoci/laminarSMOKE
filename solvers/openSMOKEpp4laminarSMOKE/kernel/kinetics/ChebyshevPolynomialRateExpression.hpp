@@ -39,6 +39,7 @@ namespace OpenSMOKE
 
 	ChebyshevPolynomialRateExpression::ChebyshevPolynomialRateExpression()
 	{
+		is_violation_allowed_ = false;
 	}
 	
 	ChebyshevPolynomialRateExpression::ChebyshevPolynomialRateExpression(const ChebyshevPolynomialRateExpression& orig)
@@ -92,23 +93,60 @@ namespace OpenSMOKE
 		log10_Pmax = std::log10(Pmax);
 	}
 
+	void ChebyshevPolynomialRateExpression::SetViolationAllowed(const bool flag)
+	{
+		is_violation_allowed_ = flag;
+	}
+
 	double ChebyshevPolynomialRateExpression::KineticConstant(const double T, const double P)
 	{
-	//	if (T>Tmax)	{ cout << T << " " << Tmax << endl; ErrorMessage("Temperature is larger than Tmax");}
-	//	if (T<Tmin)	{ cout << T << " " << Tmin << endl; ErrorMessage("Temperature is smaller than Tmin");}
-	//	if (P>Pmax)	{ cout << P << " " << Pmax << endl; ErrorMessage("Pressure is larger than Pmax");}
-	//	if (P<Pmin)	{ cout << P << " " << Pmin << endl; ErrorMessage("Pressure is smaller than Pmin");}
+		double Tc = T;
+		double Pc = P;
 
-		double Ttilde = (2./T-1./Tmin-1./Tmax) / (1./Tmax-1./Tmin);
-		double Ptilde = (2.*std::log10(P)-log10_Pmin-log10_Pmax) / (log10_Pmax-log10_Pmin);
+		if (is_violation_allowed_ == false)
+		{
+			if (T > Tmax) 
+			{ 
+				std::cout << "Current T[K]: " << T << " - Maximum T[K]: " << Tmax << std::endl; 
+				ErrorMessage("Temperature is larger than Tmax in Chebyshev Polynomial expression"); 
+			}
 
-		for(unsigned int n=1;n<=N;n++)	phi_n(n-1) = Phi(n, Ttilde);
-		for(unsigned int m=1;m<=M;m++)	phi_m(m-1) = Phi(m, Ptilde);
+			if (T < Tmin)
+			{
+				std::cout << "Current T[K]: " << T << " - Minimum T[K]: " << Tmin << std::endl;
+				ErrorMessage("Temperature is lower than Tmin in Chebyshev Polynomial expression");
+			}
+
+			if (P > Pmax)
+			{
+				std::cout << "Current P[Pa]: " << P << " - Maximum P[Pa]: " << Pmax << std::endl;
+				ErrorMessage("Pressure is larger than Pmax in Chebyshev Polynomial expression");
+			}
+
+			if (P < Pmin)
+			{
+				std::cout << "Current P[Pa]: " << P << " - Minimum P[Pa]: " << Pmin << std::endl;
+				ErrorMessage("Pressure is lower than Pmin in Chebyshev Polynomial expression");
+			}
+		}
+		else
+		{
+			if (T > Tmax) Tc = Tmax; 
+			if (T < Tmin) Tc = Tmin;
+			if (P > Pmax) Pc = Pmax;
+			if (P < Pmin) Pc = Pmin;
+		}
+
+		double Ttilde = (2. / Tc - 1. / Tmin - 1. / Tmax) / (1. / Tmax - 1. / Tmin);
+		double Ptilde = (2.*std::log10(Pc) - log10_Pmin - log10_Pmax) / (log10_Pmax - log10_Pmin);
+
+		for (unsigned int n = 1; n <= N; n++)	phi_n(n - 1) = Phi(n, Ttilde);
+		for (unsigned int m = 1; m <= M; m++)	phi_m(m - 1) = Phi(m, Ptilde);
 
 		double sum = 0.;
-		for(unsigned int n=0;n<N;n++)
-			for(unsigned int m=0;m<M;m++)	
-				sum += a(n,m)*phi_n(n)*phi_m(m);
+		for (unsigned int n = 0; n < N; n++)
+			for (unsigned int m = 0; m < M; m++)
+				sum += a(n, m)*phi_n(n)*phi_m(m);
 
 		return std::pow(10., sum) * conversion;
 	}

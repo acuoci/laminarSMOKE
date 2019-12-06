@@ -61,20 +61,14 @@
 #include "math/native-ode-solvers/MultiValueSolver"
 #include "math/external-ode-solvers/ODE_Parameters.h"
 
+// Customized radiation model
+#include "OpenSMOKEradiationModel.H"
+
 // OpenFOAM
 #include "fvCFD.H"
 #include "multivariateScheme.H"
 #include "pimpleControl.H"
 #include "interpolation.H"
-
-// Customized radiation model
-#include "OpenSMOKEradiationModel.H"
-
-#if OPENFOAM_VERSION <= 30
-#include "fvIOoptionList.H"
-#include "localEulerDdtScheme.H"
-#include "fvcSmooth.H"
-#endif
 
 #if OPENFOAM_VERSION >= 40
 #include "fvOptions.H"
@@ -83,7 +77,12 @@
 #if DEVVERSION == 1
 	#include "pressureControl.H"
 #endif
+#else
+#include "fvIOoptionList.H"
 #endif
+
+#include "fixedFluxPressureFvPatchScalarField.H"
+
 
 // Additional include files
 #include "sparkModel.H"
@@ -104,7 +103,11 @@
 
 #if SPARC==1
 #include "myNeuralNetworkBasedOnPCA.h"
+#include "classifyPoint.h"
+#include "classifyPoint_initialize.h"
+#include "classifyPoint_terminate.h"
 #include "extensions/sparc/SPARC_classifier_VQ2.H"
+#include "extensions/sparc/SPARC_classifier_SOFTMAX.H"
 #include "extensions/sparc/BatchReactorHomogeneousConstantPressureSPARC.H"
 #include "extensions/sparc/BatchReactorHomogeneousConstantPressureSPARC_ODE_Interface.H"
 #endif

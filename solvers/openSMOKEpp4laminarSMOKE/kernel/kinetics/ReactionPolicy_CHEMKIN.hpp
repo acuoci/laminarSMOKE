@@ -1361,9 +1361,19 @@ namespace OpenSMOKE
 		sumLambdaReactants_ = 0.;
 		for(unsigned int i=0;i<reactant_lambda_.size();i++)
 			sumLambdaReactants_ += reactant_lambda_[i];
-		sumLambdaProducts_ = 0.;
-		for(unsigned int i=0;i<product_lambda_.size();i++)
-			sumLambdaProducts_ += product_lambda_[i];
+		
+		if (iReversible_ == true || iExplicitlyReversible_ == true)
+		{
+			sumLambdaProducts_ = 0.;
+			for (unsigned int i = 0; i < product_lambda_.size(); i++)
+				sumLambdaProducts_ += product_lambda_[i];
+		}
+		else
+		{
+			sumLambdaProducts_ = 0.;
+			for (unsigned int i = 0; i < product_nu_.size(); i++)
+				sumLambdaProducts_ += product_nu_[i];
+		}
 
 		if ( tag_reaction_ == PhysicalConstants::REACTION_THIRDBODY)
 		{
@@ -1573,6 +1583,13 @@ namespace OpenSMOKE
 		}
 	}
 
+	void ReactionPolicy_CHEMKIN::GetReactionStringCHEMKIN(	const std::vector<std::string>& list_species, std::stringstream& reaction_data) const
+	{
+		std::string dummy_string = "";
+
+		GetReactionStringCHEMKIN( list_species, reaction_data, dummy_string);
+	}
+
 	void ReactionPolicy_CHEMKIN::GetReactionStringCHEMKIN(	const std::vector<std::string>& list_species, std::stringstream& reaction_data, const std::string& strong_comment) const
 	{
 		std::vector<bool> isReducedSpecies(list_species.size());
@@ -1580,6 +1597,14 @@ namespace OpenSMOKE
 			isReducedSpecies[i] = true;
 
 		GetReactionStringCHEMKIN( list_species, reaction_data, isReducedSpecies, strong_comment);
+	}
+
+	void ReactionPolicy_CHEMKIN::GetReactionStringCHEMKIN(const std::vector<std::string>& list_species,
+                std::stringstream& reaction_data, const std::vector<bool>& isReducedSpecies) const
+	{
+		std::string dummy_string = "";
+
+		GetReactionStringCHEMKIN( list_species, reaction_data, isReducedSpecies, dummy_string);
 	}
 
 	void ReactionPolicy_CHEMKIN::GetReactionStringCHEMKIN(const std::vector<std::string>& list_species,

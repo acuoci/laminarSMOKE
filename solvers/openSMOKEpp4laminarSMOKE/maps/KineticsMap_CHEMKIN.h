@@ -240,6 +240,82 @@ namespace OpenSMOKE
 		double E_over_R(const unsigned int j) { return E_over_R__[j]; }
 
 		/**
+		*@brief Return the third-body efficiency of a species in a given reaction
+		*@param j index of reaction (starting from zero)
+		*@param j index of species (starting from zero)
+		*@return the efficiency (if the species does not exist in the list it returns 1.)
+		*/
+		double ThirdBody(const unsigned int j, const unsigned int k);
+
+		/**
+		*@brief Sets the frequency factor of a single reaction [kmol, m, s]
+		*@param j index of reaction (starting from zero)
+		*@param A the new frequency factor
+		*/
+		void Set_A(const unsigned int j, const double A) { lnA__[j] = std::log(A); }
+
+		/**
+		*@brief Sets the temperature exponent a single reaction
+		*@param j index of reaction (starting from zero)
+		*@param Beta the new index of reaction
+		*/
+		void Set_Beta(const unsigned int j, const double Beta) { Beta__[j] = Beta; }
+
+		/**
+		*@brief Sets the activation temperature of a single reaction [K]
+		*@param j index of reaction (starting from zero)
+		*@param E_over_R the new activation temperature
+		*/
+		void Set_E_over_R(const unsigned int j, const double E_over_R) { E_over_R__[j] = E_over_R; }
+
+		/**
+		*@brief Sets the third body efficiency of a species in a give reaction
+		*@param j index of reaction (starting from zero)
+		*@param k index of species (starting from zero)
+		*@param efficiency the new efficiency coefficient
+		*/
+		void Set_ThirdBody(const unsigned int j, const unsigned int k, const double efficiency);
+
+		/**
+		*@brief Return the frequency factor of the high pressure limit of a single reaction [kmol, m, s]
+		*@param j index of reaction (starting from zero)
+		*/
+		double A_falloff_inf(const unsigned int j) { return  std::exp(lnA_falloff_inf__[j]); }
+
+		/**
+		*@brief Return the temperature exponent of the high pressure limit of a single reaction
+		*@param j index of reaction (starting from zero)
+		*/
+		double Beta_falloff_inf(const unsigned int j) { return Beta_falloff_inf__[j]; }
+
+		/**
+		*@brief Return the activation temperature of the high pressure limit of a single reaction [K]
+		*@param j index of reaction (starting from zero)
+		*/
+		double E_over_R_falloff_inf(const unsigned int j) { return E_over_R_falloff_inf__[j]; }
+
+		/**
+		*@brief Sets the frequency factor for the high pressure limit of a single reaction [kmol, m, s]
+		*@param j index of reaction (starting from zero)
+		*@param A the new frequency factor
+		*/
+		void Set_A_falloff_inf(const unsigned int j, const double A_falloff_inf) { lnA_falloff_inf__[j] = std::log(A_falloff_inf); }
+
+		/**
+		*@brief Sets the temperature exponent of the high pressure limit of a single reaction
+		*@param j index of reaction (starting from zero)
+		*@param Beta the new index of reaction
+		*/
+		void Set_Beta_falloff_inf(const unsigned int j, const double Beta_falloff_inf) { Beta_falloff_inf__[j] = Beta_falloff_inf; }
+
+		/**
+		*@brief Sets the activation temperature of the high pressure limit of a single reaction [K]
+		*@param j index of reaction (starting from zero)
+		*@param E_over_R the new activation temperature
+		*/
+		void Set_E_over_R_falloff_inf(const unsigned int j, const double E_over_R_falloff_inf) { E_over_R_falloff_inf__[j] = E_over_R_falloff_inf; }
+
+		/**
 		*@brief Returns the total number of reversible reactions
 		*/
 		unsigned int NumberOfReversibleReactions() const { return number_of_reversible_reactions_; }
@@ -324,13 +400,13 @@ namespace OpenSMOKE
 		double FallOffReactionsCorrection(const unsigned int local_k, const double cTot, const double* c);
 
 
-		const std::vector<unsigned int>& FallOffIndexOfSingleThirdbodySpecies() const { return falloff_index_of_single_thirdbody_species__;  }
+		const std::vector<unsigned int>& FallOffIndexOfSingleThirdbodySpecies() const { return falloff_index_of_single_thirdbody_species__; }
 		const std::vector< std::vector<unsigned int> >& FallOffIndicesOfThirdbodySpecies() const { return falloff_indices_of_thirdbody_species__; }
 
-		ChebyshevPolynomialRateExpression& chebyshev_reactions(const unsigned int j) const { return chebyshev_reactions_[j];  }
-		unsigned int number_of_chebyshev_reactions() const { return number_of_chebyshev_reactions_;  }
+		ChebyshevPolynomialRateExpression& chebyshev_reactions(const unsigned int j) const { return chebyshev_reactions_[j]; }
+		unsigned int number_of_chebyshev_reactions() const { return number_of_chebyshev_reactions_; }
 		const std::vector<unsigned int>& indices_of_chebyshev_reactions() const { return indices_of_chebyshev_reactions__; }
-	
+
 	public:
 
 		/**
@@ -393,7 +469,7 @@ namespace OpenSMOKE
 		*@param list_of_temperatures list of temperatures (in K) at which the analysis is carried out
 		*/
 		void WriteCollisionRateConstantForBimolecularReactions(
-			TransportPropertiesMap_CHEMKIN& transport, 
+			TransportPropertiesMap_CHEMKIN& transport,
 			std::ostream& fOut, const std::vector<std::string>& reaction_names,
 			const std::vector<double>& list_of_temperatures);
 
@@ -463,7 +539,7 @@ namespace OpenSMOKE
 
 	private:
 
-		ThermodynamicsMap_CHEMKIN& thermodynamics_;					//!< reference to the thermodynamics
+		ThermodynamicsMap_CHEMKIN & thermodynamics_;					//!< reference to the thermodynamics
 
 		std::vector<unsigned int> indices_of_irreversible_reactions__;			//!< indices of irreversible reactions
 		std::vector<unsigned int> indices_of_reversible_reactions__;			//!< indices of reversible reactions

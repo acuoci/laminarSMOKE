@@ -1,4 +1,5 @@
 NEURAL_NETWORK=neuralNetworkOpenSMOKE++.template
+FITCTREE=fitctreeOpenSMOKE++.drm19.premix.0.02
 
 EXE_INC = \
     $(OPENFOAM_VERSION) \
@@ -12,6 +13,7 @@ EXE_INC = \
     -I../laminarSMOKE/unsteady \
     -I../../libs/radiationOpenSMOKE++/lnInclude \
     -I../../libs/$(NEURAL_NETWORK)/lnInclude \
+    -I../../libs/$(FITCTREE)/lnInclude \
     -I../openSMOKEpp4laminarSMOKE/  \
     -I$(BOOST_LIBRARY_PATH)/include \
     -I$(EIGEN_LIBRARY_PATH) \
@@ -31,6 +33,7 @@ EXE_LIBS = \
     $(MKL_LIBS) \
     -lradiationOpenSMOKE++ \
     -l$(NEURAL_NETWORK) \
+    -l$(FITCTREE) \
     -lfiniteVolume \
     -lfvOptions \
     -lmeshTools \

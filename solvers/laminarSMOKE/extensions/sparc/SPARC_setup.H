@@ -47,6 +47,199 @@ std::vector<OpenSMOKE::ThermodynamicsMap_CHEMKIN*> vector_thermodynamicsMapXML;
 std::vector<OpenSMOKE::KineticsMap_CHEMKIN*> vector_kineticsMapXML;
 std::vector<OpenSMOKE::TransportPropertiesMap_CHEMKIN*> vector_transportMapXML; 
 
+
+// FITCTREE
+const dictionary& fitctreeDictionary = solverOptions.subDict("FitCTree");
+const Switch iFitCTree = Switch(fitctreeDictionary.lookup(word("fitctree")));
+Eigen::VectorXd fitctree_mu;
+Eigen::VectorXd fitctree_sigma;
+Eigen::MatrixXd fitctree_pca_coeff;
+int fitctree_npcs = 0;
+int fitctree_npcs_retained = 0;
+autoPtr<std::ofstream> fFitctree;
+label fitctreeIntegralUpdate  = 10;
+label fitctreeIntegralCounter = fitctreeIntegralUpdate;
+if (iFitCTree == true)
+{
+	Foam::string file_name = fitctreeDictionary.lookup("xml");	
+	boost::filesystem::path path_xml_input_file = file_name;
+	Foam::string folder_name = fitctreeDictionary.lookup("folder");	
+	boost::filesystem::path path_kinetics_folder = folder_name;
+	
+	std::cout << "Opening XML file containing FitCTree data..." << std::endl;
+
+	// Open the XML file
+	rapidxml::xml_document<> doc;
+	std::vector<char> xml_string;
+	OpenSMOKE::OpenInputFileXML(doc, xml_string, path_xml_input_file);
+	rapidxml::xml_node<>* opensmoke_node = doc.first_node("opensmoke");
+
+	// Read number of clusters
+	{
+		rapidxml::xml_node<>* nclusters_node = opensmoke_node->first_node("classes");
+		try
+		{
+			nclusters = boost::lexical_cast<unsigned int>(boost::trim_copy(std::string(nclusters_node->value())));
+			std::cout << " * Number of clusters: " << nclusters << std::endl;
+		}
+		catch (...)
+		{
+			OpenSMOKE::ErrorMessage("Importing data from MATLAB(R) preprocessing", "Error in reading the number of clusters.");
+		}
+	}
+
+	fitctree_mu.resize(thermodynamicsMapXML->NumberOfSpecies()+1);
+	fitctree_sigma.resize(thermodynamicsMapXML->NumberOfSpecies()+1);
+
+	// Read mean values of filtered variables
+	{
+		std::cout << " * Reading mean values (mu)..." << std::endl;
+		rapidxml::xml_node<>* mu_node = opensmoke_node->first_node("mu");
+		try
+		{
+			std::stringstream fInput;
+			fInput << mu_node->value();
+
+			for (unsigned int j = 0; j < thermodynamicsMapXML->NumberOfSpecies()+1; j++)
+				fInput >> fitctree_mu(j);
+		}
+		catch (...)
+		{
+			OpenSMOKE::ErrorMessage("Importing data from MATLAB(R) preprocessing", "Error in reading means of filtered variables.");
+		}
+	}
+
+	// Read std deviations of filtered variables
+	{
+		std::cout << " * Reading std deviation values (sigma)..." << std::endl;
+		rapidxml::xml_node<>* sigma_node = opensmoke_node->first_node("sigma");
+		try
+		{
+			std::stringstream fInput;
+			fInput << sigma_node->value();
+
+			for (unsigned int j = 0; j <  thermodynamicsMapXML->NumberOfSpecies() + 1; j++)
+				fInput >> fitctree_sigma(j);
+		}
+		catch (...)
+		{
+			OpenSMOKE::ErrorMessage("Importing data from MATLAB(R) preprocessing", "Error in reading std deviations of filtered variables.");
+		}
+	}
+
+	// Read PC if any
+	{
+		rapidxml::xml_node<>* npcs_node = opensmoke_node->first_node("npcs");
+		try
+		{
+			fitctree_npcs = boost::lexical_cast<unsigned int>(boost::trim_copy(std::string(npcs_node->value())));
+			std::cout << " * Number of PCs (total): " << fitctree_npcs << std::endl;
+		}
+		catch (...)
+		{
+			OpenSMOKE::ErrorMessage("Importing data from MATLAB(R) preprocessing", "Error in reading the number of PCs.");
+		}
+
+		if (fitctree_npcs != 0)
+		{
+			rapidxml::xml_node<>* npcs_retained_node = opensmoke_node->first_node("npcs-retained");
+			try
+			{
+				fitctree_npcs_retained = boost::lexical_cast<unsigned int>(boost::trim_copy(std::string(npcs_retained_node->value())));
+				std::cout << " * Number of PCs (retained): " << fitctree_npcs_retained << std::endl;
+			}
+			catch (...)
+			{
+				OpenSMOKE::ErrorMessage("Importing data from MATLAB(R) preprocessing", "Error in reading the number of retained PCs.");
+			}
+
+			fitctree_pca_coeff.resize(fitctree_npcs, fitctree_npcs_retained);
+			fitctree_pca_coeff.setZero();
+
+			rapidxml::xml_node<>* pca_coeff_node = opensmoke_node->first_node("pca_coeff");
+			try
+			{
+				std::stringstream fInput;
+				fInput << pca_coeff_node->value();
+
+				for (unsigned int j = 0; j < fitctree_npcs; j++)
+					for (unsigned int i = 0; i < fitctree_npcs_retained; i++)
+						fInput >> fitctree_pca_coeff(j,i);
+			}
+			catch (...)
+			{
+				OpenSMOKE::ErrorMessage("Importing data from MATLAB(R) preprocessing", "Error in reading weights of PCA.");
+			}
+		}
+	}
+
+	// Read thermodynamics and kinetics maps
+	std::cout << " * Reading reduced kinetic mechanisms..." << std::endl;
+	vector_thermodynamicsMapXML.resize(nclusters);
+	vector_transportMapXML.resize(nclusters);
+	vector_kineticsMapXML.resize(nclusters);
+	classifier_indices.resize(nclusters);
+	for (int j = 0; j < nclusters; j++)
+	{
+		std::cout << "   ** Reading reduced mechanism " << j << "..." << std::endl;
+
+		std::stringstream label; label << j;
+		const std::string folder_name = "kinetics." + label.str();
+
+		rapidxml::xml_document<> doc;
+		std::vector<char> xml_string;
+		OpenSMOKE::OpenInputFileXML(doc, xml_string, path_kinetics_folder / folder_name / "kinetics.xml");
+
+		double tStart = OpenSMOKE::OpenSMOKEGetCpuTime();
+		vector_thermodynamicsMapXML[j] = new OpenSMOKE::ThermodynamicsMap_CHEMKIN(doc);
+		vector_transportMapXML[j] = new OpenSMOKE::TransportPropertiesMap_CHEMKIN(doc);
+		vector_kineticsMapXML[j] = new OpenSMOKE::KineticsMap_CHEMKIN(*vector_thermodynamicsMapXML[j], doc);
+		double tEnd = OpenSMOKE::OpenSMOKEGetCpuTime();
+		std::cout << "Time to read XML file: " << tEnd - tStart << std::endl;
+
+		// Mapping
+		{
+			unsigned int NC = thermodynamicsMapXML->NumberOfSpecies();
+			unsigned int NClocal = vector_thermodynamicsMapXML[j]->NumberOfSpecies();
+			classifier_indices[j].resize(NClocal);
+			classifier_indices[j].setConstant(-1);
+			for (unsigned int i=0;i<NClocal;i++)
+				for (unsigned int k=0;k<NC;k++)
+					if (thermodynamicsMapXML->NamesOfSpecies()[k] == vector_thermodynamicsMapXML[j]->NamesOfSpecies()[i])
+						classifier_indices[j](i) = k;
+
+			for (unsigned int i=0;i<NClocal;i++)
+				if (classifier_indices[j](i) == -1)
+				{
+					Info << "Kinetic mechanism #" << i << endl;
+					Info << "Species " << vector_thermodynamicsMapXML[j]->NamesOfSpecies()[i] << " is not included in the main kinetic mechanism" << endl;
+					abort();
+				}
+		}
+	}
+
+	if ( !boost::filesystem::exists("fitctree.out") )
+	{
+		fFitctree.reset(new std::ofstream("fitctree.out", std::ios::out));
+		fFitctree().setf(std::ios::scientific);
+
+		fFitctree() << std::setw(20) << "time";
+		fFitctree() << std::setw(20) << "mean_species";
+		fFitctree() << std::setw(20) << "max_species";
+		fFitctree() << std::setw(20) << "mean_reactions";
+		fFitctree() << std::setw(20) << "max_reactions";
+		fFitctree() << std::setw(20) << "meanCPUchem";
+		fFitctree() << std::setw(20) << "maxCPUchem";
+		fFitctree() << std::endl;
+	}
+	else
+	{
+		fFitctree.reset(new std::ofstream("fitctree.out", std::ios::app));
+		fFitctree().setf(std::ios::scientific);
+	}	
+}
+
+
 // VQ2
 const dictionary& vq2Dictionary = solverOptions.subDict("VQ2");
 const Switch iVQ2 = Switch(vq2Dictionary.lookup(word("vq2")));
@@ -448,6 +641,5 @@ if (iSOFTMAX == true)
                 fSOFTMAX().setf(std::ios::scientific);
         }
 }
-
 
 #endif

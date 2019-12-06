@@ -1,0 +1,13 @@
+src/classifyPoint.C
+src/classifyPoint_data.C
+src/classifyPoint_initialize.C
+src/classifyPoint_terminate.C
+src/CompactClassificationModel.C
+src/CompactClassificationTree.C
+src/rtGetInf.C
+src/rtGetNaN.C
+src/rt_nonfinite.C
+
+
+LIB = $(FOAM_USER_LIBBIN)/libfitctreeOpenSMOKE++.template
+

@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------*\
+/*-----------------------------------------------------------------------*\
 |    ___                   ____  __  __  ___  _  _______                  |
 |   / _ \ _ __   ___ _ __ / ___||  \/  |/ _ \| |/ / ____| _     _         |
 |  | | | | '_ \ / _ \ '_ \\___ \| |\/| | | | | ' /|  _| _| |_ _| |_       |
@@ -16,7 +16,7 @@
 |                                                                         |
 |   This file is part of OpenSMOKE++ framework.                           |
 |                                                                         |
-|	License                                                           |
+|	License                                                               |
 |                                                                         |
 |   Copyright(C) 2014, 2013, 2012  Alberto Cuoci                          |
 |   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
@@ -191,15 +191,27 @@ namespace OpenSMOKE
 
 		/**
 		* @brief returns the index (1-based) of the species with the requested name
-		if the species is not present, a fatal error will be reported
+			     if the species is not present, a fatal error will be reported
 		*/
 		unsigned int IndexOfSpecies(const std::string name) const;
 
 		/**
+		* @brief returns the index (1-based) of the species with the requested name (case insensitive version)
+				 if the species is not present, a fatal error will be reported
+		*/
+		unsigned int IndexOfSpeciesCaseInsensitive(const std::string name) const;
+
+		/**
 		* @brief returns the index (1-based) of the species with the requested name
-		if the species is not present, the returned index is equal to 0
+				 if the species is not present, the returned index is equal to 0
 		*/
 		unsigned int IndexOfSpeciesWithoutError(const std::string name) const;
+
+		/**
+		* @brief returns the index (1-based) of the species with the requested name (case insensitive version)
+				 if the species is not present, the returned index is equal to 0
+		*/
+		unsigned int IndexOfSpeciesWithoutErrorCaseInsensitive(const std::string name) const;
 
 		/**
 		* @brief returns the index (1-based) of the element with the requested name
@@ -258,6 +270,22 @@ namespace OpenSMOKE
 		double GetLocalEquivalenceRatio(const std::vector<double>& moles,
 			const std::vector<double>& moles_st,
 			const std::vector<std::string>& fuel_names);
+
+		/**
+		*@brief Calculates the equivalence ratio for a given composition 
+		*       (assuming N2 as inert species and CO2, H2O, SO2 and NO2 as final products)
+		*@param mass_fractions mass fractions of species
+		*@returns the equivalence ratio
+		*/
+		double GetLocalEquivalenceRatioFromMassFractions(const double* mass_fractions);
+
+		/**
+		*@brief Calculates the equivalence ratio for a given composition 
+		*       (assuming N2 as inert species and CO2, H2O, SO2 and NO2 as final products)
+		*@param mole_fractions mol fractions of species
+		*@returns the equivalence ratio
+		*/
+		double GetLocalEquivalenceRatioFromMoleFractions(const double* mole_fractions);
 
 	protected:
 

@@ -1030,9 +1030,7 @@ namespace OpenSMOKE
 			if (verbose_output_ == true)
 				std::cout << "   non-zero stoichiometric coefficients: " << estimation_of_entries_reactants + estimation_of_entries_products << " /"
 				<< number_of_reactions_*number_of_species_ << " ("
-				<< (estimation_of_entries_reactants + estimation_of_entries_products) / double(number_of_reactions_*number_of_species_)*100. << "%)" << std::endl;
-
-			//std::cout	<< "Mean number of species per reaction: " << (estimation_of_entries_reactants+estimation_of_entries_products)/number_of_reactions_ << std::endl;
+				<< (estimation_of_entries_reactants + estimation_of_entries_products) / std::max(1.,static_cast<double>(number_of_reactions_*number_of_species_))*100. << "%)" << std::endl;
 
 			tripletList_reactants.reserve(estimation_of_entries_reactants);
 			tripletList_products.reserve(estimation_of_entries_products);
@@ -1150,7 +1148,7 @@ namespace OpenSMOKE
 			if (verbose_output_ == true)
 				std::cout << "   non-zero reaction-order coefficients: " << estimation_of_entries_reactants + estimation_of_entries_products << " /"
 				<< number_of_reactions_*number_of_species_ << " ("
-				<< (estimation_of_entries_reactants + estimation_of_entries_products) / double(number_of_reactions_*number_of_species_)*100. << "%)" << std::endl;
+				<< (estimation_of_entries_reactants + estimation_of_entries_products) / std::max(1., static_cast<double>(number_of_reactions_*number_of_species_))*100. << "%)" << std::endl;
 
 			//std::cout	<< "Mean number of species per reaction: " << (estimation_of_entries_reactants+estimation_of_entries_products)/number_of_reactions_ << std::endl;
 

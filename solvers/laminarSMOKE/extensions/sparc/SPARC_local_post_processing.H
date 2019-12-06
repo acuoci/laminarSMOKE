@@ -40,6 +40,37 @@
 
 #if SPARC==1
 
+// FitCTree variables
+if (iFitCTree == true)
+{
+
+	const double fitctree_mean_chemistryCpu =  sum(cpuChemistry).value()/double(mesh.globalData().nTotalCells());
+	const double fitctree_max_chemistryCpu = max(cpuChemistry).value();
+	const double fitctree_mean_species = sum(clusterSpecies).value()/double(mesh.globalData().nTotalCells());
+	const double fitctree_max_species = max(clusterSpecies).value();
+        const double fitctree_mean_reactions = sum(clusterReactions).value()/double(mesh.globalData().nTotalCells());
+        const double fitctree_max_reactions = max(clusterReactions).value();
+
+	if (fitctreeIntegralCounter == fitctreeIntegralUpdate)
+	{	
+		if (Pstream::master())
+		{
+			fFitctree() << std::setw(20) << runTime.value();
+			fFitctree() << std::setw(20) << fitctree_mean_species;
+			fFitctree() << std::setw(20) << fitctree_max_species;
+			fFitctree() << std::setw(20) << fitctree_mean_reactions;
+			fFitctree() << std::setw(20) << fitctree_max_reactions;
+			fFitctree() << std::setw(20) << fitctree_mean_chemistryCpu;
+			fFitctree() << std::setw(20) << fitctree_max_chemistryCpu;
+			fFitctree() << std::endl;
+		}
+		
+		fitctreeIntegralCounter = 0;
+	}
+
+	fitctreeIntegralCounter++;
+}
+
 // SOM variables
 if (iSOM == true)
 {

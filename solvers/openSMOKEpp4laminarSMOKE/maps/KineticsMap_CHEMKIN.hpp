@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------*\
+/*-----------------------------------------------------------------------*\
 |    ___                   ____  __  __  ___  _  _______                  |
 |   / _ \ _ __   ___ _ __ / ___||  \/  |/ _ \| |/ / ____| _     _         |
 |  | | | | '_ \ / _ \ '_ \\___ \| |\/| | | | | ' /|  _| _| |_ _| |_       |
@@ -35,7 +35,6 @@
 \*-----------------------------------------------------------------------*/
 
 #include "math/OpenSMOKEUtilities.h"
-#include "ThermodynamicsMap.h"
 
 namespace OpenSMOKE
 {
@@ -311,16 +310,28 @@ namespace OpenSMOKE
 	void KineticsMap_CHEMKIN::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)
 	{
 		rapidxml::xml_node<>* opensmoke_node = doc.first_node("opensmoke");
+		
+		// Violation of Chebyshev Polynomials
+		bool is_violation_allowed_in_chebyshev_polynomials = false;
+		{
+			rapidxml::xml_node<>* violation_chebyshev_node = opensmoke_node->first_node("ViolationChebyshev");
+			if (violation_chebyshev_node != 0)
+			{
+				std::string flag = violation_chebyshev_node->first_attribute("flag")->value();
+				if (flag == "true")
+					is_violation_allowed_in_chebyshev_polynomials = true;
+			}
+		}
+		
+		// Kinetics
 		rapidxml::xml_node<>* kinetics_node = opensmoke_node->first_node("Kinetics");
-		
-		
 		if (kinetics_node == 0)
 			ErrorMessage("void KineticsMap_CHEMKIN::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)", "Kinetics tag was not found!");
 
 		std::string kinetics_type = kinetics_node->first_attribute("type")->value();
 		std::string kinetics_version = kinetics_node->first_attribute("version")->value();
 
-		if (kinetics_type != "OpenSMOKE" || kinetics_version != "04-22-2013")
+		if (kinetics_type != "OpenSMOKE" || (kinetics_version != "04-22-2013" && kinetics_version != "01-02-2014"))
 			ErrorMessage("void KineticsMap_CHEMKIN::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)", "The current kinetic scheme is not supported.");
 
 		// Reading the number of species
@@ -909,7 +920,7 @@ namespace OpenSMOKE
 				}
 			}
                         
-                        if(verbose_output_ == true)
+			if(verbose_output_ == true)
 			    std::cout << " * Reading kinetic parameters of additional reactions..." << std::endl;
 			{
 				// Chebyshev reaction parameters
@@ -920,8 +931,16 @@ namespace OpenSMOKE
 					fInput << current_node->value();
 
 					chebyshev_reactions_ = new ChebyshevPolynomialRateExpression[number_of_chebyshev_reactions_];
+
 					for(unsigned int j=0;j<number_of_chebyshev_reactions_;j++)
 						chebyshev_reactions_[j].ReadFromASCIIFile(fInput);
+
+					if (is_violation_allowed_in_chebyshev_polynomials == true)
+					{
+						std::cout << " * WARNING: violation of T and/or P limits in Chebyshev Polynomials is turned on" << std::endl;
+						for (unsigned int j = 0; j < number_of_chebyshev_reactions_; j++)
+							chebyshev_reactions_[j].SetViolationAllowed(true);
+					}
 				}
 
 				// PressureLog reaction parameters
@@ -1009,7 +1028,7 @@ namespace OpenSMOKE
 			std::string stoichiometry_type = stoichiometry_node->first_attribute("type")->value();
 			std::string stoichiometry_version = stoichiometry_node->first_attribute("version")->value();
 
-			if (stoichiometry_type != "OpenSMOKE" || stoichiometry_version != "04-22-2013")
+			if (stoichiometry_type != "OpenSMOKE" || (stoichiometry_version != "04-22-2013" && stoichiometry_version != "01-02-2014"))
 				ErrorMessage("void KineticsMap_CHEMKIN::ImportCoefficientsFromXMLFile(rapidxml::xml_document<>& doc)", "The current stoichiometric data are not supported.");
 
 			std::stringstream fInput;
@@ -3326,6 +3345,94 @@ namespace OpenSMOKE
 
 		dF_over_dA0 = Pr/std::exp(lnA__[j-1]) * dF_over_dPr;
 		dF_over_dAInf = -Pr/std::exp(lnA_falloff_inf__[k-1]) * dF_over_dPr;
+	}
+
+	double KineticsMap_CHEMKIN::ThirdBody(const unsigned int j, const unsigned int k)
+	{
+		for (unsigned int s = 0; s < number_of_thirdbody_reactions_; s++)
+		{
+			if (indices_of_thirdbody_reactions__[s] == j + 1)
+			{
+				for (unsigned int i = 0; i < indices_of_thirdbody_species__[s].size(); i++)
+				{
+					if (indices_of_thirdbody_species__[s][i] == k + 1)
+					{
+						return indices_of_thirdbody_efficiencies__[s][i]+1.;
+						break;
+					}
+				}
+
+				break;
+			}
+
+			if (indices_of_thirdbody_reactions__[s] > j + 1)
+				break;
+		}
+
+		for (unsigned int s = 0; s < number_of_falloff_reactions_; s++)
+		{
+			if (indices_of_falloff_reactions__[s] == j + 1)
+			{
+				for (unsigned int i = 0; i < falloff_indices_of_thirdbody_species__[s].size(); i++)
+				{
+					if (falloff_indices_of_thirdbody_species__[s][i] == k + 1)
+					{
+						return falloff_indices_of_thirdbody_efficiencies__[s][i] + 1.;
+						break;
+					}
+				}
+
+				break;
+			}
+
+			if (indices_of_falloff_reactions__[s] > j + 1)
+				break;
+		}
+
+		return 1.;
+	}
+
+	void KineticsMap_CHEMKIN::Set_ThirdBody(const unsigned int j, const unsigned int k, const double efficiency)
+	{
+		for (unsigned int s = 0; s < number_of_thirdbody_reactions_; s++)
+		{
+			if (indices_of_thirdbody_reactions__[s] == j+1)
+			{
+				for (unsigned int i = 0; i < indices_of_thirdbody_species__[s].size(); i++)
+				{
+					if (indices_of_thirdbody_species__[s][i] == k + 1)
+					{
+						indices_of_thirdbody_efficiencies__[s][i] = efficiency-1.;
+						break;
+					}
+				}
+
+				break;
+			}
+
+			if (indices_of_thirdbody_reactions__[s] > j + 1)
+				break;
+		}
+
+		for (unsigned int s = 0; s < number_of_falloff_reactions_; s++)
+		{
+			if (indices_of_falloff_reactions__[s] == j + 1)
+			{
+				for (unsigned int i = 0; i < falloff_indices_of_thirdbody_species__[s].size(); i++)
+				{
+					if (falloff_indices_of_thirdbody_species__[s][i] == k + 1)
+					{
+						falloff_indices_of_thirdbody_efficiencies__[s][i] = efficiency - 1.;
+						break;
+					}
+				}
+
+				break;
+			}
+
+			if (indices_of_falloff_reactions__[s] > j + 1)
+				break;
+		}
 	}
 }
 

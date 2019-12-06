@@ -172,4 +172,83 @@ if (iVQ2 == true || iSOFTMAX == true)
 	Info << "done in " << tEnd - tStart << " s  (" << (tEnd-tStart)/double(mesh.nCells())*1000. << " ms per cell)" << endl;
 }
 
+if (iFitCTree == true)
+{
+	Info<< "Classification of points (FitCTree)... " ;
+
+	double tStart = OpenSMOKE::OpenSMOKEGetCpuTime();
+
+	{
+		const int nf = thermodynamicsMapXML->NumberOfSpecies();
+
+		Eigen::VectorXd original(nf+1);
+		Eigen::VectorXd transformed(fitctree_npcs_retained);
+		Eigen::VectorXd yCluster(nclusters);
+
+		#if OPENFOAM_VERSION >= 40
+		const scalarField& TCells = T.internalField();
+		scalarField& clusterIndexCells = clusterIndex.ref();
+		scalarField& clusterWeightCells =  clusterWeight.ref();
+		scalarField& clusterSpeciesCells =  clusterSpecies.ref();
+		scalarField& clusterReactionsCells = clusterReactions.ref();
+		#else
+		const scalarField& TCells = T.internalField();
+		scalarField& clusterIndexCells = clusterIndex.internalField();
+		scalarField& clusterWeightCells =  clusterWeight.internalField();
+		scalarField& clusterSpeciesCells =  clusterSpecies.internalField();
+		scalarField& clusterReactionsCells = clusterReactions.internalField();
+		#endif
+
+		classifyPoint_initialize();
+
+		forAll(TCells, celli)
+		{
+			if (TCells[celli] > direct_integration_minimum_temperature_for_chemistry)
+			{
+				// PCA transformation
+				original(0) = (TCells[celli]-fitctree_mu(0))/fitctree_sigma(0);
+				if (nf == thermodynamicsMapXML->NumberOfSpecies())
+				{
+					for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
+						original(i+1) = (Y[i].internalField()[celli]-fitctree_mu(i+1))/fitctree_sigma(i+1);
+				}
+
+				// Recognizing the cluster
+				int index = -1;
+				if (fitctree_npcs_retained == 0)
+				{
+					index = static_cast<int>( classifyPoint(original.data()) ) - 1;
+				}
+				else
+				{
+					transformed = original.transpose()*fitctree_pca_coeff;
+					index = static_cast<int>( classifyPoint(transformed.data()) ) - 1;
+				}
+
+				// DEBUG
+				// std::cout << celli << " " << TCells[celli] << " " << index << " " << vector_thermodynamicsMapXML[index]->NumberOfSpecies() << " " << vector_kineticsMapXML[index]->NumberOfReactions() << std::endl;
+
+				clusterWeightCells[celli] = 1;
+				clusterIndexCells[celli] = index;
+				clusterSpeciesCells[celli] = vector_thermodynamicsMapXML[index]->NumberOfSpecies();
+				clusterReactionsCells[celli] = vector_kineticsMapXML[index]->NumberOfReactions();
+			}
+			else
+			{
+				// Default values (no classification is applied)
+				clusterWeightCells[celli] = 1;
+				clusterIndexCells[celli] = 0;		// never used
+				clusterSpeciesCells[celli] = 3;		// fuel, oxidizer, inert
+				clusterReactionsCells[celli] = 0;	// no reactions
+			}
+		}
+
+		classifyPoint_terminate();
+   	}
+	
+	double tEnd = OpenSMOKE::OpenSMOKEGetCpuTime();
+
+	Info << "done in " << tEnd - tStart << " s  (" << (tEnd-tStart)/double(mesh.nCells())*1000. << " ms per cell)" << endl;
+}
+
 #endif

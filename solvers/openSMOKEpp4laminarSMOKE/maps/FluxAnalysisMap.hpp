@@ -260,8 +260,12 @@ namespace OpenSMOKE
 				std::string name1 = thermodynamicsMapXML_.NamesOfSpecies()[index_j];
 				std::string name2 = thermodynamicsMapXML_.NamesOfSpecies()[local_indices[j]];
 				boost::replace_all(name1, "-", "_");
+				boost::replace_all(name1, "(", "_");
+				boost::replace_all(name1, ")", "");
 				boost::replace_all(name2, "-", "_");
-				fOut << "edge [color=red, penwidth = " + thickness.str() << "];" << std::endl; 
+				boost::replace_all(name2, "(", "_");
+				boost::replace_all(name2, ")", "");
+				fOut << "edge [color=red, penwidth = " + thickness.str() << "];" << std::endl;
 				fOut << name1 << "->" << name2 << " " << attributes << std::endl;
 			}
 			else
@@ -269,7 +273,11 @@ namespace OpenSMOKE
 				std::string name1 = thermodynamicsMapXML_.NamesOfSpecies()[local_indices[j]];
 				std::string name2 = thermodynamicsMapXML_.NamesOfSpecies()[index_j];
 				boost::replace_all(name1, "-", "_");
+				boost::replace_all(name1, "(", "_");
+				boost::replace_all(name1, ")", "");
 				boost::replace_all(name2, "-", "_");
+				boost::replace_all(name2, "(", "_");
+				boost::replace_all(name2, ")", "");
 				fOut << "edge [color=blue, penwidth = " + thickness.str() << "];" << std::endl; 
 				fOut << name1 << "->" << name2 << " " << attributes << std::endl;
 			}

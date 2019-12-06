@@ -74,10 +74,20 @@ namespace OpenSMOKE_Utilities
 
 	/**
 	*@brief Modification of Manuel's answer
-	*/	
+	*/
+	/*
 	struct ciLessBoost : std::binary_function<std::string, std::string, bool>
 	{
 		bool operator() (const std::string & s1, const std::string & s2) const 
+		{
+			return boost::algorithm::lexicographical_compare(s1, s2, boost::is_iless());
+		}
+	};
+	*/
+
+	struct ciLessBoost
+	{
+		bool operator() (const std::string & s1, const std::string & s2) const
 		{
 			return boost::algorithm::lexicographical_compare(s1, s2, boost::is_iless());
 		}
@@ -86,8 +96,17 @@ namespace OpenSMOKE_Utilities
 	/**
 	* @brief recommended in Meyers, Effective STL when internationalization and embedded. 
 	*        NULLs aren't an issue.  Much faster than the STL or Boost lex versions.
-	*/	
+	*/
+	/*
 	struct ciLessLibC : public std::binary_function<std::string, std::string, bool> 
+	{
+		bool operator()(const std::string &lhs, const std::string &rhs) const {
+			return strcasecmp(lhs.c_str(), rhs.c_str()) < 0 ? 1 : 0;
+		}
+	};
+	*/
+
+	struct ciLessLibC
 	{
 		bool operator()(const std::string &lhs, const std::string &rhs) const {
 			return strcasecmp(lhs.c_str(), rhs.c_str()) < 0 ? 1 : 0;

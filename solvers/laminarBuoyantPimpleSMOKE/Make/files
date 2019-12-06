@@ -1,4 +1,4 @@
 laminarBuoyantPimpleSMOKE.C
 
-EXE = $(FOAM_USER_APPBIN)/laminarBuoyantPimpleSMOKE.SPARC
+EXE = $(FOAM_USER_APPBIN)/laminarBuoyantPimpleSMOKE.SPARC.polimi_c1c3ht_1412.cfdf.0.01.pca.10.finetree800
 

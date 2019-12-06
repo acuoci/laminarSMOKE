@@ -98,6 +98,9 @@
 
 #if SPARC==1
 #include "myNeuralNetworkBasedOnPCA.h"
+#include "classifyPoint.h"
+#include "classifyPoint_initialize.h"
+#include "classifyPoint_terminate.h"
 #include "extensions/sparc/SPARC_classifier_VQ2.H"
 #include "extensions/sparc/SPARC_classifier_SOFTMAX.H"
 #include "extensions/sparc/BatchReactorHomogeneousConstantPressureSPARC.H"
