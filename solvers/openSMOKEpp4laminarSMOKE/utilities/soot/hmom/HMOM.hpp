@@ -315,50 +315,50 @@ namespace OpenSMOKE
 
 			if ( dictionary.CheckOption("@A1f") == true ) 
 			{
-				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
 				dictionary.ReadMeasure("@A1f", value, units);
+				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
 				A1f_ = value;
 			}
 			if ( dictionary.CheckOption("@A1b") == true ) 
 			{
-				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
 				dictionary.ReadMeasure("@A1b", value, units);
+				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
 				A1b_ = value;
 			}
 			if ( dictionary.CheckOption("@A2f") == true ) 
 			{
-				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
 				dictionary.ReadMeasure("@A2f", value, units);
+				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
 				A2f_ = value;
 			}
 			if ( dictionary.CheckOption("@A2b") == true ) 
 			{
-				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
 				dictionary.ReadMeasure("@A2b", value, units);
+				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
 				A2b_ = value;
 			}
 			if ( dictionary.CheckOption("@A3f") == true ) 
 			{
-				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
 				dictionary.ReadMeasure("@A3f", value, units);
+				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
 				A3f_ = value;
 			}
 			if ( dictionary.CheckOption("@A3b") == true ) 
 			{
-				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
 				dictionary.ReadMeasure("@A3b", value, units);
+				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");				
 				A3b_ = value;
 			}
 			if ( dictionary.CheckOption("@A4") == true ) 
 			{
-				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
 				dictionary.ReadMeasure("@A4", value, units);
+				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
 				A4_ = value;
 			}
 			if ( dictionary.CheckOption("@A5") == true ) 
 			{
-				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
 				dictionary.ReadMeasure("@A5", value, units);
+				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
 				A5_ = value;
 			}
 		}
@@ -370,50 +370,50 @@ namespace OpenSMOKE
 
 			if ( dictionary.CheckOption("@E1f") == true ) 
 			{
-				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
 				dictionary.ReadMeasure("@E1f", value, units);
+				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
 				E1f_ = value* 1e3 / Rgas;
 			}
 			if ( dictionary.CheckOption("@E1b") == true ) 
 			{
-				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
 				dictionary.ReadMeasure("@E1b", value, units);
+				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
 				E1b_ = value* 1e3 / Rgas;
 			}
 			if ( dictionary.CheckOption("@E2f") == true ) 
 			{
-				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
 				dictionary.ReadMeasure("@E2f", value, units);
+				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
 				E2f_ = value* 1e3 / Rgas;
 			}
 			if ( dictionary.CheckOption("@E2b") == true ) 
 			{
-				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
 				dictionary.ReadMeasure("@E2b", value, units);
+				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
 				E2b_ = value* 1e3 / Rgas;
 			}
 			if ( dictionary.CheckOption("@E3f") == true ) 
 			{
-				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
 				dictionary.ReadMeasure("@E3f", value, units);
+				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
 				E3f_ = value* 1e3 / Rgas;
 			}
 			if ( dictionary.CheckOption("@E3b") == true ) 
 			{
-				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
 				dictionary.ReadMeasure("@E3b", value, units);
+				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
 				E3b_ = value* 1e3 / Rgas;
 			}
 			if ( dictionary.CheckOption("@E4") == true ) 
 			{
-				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
 				dictionary.ReadMeasure("@E4", value, units);
+				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
 				E4_ = value* 1e3 / Rgas;
 			}
 			if ( dictionary.CheckOption("@E5") == true ) 
 			{
-				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
 				dictionary.ReadMeasure("@E5", value, units);
+				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
 				E5_ = value* 1e3 / Rgas;
 			}
 		}
@@ -470,6 +470,9 @@ namespace OpenSMOKE
 			dictionary.ReadDouble("@Efficiency6", value);
 			eff6_ = value;
 		}
+
+		// Print on the screen
+		Summary();
 	}
 
 	void HMOM::MemoryAllocation()
