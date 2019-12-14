@@ -41,6 +41,41 @@
 OpenSMOKE::HMOM hmom;
 
 hmom.SetSurfaceDensity(hmom_surface_density);
+hmom.SetSurfaceDensityCorrectionCoefficient(hmom_surface_density_correction_coefficient);
+hmom.SetSurfaceDensityCorrectionCoefficientA1(hmom_surface_density_coeff_a1);
+hmom.SetSurfaceDensityCorrectionCoefficientA2(hmom_surface_density_coeff_a2);
+hmom.SetSurfaceDensityCorrectionCoefficientB1(hmom_surface_density_coeff_b1);
+hmom.SetSurfaceDensityCorrectionCoefficientB2(hmom_surface_density_coeff_b2);
+
+hmom.SetA1f(hmom_A1f);
+hmom.SetA1b(hmom_A1b);
+hmom.SetA2f(hmom_A2f);
+hmom.SetA2b(hmom_A2b);
+hmom.SetA3f(hmom_A3f);
+hmom.SetA3b(hmom_A3b);
+hmom.SetA4(hmom_A4);
+hmom.SetA5(hmom_A5);
+
+hmom.SetE1f(hmom_E1f);
+hmom.SetE1b(hmom_E1b);
+hmom.SetE2f(hmom_E2f);
+hmom.SetE2b(hmom_E2b);
+hmom.SetE3f(hmom_E3f);
+hmom.SetE3b(hmom_E3b);
+hmom.SetE4(hmom_E4);
+hmom.SetE5(hmom_E5);
+
+hmom.Setn1f(hmom_n1f);
+hmom.Setn1b(hmom_n1b);
+hmom.Setn2f(hmom_n2f);
+hmom.Setn2b(hmom_n2b);
+hmom.Setn3f(hmom_n3f);
+hmom.Setn3b(hmom_n3b);
+hmom.Setn4(hmom_n4);
+hmom.Setn5(hmom_n5);
+
+hmom.SetEfficiency6(hmom_eff6);
+
 hmom.SetNucleation(hmom_nucleation);
 hmom.SetSurfaceGrowth(hmom_surface_growth);
 hmom.SetOxidation(hmom_oxidation);
@@ -56,6 +91,9 @@ hmom.SetCollisionDiameterModel(hmom_collision_diameter_model);
 hmom.SetSchmidtNumber(hmom_schmidt_number);
 hmom.SetStickingCoefficient(hmom_sticking_coefficient);
 hmom.SetSootDensity(hmom_soot_density);
+
+hmom.Summary();
+
 
 Info<< "HMOM_Norm_N0 [mol/m3]\n" << endl;
 volScalarField HMOM_Norm_N0

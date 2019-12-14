@@ -44,33 +44,6 @@ namespace OpenSMOKE
 	const double HMOM::Rgas = 8.3143;							// [J/mol/K]
 	const double HMOM::KB = Rgas / AvogadroNumber;				// [J/K]
 
-	// Kinetics
-	const double HMOM::A1f = 6.72e1;
-	const double HMOM::n1f = 3.33;
-	const double HMOM::E1f = 6.09  * 1e3 / Rgas;
-	const double HMOM::A1b = 6.44e-1;
-	const double HMOM::n1b = 3.79;
-	const double HMOM::E1b = 27.96  * 1e3 / Rgas;
-	const double HMOM::A2f = 1.00e8;
-	const double HMOM::n2f = 1.80;
-	const double HMOM::E2f = 68.42  * 1e3 / Rgas;
-	const double HMOM::A2b = 8.68e4;
-	const double HMOM::n2b = 2.36;
-	const double HMOM::E2b = 25.46  * 1e3 / Rgas;
-	const double HMOM::A3f = 1.13e16;
-	const double HMOM::n3f = -0.06;
-	const double HMOM::E3f = 476.05  * 1e3 / Rgas;
-	const double HMOM::A3b = 4.17e13;
-	const double HMOM::n3b = 0.15;
-	const double HMOM::E3b = 0.00  * 1e3 / Rgas;
-	const double HMOM::A4 = 2.52e9;
-	const double HMOM::n4 = 1.10;
-	const double HMOM::E4 = 17.13  * 1e3 / Rgas;
-	const double HMOM::A5 = 2.20e12;
-	const double HMOM::n5 = 0.00;
-	const double HMOM::E5 = 31.38  * 1e3 / Rgas;
-	const double HMOM::eff6 = 0.13;
-
 	HMOM::HMOM()
 	{
 		// HMOM is turned on
@@ -88,8 +61,43 @@ namespace OpenSMOKE
 		pah_species_.resize(1);
 		pah_species_[0] = "C10H8";
 
-		// Physical/Chemical phenomena
+		// Kinetics (default values)
+		A1f_ = 6.72e1;
+		n1f_ = 3.33;
+		E1f_ = 6.09  * 1e3 / Rgas;
+		A1b_ = 6.44e-1;
+		n1b_ = 3.79;
+		E1b_ = 27.96  * 1e3 / Rgas;
+		A2f_ = 1.00e8;
+		n2f_ = 1.80;
+		E2f_ = 68.42  * 1e3 / Rgas;
+		A2b_ = 8.68e4;
+		n2b_ = 2.36;
+		E2b_ = 25.46  * 1e3 / Rgas;
+		A3f_ = 1.13e16;
+		n3f_ = -0.06;
+		E3f_ = 476.05  * 1e3 / Rgas;
+		A3b_ = 4.17e13;
+		n3b_ = 0.15;
+		E3b_ = 0.00  * 1e3 / Rgas;
+		A4_ = 2.52e9;
+		n4_ = 1.10;
+		E4_ = 17.13  * 1e3 / Rgas;
+		A5_ = 2.20e12;
+		n5_ = 0.00;
+		E5_ = 31.38  * 1e3 / Rgas;
+		eff6_ = 0.13;
+
+		// Surface density correction
+		surface_density_correction_coefficient_ = false;	
 		surface_density_ = 1.7e19;				// [#/m2]
+		surface_density_coeff_a1_ = 12.65;			// [-]
+		surface_density_coeff_a2_ = 0.00563; 			// [1/K]
+		surface_density_coeff_b1_ = 1.38; 			// [-]
+		surface_density_coeff_b2_ = 0.00069;			// [1/K]
+		alpha_ 			  = 1;				// [-]
+
+		// Physical/Chemical phenomena
 		nucleation_model_ = 1;
 		condensation_model_ = 1;
 		surface_growth_model_ = 1;
@@ -249,6 +257,7 @@ namespace OpenSMOKE
 			SetSootDensity(value);
 		}
 
+
 		if (dictionary.CheckOption("@SurfaceDensity") == true)
 		{
 			double value;
@@ -261,6 +270,205 @@ namespace OpenSMOKE
 			else OpenSMOKE::FatalErrorMessage("@SurfaceDensity: allowed units #/m2 | #/cm2 | #/mm2");
 
 			SetSurfaceDensity(value);
+		}
+
+		if (dictionary.CheckOption("@SurfaceDensityCorrectionCoefficient") == true)
+		{
+			bool value;
+			dictionary.ReadBool("@SurfaceDensityCorrectionCoefficient", value);
+			SetSurfaceDensityCorrectionCoefficient(value);
+		}
+
+		if (dictionary.CheckOption("@SurfaceDensityCorrectionCoefficientA1") == true)
+		{
+			double value;
+			dictionary.ReadDouble("@SurfaceDensityCorrectionCoefficientA1", value);
+			SetSurfaceDensityCorrectionCoefficientA1(value);
+		}
+
+		if (dictionary.CheckOption("@SurfaceDensityCorrectionCoefficientA2") == true)
+		{
+			double value;
+			dictionary.ReadDouble("@SurfaceDensityCorrectionCoefficientA2", value);
+			SetSurfaceDensityCorrectionCoefficientA2(value);
+		}
+
+		if (dictionary.CheckOption("@SurfaceDensityCorrectionCoefficientB1") == true)
+		{
+			double value;
+			dictionary.ReadDouble("@SurfaceDensityCorrectionCoefficientB1", value);
+			SetSurfaceDensityCorrectionCoefficientB1(value);
+		}
+
+		if (dictionary.CheckOption("@SurfaceDensityCorrectionCoefficientB2") == true)
+		{
+			double value;
+			dictionary.ReadDouble("@SurfaceDensityCorrectionCoefficientB2", value);
+			SetSurfaceDensityCorrectionCoefficientB2(value);
+		}
+
+
+		// Frequency factors
+		{ 
+			double value;
+			std::string units;
+
+			if ( dictionary.CheckOption("@A1f") == true ) 
+			{
+				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
+				dictionary.ReadMeasure("@A1f", value, units);
+				A1f_ = value;
+			}
+			if ( dictionary.CheckOption("@A1b") == true ) 
+			{
+				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
+				dictionary.ReadMeasure("@A1b", value, units);
+				A1b_ = value;
+			}
+			if ( dictionary.CheckOption("@A2f") == true ) 
+			{
+				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
+				dictionary.ReadMeasure("@A2f", value, units);
+				A2f_ = value;
+			}
+			if ( dictionary.CheckOption("@A2b") == true ) 
+			{
+				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
+				dictionary.ReadMeasure("@A2b", value, units);
+				A2b_ = value;
+			}
+			if ( dictionary.CheckOption("@A3f") == true ) 
+			{
+				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
+				dictionary.ReadMeasure("@A3f", value, units);
+				A3f_ = value;
+			}
+			if ( dictionary.CheckOption("@A3b") == true ) 
+			{
+				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
+				dictionary.ReadMeasure("@A3b", value, units);
+				A3b_ = value;
+			}
+			if ( dictionary.CheckOption("@A4") == true ) 
+			{
+				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
+				dictionary.ReadMeasure("@A4", value, units);
+				A4_ = value;
+			}
+			if ( dictionary.CheckOption("@A5") == true ) 
+			{
+				if (units != "cm3,mol,s")	OpenSMOKE::FatalErrorMessage("Allowed frequency factor units: cm3,mol,s");
+				dictionary.ReadMeasure("@A5", value, units);
+				A5_ = value;
+			}
+		}
+
+		// Activation energies
+		{
+			double value;
+			std::string units;
+
+			if ( dictionary.CheckOption("@E1f") == true ) 
+			{
+				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
+				dictionary.ReadMeasure("@E1f", value, units);
+				E1f_ = value* 1e3 / Rgas;
+			}
+			if ( dictionary.CheckOption("@E1b") == true ) 
+			{
+				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
+				dictionary.ReadMeasure("@E1b", value, units);
+				E1b_ = value* 1e3 / Rgas;
+			}
+			if ( dictionary.CheckOption("@E2f") == true ) 
+			{
+				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
+				dictionary.ReadMeasure("@E2f", value, units);
+				E2f_ = value* 1e3 / Rgas;
+			}
+			if ( dictionary.CheckOption("@E2b") == true ) 
+			{
+				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
+				dictionary.ReadMeasure("@E2b", value, units);
+				E2b_ = value* 1e3 / Rgas;
+			}
+			if ( dictionary.CheckOption("@E3f") == true ) 
+			{
+				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
+				dictionary.ReadMeasure("@E3f", value, units);
+				E3f_ = value* 1e3 / Rgas;
+			}
+			if ( dictionary.CheckOption("@E3b") == true ) 
+			{
+				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
+				dictionary.ReadMeasure("@E3b", value, units);
+				E3b_ = value* 1e3 / Rgas;
+			}
+			if ( dictionary.CheckOption("@E4") == true ) 
+			{
+				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
+				dictionary.ReadMeasure("@E4", value, units);
+				E4_ = value* 1e3 / Rgas;
+			}
+			if ( dictionary.CheckOption("@E5") == true ) 
+			{
+				if (units != "kJ/mol")	OpenSMOKE::FatalErrorMessage("Allowed activation energy units: kJ/mol");
+				dictionary.ReadMeasure("@E5", value, units);
+				E5_ = value* 1e3 / Rgas;
+			}
+		}
+
+		// Temperature exponents
+		{
+			double value;
+
+			if ( dictionary.CheckOption("@n1f") == true ) 
+			{
+				dictionary.ReadDouble("@n1f", value);
+				n1f_ = value;
+			}
+			if ( dictionary.CheckOption("@n1b") == true )
+			{
+				dictionary.ReadDouble("@n1b", value);
+				n1b_ = value;
+			}
+			if ( dictionary.CheckOption("@n2f") == true ) 
+			{
+				dictionary.ReadDouble("@n2f", value);
+				n2f_ = value;
+			}
+			if ( dictionary.CheckOption("@n2b") == true ) 
+			{
+				dictionary.ReadDouble("@n2b", value);
+				n2b_ = value;
+			}
+			if ( dictionary.CheckOption("@n3f") == true ) 
+			{
+				dictionary.ReadDouble("@n3f", value);
+				n3f_ = value;
+			}
+			if ( dictionary.CheckOption("@n3b") == true ) 
+			{
+				dictionary.ReadDouble("@n3b", value);
+				n3b_ = value;
+			}
+			if ( dictionary.CheckOption("@n4") == true )  
+			{
+				dictionary.ReadDouble("@n4",  value);
+				n4_  = value;
+			}
+			if ( dictionary.CheckOption("@n5") == true ) 
+			{
+				dictionary.ReadDouble("@n5",  value);
+				n5_  = value;
+			}
+		}
+
+		if (dictionary.CheckOption("@Efficiency6") == true)
+		{
+			double value;
+			dictionary.ReadDouble("@Efficiency6", value);
+			eff6_ = value;
 		}
 	}
 
@@ -430,6 +638,53 @@ namespace OpenSMOKE
 		Cfm_ = std::sqrt(pi*KB / 2.0 / rho_soot_);
 		betaN_TV_ = 2.2 * 4 * std::sqrt(2.0)*std::pow(K_diam, 2.)*Cfm_;
 	}
+
+	void HMOM::Summary()
+	{
+		std::cout << std::endl;
+		std::cout << "-------------------------------------------------------------------" << std::endl;
+		std::cout << " HMOM (version December 2019)                                      " << std::endl;
+		std::cout << "-------------------------------------------------------------------" << std::endl;
+		
+		std::cout << " Kinetics (A=cm3,mol,s, E=kJ/mol)                                  " << std::endl;
+		std::cout << "  * R1f: " << A1f_ << " " << n1f_ << " " << E1f_*Rgas/1000.          << std::endl;
+		std::cout << "  * R1b: " << A1b_ << " " << n1b_ << " " << E1b_*Rgas/1000.          << std::endl;
+		std::cout << "  * R2f: " << A2f_ << " " << n2f_ << " " << E2f_*Rgas/1000.          << std::endl;
+		std::cout << "  * R2b: " << A2b_ << " " << n2b_ << " " << E2b_*Rgas/1000.          << std::endl;
+		std::cout << "  * R3f: " << A3f_ << " " << n3f_ << " " << E3f_*Rgas/1000.          << std::endl;
+		std::cout << "  * R3b: " << A3b_ << " " << n3b_ << " " << E3b_*Rgas/1000.          << std::endl;
+		std::cout << "  * R4:  " << A4_  << " " << n4_  << " " << E4_*Rgas/1000.           << std::endl;
+		std::cout << "  * R5:  " << A5_  << " " << n5_  << " " << E5_*Rgas/1000.           << std::endl;
+		std::cout << "  * R6:  " << eff6_                                                  << std::endl;
+		
+		std::cout << " Surface density                                                   " << std::endl;		
+		std::cout << "  * Surface density [#/m2]: " << surface_density_                    << std::endl;
+		if (surface_density_correction_coefficient_ == true)
+		{
+			std::cout << "  * Coefficient a1 [-]:   " << surface_density_coeff_a1_             << std::endl;
+			std::cout << "  * Coefficient a2 [1/K]: " << surface_density_coeff_a2_             << std::endl;
+			std::cout << "  * Coefficient b1 [-]:   " << surface_density_coeff_b1_             << std::endl;
+			std::cout << "  * Coefficient b2 [1/K]: " << surface_density_coeff_b2_             << std::endl;
+		}
+
+		std::cout << " Sub-models                                                        " << std::endl;		
+		std::cout << "  * Nucleation:      " << nucleation_model_                          << std::endl;
+		std::cout << "  * Condensation:    " << condensation_model_                   	   << std::endl;
+		std::cout << "  * Surface growth:  " << surface_growth_model_                      << std::endl;
+		std::cout << "  * Oxidation:       " << oxidation_model_                   	   << std::endl;
+		std::cout << "  * Coagulation:     " << coagulation_model_                   	   << std::endl;
+		std::cout << "  * Coagulation (C): " << coagulation_continous_model_               << std::endl;
+		std::cout << "  * Thermophoresis:  " << thermophoretic_model_                  	   << std::endl;
+		std::cout << "  * Radiation:       " << radiative_heat_transfer_              	   << std::endl;
+
+		std::cout << " Additional data                                                   " << std::endl;		
+		std::cout << "  * Sc number:       " << schmidt_number_                            << std::endl;
+		std::cout << "  * Sticking coeff:  " << sticking_coefficient_                      << std::endl;
+		std::cout << "  * Planck coeff:    " << soot_planck_coefficient_                   << std::endl;
+
+		std::cout << "-------------------------------------------------------------------" << std::endl;
+		std::cout << std::endl;
+	}
 	
 	void HMOM::SetNormalizedMoments(	const double M00_normalized, const double M10_normalized,
 										const double M01_normalized, const double N0_normalized)
@@ -489,6 +744,10 @@ namespace OpenSMOKE
 
 	void HMOM::CalculateSourceMoments()
 	{
+		// Correction coefficient for surface density
+		if (surface_density_correction_coefficient_ == true)
+			CalculateAlphaCoefficient();
+
 		// Dimer concentration
 		DimerConcentration();
 
@@ -575,6 +834,21 @@ namespace OpenSMOKE
 		}
 	}
 
+	void HMOM::CalculateAlphaCoefficient()
+	{
+		const double NL_threshold = 1e2;
+
+		const double a = surface_density_coeff_a1_ + surface_density_coeff_a2_*T_;
+		const double b = surface_density_coeff_b1_ + surface_density_coeff_b2_*T_;
+
+		double VL = V0_;
+		if (NL_ > NL_threshold)	VL = NLVL_/NL_;	//!< mean volume of large particles (2nd mode) [m3]
+
+		const double mu1 = VL*rho_soot_ / (WC/AvogadroNumber);
+
+		alpha_ = std::tanh(a/std::log(mu1) + b ); 
+	}
+
 	void HMOM::DimerConcentration()
 	{
 		betaN_ = betaN_TV_ * std::sqrt(T_) * std::pow(dimer_volume_, 1./6.);
@@ -595,13 +869,13 @@ namespace OpenSMOKE
 
 	void HMOM::SootKineticConstants()
 	{
-		const double k1f = A1f * std::pow(T_, n1f) * std::exp(-E1f / T_);
-		const double k2f = A2f * std::pow(T_, n2f) * std::exp(-E2f / T_);
-		const double k3f = A3f * std::pow(T_, n3f) * std::exp(-E3f / T_);
-		const double k1b = A1b * std::pow(T_, n1b) * std::exp(-E1b / T_);
-		const double k2b = A2b * std::pow(T_, n2b) * std::exp(-E2b / T_);
-		const double k3b = A3b * std::pow(T_, n3b) * std::exp(-E3b / T_);
-		const double k4 = A4  * std::pow(T_, n4)  * std::exp(-E4 / T_);
+		const double k1f = A1f_ * std::pow(T_, n1f_) * std::exp(-E1f_ / T_);
+		const double k2f = A2f_ * std::pow(T_, n2f_) * std::exp(-E2f_ / T_);
+		const double k3f = A3f_ * std::pow(T_, n3f_) * std::exp(-E3f_ / T_);
+		const double k1b = A1b_ * std::pow(T_, n1b_) * std::exp(-E1b_ / T_);
+		const double k2b = A2b_ * std::pow(T_, n2b_) * std::exp(-E2b_ / T_);
+		const double k3b = A3b_ * std::pow(T_, n3b_) * std::exp(-E3b_ / T_);
+		const double k4  = A4_  * std::pow(T_, n4_)  * std::exp(-E4_  / T_);
 
 		const double ratio = k1b*conc_H2O_ + k2b*conc_H2_ + k3b*conc_H_ + k4*conc_C2H2_;
 		double conc_sootStar = 0.;
@@ -619,24 +893,24 @@ namespace OpenSMOKE
 		conc_sootStar = conc_sootStar / (1.0 + conc_sootStar);
 		conc_sootStar = std::max(conc_sootStar, 0.0);
 
-		ksg_ = A4 * std::pow(T_, n4) * std::exp(-E4 / T_) * conc_C2H2_ * conc_sootStar;
+		ksg_ = A4_ * std::pow(T_, n4_) * std::exp(-E4_ / T_) * conc_C2H2_ * conc_sootStar;
 
-		const double k6 = 8.94  * eff6 * std::sqrt(T_) * AvogadroNumber;
-		kox_ = A5 * std::pow(T_, n5) * std::exp(-E5 / T_) * conc_O2_ * conc_sootStar +
-			(0.5 / surface_density_) * k6 * conc_OH_;
+		const double k6 = 8.94  * eff6_ * std::sqrt(T_) * AvogadroNumber;
+		kox_ = A5_ * std::pow(T_, n5_) * std::exp(-E5_ / T_) * conc_O2_ * conc_sootStar +
+			( 0.5/(alpha_*surface_density_) ) * k6 * conc_OH_;
 	}
 
 	void HMOM::SootSurfaceGrowthM4()
 	{
 		source_growth_(0) = 0.;
-		source_growth_(1) = ksg_ * surface_density_ * VC2_ * GetMoment(0., 1.) / AvogadroNumber / V0_;
-		source_growth_(2) = ksg_ * surface_density_ * VC2_ * K_fractal_ * GetMoment(Av_fractal_, As_fractal_ + 2.) / AvogadroNumber / S0_;
-		source_growth_(3) = -ksg_ * surface_density_ * S0_ * N0_ / AvogadroNumber;
+		source_growth_(1) = ksg_ * (alpha_*surface_density_) * VC2_ * GetMoment(0., 1.) / AvogadroNumber / V0_;
+		source_growth_(2) = ksg_ * (alpha_*surface_density_) * VC2_ * K_fractal_ * GetMoment(Av_fractal_, As_fractal_ + 2.) / AvogadroNumber / S0_;
+		source_growth_(3) = -ksg_ * (alpha_*surface_density_) * S0_ * N0_ / AvogadroNumber;
 	}
 
 	void HMOM::SootOxidationM4()
 	{
-		const double coefficient = kox_ * surface_density_ * VC2_;
+		const double coefficient = kox_ * (alpha_*surface_density_) * VC2_;
 		const double M01 = GetMissingMoment(0., 1.);
 		const double M_12 = GetMissingMoment(-1., 2.);
 
@@ -852,7 +1126,7 @@ namespace OpenSMOKE
 		// VL = (M10-N0*V0)/NL
 		// SL = (M01-N0*S0)/NL
 
-		NL_ = M00_ - N0_;						//!< number density associated to large particles (2nd mode) [#/m3]
+		NL_ = M00_ - N0_;		//!< number density associated to large particles (2nd mode) [#/m3]
 		NLVL_ = M10_ - V0_*N0_;		//!< mean volume of large particles (2nd mode) multiplied by NL [#]
 		NLSL_ = M01_ - S0_*N0_;		//!< mean surface of large particles (2nd mode) multiplied by NL [#/m]
 	}

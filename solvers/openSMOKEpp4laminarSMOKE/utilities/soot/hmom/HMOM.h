@@ -443,6 +443,195 @@ namespace OpenSMOKE
 		*/
 		double schmidt_number() const { return schmidt_number_; }
 
+	public:
+
+		/**
+		*@brief Sets the surface density correction coefficient
+		*@param value the surface density correction coefficient (default: false)
+		*/
+		void SetSurfaceDensityCorrectionCoefficient(const bool value) { surface_density_correction_coefficient_ = value; }
+
+		/**
+		*@brief Sets the surface density correction coefficient formula: a = a1 + a2*T
+		*@param value the surface density correction coefficient formula: a = a1 + a2*T
+		*/
+		void SetSurfaceDensityCorrectionCoefficientA1(const double value) { surface_density_coeff_a1_ = value; }
+
+		/**
+		*@brief Sets the surface density correction coefficient formula: a = a1 + a2*T
+		*@param value the surface density correction coefficient formula: a = a1 + a2*T
+		*/
+		void SetSurfaceDensityCorrectionCoefficientA2(const double value) { surface_density_coeff_a2_ = value; }
+
+		/**
+		*@brief Sets the surface density correction coefficient formula: b = b1 + b2*T
+		*@param value the surface density correction coefficient formula: b = b1 + b2*T
+		*/
+		void SetSurfaceDensityCorrectionCoefficientB1(const double value) { surface_density_coeff_b1_ = value; }
+
+		/**
+		*@brief Sets the surface density correction coefficient formula: b = b1 + b2*T
+		*@param value the surface density correction coefficient formula: b = b1 + b2*T
+		*/
+		void SetSurfaceDensityCorrectionCoefficientB2(const double value) { surface_density_coeff_b2_ = value; }
+	
+	public:
+
+		/**
+		*@brief Sets the frequency factor of reaction 1:
+		*@param value the frequency factor value (cm3, mol, s)
+		*/
+		void SetA1f(const double value) { A1f_ = value; }
+
+		/**
+		*@brief Sets the frequency factor of reaction 1:
+		*@param value the frequency factor value (cm3, mol, s)
+		*/
+		void SetA1b(const double value) { A1b_ = value; }
+
+		/**
+		*@brief Sets the frequency factor of reaction 2:
+		*@param value the frequency factor value (cm3, mol, s)
+		*/
+		void SetA2f(const double value) { A2f_ = value; }
+
+		/**
+		*@brief Sets the frequency factor of reaction 2:
+		*@param value the frequency factor value (cm3, mol, s)
+		*/
+		void SetA2b(const double value) { A2b_ = value; }
+
+		/**
+		*@brief Sets the frequency factor of reaction 3:
+		*@param value the frequency factor value (cm3, mol, s)
+		*/
+		void SetA3f(const double value) { A3f_ = value; }
+
+		/**
+		*@brief Sets the frequency factor of reaction 3:
+		*@param value the frequency factor value (cm3, mol, s)
+		*/
+		void SetA3b(const double value) { A3b_ = value; }
+
+		/**
+		*@brief Sets the frequency factor of reaction 4:
+		*@param value the frequency factor value (cm3, mol, s)
+		*/
+		void SetA4(const double value) { A4_ = value; }
+
+		/**
+		*@brief Sets the frequency factor of reaction 5:
+		*@param value the frequency factor value (cm3, mol, s)
+		*/
+		void SetA5(const double value) { A5_ = value; }
+
+		/**
+		*@brief Sets the activation energy of reaction 1:
+		*@param value the activation energy (kJ/mol)
+		*/
+		void SetE1f(const double value) { E1f_ = value * 1e3 / Rgas; }
+
+		/**
+		*@brief Sets the activation energy of reaction 1:
+		*@param value the activation energy (kJ/mol)
+		*/
+		void SetE1b(const double value) { E1b_ = value * 1e3 / Rgas; }
+
+		/**
+		*@brief Sets the activation energy of reaction 2:
+		*@param value the activation energy (kJ/mol)
+		*/
+		void SetE2f(const double value) { E2f_ = value * 1e3 / Rgas; }
+
+		/**
+		*@brief Sets the activation energy of reaction 2:
+		*@param value the activation energy (kJ/mol)
+		*/
+		void SetE2b(const double value) { E2b_ = value * 1e3 / Rgas; }
+
+		/**
+		*@brief Sets the activation energy of reaction 3:
+		*@param value the activation energy (kJ/mol)
+		*/
+		void SetE3f(const double value) { E3f_ = value * 1e3 / Rgas; }
+
+		/**
+		*@brief Sets the activation energy of reaction 3:
+		*@param value the activation energy (kJ/mol)
+		*/
+		void SetE3b(const double value) { E3b_ = value * 1e3 / Rgas; }
+
+		/**
+		*@brief Sets the activation energy of reaction 4:
+		*@param value the activation energy (kJ/mol)
+		*/
+		void SetE4(const double value) { E4_ = value * 1e3 / Rgas; }
+
+		/**
+		*@brief Sets the activation energy of reaction 5:
+		*@param value the activation energy (kJ/mol)
+		*/
+		void SetE5(const double value) { E5_ = value * 1e3 / Rgas; }
+
+		/**
+		*@brief Sets the temperature exponent of reaction 1:
+		*@param value the temperature exponent
+		*/
+		void Setn1f(const double value) { n1f_ = value; }
+
+		/**
+		*@brief Sets the temperature exponent of reaction 1:
+		*@param value the temperature exponent
+		*/
+		void Setn1b(const double value) { n1b_ = value; }
+
+		/**
+		*@brief Sets the temperature exponent of reaction 2:
+		*@param value the temperature exponent
+		*/
+		void Setn2f(const double value) { n2f_ = value; }
+
+		/**
+		*@brief Sets the temperature exponent of reaction 2:
+		*@param value the temperature exponent
+		*/
+		void Setn2b(const double value) { n2b_ = value; }
+
+		/**
+		*@brief Sets the temperature exponent of reaction 3:
+		*@param value the temperature exponent
+		*/
+		void Setn3f(const double value) { n3f_ = value; }
+
+		/**
+		*@brief Sets the temperature exponent of reaction 3:
+		*@param value the temperature exponent
+		*/
+		void Setn3b(const double value) { n3b_ = value; }
+
+		/**
+		*@brief Sets the temperature exponent of reaction 4:
+		*@param value the temperature exponent
+		*/
+		void Setn4(const double value) { n4_ = value; }
+
+		/**
+		*@brief Sets the temperature exponent of reaction 5:
+		*@param value the temperature exponent
+		*/
+		void Setn5(const double value) { n5_ = value; }
+
+		/**
+		*@brief Sets the efficiency of reaction 6:
+		*@param value the efficiency
+		*/
+		void SetEfficiency6(const double value) { eff6_ = value; }
+
+		/**
+		*@brief Prints a summary on the screen
+		*/
+		void Summary();
+
 	private:
 
 		/**
@@ -528,6 +717,11 @@ namespace OpenSMOKE
 		*@brief Calculates the coagulation (continous) source terms
 		*/
 		void SootCoagulationContinousM4();
+
+		/**
+		*@brief Calculates the alpha coefficient for correcting the surface density
+		*/
+		void CalculateAlphaCoefficient();
 
 		/**
 		*@brief Calculates the coagulation (continous) source terms (small/small)
@@ -638,7 +832,42 @@ namespace OpenSMOKE
 
 		double schmidt_number_;				//!< soot Schmidt number
 		double sticking_coefficient_;			//!< sticking coefficient
-		double surface_density_;			//!< surface density []#/m2
+
+		double surface_density_;			//!< surface density [#/m2]
+		double surface_density_correction_coefficient_;	//!< surface density correction coefficient on/off
+		double surface_density_coeff_a1_;		//!< coefficient in correction coefficient formula: a=a1+a2*T [-]
+		double surface_density_coeff_a2_; 		//!< coefficient in correction coefficient formula: a=a1+a2*T [1/K]
+		double surface_density_coeff_b1_; 		//!< coefficient in correction coefficient formula: b=b1+b2*T [-]
+		double surface_density_coeff_b2_;		//!< coefficient in correction coefficient formula: b=b1+b2*T [1/K]
+		double alpha_;					//!< correction coefficient
+
+	private:
+
+		double A1f_;
+		double n1f_;
+		double E1f_;
+		double A1b_;
+		double n1b_;
+		double E1b_;
+		double A2f_;
+		double n2f_;
+		double E2f_;
+		double A2b_;
+		double n2b_;
+		double E2b_;
+		double A3f_;
+		double n3f_;
+		double E3f_;
+		double A3b_;
+		double n3b_;
+		double E3b_;
+		double A4_;
+		double n4_;
+		double E4_;
+		double A5_;
+		double n5_;
+		double E5_;
+		double eff6_;
 
 	private:
 
@@ -649,32 +878,6 @@ namespace OpenSMOKE
 		static const double K_spher;
 		static const double Rgas;
 		static const double KB;
-
-		static const double A1f;
-		static const double n1f;
-		static const double E1f;
-		static const double A1b;
-		static const double n1b;
-		static const double E1b;
-		static const double A2f;
-		static const double n2f;
-		static const double E2f;
-		static const double A2b;
-		static const double n2b;
-		static const double E2b;
-		static const double A3f;
-		static const double n3f;
-		static const double E3f;
-		static const double A3b;
-		static const double n3b;
-		static const double E3b;
-		static const double A4;
-		static const double n4;
-		static const double E4;
-		static const double A5;
-		static const double n5;
-		static const double E5;
-		static const double eff6;
 	};
 }
 

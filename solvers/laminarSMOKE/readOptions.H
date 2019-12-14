@@ -217,13 +217,48 @@ int hmom_coagulation = 1;
 int hmom_coagulation_continous = 1;
 double hmom_schmidt_number = 50.;
 
-double hmom_surface_density = 1.7e19;
+
 double hmom_sticking_coefficient = 0.002;
 double hmom_soot_density = 1800.;
 int hmom_thermophoretic_model = 1;
 
 scalar hmom_minimum_normalized_value = 1.e-16;
 scalar hmom_minimum_fv_for_integration = 1.e-16;
+
+// Surface density correction
+double hmom_surface_density = 1.7e19;
+Switch hmom_surface_density_correction_coefficient = false;	
+double hmom_surface_density_coeff_a1 = 12.65;		// [-]
+double hmom_surface_density_coeff_a2 = 0.00563; 	// [1/K]
+double hmom_surface_density_coeff_b1 = 1.38; 		// [-]
+double hmom_surface_density_coeff_b2 = 0.00069;		// [1/K]
+
+// Kinetics (default values)
+double hmom_A1f = 6.72e1;
+double hmom_n1f = 3.33;
+double hmom_E1f = 6.09;
+double hmom_A1b = 6.44e-1;
+double hmom_n1b = 3.79;
+double hmom_E1b = 27.96;
+double hmom_A2f = 1.00e8;
+double hmom_n2f = 1.80;
+double hmom_E2f = 68.42;
+double hmom_A2b = 8.68e4;
+double hmom_n2b = 2.36;
+double hmom_E2b = 25.46;
+double hmom_A3f = 1.13e16;
+double hmom_n3f = -0.06;
+double hmom_E3f = 476.05;
+double hmom_A3b = 4.17e13;
+double hmom_n3b = 0.15;
+double hmom_E3b = 0.00;
+double hmom_A4 = 2.52e9;
+double hmom_n4 = 1.10;
+double hmom_E4 = 17.13;
+double hmom_A5 = 2.20e12;
+double hmom_n5 = 0.00;
+double hmom_E5 = 31.38;
+double hmom_eff6 = 0.13;
 
 
 const dictionary& hmomDictionary = solverOptions.subDict("HMOM");
@@ -264,13 +299,48 @@ const dictionary& hmomDictionary = solverOptions.subDict("HMOM");
 
 		hmom_schmidt_number = hmomDictionary.lookupOrDefault<scalar>(word("schmidt_number"),  scalar(50.));
 
-		hmom_surface_density = hmomDictionary.lookupOrDefault<scalar>(word("surface_density"),  scalar(1.7e19));
 		hmom_sticking_coefficient = hmomDictionary.lookupOrDefault<scalar>(word("sticking_coefficient"),  scalar(0.002));
 		hmom_soot_density = hmomDictionary.lookupOrDefault<scalar>(word("soot_density"),  scalar(1800.));
 		hmom_thermophoretic_model = hmomDictionary.lookupOrDefault<label>(word("thermophoretic_model"),  label(1));
 
 		hmom_minimum_normalized_value   = hmomDictionary.lookupOrDefault<scalar>(word("mininum_normalized_value"),  scalar(1.e-16));
 		hmom_minimum_fv_for_integration = hmomDictionary.lookupOrDefault<scalar>(word("mininum_fv_for_integration"),  scalar(1.e-16));
+
+		hmom_A1f   = hmomDictionary.lookupOrDefault<scalar>(word("A1f"),  scalar(hmom_A1f));
+		hmom_A1b   = hmomDictionary.lookupOrDefault<scalar>(word("A1b"),  scalar(hmom_A1b));
+		hmom_A2f   = hmomDictionary.lookupOrDefault<scalar>(word("A2f"),  scalar(hmom_A2f));
+		hmom_A2b   = hmomDictionary.lookupOrDefault<scalar>(word("A2b"),  scalar(hmom_A2b));
+		hmom_A3f   = hmomDictionary.lookupOrDefault<scalar>(word("A3f"),  scalar(hmom_A3f));
+		hmom_A3b   = hmomDictionary.lookupOrDefault<scalar>(word("A3b"),  scalar(hmom_A3b));	
+		hmom_A4    = hmomDictionary.lookupOrDefault<scalar>(word("A4"),   scalar(hmom_A4));
+		hmom_A5    = hmomDictionary.lookupOrDefault<scalar>(word("A5"),   scalar(hmom_A5));	
+
+		hmom_E1f   = hmomDictionary.lookupOrDefault<scalar>(word("E1f"),  scalar(hmom_E1f));
+		hmom_E1b   = hmomDictionary.lookupOrDefault<scalar>(word("E1b"),  scalar(hmom_E1b));
+		hmom_E2f   = hmomDictionary.lookupOrDefault<scalar>(word("E2f"),  scalar(hmom_E2f));
+		hmom_E2b   = hmomDictionary.lookupOrDefault<scalar>(word("E2b"),  scalar(hmom_E2b));
+		hmom_E3f   = hmomDictionary.lookupOrDefault<scalar>(word("E3f"),  scalar(hmom_E3f));
+		hmom_E3b   = hmomDictionary.lookupOrDefault<scalar>(word("E3b"),  scalar(hmom_E3b));	
+		hmom_E4    = hmomDictionary.lookupOrDefault<scalar>(word("E4"),   scalar(hmom_E4));
+		hmom_E5    = hmomDictionary.lookupOrDefault<scalar>(word("E5"),   scalar(hmom_E5));	
+
+		hmom_n1f   = hmomDictionary.lookupOrDefault<scalar>(word("n1f"),  scalar(hmom_n1f));
+		hmom_n1b   = hmomDictionary.lookupOrDefault<scalar>(word("n1b"),  scalar(hmom_n1b));
+		hmom_n2f   = hmomDictionary.lookupOrDefault<scalar>(word("n2f"),  scalar(hmom_n2f));
+		hmom_n2b   = hmomDictionary.lookupOrDefault<scalar>(word("n2b"),  scalar(hmom_n2b));
+		hmom_n3f   = hmomDictionary.lookupOrDefault<scalar>(word("n3f"),  scalar(hmom_n3f));
+		hmom_n3b   = hmomDictionary.lookupOrDefault<scalar>(word("n3b"),  scalar(hmom_n3b));	
+		hmom_n4    = hmomDictionary.lookupOrDefault<scalar>(word("n4"),   scalar(hmom_n4));
+		hmom_n5    = hmomDictionary.lookupOrDefault<scalar>(word("n5"),   scalar(hmom_n5));	
+
+		hmom_eff6  = hmomDictionary.lookupOrDefault<scalar>(word("Eff6"),   scalar(hmom_eff6));
+
+		hmom_surface_density = hmomDictionary.lookupOrDefault<scalar>(word("surface_density"),  scalar(hmom_surface_density));
+		hmom_surface_density_correction_coefficient = Switch(hmomDictionary.lookup(word("surface_density_correction")));
+		hmom_surface_density_coeff_a1 = hmomDictionary.lookupOrDefault<scalar>(word("surface_density_a1"),  scalar(hmom_surface_density_coeff_a1));
+		hmom_surface_density_coeff_a2 = hmomDictionary.lookupOrDefault<scalar>(word("surface_density_a2"),  scalar(hmom_surface_density_coeff_a2));
+		hmom_surface_density_coeff_b1 = hmomDictionary.lookupOrDefault<scalar>(word("surface_density_b1"),  scalar(hmom_surface_density_coeff_b1));
+		hmom_surface_density_coeff_b2 = hmomDictionary.lookupOrDefault<scalar>(word("surface_density_b2"),  scalar(hmom_surface_density_coeff_b2));
 
 		Info << "HMOM: surface density (#/m2): " << hmom_surface_density << endl;
 		Info << "HMOM: sticking coefficient:   " << hmom_sticking_coefficient << endl;

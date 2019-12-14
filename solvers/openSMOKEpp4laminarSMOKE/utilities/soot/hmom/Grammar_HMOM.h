@@ -144,6 +144,155 @@ namespace OpenSMOKE
 				OpenSMOKE::SINGLE_MEASURE,
 				"Surface density (default: 1.7 #/m2)",
 				false));
+
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@SurfaceDensityCorrectionCoefficient",
+				OpenSMOKE::SINGLE_BOOL,
+				"SurfaceDensityCorrectionCoefficient (default: false)",
+				false));
+
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@SurfaceDensityCorrectionCoefficientA1",
+				OpenSMOKE::SINGLE_DOUBLE,
+				"SurfaceDensityCorrectionCoefficientA1 (default: 12.65)",
+				false));
+
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@SurfaceDensityCorrectionCoefficientA2",
+				OpenSMOKE::SINGLE_DOUBLE,
+				"SurfaceDensityCorrectionCoefficientA2 (default: -0.00563)",
+				false));
+
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@SurfaceDensityCorrectionCoefficientB1",
+				OpenSMOKE::SINGLE_DOUBLE,
+				"SurfaceDensityCorrectionCoefficientB1 (default: -1.38)",
+				false));
+
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@SurfaceDensityCorrectionCoefficientB2",
+				OpenSMOKE::SINGLE_DOUBLE,
+				"SurfaceDensityCorrectionCoefficientB2 (default: 0.00069)",
+				false));
+
+			// ----------------------------------------------------------------------------------------------------------- //
+			// Reaction 1: Soot-H + OH = Soot* + H2O
+			// ----------------------------------------------------------------------------------------------------------- //
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@A1f",
+				OpenSMOKE::SINGLE_MEASURE,
+				"Frequency factor reaction 1 (forward): Soot-H + OH = Soot* + H2O (default: 6.72e1 cm3,mol,s)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@A1b",
+				OpenSMOKE::SINGLE_MEASURE,
+				"Frequency factor reaction 1 (backward): Soot-H + OH = Soot* + H2O (default: 6.44e-1 cm3,mol,s)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@n1f",
+				OpenSMOKE::SINGLE_DOUBLE,
+				"Temperature exponent reaction 1 (forward): Soot-H + OH = Soot* + H2O (default: 3.33)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@n1b",
+				OpenSMOKE::SINGLE_DOUBLE,
+				"Temperature exponent reaction 1 (backward): Soot-H + OH = Soot* + H2O (default: 3.79)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@E1f",
+				OpenSMOKE::SINGLE_MEASURE,
+				"Activation energy reaction 1 (forward): Soot-H + OH = Soot* + H2O (default: 6.09 kJ/mol)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@E1b",
+				OpenSMOKE::SINGLE_MEASURE,
+				"Activation energy reaction 1 (backward): Soot-H + OH = Soot* + H2O (default: 27.96 kJ/mol)",
+				false));
+
+			// ----------------------------------------------------------------------------------------------------------- //
+			// Reaction 2: Soot-H + H = Soot* + H2
+			// ----------------------------------------------------------------------------------------------------------- //
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@A2f",
+				OpenSMOKE::SINGLE_MEASURE,
+				"Frequency factor reaction 2 (forward): Soot-H + H = Soot* + H2 (default: 1e8 cm3,mol,s)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@A2b",
+				OpenSMOKE::SINGLE_MEASURE,
+				"Frequency factor reaction 2 (backward): Soot-H + H = Soot* + H2 (default: 8.68e4 cm3,mol,s)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@n2f",
+				OpenSMOKE::SINGLE_DOUBLE,
+				"Temperature exponent reaction 2 (forward): Soot-H + H = Soot* + H2 (default: 1.80)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@n2b",
+				OpenSMOKE::SINGLE_DOUBLE,
+				"Temperature exponent reaction 2 (backward): Soot-H + H = Soot* + H2 (default: 2.36)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@E2f",
+				OpenSMOKE::SINGLE_MEASURE,
+				"Activation energy reaction 2 (forward): Soot-H + H = Soot* + H2 (default: 68.42 kJ/mol)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@E2b",
+				OpenSMOKE::SINGLE_MEASURE,
+				"Activation energy reaction 2 (backward): Soot-H + H = Soot* + H2 (default: 25.46 kJ/mol)",
+				false));
+
+			// ----------------------------------------------------------------------------------------------------------- //
+			// Reaction 3: Soot + H = Soot* + H
+			// ----------------------------------------------------------------------------------------------------------- //
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@A3f",
+				OpenSMOKE::SINGLE_MEASURE,
+				"Frequency factor reaction 3 (forward): Soot + H = Soot* + H (default: 1.13e16 cm3,mol,s)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@A3b",
+				OpenSMOKE::SINGLE_MEASURE,
+				"Frequency factor reaction 3 (backward): Soot + H = Soot* + H (default: 4.17e13 cm3,mol,s)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@n3f",
+				OpenSMOKE::SINGLE_DOUBLE,
+				"Temperature exponent reaction 3 (forward): Soot + H = Soot* + H (default: -0.06)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@n3b",
+				OpenSMOKE::SINGLE_DOUBLE,
+				"Temperature exponent reaction 3 (backward): Soot + H = Soot* + H (default: 0.15)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@E3f",
+				OpenSMOKE::SINGLE_MEASURE,
+				"Activation energy reaction 3 (forward): Soot + H = Soot* + H (default: 476.05 kJ/mol)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@E3b",
+				OpenSMOKE::SINGLE_MEASURE,
+				"Activation energy reaction 3 (backward): Soot + H = Soot* + H (default: 0 kJ/mol)",
+				false));
+
+			// ----------------------------------------------------------------------------------------------------------- //
+			// Reaction 4: Soot* + C2H2 => Soot-H
+			// ----------------------------------------------------------------------------------------------------------- //
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@A4",
+				OpenSMOKE::SINGLE_MEASURE,
+				"Frequency factor reaction 4: Soot* + C2H2 => Soot-H (default: 2.52e9 cm3,mol,s)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@n4",
+				OpenSMOKE::SINGLE_DOUBLE,
+				"Temperature exponent reaction 4: Soot* + C2H2 => Soot-H (default: 1.10)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@E4",
+				OpenSMOKE::SINGLE_MEASURE,
+				"Activation energy reaction 4: Soot* + C2H2 => Soot-H (default: 17.13 kJ/mol)",
+				false));
+
+			// ----------------------------------------------------------------------------------------------------------- //
+			// Reaction 5: Soot* + O2 => Soot-H + 2CO
+			// ----------------------------------------------------------------------------------------------------------- //
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@A5",
+				OpenSMOKE::SINGLE_MEASURE,
+				"Frequency factor reaction 5: Soot* + O2 => Soot-H + 2CO (default: 2.20e12 cm3,mol,s)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@n5",
+				OpenSMOKE::SINGLE_DOUBLE,
+				"Temperature exponent reaction 5: Soot* + O2 => Soot-H + 2CO (default: 0)",
+				false));
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@E5",
+				OpenSMOKE::SINGLE_MEASURE,
+				"Activation energy reaction 5: Soot* + O2 => Soot-H + 2CO (default: 31.38 kJ/mol)",
+				false));
+
+			// ----------------------------------------------------------------------------------------------------------- //
+			// Reaction 6: Soot-H + OH => Soot-H + CO
+			// ----------------------------------------------------------------------------------------------------------- //
+			AddKeyWord(OpenSMOKE::OpenSMOKE_DictionaryKeyWord("@Efficiency6",
+				OpenSMOKE::SINGLE_DOUBLE,
+				"Efficiency reaction 6: Soot-H + OH => Soot-H + CO (default: 0.13)",
+				false));
 		}
 	};
 }
