@@ -80,6 +80,20 @@ volScalarField omega_C
     	dimensionedScalar("omega_O", dimensionSet(0, 0, 0, 0, 0), 0.0)
 );
 
+volScalarField omega_N
+(
+	IOobject
+	(
+		"omega_N",
+		mesh.time().timeName(),
+		mesh,
+		IOobject::NO_READ,
+		IOobject::NO_WRITE
+	),
+	mesh,
+    	dimensionedScalar("omega_N", dimensionSet(0, 0, 0, 0, 0), 0.0)
+);
+
 {
 	unsigned int ns = Y.size();
 	OpenSMOKE::OpenSMOKEVectorDouble massFractions(ns);
@@ -92,17 +106,20 @@ volScalarField omega_C
 	scalarField& omega_CCells = omega_C.ref();
 	scalarField& omega_HCells = omega_H.ref();
 	scalarField& omega_OCells = omega_O.ref();
+	scalarField& omega_NCells = omega_N.ref();
 	#else
 	scalarField& rhoCells = rho.internalField();
 	scalarField& omega_CCells = omega_C.internalField();
 	scalarField& omega_HCells = omega_H.internalField();
 	scalarField& omega_OCells = omega_O.internalField();
+	scalarField& omega_NCells = omega_N.internalField();
 	#endif
 
 
 	const unsigned int jC = thermodynamicsMapXML->IndexOfElementWithoutError("C");
 	const unsigned int jO = thermodynamicsMapXML->IndexOfElementWithoutError("O");
 	const unsigned int jH = thermodynamicsMapXML->IndexOfElementWithoutError("H");
+	const unsigned int jN = thermodynamicsMapXML->IndexOfElementWithoutError("N");
 
 	forAll(TCells, celli)
 	{
@@ -129,6 +146,11 @@ volScalarField omega_C
 			for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 				omega_HCells[celli] += thermodynamicsMapXML->atomic_composition()(i,jH-1)*moleFractions[i+1]*OpenSMOKE::AtomicWeights["H"]/MWmix;
 		}	
+		if (jN>0)
+		{
+			for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
+				omega_NCells[celli] += thermodynamicsMapXML->atomic_composition()(i,jN-1)*moleFractions[i+1]*OpenSMOKE::AtomicWeights["N"]/MWmix;
+		}	
 	}
 
 	const fvPatchList& patches = mesh.boundary();
@@ -138,10 +160,12 @@ volScalarField omega_C
 		fvPatchScalarField& pomega_O  = omega_O.boundaryFieldRef()[patchi];
 		fvPatchScalarField& pomega_H  = omega_H.boundaryFieldRef()[patchi];
 		fvPatchScalarField& pomega_C  = omega_C.boundaryFieldRef()[patchi];
+		fvPatchScalarField& pomega_N  = omega_N.boundaryFieldRef()[patchi];
 		#else
 		fvPatchScalarField& pomega_O  = omega_O.boundaryField()[patchi];
 		fvPatchScalarField& pomega_H  = omega_H.boundaryField()[patchi];
 		fvPatchScalarField& pomega_C  = omega_C.boundaryField()[patchi];
+		fvPatchScalarField& pomega_N  = omega_N.boundaryField()[patchi];
 		#endif
 		
 		forAll(pomega_H, facei)
@@ -149,6 +173,7 @@ volScalarField omega_C
 			pomega_H[facei] = 0.;
 			pomega_O[facei] = 0.;
 			pomega_C[facei] = 0.;
+			pomega_N[facei] = 0.;
 			
 			for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 				massFractions[i+1] = Y[i].boundaryField()[patchi][facei];
@@ -172,6 +197,20 @@ volScalarField omega_C
 				for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
 					pomega_H[facei] += thermodynamicsMapXML->atomic_composition()(i,jH-1)*moleFractions[i+1]*OpenSMOKE::AtomicWeights["H"]/MWmix;
 			}	
+			if (jN>0)
+			{
+				for(int i=0;i<thermodynamicsMapXML->NumberOfSpecies();i++)
+					pomega_N[facei] += thermodynamicsMapXML->atomic_composition()(i,jN-1)*moleFractions[i+1]*OpenSMOKE::AtomicWeights["N"]/MWmix;
+			}	
 		}
+	}
+
+	if (calculateElementsMassFractions == true)
+	{
+		Info<< "Reconstructing elements mass fractions\n" << endl;
+		omega_H.write();
+		omega_C.write();
+		omega_N.write();
+		omega_O.write();
 	}
 }
