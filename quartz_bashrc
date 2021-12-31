@@ -25,3 +25,6 @@ export EIGEN3_ROOT=$HOME/soot/local/eigen/eigen-3.3.8
 
 export PATH=/usr/tce/packages/gcc/gcc-4.9.3/bin:$PATH
 
+export BOOST_LIBRARY_PATH=/usr/tce/packages/boost/boost-1.72.0-mvapich2-2.3-gcc-4.9.3/
+export BOOST_ROOT=$BOOST_LIBRARY_PATH
+export LD_LIBRARY_PATH=$BOOST_LIBRARY_PATH/lib:$LD_LIBRARY_PATH
