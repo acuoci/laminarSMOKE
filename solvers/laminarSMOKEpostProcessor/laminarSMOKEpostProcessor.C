@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
 	bool calculateMoleFractions = false;
 	bool calculateConcentrations = false;
 	bool calculateHeatRelease = false;
-	
+	bool calculateElementsMassFractions = false;
 	
 	bool xmlProbeLocations = false;
 	bool exportDisks = false;
@@ -255,6 +255,7 @@ int main(int argc, char *argv[])
 		calculateRatesAcrossBoundaries = Switch(postProcessingDictionary.lookupOrDefault(word("flowRates"), word("off")));
 		calculateLocalStrainRate = Switch(postProcessingDictionary.lookupOrDefault(word("localStrainRate"), word("off")));
 		calculateHeatRelease = Switch(postProcessingDictionary.lookupOrDefault(word("heatRelease"), word("off")));
+		calculateElementsMassFractions = Switch(postProcessingDictionary.lookupOrDefault(word("elementsMassFractions"), word("off")));
 
 		reconstructMixtureFraction = Switch(postProcessingDictionary.lookupOrDefault(word("reconstructMixtureFraction"), word("off")));
 
