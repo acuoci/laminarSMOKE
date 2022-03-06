@@ -362,6 +362,7 @@ void BatchReactorHomogeneousConstantPressure::Equations(double* y, std::vector<d
 
 int BatchReactorHomogeneousConstantPressure::Print(const double t, const OpenSMOKE::OpenSMOKEVectorDouble& y)
 {
+	return 0;
 }
 
 #endif // BatchReactorHomogeneousConstantPressure_H
