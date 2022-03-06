@@ -206,6 +206,7 @@ void BatchReactorHomogeneousConstantVolume::Equations(double* y, std::vector<dou
 
 int BatchReactorHomogeneousConstantVolume::Print(const double t, const OpenSMOKE::OpenSMOKEVectorDouble& y)
 {
+	return 0;
 }
 
 #endif // BatchReactorHomogeneousConstantVolume_H

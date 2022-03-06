@@ -213,6 +213,7 @@ void BatchReactorHomogeneousConstantPressureVirtualChemistry::Equations(double* 
 
 int BatchReactorHomogeneousConstantPressureVirtualChemistry::Print(const double t, const OpenSMOKE::OpenSMOKEVectorDouble& y)
 {
+	return 0;
 }
 
 #endif // BatchReactorHomogeneousConstantPressureVirtualChemistry_H
